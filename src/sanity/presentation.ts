@@ -45,33 +45,47 @@ export const presentationTools: PluginOptions[] = BRAND_KEYS.map((key) =>
           select: {
             title: 'title',
             slug: 'slug.current',
+            brand: 'brand',
           },
-          resolve: (doc) => ({
-            locations: [
-              {
-                title: doc?.title ?? 'Untitled',
-                href: doc?.slug === 'home' ? '/' : `/${doc?.slug}`,
-              },
-            ],
-          }),
+          resolve: (doc) => {
+            if (doc?.brand !== key) {
+              return null
+            }
+
+            return {
+              locations: [
+                {
+                  title: doc?.title ?? 'Untitled',
+                  href: doc?.slug === 'home' ? '/' : `/${doc?.slug}`,
+                },
+              ],
+            }
+          },
         }),
         post: defineLocations({
           select: {
             title: 'title',
             slug: 'slug.current',
+            brands: 'brands',
           },
-          resolve: (doc) => ({
-            locations: [
-              {
-                title: doc?.title ?? 'Untitled',
-                href: `/posts/${doc?.slug}`,
-              },
-              {
-                title: 'Posts',
-                href: '/posts',
-              },
-            ],
-          }),
+          resolve: (doc) => {
+            if (!doc?.brands?.includes(key)) {
+              return null
+            }
+
+            return {
+              locations: [
+                {
+                  title: doc?.title ?? 'Untitled',
+                  href: `/posts/${doc?.slug}`,
+                },
+                {
+                  title: 'Posts',
+                  href: '/posts',
+                },
+              ],
+            }
+          },
         }),
       },
     },

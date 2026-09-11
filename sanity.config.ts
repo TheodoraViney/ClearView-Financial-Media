@@ -1,8 +1,7 @@
-import { visionTool } from '@sanity/vision'
 import { defineConfig, type Template } from 'sanity'
 import { structureTool } from 'sanity/structure'
 
-import { apiVersion, dataset, projectId } from './src/sanity/env'
+import { dataset, projectId } from './src/sanity/env'
 import { presentationTools } from './src/sanity/presentation'
 import { schemaTypes } from './src/sanity/schema'
 import { structure } from './src/sanity/structure'
@@ -37,5 +36,6 @@ export default defineConfig({
       postByBrandTemplate,
     ],
   },
-  plugins: [structureTool({ structure }), ...presentationTools, visionTool({ defaultApiVersion: apiVersion })],
+  plugins: [structureTool({ structure }), ...presentationTools],
+  releases: { enabled: false },
 })
