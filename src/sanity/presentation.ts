@@ -8,7 +8,9 @@ export function brandOrigin(key: BrandKey): string {
     return `https://www.${BRANDS[key].domain}`
   }
 
-  return `http://${key}.localhost:3000`
+  const protocol = process.env.NEXT_PUBLIC_DEV_HTTPS === 'true' ? 'https' : 'http'
+
+  return `${protocol}://${key}.localhost:3000`
 }
 
 export const presentationTools: PluginOptions[] = BRAND_KEYS.map((key) =>

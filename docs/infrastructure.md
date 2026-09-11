@@ -230,12 +230,39 @@ Add these lines to `/etc/hosts` for those tools:
 The Studio runs at `http://clearview.localhost:3000/studio`.
 Any of the four local hosts serves the same Studio, since the Studio route is not brand-scoped.
 
+### Two dev modes
+
+`pnpm dev` serves plain HTTP.
+In this mode the Presentation tool previews only the brand whose host serves the Studio.
+Previews of the other three brands stay in published mode, because draft mode never turns on.
+
+`pnpm certs` once, then `pnpm dev:https`, gives cross-brand previews.
+`pnpm certs` runs `scripts/dev-certs.sh`.
+That script makes an mkcert certificate in `certificates/`.
+The certificate covers `localhost`, `127.0.0.1`, `::1`, `*.localhost`, and each `{brand}.localhost` host by name.
+The named hosts matter, because OpenSSL and most browsers reject a wildcard on a single-label parent like `*.localhost`.
+The script reads the brand keys from `src/brands.ts`, so a new brand key is picked up on the next run.
+It uses `mkcert` from your PATH, or the binary that Next.js already downloaded to `~/Library/Caches/mkcert/`.
+The first run installs the local CA and asks for your password.
+`pnpm dev:https` then starts `next dev --experimental-https` with that certificate and sets `NEXT_PUBLIC_DEV_HTTPS=true`.
+
+### Why HTTPS is needed for cross-brand previews
+
+The Studio runs on one host and loads another brand host in an iframe, so the preview request is cross-site.
+Over HTTP, `next-sanity` sets the draft-mode cookies with `SameSite=lax`, and browsers drop those on a cross-site iframe navigation.
+Over HTTPS with `NEXT_PUBLIC_DEV_HTTPS=true`, the app passes `secureDevMode` and the cookies get `Secure`, `SameSite=None` and `Partitioned`.
+That is the same cookie shape that production uses, so local behaviour matches production.
+
 Sanity CORS origins to add, in the Sanity project settings:
 
 - `http://wealthbriefing.localhost:3000`
 - `http://wealthbriefingasia.localhost:3000`
 - `http://familywealthreport.localhost:3000`
 - `http://clearview.localhost:3000`
+- `https://wealthbriefing.localhost:3000`
+- `https://wealthbriefingasia.localhost:3000`
+- `https://familywealthreport.localhost:3000`
+- `https://clearview.localhost:3000`
 - `https://wealthbriefing.com`
 - `https://wealthbriefingasia.com`
 - `https://familywealthreport.com`

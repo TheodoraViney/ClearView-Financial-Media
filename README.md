@@ -50,6 +50,8 @@ Infrastructure and routing are described in `docs/infrastructure.md`.
 
 ```
 pnpm dev          # http://{brand}.localhost:3000, see docs/infrastructure.md section 8
+pnpm certs        # one-time mkcert certificate for localhost and *.localhost
+pnpm dev:https    # https://{brand}.localhost:3000, needed for cross-brand Presentation previews
 pnpm typegen      # extract schema and generate src/sanity/types.ts, run after any schema or query change
 pnpm typecheck
 pnpm lint
