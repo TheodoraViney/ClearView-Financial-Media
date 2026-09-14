@@ -44,3 +44,8 @@ next-env.d.ts
 
 # sanity
 schema.json
+
+# migration baseline output (44MB, regenerate with scripts/build-baseline.py)
+baseline.csv
+baseline.csv.gz
+baseline-cache/
