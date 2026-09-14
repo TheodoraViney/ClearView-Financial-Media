@@ -72,6 +72,13 @@ The cookie is ignored on known hosts.
 The prefix is `/sites`, not `/_sites`.
 Next treats `_`-prefixed app folders as private and the URL-encoded workaround breaks `generateStaticParams`.
 
+### Environments
+
+`NEXT_PUBLIC_SITE_ENV` takes `development`, `staging` or `production`.
+`development` points Studio previews at `http://{brand}.localhost:3000`, or `https://` when `NEXT_PUBLIC_DEV_HTTPS=true`.
+`staging` points Studio previews at each brand's `*-staging.vercel.app` host from `BRANDS[key].stagingHost` in `src/brands.ts`.
+`production` points Studio previews at each brand's live apex domain.
+
 ### Content model conventions
 
 - Brand assignment is stored as brand KEY strings, not references. `post.brands` is a checkbox multiselect of editorial brands. `page.brand` is a radio of all four.

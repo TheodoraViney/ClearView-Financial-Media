@@ -105,6 +105,18 @@ Never switch brand by query parameter.
 The demo app had a `?brand=` bug that let any visitor switch brand chrome on any production domain.
 That bug does not exist here, because the cookie path is only honoured on unknown hosts.
 
+### Staging before cutover
+
+The four live domains stay on the legacy sites until cutover.
+Each brand still needs a reachable staging host on the same Vercel project.
+Attach `wealthbriefing-staging.vercel.app`, `wealthbriefingasia-staging.vercel.app`, `familywealthreport-staging.vercel.app` and `clearview-staging.vercel.app` to the project.
+This needs no DNS change, because each host is a Vercel-issued `*.vercel.app` subdomain.
+Set `NEXT_PUBLIC_SITE_ENV=staging` for the staging environment.
+`resolveBrandFromHost` in `src/brands.ts` matches each host to its brand through `BRANDS[key].stagingHost`.
+Add these four `https://` origins to Sanity CORS origins, one per brand's staging host.
+Branch preview URLs, such as `wealth-briefing-abc123.vercel.app`, still fall back to `DEFAULT_BRAND`.
+Switch the brand shown on a branch preview with the `brand` cookie, as described above.
+
 ## 4. Cloudflare setup per zone
 
 Four zones, one per apex domain.

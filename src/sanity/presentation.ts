@@ -8,6 +8,10 @@ export function brandOrigin(key: BrandKey): string {
     return `https://www.${BRANDS[key].domain}`
   }
 
+  if (process.env.NEXT_PUBLIC_SITE_ENV === 'staging') {
+    return `https://${BRANDS[key].stagingHost}`
+  }
+
   const protocol = process.env.NEXT_PUBLIC_DEV_HTTPS === 'true' ? 'https' : 'http'
 
   return `${protocol}://${key}.localhost:3000`
