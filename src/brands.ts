@@ -31,33 +31,29 @@ export const BRANDS: Record<BrandKey, BrandDefaults> = {
     domain: 'wealthbriefing.com',
     region: 'uk',
     brandColor: '#0B3C5D',
-    stagingHost: 'wealthbriefing-staging.vercel.app',
+    stagingHost: 'wealthbriefing.vercel.app',
   },
   wealthbriefingasia: {
     title: 'WealthBriefingAsia',
     domain: 'wealthbriefingasia.com',
     region: 'asia',
     brandColor: '#B5121B',
-    stagingHost: 'wealthbriefingasia-staging.vercel.app',
+    stagingHost: 'wealthbriefingasia.vercel.app',
   },
   familywealthreport: {
     title: 'Family Wealth Report',
     domain: 'familywealthreport.com',
     region: 'us',
     brandColor: '#1F6F43',
-    stagingHost: 'familywealthreport-staging.vercel.app',
+    stagingHost: 'familywealthreport.vercel.app',
   },
   clearview: {
     title: 'ClearView Financial Media',
     domain: 'clearviewpublishing.com',
     region: 'global',
     brandColor: '#222222',
-    stagingHost: 'clearview-staging.vercel.app',
+    stagingHost: 'clear-view-financial-media.vercel.app',
   },
-}
-
-export const EXTRA_HOSTS: Record<string, BrandKey> = {
-  'clear-view-financial-media.vercel.app': 'clearview',
 }
 
 const HOST_TO_BRAND: Record<string, BrandKey> = {}
@@ -74,5 +70,5 @@ export function resolveBrandFromHost(host: string): BrandKey | null {
     ? withoutPort.slice(4)
     : withoutPort
 
-  return HOST_TO_BRAND[withoutWww] ?? EXTRA_HOSTS[withoutWww] ?? null
+  return HOST_TO_BRAND[withoutWww] ?? null
 }
