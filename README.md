@@ -299,13 +299,42 @@ Never clean the whole document, or text loses click-to-edit.
 
 The source is WordPress, not Sanity and not the legacy PHP estate.
 242 published event records. 253 including drafts.
-77 ACF fields on the events edit screen, including repeaters, groups and `post_object` relations.
+Both ACF and Pods run side by side. Verified on the live instance 2026-09-15.
 
-It is ACF, not Pods.
-Every document before 2026-08-06 said Pods and was wrong.
+| CPT | Plugin | Shape |
+| --- | --- | --- |
+| Events | ACF | 78 data fields across 15 tabs, repeaters nested 3 deep, 11 `post_object` relations |
+| Companies | Pods | `website_url`, `company_address`, `google_map_location`, `phone_number`, `comp_about`, `people[]`, taxonomy `company_category` |
+| People | Pods | `first_name`, `last_name`, `job_title`, `email`, `photo`, `company[]`, native `content` for bio, taxonomy `people_category` |
+
+The 2026-08-06 correction said "ACF, not Pods" and was itself an over-correction.
+It read the Events screen and generalised. The earlier documents saying Pods were
+describing Companies and People, which are still Pods today.
+
+Pods matters for the export. Companies and People are ordinary CPTs edited through
+`post.php`, so their scalar fields should sit in `wp_postmeta` and survive a WXR export.
+The `company` <-> `person` relation is bidirectional and Pods keeps those in `wp_podsrel`,
+which WXR never exports. Verify both in the export before trusting it.
 
 The events, companies and people CPTs are not REST-exposed.
-Dates and venues are structured fields, so this migrates as records rather than prose parsing.
+
+Dates, venues, judges, speakers and sponsors are structured fields.
+Categories, winners, finalists and previous winners are not: they are `wysiwyg` blobs,
+4 of the 18 `wysiwyg` fields on the event. The Schedule commits AwardCategory and
+AwardWinner as typed records, so that part is prose parsing after all and is not in the
+estimate. Settle it before writing schema.
+
+Brand is not a field. It is carried by the `awards_event_programme` taxonomy, whose terms
+name the publication, for example "WealthBriefingAsia Greater China Awards". The taxonomy
+mixes evergreen programmes with year-specific ones as sibling terms.
+
+The event type drives which fields apply. Three in-form notices mark the Judges and
+Nominations tabs as Awards-only and the Speakers tab as Summit/Briefing-only. That matches
+the `events-category` taxonomy: awards, briefings, summits, webinar.
+
+Agenda is stored twice. `cyph_agenda` is a `wysiwyg` created 2022-07-15; `agenda_itineraries`
+is a 3-level repeater created 2025-03-12. The old field was never removed, so a record may
+use either. ACF field keys carry their creation timestamp in hex, which is how this is dated.
 
 This WordPress was hit by ClickFix malware on 2026-08-20.
 Scan everything imported, whatever the export date.
@@ -454,7 +483,7 @@ The licence answer given to the client scanned 782 demo packages containing zero
 ## 11. Stale documents to distrust
 
 - Anything dated before 2026-08-06 describes the superseded path-prefix architecture.
-- Any document saying Pods instead of ACF for the WordPress events source.
+- Any document saying the WordPress source is only ACF, or only Pods. Events are ACF; Companies and People are Pods. See section 4.
 - **The Technical Proposal is stale and still published in public.** Last edited 2026-07-16. It predates the two decisions that reshaped the project. It is live at a `notion.site` address, so the client can read it at any time. It has already generated one client question. Details below.
 - A Notion transcript has Eugene saying "that's why we pick OpenNext". He did not. It is a mishearing of Next.js. The contract commits to Vercel Pro.
 - Deliverables section 5 says site search is empty at launch. Section 7 is correct: search covers the archive.
