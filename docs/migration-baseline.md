@@ -106,6 +106,16 @@ Two static pages need a decision rather than a redirect: `/awards-submissions-sa
 looks like a form-state page, and `/virtual-family-office-fintech-summit-2020-replay/` is
 a 2020 event held as a page rather than an event record.
 
+One event page needs a decision about its listing rather than its address.
+`/events/swiss-finance-institute-international-wealth-management-retreat/` is the only one
+of the 255 exported event records carrying no `events-category` term, so no listing claims
+it. Measured 2026-09-17 in the export: event dated September 2013, record created
+2015-07-14, carrying a start date, an end date and 811 characters of body text and nothing
+else. The address is kept and answers 200 either way; the open question is whether the
+page appears under summits, under briefings, or on no listing at all. This document's
+destination column reads `awardsProgramme / conferenceEvent` for it, which is the same
+question left open.
+
 ### Total
 
 308,107 distinct URLs: 307,816 editorial and 291 on clearviewpublishing.com.
@@ -171,6 +181,7 @@ which is generated from identifiers, and it is work for that task rather than th
 | Gap | What closes it |
 | --- | --- |
 | Destination rule for the five taxonomy URLs, plus `register` and `wealthtalk` | Client, with the editorial section paths |
+| Listing for the one uncategorised event, `swiss-finance-institute-international-wealth-management-retreat` | Client. Summit, briefing, or off every listing |
 | Alias domains beyond fwreport.com | Registrar or DNS access, which is a client dependency anyway |
 | Every URL's status, title, meta and canonical | A pass over all 308,107 pages. Blocked on written crawl permission |
 | Organic entry pages, most-linked | Search Console access on all four domains |

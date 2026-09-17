@@ -27,34 +27,485 @@ export type Cta = {
   link?: Link;
 };
 
-export type Award = {
-  _id: string;
-  _type: "award";
-  _createdAt: string;
-  _updatedAt: string;
-  _rev: string;
-  title?: string;
-  region?: "uk" | "asia" | "us" | "global";
-  status?: "entriesOpen" | "entriesClosed" | "judging" | "awarded";
-};
-
-export type Event = {
-  _id: string;
-  _type: "event";
-  _createdAt: string;
-  _updatedAt: string;
-  _rev: string;
-  title?: string;
-  date?: string;
-  location?: string;
-  type?: "conference" | "awards-ceremony" | "webinar" | "roundtable";
-};
-
 export type SanityImageAssetReference = {
   _ref: string;
   _type: "reference";
   _weak?: boolean;
   [internalGroqTypeReferenceTo]?: "sanity.imageAsset";
+};
+
+export type VideoGallery = {
+  _type: "videoGallery";
+  thumbnail?: {
+    asset?: SanityImageAssetReference;
+    media?: unknown;
+    hotspot?: SanityImageHotspot;
+    crop?: SanityImageCrop;
+    alt?: string;
+    _type: "image";
+  };
+  videos?: Array<{
+    vimeoId?: string;
+    name?: string;
+    categoryGroups?: Array<{
+      group?: string;
+      categories?: string;
+      _type: "winningCategories";
+      _key: string;
+    }>;
+    _type: "video";
+    _key: string;
+  }>;
+};
+
+export type Agenda = {
+  _type: "agenda";
+  title?: string;
+  items?: Array<{
+    time?: string;
+    title?: string;
+    text?: RichText;
+    _type: "agendaItem";
+    _key: string;
+  }>;
+};
+
+export type CustomTab = {
+  _type: "customTab";
+  name?: string;
+  content?: RichText;
+};
+
+export type AwardCategoryReference = {
+  _ref: string;
+  _type: "reference";
+  _weak?: boolean;
+  [internalGroqTypeReferenceTo]?: "awardCategory";
+};
+
+export type CompanyReference = {
+  _ref: string;
+  _type: "reference";
+  _weak?: boolean;
+  [internalGroqTypeReferenceTo]?: "company";
+};
+
+export type Winner = {
+  _type: "winner";
+  categoryGroup?: string;
+  category?: AwardCategoryReference;
+  company?: CompanyReference;
+};
+
+export type CompanyGroup = {
+  _type: "companyGroup";
+  name?: string;
+  companies?: Array<
+    {
+      _key: string;
+    } & CompanyReference
+  >;
+};
+
+export type PersonReference = {
+  _ref: string;
+  _type: "reference";
+  _weak?: boolean;
+  [internalGroqTypeReferenceTo]?: "person";
+};
+
+export type PersonGroup = {
+  _type: "personGroup";
+  name?: string;
+  people?: Array<
+    {
+      _key: string;
+    } & PersonReference
+  >;
+};
+
+export type RichText = Array<
+  | {
+      children?: Array<{
+        marks?: Array<string>;
+        text?: string;
+        _type: "span";
+        _key: string;
+      }>;
+      style?: "normal" | "h2" | "h3" | "h4" | "blockquote";
+      listItem?: "bullet" | "number";
+      markDefs?: Array<{
+        href?: string;
+        openInNewTab?: boolean;
+        _type: "link";
+        _key: string;
+      }>;
+      level?: number;
+      _type: "block";
+      _key: string;
+    }
+  | {
+      asset?: SanityImageAssetReference;
+      media?: unknown;
+      hotspot?: SanityImageHotspot;
+      crop?: SanityImageCrop;
+      alt?: string;
+      _type: "image";
+      _key: string;
+    }
+>;
+
+export type SanityFileAssetReference = {
+  _ref: string;
+  _type: "reference";
+  _weak?: boolean;
+  [internalGroqTypeReferenceTo]?: "sanity.fileAsset";
+};
+
+export type Resource = {
+  _id: string;
+  _type: "resource";
+  _createdAt: string;
+  _updatedAt: string;
+  _rev: string;
+  title?: string;
+  slug?: Slug;
+  category?: "research";
+  body?: RichText;
+  downloadThumbnail?: {
+    asset?: SanityImageAssetReference;
+    media?: unknown;
+    hotspot?: SanityImageHotspot;
+    crop?: SanityImageCrop;
+    alt?: string;
+    _type: "image";
+  };
+  downloadFile?: {
+    asset?: SanityFileAssetReference;
+    media?: unknown;
+    _type: "file";
+  };
+  downloadUrl?: string;
+  authors?: Array<
+    {
+      _key: string;
+    } & PersonReference
+  >;
+  partnerCategories?: Array<
+    {
+      _key: string;
+    } & CompanyGroup
+  >;
+  legacyWpId?: number;
+};
+
+export type SanityImageCrop = {
+  _type: "sanity.imageCrop";
+  top?: number;
+  bottom?: number;
+  left?: number;
+  right?: number;
+};
+
+export type SanityImageHotspot = {
+  _type: "sanity.imageHotspot";
+  x?: number;
+  y?: number;
+  height?: number;
+  width?: number;
+};
+
+export type Slug = {
+  _type: "slug";
+  current?: string;
+  source?: string;
+};
+
+export type Person = {
+  _id: string;
+  _type: "person";
+  _createdAt: string;
+  _updatedAt: string;
+  _rev: string;
+  title?: string;
+  firstName?: string;
+  lastName?: string;
+  slug?: Slug;
+  jobTitle?: string;
+  companies?: Array<
+    {
+      _key: string;
+    } & CompanyReference
+  >;
+  photo?: {
+    asset?: SanityImageAssetReference;
+    media?: unknown;
+    hotspot?: SanityImageHotspot;
+    crop?: SanityImageCrop;
+    alt?: string;
+    _type: "image";
+  };
+  bio?: RichText;
+  categories?: Array<string>;
+  legacyWpId?: number;
+};
+
+export type AwardCategory = {
+  _id: string;
+  _type: "awardCategory";
+  _createdAt: string;
+  _updatedAt: string;
+  _rev: string;
+  title?: string;
+  slug?: Slug;
+  categoryGroup?: string;
+  description?: RichText;
+};
+
+export type ConferenceEvent = {
+  _id: string;
+  _type: "conferenceEvent";
+  _createdAt: string;
+  _updatedAt: string;
+  _rev: string;
+  title?: string;
+  slug?: Slug;
+  eventType?: "summit" | "briefing" | "webinar";
+  body?: RichText;
+  logo?: {
+    asset?: SanityImageAssetReference;
+    media?: unknown;
+    hotspot?: SanityImageHotspot;
+    crop?: SanityImageCrop;
+    alt?: string;
+    _type: "image";
+  };
+  venue?: CompanyReference;
+  country?: "AE" | "CH" | "GB" | "JE" | "SA" | "SG" | "US";
+  startDate?: string;
+  startTime?: string;
+  endDate?: string;
+  endTime?: string;
+  timezoneCode?: string;
+  hideDateTime?: boolean;
+  speakerTypes?: Array<
+    {
+      _key: string;
+    } & PersonGroup
+  >;
+  chairs?: Array<
+    {
+      _key: string;
+    } & PersonReference
+  >;
+  agenda?: Array<
+    {
+      _key: string;
+    } & Agenda
+  >;
+  agendaText?: RichText;
+  techDemos?: Array<{
+    title?: string;
+    company?: CompanyReference;
+    description?: RichText;
+    _type: "techDemo";
+    _key: string;
+  }>;
+  sponsorTypes?: Array<
+    {
+      _key: string;
+    } & CompanyGroup
+  >;
+  sponsorBenefits?: RichText;
+  sponsorVideos?: VideoGallery;
+  photographs?: Array<{
+    asset?: SanityImageAssetReference;
+    media?: unknown;
+    hotspot?: SanityImageHotspot;
+    crop?: SanityImageCrop;
+    alt?: string;
+    _type: "image";
+    _key: string;
+  }>;
+  registerButtonLink?: string;
+  register?: RichText;
+  faqs?: RichText;
+  customTabs?: Array<
+    {
+      _key: string;
+    } & CustomTab
+  >;
+  legacyWpId?: number;
+};
+
+export type AwardsProgrammeGroupReference = {
+  _ref: string;
+  _type: "reference";
+  _weak?: boolean;
+  [internalGroqTypeReferenceTo]?: "awardsProgrammeGroup";
+};
+
+export type AcclaimReference = {
+  _ref: string;
+  _type: "reference";
+  _weak?: boolean;
+  [internalGroqTypeReferenceTo]?: "acclaim";
+};
+
+export type AwardsProgramme = {
+  _id: string;
+  _type: "awardsProgramme";
+  _createdAt: string;
+  _updatedAt: string;
+  _rev: string;
+  title?: string;
+  slug?: Slug;
+  programme?: AwardsProgrammeGroupReference;
+  body?: RichText;
+  logo?: {
+    asset?: SanityImageAssetReference;
+    media?: unknown;
+    hotspot?: SanityImageHotspot;
+    crop?: SanityImageCrop;
+    alt?: string;
+    _type: "image";
+  };
+  venue?: CompanyReference;
+  country?: "AE" | "CH" | "GB" | "JE" | "SA" | "SG" | "US";
+  keyDates?: RichText;
+  startDate?: string;
+  startTime?: string;
+  endDate?: string;
+  endTime?: string;
+  timezoneCode?: string;
+  hideDateTime?: boolean;
+  judgesIntro?: RichText;
+  judgesPanels?: Array<
+    {
+      _key: string;
+    } & PersonGroup
+  >;
+  nominationsOpeningDate?: string;
+  nominationsClosingDate?: string;
+  winnersAnnouncementDate?: string;
+  categoriesContent?: RichText;
+  winners?: Array<
+    {
+      _key: string;
+    } & Winner
+  >;
+  finalists?: RichText;
+  previousWinners?: RichText;
+  awardWinnersSupplement?: RichText;
+  acclaim?: AcclaimReference;
+  charityPartners?: Array<
+    {
+      _key: string;
+    } & CompanyReference
+  >;
+  sponsorTypes?: Array<
+    {
+      _key: string;
+    } & CompanyGroup
+  >;
+  sponsorBenefits?: RichText;
+  sponsorVideos?: VideoGallery;
+  winnerVideos?: VideoGallery;
+  highlightsVideoId?: string;
+  highlightVideoThumbnail?: {
+    asset?: SanityImageAssetReference;
+    media?: unknown;
+    hotspot?: SanityImageHotspot;
+    crop?: SanityImageCrop;
+    alt?: string;
+    _type: "image";
+  };
+  hidePreviousYearsHighlightVideo?: boolean;
+  photographs?: Array<{
+    asset?: SanityImageAssetReference;
+    media?: unknown;
+    hotspot?: SanityImageHotspot;
+    crop?: SanityImageCrop;
+    alt?: string;
+    _type: "image";
+    _key: string;
+  }>;
+  registerButtonLink?: string;
+  register?: RichText;
+  faqs?: RichText;
+  customTabs?: Array<
+    {
+      _key: string;
+    } & CustomTab
+  >;
+  legacyWpId?: number;
+};
+
+export type Acclaim = {
+  _id: string;
+  _type: "acclaim";
+  _createdAt: string;
+  _updatedAt: string;
+  _rev: string;
+  title?: string;
+  slug?: Slug;
+  programme?: AwardsProgrammeGroupReference;
+  thumbnailImage?: {
+    asset?: SanityImageAssetReference;
+    media?: unknown;
+    hotspot?: SanityImageHotspot;
+    crop?: SanityImageCrop;
+    alt?: string;
+    _type: "image";
+  };
+  issuuId?: string;
+  embedCode?: string;
+  legacyWpId?: number;
+};
+
+export type Company = {
+  _id: string;
+  _type: "company";
+  _createdAt: string;
+  _updatedAt: string;
+  _rev: string;
+  title?: string;
+  slug?: Slug;
+  logo?: {
+    asset?: SanityImageAssetReference;
+    media?: unknown;
+    hotspot?: SanityImageHotspot;
+    crop?: SanityImageCrop;
+    alt?: string;
+    _type: "image";
+  };
+  websiteUrl?: string;
+  about?: RichText;
+  address?: string;
+  googleMapLocation?: string;
+  phoneNumber?: string;
+  categories?: Array<string>;
+  legacyWpId?: number;
+};
+
+export type AwardsProgrammeGroup = {
+  _id: string;
+  _type: "awardsProgrammeGroup";
+  _createdAt: string;
+  _updatedAt: string;
+  _rev: string;
+  title?: string;
+  slug?: Slug;
+  description?: RichText;
+  logo?: {
+    asset?: SanityImageAssetReference;
+    media?: unknown;
+    hotspot?: SanityImageHotspot;
+    crop?: SanityImageCrop;
+    alt?: string;
+    _type: "image";
+  };
+  legacyTermId?: number;
 };
 
 export type Post = {
@@ -104,28 +555,6 @@ export type Post = {
         _key: string;
       }
   >;
-};
-
-export type SanityImageCrop = {
-  _type: "sanity.imageCrop";
-  top?: number;
-  bottom?: number;
-  left?: number;
-  right?: number;
-};
-
-export type SanityImageHotspot = {
-  _type: "sanity.imageHotspot";
-  x?: number;
-  y?: number;
-  height?: number;
-  width?: number;
-};
-
-export type Slug = {
-  _type: "slug";
-  current?: string;
-  source?: string;
 };
 
 export type Page = {
@@ -268,13 +697,32 @@ export type Geopoint = {
 export type AllSanitySchemaTypes =
   | Link
   | Cta
-  | Award
-  | Event
   | SanityImageAssetReference
-  | Post
+  | VideoGallery
+  | Agenda
+  | CustomTab
+  | AwardCategoryReference
+  | CompanyReference
+  | Winner
+  | CompanyGroup
+  | PersonReference
+  | PersonGroup
+  | RichText
+  | SanityFileAssetReference
+  | Resource
   | SanityImageCrop
   | SanityImageHotspot
   | Slug
+  | Person
+  | AwardCategory
+  | ConferenceEvent
+  | AwardsProgrammeGroupReference
+  | AcclaimReference
+  | AwardsProgramme
+  | Acclaim
+  | Company
+  | AwardsProgrammeGroup
+  | Post
   | Page
   | Brand
   | SanityImagePaletteSwatch

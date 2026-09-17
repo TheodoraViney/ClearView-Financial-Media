@@ -1,9 +1,15 @@
+import { BookIcon } from '@sanity/icons/Book'
+import { BookmarkIcon } from '@sanity/icons/Bookmark'
 import { CalendarIcon } from '@sanity/icons/Calendar'
+import { CaseIcon } from '@sanity/icons/Case'
 import { CogIcon } from '@sanity/icons/Cog'
 import { DocumentIcon } from '@sanity/icons/Document'
+import { DocumentPdfIcon } from '@sanity/icons/DocumentPdf'
 import { DocumentTextIcon } from '@sanity/icons/DocumentText'
 import { EarthGlobeIcon } from '@sanity/icons/EarthGlobe'
 import { StarIcon } from '@sanity/icons/Star'
+import { TagIcon } from '@sanity/icons/Tag'
+import { UserIcon } from '@sanity/icons/User'
 import type { StructureResolver } from 'sanity/structure'
 
 import { BRAND_KEYS, BRANDS, brandDocumentId } from '@/brands'
@@ -49,6 +55,31 @@ export const structure: StructureResolver = (S) =>
       ),
       S.divider(),
       S.documentTypeListItem('post').title('All Posts').icon(DocumentTextIcon),
-      S.documentTypeListItem('award').title('Awards').icon(StarIcon),
-      S.documentTypeListItem('event').title('Events').icon(CalendarIcon),
+      S.divider(),
+      // Shared records. They belong to the group, not to one brand: filtering
+      // them by the host brand would hide them from clearviewpublishing.com.
+      S.listItem()
+        .title('Awards')
+        .icon(StarIcon)
+        .child(
+          S.list()
+            .title('Awards')
+            .items([
+              S.documentTypeListItem('awardsProgrammeGroup')
+                .title('Programmes')
+                .icon(BookmarkIcon),
+              S.documentTypeListItem('awardsProgramme')
+                .title('Editions')
+                .icon(StarIcon),
+              S.documentTypeListItem('awardCategory')
+                .title('Categories')
+                .icon(TagIcon),
+              S.documentTypeListItem('acclaim').title('Acclaim').icon(BookIcon),
+            ]),
+        ),
+      S.documentTypeListItem('conferenceEvent').title('Events').icon(CalendarIcon),
+      S.documentTypeListItem('resource').title('Resources').icon(DocumentPdfIcon),
+      S.divider(),
+      S.documentTypeListItem('company').title('Companies').icon(CaseIcon),
+      S.documentTypeListItem('person').title('People').icon(UserIcon),
     ])

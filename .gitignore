@@ -45,3 +45,14 @@ next-env.d.ts
 # sanity
 schema.json
 
+
+# migration source dumps (contains PII: judges, speakers, attendees)
+/.migration-source/
+
+# session handoff, not for the repo
+/MIGRATION-CONTEXT.md
+
+# Dataset exports. `sanity dataset export` writes a tarball of every document
+# and every asset - 791 MB for this migration, well past GitHub's 100 MB ceiling,
+# and it carries the same personal data as .migration-source/.
+*.tar.gz
