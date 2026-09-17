@@ -1,4 +1,5 @@
 import { defineConfig, type Template } from 'sanity'
+import { media } from 'sanity-plugin-media'
 import { structureTool } from 'sanity/structure'
 
 import { dataset, projectId } from './src/sanity/env'
@@ -36,6 +37,9 @@ export default defineConfig({
       postByBrandTemplate,
     ],
   },
-  plugins: [structureTool({ structure }), ...presentationTools],
+  // `media` adds the asset browser Studio has no built-in equivalent for: without
+  // it, the 6,605 migrated files are reachable only by opening a document that
+  // happens to reference one.
+  plugins: [structureTool({ structure }), media(), ...presentationTools],
   releases: { enabled: false },
 })
