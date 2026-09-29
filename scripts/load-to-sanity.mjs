@@ -5,7 +5,7 @@
  * Reads the four verified extracts in `.migration-source/`, builds every Sanity
  * document in memory, proves the result before it writes anything, and only
  * then writes. Dry run is the default; `--commit` is the only way to write, and
- * `--dataset production` is refused outright.
+ * `--dataset production` is refused unless `--production` is also passed.
  *
  * Every number in the comments below was measured on the extracts dated
  * 2026-09-15 (events, source), 2026-09-15 (winners) and 2026-09-17 (media), by
@@ -234,6 +234,110 @@ const EVENT_OVERRIDES = {
     reason:
       'no events-category term at all, the only one of 255. Swiss Finance Institute International Wealth Management Retreat, September 2013. Loaded as a summit provisionally; the question is with Theodora Viney, MIGRATION-CONTEXT section 7a. Reversible with one field.',
   },
+}
+
+/**
+ * Winner rows that parse-winners.py produced by mistake, dropped by name.
+ * Each entry must match exactly one row, or the run stops.
+ */
+const WINNER_ROW_DROPS = [
+  {
+    eventId: '41907',
+    category: '-',
+    winner: 'Dr. Kurt Moosmann',
+    reason:
+      'The source reads "Swiss Single Family Office Association (SFOA)</span><b> - </b><span>Dr. Kurt Moosmann": the winner and the person who represents it. The parser took the bold " - " for a category heading. The SFOA row itself is parsed correctly under Thought Leadership (Switzerland), so nothing is lost by dropping this one.',
+  },
+]
+
+/**
+ * Group headings that the parser glued to the next category. They are marked
+ * only by underline, which none of parse-winners.py's rules look at, so
+ * `US - GENERAL WEALTHTECH Artificial Intelligence (AI) Application` came out
+ * as one category name, and the rows after it kept the previous group (none at
+ * all on 29430) until the next heading the parser did recognise.
+ *
+ * Each heading is cut off the category it prefixes and becomes the group of
+ * that row and of the rows after it, up to the next row whose parsed group
+ * differs. Every heading listed must be found exactly once, or the run stops.
+ */
+const WINNER_GROUP_FIXES = {
+  29430: [
+    'US - GENERAL WEALTHTECH',
+    'US - REGTECH & COMPLIANCE',
+    'US - WEALTHTECH CONSULTANCY & TRAINING',
+    'US - INDIVIDUAL & LEADERSHIP WEALTHTECH',
+    'CANADA - GENERAL WEALTHTECH',
+    'CANADA - REGTECH',
+    'LATIN AMERICA - GENERAL WEALTHTECH',
+    'MEXICO - GENERAL WEALTHTECH',
+  ],
+  23721: ['INDIVIDUAL AWARDS'],
+  23837: ['INDIVIDUAL AWARDS (GREATER CHINA)'],
+  30348: ['INDIVIDUAL AWARDS'],
+  30499: ['INDIVIDUAL AWARDS'],
+}
+
+function fixWinnerRows(plan, winners) {
+  const out = []
+  for (const drop of WINNER_ROW_DROPS) drop.hits = 0
+
+  for (const pair of winners) {
+    const drop = WINNER_ROW_DROPS.find(
+      (entry) =>
+        entry.eventId === String(pair.eventId) &&
+        entry.category === String(pair.category || '').trim() &&
+        entry.winner === String(pair.winner || '').trim(),
+    )
+    if (drop) {
+      drop.hits += 1
+      plan.notes.push(`winner row on event ${pair.eventId} dropped: ${JSON.stringify(pair.category)} -> ${JSON.stringify(pair.winner)} — ${drop.reason}`)
+      continue
+    }
+    out.push({ ...pair })
+  }
+
+  for (const drop of WINNER_ROW_DROPS) {
+    if (drop.hits !== 1) {
+      plan.blockers.push({
+        code: 'winner-fix-stale',
+        message: `WINNER_ROW_DROPS entry for event ${drop.eventId} (${JSON.stringify(drop.category)} -> ${JSON.stringify(drop.winner)}) matched ${drop.hits} rows, expected 1`,
+      })
+    }
+  }
+
+  for (const [eventId, headings] of Object.entries(WINNER_GROUP_FIXES)) {
+    const rows = out.filter((pair) => String(pair.eventId) === eventId)
+    const found = new Map(headings.map((heading) => [heading, 0]))
+    let current
+    let parsedGroup
+
+    for (const pair of rows) {
+      const category = String(pair.category || '').trim()
+      const heading = headings.find((candidate) => category.startsWith(`${candidate} `))
+      if (heading) {
+        found.set(heading, found.get(heading) + 1)
+        current = heading
+        parsedGroup = pair.group
+        pair.category = category.slice(heading.length).trim()
+      } else if (current && pair.group !== parsedGroup) {
+        current = undefined
+      }
+      if (current) pair.group = current
+    }
+
+    for (const [heading, hits] of found) {
+      if (hits !== 1) {
+        plan.blockers.push({
+          code: 'winner-fix-stale',
+          message: `WINNER_GROUP_FIXES heading ${JSON.stringify(heading)} on event ${eventId} prefixed ${hits} categories, expected 1`,
+        })
+      }
+    }
+    plan.notes.push(`event ${eventId}: ${headings.length} group heading${headings.length === 1 ? '' : 's'} cut off the category names they were glued to (WINNER_GROUP_FIXES)`)
+  }
+
+  return out
 }
 
 /**
@@ -514,10 +618,12 @@ function prose(html, context, plan) {
 
   // The converter removes what richText has no member for and reports it
   // rather than dropping it silently. Those reports stop at the converter, so
-  // they are carried up here: 37 iframes and 50 tables across the corpus are
-  // content that will not be on the migrated page.
+  // they are carried up here: 12 iframes (11 Photobucket, 1 Twitter widget)
+  // and 50 tables across the corpus are content that will not be on the
+  // migrated page. The 25 Vimeo and Issuu iframes are kept as `embed` blocks.
+  for (const embed of notes.embeds) plan.embeds.push({ where: context.where, provider: embed.provider, id: embed.id })
   for (const iframe of notes.iframes) {
-    plan.removed.push(`${context.where}: <iframe> removed, no richText member for it — ${String(iframe.src || iframe).slice(0, 80)}`)
+    plan.removed.push(`${context.where}: <iframe> removed, ${iframe.reason || 'no richText member for it'} — ${String(iframe.src || iframe).slice(0, 80)}`)
   }
   for (const table of notes.tables) {
     plan.removed.push(`${context.where}: <table> removed, no richText member for it — ${String(table.summary || table.rows || '').slice(0, 60)}`)
@@ -674,6 +780,7 @@ function newPlan(options) {
     consumed: new Map(),
     inlineImages: { resolved: [], foreign: [], unresolvable: [] },
     removed: [],
+    embeds: [],
     altSources: new Map(),
     stats: {},
     references: { requested: 0, resolved: 0, failed: [] },
@@ -932,11 +1039,11 @@ function buildCompanies(plan, records) {
       address: textOf(record.fields?.pods_meta_company_address),
       googleMapLocation: textOf(record.fields?.pods_meta_google_map_location),
       phoneNumber: textOf(record.fields?.pods_meta_phone_number),
-      categories: taxonomyTags(plan, record.fields?.['tax_input[company_category]']),
+      categories: taxonomyTags(plan, record.fields?.['tax_input[company_category]'], 'company_category', where),
       legacyWpId: Number(record.id),
     })
 
-    if (plan.options.accept.has('taxonomy-ids')) consume(seen, 'tax:company_category')
+    if (plan.taxonomyNames?.has('company_category') || plan.options.accept.has('taxonomy-ids')) consume(seen, 'tax:company_category')
     auditRecord(plan, 'companies', record, seen)
     addDocument(plan, document)
     ids.set(String(record.id), id)
@@ -981,11 +1088,11 @@ function buildPeople(plan, records, companyIds) {
       companies: resolveRefs(plan, record.fields?.pods_meta_company, companyIds, `${where} companies`),
       photo: photoId ? image(plan, photoId, 'personPhoto', { where, parentTitle: title }) : undefined,
       bio: prose(record.content, { where: `${where} bio`, fallbackAlt: title }, plan),
-      categories: taxonomyTags(plan, record.fields?.['tax_input[people_category]']),
+      categories: taxonomyTags(plan, record.fields?.['tax_input[people_category]'], 'people_category', where),
       legacyWpId: Number(record.id),
     })
 
-    if (plan.options.accept.has('taxonomy-ids')) consume(seen, 'tax:people_category')
+    if (plan.taxonomyNames?.has('people_category') || plan.options.accept.has('taxonomy-ids')) consume(seen, 'tax:people_category')
     auditRecord(plan, 'people', record, seen)
     addDocument(plan, document)
     ids.set(String(record.id), `person-wp-${record.id}`)
@@ -1496,6 +1603,13 @@ function buildEvents(plan, records, ids) {
       plan.blockers.push({ code: 'event-without-start-date', message: `${where}: startDate is required and empty` })
     }
 
+    // Carried as the source has it: a reversed pair is the client's typo, not a
+    // structural fault, and the schema flags it in Studio for the editor. Two
+    // exist (5212, 14550).
+    if (common.startDate && common.endDate && common.endDate < common.startDate) {
+      plan.problems.push(`${where}: endDate ${common.endDate} is before startDate ${common.startDate}, carried as in the source`)
+    }
+
     let document
     if (isAwards) {
       consume(
@@ -1542,6 +1656,13 @@ function buildEvents(plan, records, ids) {
           code: 'winners-blob-unparsed',
           message: `${where}: cyph_winners holds ${String(rawWinners).length} characters and parse-winners.py produced no pairs for it, so the whole winners list would be lost`,
         })
+      }
+
+      // cyph_winners is parsed into winner rows, never converted as prose, so an
+      // embed inside it has no block to land in. One exists: 20953 carries
+      // Vimeo 762229585, the same video 24939 shows in previousWinners.
+      for (const embed of convert(String(rawWinners || '')).notes.embeds) {
+        plan.problems.push(`${where} winners: ${embed.provider} ${embed.id} embedded in cyph_winners is not carried, the field becomes winner rows`)
       }
 
       document = pick({
@@ -1599,6 +1720,14 @@ function buildEvents(plan, records, ids) {
         hidePreviousYearsHighlightVideo:
           record.fields[`acf[${F.hidePreviousHighlights}]`] === '1' ? true : undefined,
       })
+
+      if (
+        document.nominationsOpeningDate &&
+        document.nominationsClosingDate &&
+        document.nominationsClosingDate < document.nominationsOpeningDate
+      ) {
+        plan.problems.push(`${where}: nominationsClosingDate ${document.nominationsClosingDate} is before nominationsOpeningDate ${document.nominationsOpeningDate}, carried as in the source`)
+      }
 
       if (highlightsVideoId && !VIMEO_ID.test(highlightsVideoId)) {
         plan.problems.push(`${where}: highlightsVideoId ${JSON.stringify(highlightsVideoId)} is not numeric`)
@@ -1720,10 +1849,61 @@ function cleanUrl(plan, value, where) {
   return url.toString()
 }
 
-function taxonomyTags(plan, value) {
-  if (!plan.options.accept.has('taxonomy-ids')) return undefined
+/**
+ * company_category / people_category tags. With `wp-taxonomies.json` present
+ * (scripts/wp-taxonomy-extract.js) each term id becomes its WordPress name, and
+ * an id the file does not name is a blocker rather than a placeholder. Without
+ * the file the old `wp-term-<id>` placeholders are written, and only under
+ * `--accept=taxonomy-ids`.
+ */
+function taxonomyTags(plan, value, taxonomy, where) {
   const terms = (value || []).filter((id) => id !== '0')
-  return terms.length ? terms.map((id) => `wp-term-${id}`) : undefined
+  if (!terms.length) return undefined
+
+  const names = plan.taxonomyNames?.get(taxonomy)
+  if (!names) {
+    if (!plan.options.accept.has('taxonomy-ids')) return undefined
+    return terms.map((id) => `wp-term-${id}`)
+  }
+
+  const out = []
+  for (const id of terms) {
+    const name = names.get(String(id))
+    if (!name) {
+      plan.blockers.push({
+        code: 'taxonomy-term-unnamed',
+        message: `${where}: ${taxonomy} term ${id} is not in wp-taxonomies.json, so it has no name to write`,
+      })
+      continue
+    }
+    if (!out.includes(name)) out.push(name)
+  }
+  return out.length ? out : undefined
+}
+
+/**
+ * Term names from `.migration-source/wp-taxonomies.json`, when it exists. A file
+ * that reports itself incomplete for a taxonomy is not used for it: a partial
+ * list would turn the missing ids into blockers that look like source defects.
+ */
+function loadTaxonomyNames(plan) {
+  const path = `${SOURCE_DIR}/wp-taxonomies.json`
+  if (!existsSync(path)) return undefined
+  const file = readJson(path)
+  const out = new Map()
+  for (const taxonomy of ['company_category', 'people_category']) {
+    const entry = file.taxonomies?.[taxonomy]
+    if (!entry?.complete) {
+      plan.blockers.push({
+        code: 'taxonomy-file-incomplete',
+        message: `wp-taxonomies.json (${file.extractedAt}) does not hold a complete ${taxonomy}; re-run scripts/wp-taxonomy-extract.js`,
+      })
+      continue
+    }
+    out.set(taxonomy, new Map(entry.terms.map((term) => [String(term.id), String(term.name).trim()])))
+  }
+  plan.stats.taxonomyFile = { extractedAt: file.extractedAt, taxonomies: [...out.keys()] }
+  return out
 }
 
 function resolveRefs(plan, value, ids, where) {
@@ -1822,7 +2002,10 @@ function loadAssetMap(options) {
     return { version: 1, projectId: options.projectId, dataset: options.dataset, assets: {}, failed: {} }
   }
   const map = JSON.parse(readFileSync(ASSET_MAP_PATH, 'utf8'))
-  if (map.dataset && map.dataset !== options.dataset) {
+  // --production reuses the sandbox's map: production was filled by importing
+  // migration-dev, so its asset ids are the same, and main() proves that
+  // against the dataset before anything is written.
+  if (map.dataset && map.dataset !== options.dataset && !(options.production && map.dataset === 'migration-dev')) {
     throw new Error(
       `asset-map.json was built for dataset "${map.dataset}" and this run targets "${options.dataset}". Asset ids are per dataset; move the file aside or pass the matching dataset.`,
     )
@@ -2092,6 +2275,9 @@ function report(plan) {
   line(`  --acclaim-embed=${plan.options.acclaimEmbed}`)
   line(`  --gallery-alt=${plan.options.galleryAlt}`)
   line(`  --accept=${[...plan.options.accept].join(',') || '(nothing)'}`)
+  if (plan.stats.taxonomyFile) {
+    line(`  term names: wp-taxonomies.json extracted ${plan.stats.taxonomyFile.extractedAt}, used for ${plan.stats.taxonomyFile.taxonomies.join(', ')}`)
+  }
   if (plan.options.accept.has('taxonomy-ids')) {
     line('    taxonomy-ids accepted: company_category and people_category land as `wp-term-<id>` tags, to be renamed once the term names are re-extracted')
   }
@@ -2124,6 +2310,12 @@ function report(plan) {
   line(`  ${plan.stats.winnerRows} rows written, ${plan.stats.winnerRowsUnresolved} unresolved`)
   line(`  winner name -> company: exact ${match.exact}, punctuation ${match.punctuation}, legal suffix ${match.legalSuffix}, created ${match.created}`)
   line(`  award categories: ${(plan.byType.get('awardCategory') || []).length} (${plan.stats.awardCategorySlugCollisions} slug collisions disambiguated by hash)`)
+
+  line()
+  line('EMBEDS')
+  const providers = new Map()
+  for (const embed of plan.embeds) providers.set(embed.provider, (providers.get(embed.provider) || 0) + 1)
+  line(`  ${plan.embeds.length} kept in prose: ${[...providers].map(([provider, count]) => `${provider} ${count}`).join(', ') || 'none'}`)
 
   line()
   line('IMAGES')
@@ -2283,7 +2475,10 @@ function forWrite(document, options) {
 const USAGE = `
 Usage: node scripts/load-to-sanity.mjs --dataset <name> [options]
 
-  --dataset <name>            required. "production" is refused.
+  --dataset <name>            required. "production" also needs --production.
+  --production                allow --dataset production. Documents only: the
+                              asset phase is refused, and every asset in the
+                              map is checked to exist in production first.
   --commit                    actually write. Without it, nothing is sent.
   --assets                    run the asset phase (needs --commit).
   --plan <path>               write the built documents to a JSON file.
@@ -2310,6 +2505,7 @@ function parseArgs(argv) {
     galleryAlt: 'positional',
     concurrency: 3,
     assetDelay: 300,
+    production: false,
     projectId: process.env.NEXT_PUBLIC_SANITY_PROJECT_ID || 'hcxqlh4h',
   }
 
@@ -2322,6 +2518,7 @@ function parseArgs(argv) {
       case '--dataset': options.dataset = next(); break
       case '--commit': options.commit = true; break
       case '--assets': options.assets = true; break
+      case '--production': options.production = true; break
       case '--plan': options.plan = next(); break
       case '--accept': for (const code of next().split(',')) options.accept.add(code.trim()); break
       case '--inline-foreign-images': options.inlineForeignImages = next(); break
@@ -2336,9 +2533,11 @@ function parseArgs(argv) {
   }
 
   if (!options.dataset) throw new Error(`--dataset is required${USAGE}`)
-  if (options.dataset === 'production') {
-    throw new Error('refusing to touch the production dataset. Create a sandbox: npx sanity dataset create migration-dev')
+  if (options.dataset === 'production' && !options.production) {
+    throw new Error('refusing to touch the production dataset without --production. Rehearse on a sandbox: npx sanity dataset create migration-dev')
   }
+  if (options.production && options.dataset !== 'production') throw new Error('--production only goes with --dataset production')
+  if (options.production && options.assets) throw new Error('--production writes documents only; upload assets on a sandbox and import them')
   if (!['drop', 'keep'].includes(options.inlineForeignImages)) throw new Error('--inline-foreign-images takes drop or keep')
   if (!['draft', 'skip', 'publish'].includes(options.unpublished)) throw new Error('--unpublished takes draft, skip or publish')
   if (!['keep', 'drop'].includes(options.acclaimEmbed)) throw new Error('--acclaim-embed takes keep or drop')
@@ -2368,13 +2567,14 @@ async function main(argv) {
   const plan = newPlan(options)
   const events = readJson(`${SOURCE_DIR}/wp-events.json`)
   const source = readJson(`${SOURCE_DIR}/wp-source.json`)
-  const winners = readJson(`${SOURCE_DIR}/wp-events-winners.json`)
+  const sourceWinners = readJson(`${SOURCE_DIR}/wp-events-winners.json`)
   const media = readJson(`${SOURCE_DIR}/wp-media.json`)
 
   if (!media.complete) {
     plan.blockers.push({ code: 'media-incomplete', message: 'wp-media.json reports complete:false; some attachment URLs were never resolved' })
   }
   plan.media = media.media
+  plan.taxonomyNames = loadTaxonomyNames(plan)
 
   const eventRecords = events.records
   const companyRecords = source.types.companies.records
@@ -2383,10 +2583,11 @@ async function main(argv) {
   const resourceRecords = source.types.resource.records
 
   console.log(
-    `inputs: events ${eventRecords.length}, companies ${companyRecords.length}, people ${peopleRecords.length}, acclaim ${acclaimRecords.length}, resource ${resourceRecords.length}, winner pairs ${winners.length}, attachments ${Object.keys(plan.media).length}`,
+    `inputs: events ${eventRecords.length}, companies ${companyRecords.length}, people ${peopleRecords.length}, acclaim ${acclaimRecords.length}, resource ${resourceRecords.length}, winner pairs ${sourceWinners.length}, attachments ${Object.keys(plan.media).length}`,
   )
 
   assertRelationMirror(plan, companyRecords, peopleRecords)
+  const winners = fixWinnerRows(plan, sourceWinners)
 
   const programmeIds = buildProgrammeGroups(plan, eventRecords)
   const companyIds = buildCompanies(plan, companyRecords)
@@ -2465,6 +2666,16 @@ async function main(argv) {
   if (!assetsResolved) {
     console.error('\nrefusing to write documents before the asset phase: an image with no asset renders as nothing. Run with --assets --commit first.')
     return 1
+  }
+
+  if (options.production) {
+    const ids = [...new Set(Object.values(plan.assetMap.assets).map((entry) => entry._id))]
+    const found = await client.fetch('count(*[_id in $ids])', { ids })
+    if (found !== ids.length) {
+      console.error(`\nrefusing to write: ${ids.length - found} of ${ids.length} assets in the map are missing from ${options.dataset}`)
+      return 1
+    }
+    console.log(`\nassets: all ${ids.length} in the map exist in ${options.dataset}`)
   }
 
   await runWritePhase(plan, client)

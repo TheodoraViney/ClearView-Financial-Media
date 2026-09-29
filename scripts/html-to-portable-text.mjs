@@ -48,13 +48,16 @@
  *    they are replaced by the emoji character itself (from the `alt`, which
  *    carries it) before parsing, because an emoji is text, not an attachment.
  *
- * 5. `<iframe>` (37 in prose: vimeo 16, issuu 9, photobucket 11, 1 with no
- *    src) has no home in `richText` and no home in the schema at all. It is
- *    removed and reported per record so a decision can be made; it is never
- *    dropped silently. Same treatment for the 50 `<table>` elements in 14
- *    blobs, 48 `<hr>`, and the 4 `<script>`/`<style>` blocks. A further 8
- *    iframes live in the acclaim `issuu_embed_code` field, which is not prose
- *    and is excluded below with its reason.
+ * 5. `<iframe>` (37 in prose: 14 player.vimeo.com, 2 vimeo.com, 9 e.issuu.com,
+ *    11 s40.photobucket.com, 1 Twitter widget with no src). Vimeo and Issuu
+ *    become an `embed` member carrying the provider and an identifier, never
+ *    the src (see `parseEmbed()`), hoisted to a top-level block in document
+ *    order. Everything else is removed and reported per record; it is never
+ *    dropped silently. Photobucket shut third-party embeds in 2017, so those 11
+ *    stay removed. Same remove-and-report treatment for the 50 `<table>`
+ *    elements in 14 blobs, 48 `<hr>`, and the 4 `<script>`/`<style>` blocks. A
+ *    further 8 iframes live in the acclaim `issuu_embed_code` field, which is
+ *    not prose and is excluded below with its reason.
  *
  * ## Paste noise that is inert, and paste noise that is not
  *
@@ -159,7 +162,18 @@ const schema = compileSchema({
   ],
   // `options: {hotspot: true}` is deliberately not mirrored: it changes the
   // Studio cropping UI and nothing about deserialisation.
-  blockObjects: [{ name: 'image', fields: [{ name: 'alt', type: 'string' }] }],
+  blockObjects: [
+    { name: 'image', fields: [{ name: 'alt', type: 'string' }] },
+    {
+      name: 'embed',
+      fields: [
+        { name: 'provider', type: 'string' },
+        { name: 'id', type: 'string' },
+        { name: 'hash', type: 'string' },
+        { name: 'caption', type: 'string' },
+      ],
+    },
+  ],
   inlineObjects: [],
 })
 
@@ -310,6 +324,75 @@ function hostOf(src) {
   }
 }
 
+/**
+ * iframe src -> `{provider, id, hash?}` for the `embed` member, or `{reason}`.
+ *
+ * Only the identifier is kept. Player options in the query string (`color`,
+ * `title=0`, `autoplay=1&loop=1` on one clip, Issuu's `hideIssuuLogo`) are
+ * cosmetic and the front end sets its own. The shapes seen in the corpus:
+ *
+ *   player.vimeo.com/video/762229585?h=54e5b4c1c2   -> vimeo 762229585, hash 54e5b4c1c2
+ *   vimeo.com/showcase/6614946/embed                -> vimeo showcase/6614946
+ *   vimeo.com/album/5863708/embed                   -> vimeo showcase/5863708
+ *   e.issuu.com/embed.html?pubId=68c1ef32...f0b     -> issuu 68c1ef32...f0b
+ *   e.issuu.com/embed.html?d=fwrfintechreport2024&u=clearviewpublishing
+ *                                                   -> issuu clearviewpublishing/fwrfintechreport2024
+ *
+ * `h` is Vimeo's privacy hash, on 8 of the 14 player iframes: an unlisted
+ * video does not play without it. Vimeo renamed albums to showcases in 2019 and the ids are shared,
+ * so an album becomes a showcase. Protocol-relative and `http:` srcs parse the
+ * same, because only the host and path are read.
+ */
+export function parseEmbed(raw) {
+  const src = String(raw ?? '').trim()
+  let url
+  try {
+    url = new URL(src.startsWith('//') ? `https:${src}` : src)
+  } catch {
+    return { reason: 'src is not a URL' }
+  }
+  if (url.protocol !== 'https:' && url.protocol !== 'http:') return { reason: `scheme ${url.protocol}` }
+  const host = url.hostname.toLowerCase()
+  const path = url.pathname.replace(/\/+$/, '')
+
+  if (host === 'player.vimeo.com' || host === 'vimeo.com' || host === 'www.vimeo.com') {
+    const video = /^\/(?:video\/)?(\d+)$/.exec(path)
+    if (video) {
+      const hash = url.searchParams.get('h')
+      return { provider: 'vimeo', id: video[1], hash: hash && /^[0-9a-f]+$/i.test(hash) ? hash.toLowerCase() : undefined }
+    }
+    const showcase = /^\/(?:showcase|album)\/(\d+)(?:\/embed)?$/.exec(path)
+    if (showcase) return { provider: 'vimeo', id: `showcase/${showcase[1]}` }
+    return { reason: 'Vimeo URL with no video or showcase id' }
+  }
+
+  if (host === 'e.issuu.com') {
+    const pubId = (url.searchParams.get('pubId') || '').toLowerCase()
+    if (/^[0-9a-f]{32}$/.test(pubId)) return { provider: 'issuu', id: pubId }
+    const user = url.searchParams.get('u') || ''
+    const document = url.searchParams.get('d') || ''
+    if (/^[\w.-]+$/.test(user) && /^[\w.-]+$/.test(document)) return { provider: 'issuu', id: `${user}/${document}` }
+    return { reason: 'Issuu URL with neither pubId nor d and u' }
+  }
+
+  return { reason: 'host is not Vimeo or Issuu' }
+}
+
+/**
+ * Lift `el` out of every ancestor up to `<body>`, splitting each ancestor
+ * around it, so `<p>a<iframe>b</p>` becomes `<p>a</p><iframe><p>b</p>`. Text
+ * keeps its order; the empty halves become empty blocks and are dropped later.
+ */
+function hoist(el) {
+  const body = el.ownerDocument.body
+  while (el.parentNode && el.parentNode !== body) {
+    const parent = el.parentNode
+    const after = parent.cloneNode(false)
+    while (el.nextSibling) after.appendChild(el.nextSibling)
+    parent.after(el, after)
+  }
+}
+
 function rename(doc, el, tag) {
   const next = doc.createElement(tag)
   while (el.firstChild) next.appendChild(el.firstChild)
@@ -319,11 +402,20 @@ function rename(doc, el, tag) {
 }
 
 function domClean(doc, notes) {
-  // Iframes: 45 in the corpus, no home in the schema. Recorded, then removed,
-  // so the report can name the record that loses an embed.
+  // Iframes: 37 in prose. Vimeo and Issuu are kept for the `embed` rule and
+  // hoisted below, once containers are flattened. The rest are recorded, then
+  // removed, so the report can name the record that loses an embed.
+  const embeds = []
   for (const el of Array.from(doc.querySelectorAll('iframe'))) {
     const src = el.getAttribute('src') || ''
-    notes.iframes.push({ src, host: hostOf(src) || '(no src)' })
+    const embed = parseEmbed(src)
+    if (embed.provider) {
+      notes.embeds.push({ ...embed, src })
+      el.setAttribute('data-embed', JSON.stringify(compact(embed)))
+      embeds.push(el)
+      continue
+    }
+    notes.iframes.push({ src, host: hostOf(src) || '(no src)', reason: embed.reason })
     el.remove()
   }
 
@@ -358,6 +450,11 @@ function domClean(doc, notes) {
       rename(doc, el, 'p')
     }
   }
+
+  // An embed is a block member, so it cannot sit inside a paragraph, a list
+  // item or a link. 1214 has it in `<p align="center">`, 1275 in a table cell
+  // followed by Vimeo's attribution line; both keep their text either side.
+  for (const el of embeds) hoist(el)
 
   // Headings the schema does not have. h5 appears 186 times, h1 twice.
   for (const el of Array.from(doc.querySelectorAll('h1,h5,h6'))) {
@@ -619,6 +716,7 @@ function emptyNotes() {
     inlineUnwrapped: {},
     tables: [],
     iframes: [],
+    embeds: [],
     images: [],
     links: { kept: {}, repaired: [], dropped: [] },
     unmapped: [],
@@ -667,6 +765,15 @@ export function convert(html) {
   }
 
   const rules = [
+    {
+      deserialize(el, next, createBlock) {
+        if (!el.tagName || el.tagName.toLowerCase() !== 'iframe') return undefined
+        const embed = JSON.parse(el.getAttribute('data-embed') || 'null')
+        // `domClean` removed every iframe it did not mark, so this is a guard.
+        if (!embed) return undefined
+        return createBlock({ _type: 'embed', _key: keyGenerator(), ...embed })
+      },
+    },
     {
       deserialize(el, next) {
         if (!el.tagName || el.tagName.toLowerCase() !== 'a') return undefined
@@ -966,6 +1073,7 @@ function main(argv) {
     linksDropped: [],
     images: [],
     iframes: [],
+    embeds: [],
     tables: [],
     scripts: [],
     stripped: { mceBookmark: 0, dataStartEnd: 0, hr: 0 },
@@ -1017,6 +1125,8 @@ function main(argv) {
     for (const item of notes.links.dropped) totals.linksDropped.push({ ...blob, ...item })
     for (const item of notes.images) totals.images.push({ type: blob.type, id: blob.id, path: blob.path, ...item })
     for (const item of notes.iframes) totals.iframes.push({ type: blob.type, id: blob.id, path: blob.path, ...item })
+    for (const { id: embedId, ...item } of notes.embeds)
+      totals.embeds.push({ type: blob.type, id: blob.id, path: blob.path, embedId, ...item })
     for (const cells of notes.tables) totals.tables.push({ type: blob.type, id: blob.id, path: blob.path, cells })
     for (const sample of [...notes.stripped.script, ...notes.stripped.style])
       totals.scripts.push({ type: blob.type, id: blob.id, path: blob.path, sample })
@@ -1141,10 +1251,20 @@ function report(totals, blobs, strays, targets) {
   for (const img of noId) p(`    ${img.type} ${img.id} ${img.path}: ${img.src.slice(0, 110)}`)
   p()
 
+  const providers = {}
+  for (const item of totals.embeds) bump(providers, item.provider)
+  p('Embeds')
+  p(`  embed members emitted   ${totals.embeds.length}`)
+  p(table(providers) || '         0')
+  for (const item of totals.embeds) {
+    p(`    ${item.type} ${item.id} ${item.path}: ${item.provider} ${item.embedId}${item.hash ? ` h=${item.hash}` : ''}`)
+  }
+  p()
+
   p('Unmapped constructs, by record')
-  p(`  iframes removed ${totals.iframes.length} - no member in richText, decision needed`)
+  p(`  iframes removed ${totals.iframes.length} - not Vimeo or Issuu, no member in richText`)
   for (const item of totals.iframes) {
-    p(`    ${item.type} ${item.id} ${item.path}: ${item.host}  ${item.src.slice(0, 90)}`)
+    p(`    ${item.type} ${item.id} ${item.path}: ${item.host}  ${item.src.slice(0, 90)}  (${item.reason})`)
   }
   p(`  tables flattened to paragraphs ${totals.tables.length}`)
   for (const item of totals.tables) p(`    ${item.type} ${item.id} ${item.path}: ${item.cells} cells`)
