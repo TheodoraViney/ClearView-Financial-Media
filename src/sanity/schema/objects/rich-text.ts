@@ -1,3 +1,4 @@
+import { PlayIcon } from '@sanity/icons/Play'
 import { defineArrayMember, defineField, defineType } from 'sanity'
 
 import { altField } from '../fields'
@@ -12,6 +13,11 @@ import { altField } from '../fields'
  * The link annotation allowlists schemes. Without it a CMS-authored
  * `javascript:` href is stored XSS, one of the three live bugs in README
  * section 10.
+ *
+ * The embed member exists for the Vimeo and Issuu iframes inside migrated
+ * prose. It stores an identifier, never a URL or HTML, so the front end builds
+ * the iframe from a fixed template per provider and nothing an editor types can
+ * point it at another host.
  */
 export const richText = defineType({
   name: 'richText',
@@ -58,6 +64,73 @@ export const richText = defineType({
       type: 'image',
       options: { hotspot: true },
       fields: [altField],
+    }),
+    defineArrayMember({
+      name: 'embed',
+      title: 'Embed',
+      type: 'object',
+      icon: PlayIcon,
+      fields: [
+        defineField({
+          name: 'provider',
+          title: 'Provider',
+          type: 'string',
+          options: {
+            list: [
+              { title: 'Vimeo', value: 'vimeo' },
+              { title: 'Issuu', value: 'issuu' },
+            ],
+            layout: 'radio',
+          },
+          validation: (Rule) => Rule.required(),
+        }),
+        defineField({
+          name: 'id',
+          title: 'ID',
+          type: 'string',
+          description:
+            'Vimeo: the numeric video id, for example 762229585, or showcase/6614946 for a showcase. Issuu: the 32-character pubId, for example 68c1ef3232d11826d464e0575ef51f0b, or {user}/{document} for older embeds, for example clearviewpublishing/fwrfintechreport2024.',
+          validation: (Rule) =>
+            Rule.required().custom((id, context) => {
+              const { provider } = (context.parent ?? {}) as { provider?: string }
+
+              if (!id || !provider) {
+                return true
+              }
+              if (provider === 'vimeo' && !/^(?:showcase\/)?\d+$/.test(id)) {
+                return 'A Vimeo id is digits only, or showcase/ followed by digits'
+              }
+              if (provider === 'issuu' && !/^(?:[0-9a-f]{32}|[\w.-]+\/[\w.-]+)$/.test(id)) {
+                return 'An Issuu id is a 32-character pubId, or {user}/{document}'
+              }
+
+              return true
+            }),
+        }),
+        defineField({
+          name: 'hash',
+          title: 'Vimeo privacy hash',
+          type: 'string',
+          description:
+            'The h= value from an unlisted video link, for example 54e5b4c1c2. Unlisted videos do not play without it.',
+          hidden: ({ parent }) => parent?.provider !== 'vimeo',
+          validation: (Rule) => Rule.regex(/^[0-9a-f]+$/, { name: 'Vimeo privacy hash', invert: false }),
+        }),
+        defineField({
+          name: 'caption',
+          title: 'Caption',
+          type: 'string',
+        }),
+      ],
+      preview: {
+        select: { provider: 'provider', id: 'id', caption: 'caption' },
+        prepare({ provider, id, caption }) {
+          return {
+            title: caption || (provider === 'issuu' ? 'Issuu publication' : 'Vimeo video'),
+            subtitle: id,
+          }
+        },
+      },
     }),
   ],
 })

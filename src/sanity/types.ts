@@ -153,6 +153,14 @@ export type RichText = Array<
       _type: "image";
       _key: string;
     }
+  | {
+      provider?: "vimeo" | "issuu";
+      id?: string;
+      hash?: string;
+      caption?: string;
+      _type: "embed";
+      _key: string;
+    }
 >;
 
 export type SanityFileAssetReference = {
@@ -597,6 +605,32 @@ export type Brand = {
   brandColor?: string;
 };
 
+export type MediaFolderReference = {
+  _ref: string;
+  _type: "reference";
+  _weak?: boolean;
+  [internalGroqTypeReferenceTo]?: "media.folder";
+};
+
+export type MediaFolder = {
+  _id: string;
+  _type: "media.folder";
+  _createdAt: string;
+  _updatedAt: string;
+  _rev: string;
+  name?: string;
+  parent?: MediaFolderReference;
+};
+
+export type MediaTag = {
+  _id: string;
+  _type: "media.tag";
+  _createdAt: string;
+  _updatedAt: string;
+  _rev: string;
+  name?: Slug;
+};
+
 export type SanityImagePaletteSwatch = {
   _type: "sanity.imagePaletteSwatch";
   background?: string;
@@ -725,6 +759,9 @@ export type AllSanitySchemaTypes =
   | Post
   | Page
   | Brand
+  | MediaFolderReference
+  | MediaFolder
+  | MediaTag
   | SanityImagePaletteSwatch
   | SanityImagePalette
   | SanityImageDimensions
