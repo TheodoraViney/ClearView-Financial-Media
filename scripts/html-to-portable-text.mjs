@@ -235,6 +235,17 @@ function preClean(html, notes) {
   // reported if the URL is not Vimeo or Issuu.
   out = out.replace(/\[embed\]\s*(https?:\/\/[^\s[\]"<>]+)\s*\[\/embed\]/gi, (m, url) => `<iframe src="${url}"></iframe>`)
 
+  // WordPress's `[gallery ids="1,2,3"]` shortcode: a grid of library images.
+  // One in the corpus, 204 images at the top of event 11372's body. It is
+  // taken out of the prose and its ids handed to the caller in notes.galleries;
+  // the loader files them in the record's `photographs` gallery.
+  out = out.replace(/\[gallery\b([^\]]*)\]/gi, (m, attrs) => {
+    const ids = /\bids\s*=\s*["']([^"']+)["']/i.exec(attrs)?.[1]
+    if (!ids) return m
+    notes.galleries.push({ ids: ids.split(',').map((id) => id.trim()).filter(Boolean) })
+    return ''
+  })
+
   // WordPress's `[video mp4="URL"][/video]` shortcode: a video file in
   // wp-content/uploads, played by WordPress's own player. 6 in the corpus: 4 in
   // prose (23133, 26744, 29821, 29954) and 2 in cyph_winners (22180, 23686).
@@ -743,6 +754,7 @@ function emptyNotes() {
     iframes: [],
     embeds: [],
     videos: [],
+    galleries: [],
     images: [],
     links: { kept: {}, repaired: [], dropped: [] },
     unmapped: [],
