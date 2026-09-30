@@ -66,7 +66,7 @@
  */
 
 import { createHash } from 'node:crypto'
-import { existsSync, mkdirSync, readFileSync, renameSync, writeFileSync } from 'node:fs'
+import { existsSync, mkdirSync, readdirSync, readFileSync, renameSync, writeFileSync } from 'node:fs'
 import { dirname, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
 
@@ -207,8 +207,12 @@ const F = {
  */
 const TERM_AWARDS = '6'
 const TERM_SUMMITS = '8'
-const TERM_BRIEFINGS = '21'
-const TERM_WEBINAR = '9'
+// Names and ids from wp-taxonomies.json (edit-tags.php, 2026-09-29) and the
+// body class of each live /events-category/ page. 9 and 21 were guessed the
+// wrong way round before the names were extracted, which filed 72 briefings as
+// webinars; fixed 2026-09-30.
+const TERM_BRIEFINGS = '9'
+const TERM_WEBINAR = '21'
 
 /**
  * The three records whose `events-category` terms do not resolve on their own.
@@ -219,13 +223,13 @@ const EVENT_OVERRIDES = {
   20663: {
     type: 'awardsProgramme',
     reason:
-      'terms 6,21 (awards + briefings). Briefings has no record of its own; the awards term wins and the record is the Tenth Annual WealthBriefingAsia Awards 2022.',
+      'terms 6,21 (awards + webinar). The only record carrying the Webinar term; the awards term wins and the record is the Tenth Annual WealthBriefingAsia Awards 2022.',
   },
   45031: {
     type: 'conferenceEvent',
-    eventType: 'webinar',
+    eventType: 'briefing',
     reason:
-      'terms 9,8 (webinar + summits). Title begins "Webinar:" and the record carries speaker types, so webinar wins over summit.',
+      'terms 9,8 (briefings + summits). Title begins "Webinar:", but the record is not in the Webinar category: the live site lists it under Briefings and Summits. Briefing keeps it on one of the listings it is on today.',
   },
   2877: {
     type: 'conferenceEvent',
@@ -624,6 +628,10 @@ function prose(html, context, plan) {
   const { blocks, notes } = convert(html)
   const out = []
 
+  // `[gallery]` shortcodes come back as id lists; buildEvents() files the one
+  // in an event body under `photographs`, anything else is reported there.
+  for (const gallery of notes.galleries) plan.proseGalleries.push({ where: context.where, ids: gallery.ids })
+
   // The converter removes what richText has no member for and reports it
   // rather than dropping it silently. Those reports stop at the converter, so
   // they are carried up here: 12 iframes (11 Photobucket, 1 Twitter widget)
@@ -821,6 +829,7 @@ function newPlan(options) {
     removed: [],
     embeds: [],
     videos: [],
+    proseGalleries: [],
     altSources: new Map(),
     stats: {},
     references: { requested: 0, resolved: 0, failed: [] },
@@ -1641,6 +1650,18 @@ function buildEvents(plan, records, ids) {
 
     if (!common.startDate) {
       plan.blockers.push({ code: 'event-without-start-date', message: `${where}: startDate is required and empty` })
+    }
+
+    // A [gallery] shortcode in the body is the record's photo gallery, written
+    // into prose instead of the Photographs field.
+    for (const found of plan.proseGalleries.filter((entry) => entry.where === `${where} body`)) {
+      if (common.photographs) {
+        plan.problems.push(`${where}: body [gallery] of ${found.ids.length} images not carried, photographs is already filled`)
+        continue
+      }
+      common.photographs = gallery(plan, found.ids, where, title)
+      found.carried = true
+      plan.notes.push(`${where}: body [gallery] of ${found.ids.length} images filed under photographs`)
     }
 
     // Carried as the source has it: a reversed pair is the client's typo, not a
@@ -2622,6 +2643,18 @@ async function main(argv) {
     plan.blockers.push({ code: 'media-incomplete', message: 'wp-media.json reports complete:false; some attachment URLs were never resolved' })
   }
   plan.media = media.media
+  // Supplementary resolver runs, e.g. wp-media-11372.json for the 204 images of
+  // the [gallery] shortcode on 11372, which the manifest never asked for because
+  // no attachment field points at them.
+  for (const name of readdirSync(SOURCE_DIR).filter((file) => /^wp-media-.+\.json$/.test(file))) {
+    const extra = readJson(`${SOURCE_DIR}/${name}`)
+    if (!extra.complete) {
+      plan.blockers.push({ code: 'media-incomplete', message: `${name} reports complete:false` })
+      continue
+    }
+    for (const [id, entry] of Object.entries(extra.media)) plan.media[id] ||= entry
+    plan.notes.push(`media: ${Object.keys(extra.media).length} attachments added from ${name}`)
+  }
   plan.taxonomyNames = loadTaxonomyNames(plan)
 
   const eventRecords = events.records
@@ -2665,6 +2698,10 @@ async function main(argv) {
       plan.byType.set(type, list.filter((document) => !document._wpStatus || document._wpStatus === 'publish'))
     }
     console.log(`--unpublished=skip removed ${before - plan.documents.length} documents`)
+  }
+
+  for (const found of plan.proseGalleries.filter((entry) => !entry.carried)) {
+    plan.problems.push(`${found.where}: [gallery] of ${found.ids.length} images has no Photographs field to go to and is not carried`)
   }
 
   const assetsResolved =
