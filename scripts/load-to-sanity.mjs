@@ -1329,6 +1329,18 @@ function buildAcclaim(plan, records, acclaimProgramme) {
   return ids
 }
 
+/**
+ * `resource-categories` never reached the dump: Resources are the one CPT on
+ * the block editor, whose taxonomy panel posts over REST, so no tax_input is
+ * printed into the edit screen. The category is taken from the live site
+ * instead: /resource-categories/research/ listed exactly these 12 records on
+ * 2026-09-30 (9 on page 1, 3 on page 2), wp-taxonomies.json counts 12 on term
+ * 52 Research, and the other two terms (Webinars, Interview) hold none. A
+ * resource missing from this list is a blocker, so a record added before the
+ * December re-export gets looked at instead of guessed.
+ */
+const RESEARCH_RESOURCES = new Set(['46443', '45793', '45521', '42959', '41440', '41249', '40105', '39971', '36571', '37454', '37458', '37498'])
+
 function buildResources(plan, records, companyIds, personIds) {
   for (const record of records) {
     const seen = new Set(['rec:id', 'rec:title', 'rec:slug', 'rec:status', 'rec:content'])
@@ -1371,9 +1383,7 @@ function buildResources(plan, records, companyIds, personIds) {
         _type: 'resource',
         title,
         slug: { _type: 'slug', current: record.slug || slugify(title) },
-        // `resource-categories` never reached the dump - the taxonomy is absent
-        // from all 12 records - so `category` is left unset rather than guessed
-        // at from the /resource-categories/research/ listing.
+        category: RESEARCH_RESOURCES.has(String(record.id)) ? 'research' : undefined,
         body: prose(record.content, { where: `${where} body`, fallbackAlt: title }, plan),
         downloadThumbnail: thumbIsImage
           ? image(plan, thumbId, 'resourceDownloadThumbnail', { where, parentTitle: title })
@@ -1388,6 +1398,13 @@ function buildResources(plan, records, companyIds, personIds) {
         legacyWpId: Number(record.id),
       }),
     )
+
+    if (!RESEARCH_RESOURCES.has(String(record.id))) {
+      plan.blockers.push({
+        code: 'resource-category-unknown',
+        message: `${where}: not in RESEARCH_RESOURCES. Check which /resource-categories/ listing shows it on the live site and add it.`,
+      })
+    }
 
     auditRecord(plan, 'resource', record, seen)
   }
