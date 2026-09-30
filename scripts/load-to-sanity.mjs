@@ -605,6 +605,14 @@ const keyed = (items, prefix) =>
  */
 const LIBRARY_HOST = 'clearviewpublishing.com'
 
+const hostOf = (url) => {
+  try {
+    return new URL(url).hostname.replace(/^www\./, '')
+  } catch {
+    return undefined
+  }
+}
+
 /**
  * Convert one wysiwyg blob and hand back Portable Text plus the inline images
  * it found. Images arrive from the converter as `{_type:'image', wpImage:{...}}`
@@ -641,6 +649,37 @@ function prose(html, context, plan) {
   }
 
   for (const block of blocks) {
+    // `[video mp4="..."]` files from wp-content/uploads. They are referenced
+    // only from prose, never from an attachment field, so wp-media.json does not
+    // list them and they are keyed on their URL like the 54 inline images below.
+    if (block._type === 'videoFile' && block.wpVideo) {
+      const url = block.wpVideo.src
+      if (hostOf(url) !== LIBRARY_HOST) {
+        plan.problems.push(`${context.where}: video file on ${hostOf(url) || 'an invalid URL'} is not in the WordPress library and is not carried — ${url}`)
+        continue
+      }
+      const assetKey = `url-${hash10(url)}`
+      plan.assetsWanted.set(assetKey, {
+        key: assetKey,
+        kind: 'file',
+        url,
+        filename: url.split('/').pop(),
+        mimeType: 'video/mp4',
+        origin: 'inline-video',
+      })
+      plan.videos.push({ where: context.where, url })
+      out.push(
+        pick({
+          _type: 'videoFile',
+          _key: block._key,
+          title: context.fallbackAlt ? `${context.fallbackAlt} — video` : undefined,
+          asset: plan.assetRef(assetKey, 'file'),
+          _wpAssetKey: assetKey,
+        }),
+      )
+      continue
+    }
+
     if (block._type !== 'image' || !block.wpImage) {
       out.push(block)
       continue
@@ -781,6 +820,7 @@ function newPlan(options) {
     inlineImages: { resolved: [], foreign: [], unresolvable: [] },
     removed: [],
     embeds: [],
+    videos: [],
     altSources: new Map(),
     stats: {},
     references: { requested: 0, resolved: 0, failed: [] },
@@ -1661,8 +1701,12 @@ function buildEvents(plan, records, ids) {
       // cyph_winners is parsed into winner rows, never converted as prose, so an
       // embed inside it has no block to land in. One exists: 20953 carries
       // Vimeo 762229585, the same video 24939 shows in previousWinners.
-      for (const embed of convert(String(rawWinners || '')).notes.embeds) {
+      const winnerNotes = convert(String(rawWinners || '')).notes
+      for (const embed of winnerNotes.embeds) {
         plan.problems.push(`${where} winners: ${embed.provider} ${embed.id} embedded in cyph_winners is not carried, the field becomes winner rows`)
+      }
+      for (const video of winnerNotes.videos) {
+        plan.problems.push(`${where} winners: video file ${video.src.split('/').pop()} in cyph_winners is not carried, the field becomes winner rows`)
       }
 
       document = pick({
@@ -2002,10 +2046,7 @@ function loadAssetMap(options) {
     return { version: 1, projectId: options.projectId, dataset: options.dataset, assets: {}, failed: {} }
   }
   const map = JSON.parse(readFileSync(ASSET_MAP_PATH, 'utf8'))
-  // --production reuses the sandbox's map: production was filled by importing
-  // migration-dev, so its asset ids are the same, and main() proves that
-  // against the dataset before anything is written.
-  if (map.dataset && map.dataset !== options.dataset && !(options.production && map.dataset === 'migration-dev')) {
+  if (map.dataset && map.dataset !== options.dataset) {
     throw new Error(
       `asset-map.json was built for dataset "${map.dataset}" and this run targets "${options.dataset}". Asset ids are per dataset; move the file aside or pass the matching dataset.`,
     )
@@ -2165,6 +2206,12 @@ function assertDocuments(plan, { assetsResolved }) {
       if (assetsResolved && node && typeof node === 'object' && node._type === 'image' && !node.asset) {
         plan.blockers.push({ code: 'image-without-asset', message: `${id} ${path}: image with no asset renders as nothing` })
       }
+      if (assetsResolved && node && typeof node === 'object' && node._type === 'videoFile' && !node.asset) {
+        plan.blockers.push({ code: 'file-without-asset', message: `${id} ${path}: video file with no asset plays nothing` })
+      }
+      if (node && typeof node === 'object' && node._type === 'videoFile' && node.asset && !node.title) {
+        plan.blockers.push({ code: 'video-without-title', message: `${id} ${path}: an attached video with no title fails schema validation` })
+      }
       if (assetsResolved && node && typeof node === 'object' && node._type === 'file' && !node.asset) {
         plan.blockers.push({ code: 'file-without-asset', message: `${id} ${path}: file with no asset has nothing to download` })
       }
@@ -2316,6 +2363,8 @@ function report(plan) {
   const providers = new Map()
   for (const embed of plan.embeds) providers.set(embed.provider, (providers.get(embed.provider) || 0) + 1)
   line(`  ${plan.embeds.length} kept in prose: ${[...providers].map(([provider, count]) => `${provider} ${count}`).join(', ') || 'none'}`)
+  line(`  ${plan.videos.length} video files in prose`)
+  for (const video of plan.videos) line(`    ${video.where}: ${video.url.split('/').pop()}`)
 
   line()
   line('IMAGES')
@@ -2476,9 +2525,9 @@ const USAGE = `
 Usage: node scripts/load-to-sanity.mjs --dataset <name> [options]
 
   --dataset <name>            required. "production" also needs --production.
-  --production                allow --dataset production. Documents only: the
-                              asset phase is refused, and every asset in the
-                              map is checked to exist in production first.
+  --production                allow --dataset production. Before documents are
+                              written, every asset in the map is checked to
+                              exist in production.
   --commit                    actually write. Without it, nothing is sent.
   --assets                    run the asset phase (needs --commit).
   --plan <path>               write the built documents to a JSON file.
@@ -2537,7 +2586,6 @@ function parseArgs(argv) {
     throw new Error('refusing to touch the production dataset without --production. Rehearse on a sandbox: npx sanity dataset create migration-dev')
   }
   if (options.production && options.dataset !== 'production') throw new Error('--production only goes with --dataset production')
-  if (options.production && options.assets) throw new Error('--production writes documents only; upload assets on a sandbox and import them')
   if (!['drop', 'keep'].includes(options.inlineForeignImages)) throw new Error('--inline-foreign-images takes drop or keep')
   if (!['draft', 'skip', 'publish'].includes(options.unpublished)) throw new Error('--unpublished takes draft, skip or publish')
   if (!['keep', 'drop'].includes(options.acclaimEmbed)) throw new Error('--acclaim-embed takes keep or drop')

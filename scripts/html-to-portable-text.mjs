@@ -164,6 +164,7 @@ const schema = compileSchema({
   // Studio cropping UI and nothing about deserialisation.
   blockObjects: [
     { name: 'image', fields: [{ name: 'alt', type: 'string' }] },
+    { name: 'videoFile', fields: [{ name: 'title', type: 'string' }] },
     {
       name: 'embed',
       fields: [
@@ -224,6 +225,24 @@ function preClean(html, notes) {
   out = out.replace(/<\/?(?:script|style)\b[^>]*>/gi, (m) => {
     notes.stripped.script.push(`unclosed: ${m.slice(0, 120)}`)
     return ''
+  })
+
+  // WordPress's `[embed]URL[/embed]` shortcode, which WordPress turns into a
+  // player at render time. 6 in the corpus, all vimeo.com: 4 in previousWinners
+  // (26755, 28981, 29132, 30499) and 2 in cyph_winners (22122, 23024). Left
+  // alone it lands as literal text, so it is rewritten into the iframe it
+  // renders as and takes the iframe path: kept as an embed, or removed and
+  // reported if the URL is not Vimeo or Issuu.
+  out = out.replace(/\[embed\]\s*(https?:\/\/[^\s[\]"<>]+)\s*\[\/embed\]/gi, (m, url) => `<iframe src="${url}"></iframe>`)
+
+  // WordPress's `[video mp4="URL"][/video]` shortcode: a video file in
+  // wp-content/uploads, played by WordPress's own player. 6 in the corpus: 4 in
+  // prose (23133, 26744, 29821, 29954) and 2 in cyph_winners (22180, 23686).
+  // It rides the iframe path for hoisting and becomes a `videoFile` block; the
+  // loader fetches the file like an inline image.
+  out = out.replace(/\[video\b([^\]]*)\](?:\s*\[\/video\])?/gi, (m, attrs) => {
+    const src = /\b(?:mp4|webm|m4v|mov|src)\s*=\s*["']([^"']+)["']/i.exec(attrs)?.[1]
+    return src ? `<iframe data-wp-video="${src}"></iframe>` : m
   })
 
   // TinyMCE selection bookmarks and the zero-width chars they leave behind.
@@ -407,6 +426,12 @@ function domClean(doc, notes) {
   // removed, so the report can name the record that loses an embed.
   const embeds = []
   for (const el of Array.from(doc.querySelectorAll('iframe'))) {
+    const video = el.getAttribute('data-wp-video')
+    if (video) {
+      notes.videos.push({ src: video, host: hostOf(video) || '(invalid src)' })
+      embeds.push(el)
+      continue
+    }
     const src = el.getAttribute('src') || ''
     const embed = parseEmbed(src)
     if (embed.provider) {
@@ -717,6 +742,7 @@ function emptyNotes() {
     tables: [],
     iframes: [],
     embeds: [],
+    videos: [],
     images: [],
     links: { kept: {}, repaired: [], dropped: [] },
     unmapped: [],
@@ -768,6 +794,8 @@ export function convert(html) {
     {
       deserialize(el, next, createBlock) {
         if (!el.tagName || el.tagName.toLowerCase() !== 'iframe') return undefined
+        const video = el.getAttribute('data-wp-video')
+        if (video) return createBlock({ _type: 'videoFile', _key: keyGenerator(), wpVideo: { src: video } })
         const embed = JSON.parse(el.getAttribute('data-embed') || 'null')
         // `domClean` removed every iframe it did not mark, so this is a guard.
         if (!embed) return undefined

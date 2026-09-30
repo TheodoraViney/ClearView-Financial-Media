@@ -124,6 +124,13 @@ export type PersonGroup = {
   >;
 };
 
+export type SanityFileAssetReference = {
+  _ref: string;
+  _type: "reference";
+  _weak?: boolean;
+  [internalGroqTypeReferenceTo]?: "sanity.fileAsset";
+};
+
 export type RichText = Array<
   | {
       children?: Array<{
@@ -154,6 +161,13 @@ export type RichText = Array<
       _key: string;
     }
   | {
+      asset?: SanityFileAssetReference;
+      media?: unknown;
+      title?: string;
+      _type: "videoFile";
+      _key: string;
+    }
+  | {
       provider?: "vimeo" | "issuu";
       id?: string;
       hash?: string;
@@ -162,13 +176,6 @@ export type RichText = Array<
       _key: string;
     }
 >;
-
-export type SanityFileAssetReference = {
-  _ref: string;
-  _type: "reference";
-  _weak?: boolean;
-  [internalGroqTypeReferenceTo]?: "sanity.fileAsset";
-};
 
 export type Resource = {
   _id: string;
@@ -741,8 +748,8 @@ export type AllSanitySchemaTypes =
   | CompanyGroup
   | PersonReference
   | PersonGroup
-  | RichText
   | SanityFileAssetReference
+  | RichText
   | Resource
   | SanityImageCrop
   | SanityImageHotspot

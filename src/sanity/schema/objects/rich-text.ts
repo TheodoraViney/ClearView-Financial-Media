@@ -1,4 +1,5 @@
 import { PlayIcon } from '@sanity/icons/Play'
+import { VideoIcon } from '@sanity/icons/Video'
 import { defineArrayMember, defineField, defineType } from 'sanity'
 
 import { altField } from '../fields'
@@ -64,6 +65,38 @@ export const richText = defineType({
       type: 'image',
       options: { hotspot: true },
       fields: [altField],
+    }),
+    // A video file held in the media library, the counterpart of `image`. In
+    // WordPress these were `[video mp4="..."]` shortcodes pointing at files in
+    // wp-content/uploads: 4 in prose (23133, 26744, 29821, 29954).
+    defineArrayMember({
+      name: 'videoFile',
+      title: 'Video file',
+      type: 'file',
+      icon: VideoIcon,
+      options: { accept: 'video/*' },
+      fields: [
+        defineField({
+          name: 'title',
+          title: 'Title',
+          type: 'string',
+          description: 'Names the video for screen readers. Required once a file is attached.',
+          validation: (Rule) =>
+            Rule.custom((title, context) => {
+              const parent = context.parent as { asset?: { _ref?: string } } | undefined
+              if (parent?.asset?._ref && !title?.trim()) {
+                return 'A video needs a title'
+              }
+              return true
+            }),
+        }),
+      ],
+      preview: {
+        select: { title: 'title', filename: 'asset.originalFilename' },
+        prepare({ title, filename }) {
+          return { title: title || 'Video file', subtitle: filename }
+        },
+      },
     }),
     defineArrayMember({
       name: 'embed',
