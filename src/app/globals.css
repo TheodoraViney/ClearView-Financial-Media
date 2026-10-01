@@ -1,26 +1,197 @@
 @import "tailwindcss";
 
+/*
+ * Design tokens from the Claude Design project (ClearView/tokens.css and the
+ * per-brand tokens.css files). Neutrals are shared by every brand; semantic
+ * brand roles are switched by the data-brand attribute set in
+ * src/app/sites/[brand]/layout.tsx. :root carries the ClearView values so
+ * pages outside a brand shell still render.
+ */
+
 :root {
   --background: #ffffff;
-  --foreground: #171717;
+  --foreground: #1f2b32;
+
+  /* Brand palettes, names as in the design files */
+  --wb-blue-800: #10377d;
+  --wb-blue-700: #174493;
+  --wb-blue-600: #2860b5;
+  --wb-blue-50: #f6f9fe;
+  --wb-blue-border: #dce6f6;
+
+  --wba-red-800: #8e100e;
+  --wba-red-700: #b41412;
+  --wba-red-600: #c8302d;
+  --wba-red-50: #fef6f6;
+  --wba-red-border: #f6dcdc;
+
+  --fwr-brand: #1b6b47;
+  --fwr-brand-hover: #14553a;
+  --fwr-focus: #2a8a5a;
+  --fwr-brand-soft: #d6e8dd;
+  --fwr-brand-wash: #f3f8f5;
+
+  --logo-red: #b4181e;
+
+  /* Semantic brand roles, ClearView */
+  --accent: #b41412;
+  --accent-hover: #9a1110;
+  --accent-subtle: #e5e7eb;
+  --secondary: #385363;
+  --focus: #1f2b32;
+  --surface-hover: #f7f7f7;
+  --input: #e5e7eb;
+  --error: #b41412;
+  --ad-surface: transparent;
+  --ad-border: #dbdde0;
+  --ad-foreground: #706f6f;
+
+  /* Responsive type and spacing roles: mobile, then md (tablet), then lg/xl (desktop) */
+  --fs-display: 2.25rem;
+  --fs-heading-lg: 1.75rem;
+  --fs-heading-md: 1.5rem;
+  --fs-heading-sm: 1.375rem;
+  --gutter: 1rem;
+  --section: 3rem;
+  --section-lg: 3.5rem;
+
+  @variant md {
+    --fs-display: 2.5rem;
+    --fs-heading-lg: 2.25rem;
+    --fs-heading-md: 2rem;
+    --fs-heading-sm: 1.625rem;
+    --gutter: 2rem;
+    --section: 4rem;
+    --section-lg: 4.5rem;
+  }
+
+  @variant lg {
+    --fs-display: 3rem;
+    --section: 5rem;
+    --section-lg: 7.5rem;
+  }
+
+  @variant xl {
+    --gutter: 4rem;
+  }
 }
 
+[data-brand='wealthbriefing'] {
+  --accent: var(--wb-blue-700);
+  --accent-hover: var(--wb-blue-800);
+  --accent-subtle: var(--wb-blue-border);
+  --secondary: var(--wb-blue-700);
+  --focus: var(--wb-blue-600);
+  --surface-hover: var(--wb-blue-50);
+  --input: #dbdde0;
+  --error: var(--logo-red);
+  --ad-surface: var(--wb-blue-50);
+  --ad-border: var(--wb-blue-border);
+  --ad-foreground: var(--wb-blue-700);
+}
+
+[data-brand='wealthbriefingasia'] {
+  --accent: var(--wba-red-700);
+  --accent-hover: var(--wba-red-800);
+  --accent-subtle: var(--wba-red-border);
+  --secondary: var(--wba-red-700);
+  --focus: var(--wba-red-600);
+  --surface-hover: var(--wba-red-50);
+  --input: #dbdde0;
+  --error: var(--logo-red);
+  --ad-surface: var(--wba-red-50);
+  --ad-border: var(--wba-red-border);
+  --ad-foreground: var(--wba-red-700);
+}
+
+[data-brand='familywealthreport'] {
+  --accent: var(--fwr-brand);
+  --accent-hover: var(--fwr-brand-hover);
+  --accent-subtle: var(--fwr-brand-soft);
+  --secondary: var(--fwr-brand);
+  --focus: var(--fwr-focus);
+  --surface-hover: var(--fwr-brand-wash);
+  --input: #dbdde0;
+  --error: var(--logo-red);
+  --ad-surface: var(--fwr-brand-wash);
+  --ad-border: var(--fwr-brand-soft);
+  --ad-foreground: var(--fwr-brand);
+}
+
+/* Shared neutrals, names from the ClearView Figma variables */
+@theme {
+  --color-dark: #1f2b32;
+  --color-grey: #706f6f;
+  --color-border: #e5e7eb;
+  --color-border-plus: #dbdde0;
+  --color-light: #ededed;
+  --color-dark-blue-grey: #385363;
+  --color-light-blue-grey: #63788c;
+
+  --container-page: 90rem;
+
+  --ease-smooth: cubic-bezier(0.2, 0.65, 0.3, 1);
+
+  --leading-heading: 1.2;
+  --leading-title: 1.3;
+  --leading-copy: 1.4;
+
+  --text-title-lg: 1.25rem;
+  --text-title-lg--line-height: 1.2;
+  --text-title-md: 1rem;
+  --text-title-md--line-height: 1.2;
+  --text-caption: 0.8125rem;
+  --text-caption--line-height: 1.4;
+}
+
+/* Tokens that resolve per brand or per breakpoint at the element */
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
+  --color-accent: var(--accent);
+  --color-accent-hover: var(--accent-hover);
+  --color-accent-subtle: var(--accent-subtle);
+  --color-secondary: var(--secondary);
+  --color-focus: var(--focus);
+  --color-surface-hover: var(--surface-hover);
+  --color-input: var(--input);
+  --color-error: var(--error);
+  --color-ad-surface: var(--ad-surface);
+  --color-ad-border: var(--ad-border);
+  --color-ad-foreground: var(--ad-foreground);
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+  --font-sans: var(--font-onest), ui-sans-serif, system-ui, sans-serif;
+
+  --text-display: var(--fs-display);
+  --text-display--line-height: 1;
+  --text-heading-lg: var(--fs-heading-lg);
+  --text-heading-lg--line-height: 1.2;
+  --text-heading-md: var(--fs-heading-md);
+  --text-heading-md--line-height: 1.2;
+  --text-heading-sm: var(--fs-heading-sm);
+  --text-heading-sm--line-height: 1.25;
+
+  --spacing-gutter: var(--gutter);
+  --spacing-section: var(--section);
+  --spacing-section-lg: var(--section-lg);
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-sans);
+}
+
+:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  ::before,
+  ::after {
+    transition-duration: 1ms !important;
+    animation-duration: 1ms !important;
+  }
 }
