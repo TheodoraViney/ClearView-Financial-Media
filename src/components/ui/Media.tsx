@@ -1,4 +1,5 @@
 import Image from 'next/image'
+import { type ReactNode } from 'react'
 
 import { cx } from './cx'
 
@@ -8,6 +9,9 @@ const RATIOS = {
   '3/2': 'aspect-3/2',
   square: 'aspect-square',
 }
+
+// Without `ratio` or `thumb` the caller sizes the box through className, e.g. responsive aspect classes.
+// `children` render as an overlay layer above the image (slider dots, badges).
 
 // Fixed thumbnail sizes from the design.
 const THUMBS = {
@@ -26,6 +30,7 @@ export function Media({
   zoom = false,
   priority = false,
   className,
+  children,
 }: {
   src?: string | null
   alt: string
@@ -35,6 +40,7 @@ export function Media({
   zoom?: boolean
   priority?: boolean
   className?: string
+  children?: ReactNode
 }) {
   return (
     <div
@@ -51,7 +57,9 @@ export function Media({
           alt={alt}
           fill
           sizes={thumb ? '80px' : sizes}
-          priority={priority}
+          // `priority` is deprecated in Next 16; the docs recommend eager loading with a high fetch priority for the LCP image.
+          loading={priority ? 'eager' : undefined}
+          fetchPriority={priority ? 'high' : undefined}
           className={cx(
             'object-cover',
             zoom &&
@@ -59,6 +67,7 @@ export function Media({
           )}
         />
       )}
+      {children && <div className="absolute inset-0">{children}</div>}
     </div>
   )
 }

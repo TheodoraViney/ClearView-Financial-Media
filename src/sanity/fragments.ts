@@ -39,6 +39,20 @@ const CTA = /* groq */ `
   link{ label, href }
 `
 
+// Picks first; `latest` fills the remaining places. `^` is the topStories block, so picks are excluded.
+// On ClearView every editorial post qualifies: post.brands never holds the clearview key.
+const TOP_STORIES = /* groq */ `
+  "slides": slides[]->{ ${POST_CARD} },
+  "articles": articles[]->{ ${POST_CARD} },
+  "latest": *[
+    _type == "post"
+    && defined(slug.current)
+    && ($brand == "clearview" || $brand in brands)
+    && !(_id in ^.slides[]._ref)
+    && !(_id in ^.articles[]._ref)
+  ] | order(publishedAt desc)[0...6]{ ${POST_CARD} }
+`
+
 const AD_SLOT = /* groq */ `
   size,
   label,
@@ -48,6 +62,7 @@ const AD_SLOT = /* groq */ `
 // adminLabel is CMS-only and deliberately not projected.
 const MAIN_COLUMN_BLOCKS = /* groq */ `
   _type == "adSlot" => { ${AD_SLOT} },
+  _type == "topStories" => { ${TOP_STORIES} },
   _type == "cta" => { ${CTA} }
 `
 
@@ -58,6 +73,7 @@ const ASIDE_BLOCKS = /* groq */ `
 /** One member of a page's `blocks[]`. Use as `blocks[]{ _key, _type, ${BLOCKS_PROJECTION} }`. */
 export const BLOCKS_PROJECTION = /* groq */ `
   _type == "adSlot" => { ${AD_SLOT} },
+  _type == "topStories" => { ${TOP_STORIES} },
   _type == "cta" => { ${CTA} },
   _type == "splitLayout" => {
     "main": main[]{ _key, _type, ${MAIN_COLUMN_BLOCKS} },
