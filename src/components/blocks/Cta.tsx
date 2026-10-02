@@ -1,19 +1,17 @@
-import type { Cta as CtaValue } from '@/sanity/types'
+import { Cta as CtaSection } from '@/components/sections/Cta'
+import { safeHref } from '@/lib/links'
 
-export function Cta({ heading, text, link }: CtaValue) {
+import type { BlockProps } from './types'
+
+export function Cta({ block }: BlockProps<'cta'>) {
+  const { heading, text, link } = block
+
   return (
-    <section className="flex flex-col items-start gap-3 px-6 py-10">
-      {heading && <h2 className="text-2xl font-semibold">{heading}</h2>}
-      {text && <p>{text}</p>}
-      {link?.href && (
-        <a
-          href={link.href}
-          className="rounded px-4 py-2 text-white"
-          style={{ backgroundColor: 'var(--brand-color)' }}
-        >
-          {link.label ?? 'Read more'}
-        </a>
-      )}
-    </section>
+    <CtaSection
+      heading={heading ?? undefined}
+      text={text ?? undefined}
+      href={safeHref(link?.href) ?? undefined}
+      label={link?.label ?? undefined}
+    />
   )
 }

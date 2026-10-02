@@ -1,5 +1,7 @@
 import { defineField, defineType } from 'sanity'
 
+import { isAllowedLinkTarget } from '@/lib/links'
+
 export const cta = defineType({
   name: 'cta',
   title: 'CTA',
@@ -29,21 +31,17 @@ export const cta = defineType({
           name: 'href',
           title: 'Href',
           type: 'string',
+          description: 'https://…, mailto:…, tel:… or a path on this site starting with /',
           validation: (Rule) =>
             Rule.custom((value) => {
               if (!value) {
                 return true
               }
 
-              if (
-                value.startsWith('/') ||
-                value.startsWith('http://') ||
-                value.startsWith('https://')
-              ) {
-                return true
-              }
-
-              return 'Link must be a relative path or an http(s) URL'
+              // A bare startsWith('/') let "//evil.com" through, which browsers treat as another host.
+              return isAllowedLinkTarget(value.trim())
+                ? true
+                : 'Use https://, http://, mailto:, tel: or a path starting with a single /'
             }),
         }),
       ],

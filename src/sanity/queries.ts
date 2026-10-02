@@ -1,5 +1,7 @@
 import { defineQuery } from 'next-sanity'
 
+import { BLOCKS_PROJECTION } from './fragments'
+
 export const BRAND_QUERY = defineQuery(`
   *[_type == "brand" && _id == $brandId][0]{
     _id,
@@ -16,7 +18,7 @@ export const HOME_PAGE_QUERY = defineQuery(`
   *[_type == "page" && brand == $brand && slug.current == "home"][0]{
     _id,
     title,
-    blocks
+    blocks[]{ _key, _type, ${BLOCKS_PROJECTION} }
   }
 `)
 
@@ -24,7 +26,7 @@ export const PAGE_QUERY = defineQuery(`
   *[_type == "page" && slug.current == $slug && brand == $brand][0]{
     _id,
     title,
-    blocks
+    blocks[]{ _key, _type, ${BLOCKS_PROJECTION} }
   }
 `)
 

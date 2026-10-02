@@ -1,21 +1,8 @@
 import type { PluginOptions } from 'sanity'
 import { defineDocuments, defineLocations, presentationTool } from 'sanity/presentation'
 
-import { BRAND_KEYS, BRANDS, type BrandKey } from '@/brands'
-
-export function brandOrigin(key: BrandKey): string {
-  if (process.env.NEXT_PUBLIC_SITE_ENV === 'production') {
-    return `https://www.${BRANDS[key].domain}`
-  }
-
-  if (process.env.NEXT_PUBLIC_SITE_ENV === 'staging') {
-    return `https://${BRANDS[key].stagingHost}`
-  }
-
-  const protocol = process.env.NEXT_PUBLIC_DEV_HTTPS === 'true' ? 'https' : 'http'
-
-  return `${protocol}://${key}.localhost:3000`
-}
+import { BRAND_KEYS, BRANDS, brandOrigin } from '@/brands'
+import { HOME_PAGE_SLUG } from '@/lib/links'
 
 export const presentationTools: PluginOptions[] = BRAND_KEYS.map((key) =>
   presentationTool({
@@ -62,7 +49,7 @@ export const presentationTools: PluginOptions[] = BRAND_KEYS.map((key) =>
               locations: [
                 {
                   title: doc?.title ?? 'Untitled',
-                  href: doc?.slug === 'home' ? '/' : `/${doc?.slug}`,
+                  href: doc?.slug === HOME_PAGE_SLUG ? '/' : `/${doc?.slug}`,
                 },
               ],
             }
