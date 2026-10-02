@@ -18,6 +18,8 @@ const SWIPE_THRESHOLD = 40
  * Hero slider. Renders the current slide only, so the server HTML carries slide 1 in full.
  * Below lg the text wrappers are `display: contents`, which lets `order-*` place the image
  * between the heading and the summary on mobile and after the link on tablet without duplicate DOM.
+ * Because a `contents` box cannot carry opacity, below lg the whole hero fades; from lg only the
+ * text column fades and the image swaps in place at the midpoint.
  */
 export function TopStoriesHero({ slides }: { slides: TopStory[] }) {
   // `selected` follows the dots at once; `shown` swaps mid-fade.
@@ -94,11 +96,16 @@ export function TopStoriesHero({ slides }: { slides: TopStory[] }) {
   return (
     <div
       className={cx(
-        'flex flex-col gap-5 transition-opacity duration-260 ease-in-out lg:grid lg:min-h-90 lg:grid-cols-12 lg:gap-8',
-        visible ? 'opacity-100' : 'opacity-0',
+        'flex flex-col gap-5 max-lg:transition-opacity max-lg:duration-260 max-lg:ease-in-out lg:grid lg:min-h-90 lg:grid-cols-12 lg:gap-8',
+        !visible && 'max-lg:opacity-0',
       )}
     >
-      <div className="contents lg:col-span-5 lg:flex lg:min-h-90 lg:flex-col lg:justify-between lg:pr-6">
+      <div
+        className={cx(
+          'contents lg:col-span-5 lg:flex lg:min-h-90 lg:flex-col lg:justify-between lg:pr-6 lg:transition-opacity lg:duration-260 lg:ease-in-out',
+          !visible && 'lg:opacity-0',
+        )}
+      >
         <div className="contents lg:flex lg:flex-col lg:gap-3">
           {meta.length > 0 && <Meta items={meta} />}
           <h2 className="text-heading-lg font-medium text-pretty text-foreground">{story.title}</h2>
