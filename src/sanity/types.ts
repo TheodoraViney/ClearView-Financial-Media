@@ -20,6 +20,32 @@ export type Link = {
   href?: string;
 };
 
+export type SplitLayout = {
+  _type: "splitLayout";
+  adminLabel?: string;
+  main?: Array<
+    | ({
+        _key: string;
+      } & AdSlot)
+    | ({
+        _key: string;
+      } & Cta)
+  >;
+  aside?: Array<
+    {
+      _key: string;
+    } & AdSlot
+  >;
+};
+
+export type AdSlot = {
+  _type: "adSlot";
+  adminLabel?: string;
+  size?: "leaderboard" | "billboard";
+  label?: string;
+  spacing?: "around" | "below" | "belowSection" | "none";
+};
+
 export type Cta = {
   _type: "cta";
   heading?: string;
@@ -586,9 +612,15 @@ export type Page = {
   title?: string;
   slug?: Slug;
   blocks?: Array<
-    {
-      _key: string;
-    } & Cta
+    | ({
+        _key: string;
+      } & Cta)
+    | ({
+        _key: string;
+      } & AdSlot)
+    | ({
+        _key: string;
+      } & SplitLayout)
   >;
 };
 
@@ -737,6 +769,8 @@ export type Geopoint = {
 
 export type AllSanitySchemaTypes =
   | Link
+  | SplitLayout
+  | AdSlot
   | Cta
   | SanityImageAssetReference
   | VideoGallery
@@ -799,27 +833,115 @@ export type BRAND_QUERY_RESULT = {
 
 // Source: src/sanity/queries.ts
 // Variable: HOME_PAGE_QUERY
-// Query: *[_type == "page" && brand == $brand && slug.current == "home"][0]{    _id,    title,    blocks  }
+// Query: *[_type == "page" && brand == $brand && slug.current == "home"][0]{    _id,    title,    blocks[]{ _key, _type,   _type == "adSlot" => {   size,  label,  spacing },  _type == "cta" => {   heading,  text,  link{ label, href } },  _type == "splitLayout" => {    "main": main[]{ _key, _type,   _type == "adSlot" => {   size,  label,  spacing },  _type == "cta" => {   heading,  text,  link{ label, href } } },    "aside": aside[]{ _key, _type,   _type == "adSlot" => {   size,  label,  spacing } }  } }  }
 export type HOME_PAGE_QUERY_RESULT = {
   _id: string;
   title: string | null;
   blocks: Array<
-    {
-      _key: string;
-    } & Cta
+    | {
+        _key: string;
+        _type: "adSlot";
+        size: "billboard" | "leaderboard" | null;
+        label: string | null;
+        spacing: "around" | "below" | "belowSection" | "none" | null;
+      }
+    | {
+        _key: string;
+        _type: "cta";
+        heading: string | null;
+        text: string | null;
+        link: {
+          label: string | null;
+          href: string | null;
+        } | null;
+      }
+    | {
+        _key: string;
+        _type: "splitLayout";
+        main: Array<
+          | {
+              _key: string;
+              _type: "adSlot";
+              size: "billboard" | "leaderboard" | null;
+              label: string | null;
+              spacing: "around" | "below" | "belowSection" | "none" | null;
+            }
+          | {
+              _key: string;
+              _type: "cta";
+              heading: string | null;
+              text: string | null;
+              link: {
+                label: string | null;
+                href: string | null;
+              } | null;
+            }
+        > | null;
+        aside: Array<{
+          _key: string;
+          _type: "adSlot";
+          size: "billboard" | "leaderboard" | null;
+          label: string | null;
+          spacing: "around" | "below" | "belowSection" | "none" | null;
+        }> | null;
+      }
   > | null;
 } | null;
 
 // Source: src/sanity/queries.ts
 // Variable: PAGE_QUERY
-// Query: *[_type == "page" && slug.current == $slug && brand == $brand][0]{    _id,    title,    blocks  }
+// Query: *[_type == "page" && slug.current == $slug && brand == $brand][0]{    _id,    title,    blocks[]{ _key, _type,   _type == "adSlot" => {   size,  label,  spacing },  _type == "cta" => {   heading,  text,  link{ label, href } },  _type == "splitLayout" => {    "main": main[]{ _key, _type,   _type == "adSlot" => {   size,  label,  spacing },  _type == "cta" => {   heading,  text,  link{ label, href } } },    "aside": aside[]{ _key, _type,   _type == "adSlot" => {   size,  label,  spacing } }  } }  }
 export type PAGE_QUERY_RESULT = {
   _id: string;
   title: string | null;
   blocks: Array<
-    {
-      _key: string;
-    } & Cta
+    | {
+        _key: string;
+        _type: "adSlot";
+        size: "billboard" | "leaderboard" | null;
+        label: string | null;
+        spacing: "around" | "below" | "belowSection" | "none" | null;
+      }
+    | {
+        _key: string;
+        _type: "cta";
+        heading: string | null;
+        text: string | null;
+        link: {
+          label: string | null;
+          href: string | null;
+        } | null;
+      }
+    | {
+        _key: string;
+        _type: "splitLayout";
+        main: Array<
+          | {
+              _key: string;
+              _type: "adSlot";
+              size: "billboard" | "leaderboard" | null;
+              label: string | null;
+              spacing: "around" | "below" | "belowSection" | "none" | null;
+            }
+          | {
+              _key: string;
+              _type: "cta";
+              heading: string | null;
+              text: string | null;
+              link: {
+                label: string | null;
+                href: string | null;
+              } | null;
+            }
+        > | null;
+        aside: Array<{
+          _key: string;
+          _type: "adSlot";
+          size: "billboard" | "leaderboard" | null;
+          label: string | null;
+          spacing: "around" | "below" | "belowSection" | "none" | null;
+        }> | null;
+      }
   > | null;
 } | null;
 
@@ -905,8 +1027,8 @@ export type POST_SLUGS_QUERY_RESULT = Array<{
 declare global {
   interface SanityQueries {
     '\n  *[_type == "brand" && _id == $brandId][0]{\n    _id,\n    title,\n    key,\n    domain,\n    region,\n    logo,\n    brandColor\n  }\n': BRAND_QUERY_RESULT;
-    '\n  *[_type == "page" && brand == $brand && slug.current == "home"][0]{\n    _id,\n    title,\n    blocks\n  }\n': HOME_PAGE_QUERY_RESULT;
-    '\n  *[_type == "page" && slug.current == $slug && brand == $brand][0]{\n    _id,\n    title,\n    blocks\n  }\n': PAGE_QUERY_RESULT;
+    '\n  *[_type == "page" && brand == $brand && slug.current == "home"][0]{\n    _id,\n    title,\n    blocks[]{ _key, _type, \n  _type == "adSlot" => { \n  size,\n  label,\n  spacing\n },\n  _type == "cta" => { \n  heading,\n  text,\n  link{ label, href }\n },\n  _type == "splitLayout" => {\n    "main": main[]{ _key, _type, \n  _type == "adSlot" => { \n  size,\n  label,\n  spacing\n },\n  _type == "cta" => { \n  heading,\n  text,\n  link{ label, href }\n }\n },\n    "aside": aside[]{ _key, _type, \n  _type == "adSlot" => { \n  size,\n  label,\n  spacing\n }\n }\n  }\n }\n  }\n': HOME_PAGE_QUERY_RESULT;
+    '\n  *[_type == "page" && slug.current == $slug && brand == $brand][0]{\n    _id,\n    title,\n    blocks[]{ _key, _type, \n  _type == "adSlot" => { \n  size,\n  label,\n  spacing\n },\n  _type == "cta" => { \n  heading,\n  text,\n  link{ label, href }\n },\n  _type == "splitLayout" => {\n    "main": main[]{ _key, _type, \n  _type == "adSlot" => { \n  size,\n  label,\n  spacing\n },\n  _type == "cta" => { \n  heading,\n  text,\n  link{ label, href }\n }\n },\n    "aside": aside[]{ _key, _type, \n  _type == "adSlot" => { \n  size,\n  label,\n  spacing\n }\n }\n  }\n }\n  }\n': PAGE_QUERY_RESULT;
     '\n  *[_type == "page" && brand == $brand && defined(slug.current) && slug.current != "home"]{\n    "slug": slug.current\n  }\n': PAGE_SLUGS_QUERY_RESULT;
     '\n  *[_type == "post" && $brand in brands] | order(publishedAt desc){\n    _id,\n    title,\n    "slug": slug.current,\n    publishedAt,\n    excerpt,\n    image\n  }\n': POSTS_QUERY_RESULT;
     '\n  *[_type == "post" && slug.current == $slug && $brand in brands][0]{\n    _id,\n    title,\n    publishedAt,\n    excerpt,\n    image,\n    content\n  }\n': POST_QUERY_RESULT;

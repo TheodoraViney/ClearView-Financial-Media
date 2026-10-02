@@ -56,6 +56,27 @@ export const BRANDS: Record<BrandKey, BrandDefaults> = {
   },
 }
 
+/**
+ * Origin a brand is served from in the current environment, from
+ * `NEXT_PUBLIC_SITE_ENV`: the live apex on `production` (with the `www` the
+ * apex redirects to), the Vercel staging host on `staging`, and
+ * `{key}.localhost:3000` in development, over https when
+ * `NEXT_PUBLIC_DEV_HTTPS=true`.
+ */
+export function brandOrigin(key: BrandKey): string {
+  if (process.env.NEXT_PUBLIC_SITE_ENV === 'production') {
+    return `https://www.${BRANDS[key].domain}`
+  }
+
+  if (process.env.NEXT_PUBLIC_SITE_ENV === 'staging') {
+    return `https://${BRANDS[key].stagingHost}`
+  }
+
+  const protocol = process.env.NEXT_PUBLIC_DEV_HTTPS === 'true' ? 'https' : 'http'
+
+  return `${protocol}://${key}.localhost:3000`
+}
+
 const HOST_TO_BRAND: Record<string, BrandKey> = {}
 
 for (const key of BRAND_KEYS) {

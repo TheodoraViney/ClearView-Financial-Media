@@ -73,7 +73,7 @@ async function CachedHome({
 
   return (
     <main>
-      <BlockRenderer blocks={data.blocks} />
+      <BlockRenderer blocks={data.blocks} brand={brand} />
     </main>
   )
 }

@@ -102,7 +102,7 @@ async function CachedPage({
   return (
     <main>
       <h1 className="px-6 pt-10 text-3xl font-semibold">{data.title}</h1>
-      <BlockRenderer blocks={data.blocks} />
+      <BlockRenderer blocks={data.blocks} brand={brand} />
     </main>
   )
 }

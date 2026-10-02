@@ -5,6 +5,7 @@ import {
   type PortableTextProps,
 } from 'next-sanity'
 
+import { safeHref } from '@/lib/links'
 import { urlFor } from '@/sanity/image'
 
 const components: PortableTextComponents = {
@@ -19,6 +20,24 @@ const components: PortableTextComponents = {
           className="h-auto w-full"
         />
       ) : null,
+  },
+  marks: {
+    // The default link mark renders any stored href, javascript: included. Unsafe hrefs render as plain text.
+    link: ({ value, children }) => {
+      const href = safeHref(value?.href)
+
+      if (!href) {
+        return <>{children}</>
+      }
+
+      return value?.openInNewTab === true ? (
+        <a href={href} target="_blank" rel="noopener noreferrer">
+          {children}
+        </a>
+      ) : (
+        <a href={href}>{children}</a>
+      )
+    },
   },
 }
 

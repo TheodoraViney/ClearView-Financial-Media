@@ -6,12 +6,14 @@ const SIZES = {
   billboard: 'min-h-16 md:min-h-18 lg:min-h-22.5',
 }
 
+export type AdSlotSize = keyof typeof SIZES
+
 export function AdSlot({
   size = 'leaderboard',
   label,
   className,
 }: {
-  size?: keyof typeof SIZES
+  size?: AdSlotSize
   label?: string
   className?: string
 }) {
