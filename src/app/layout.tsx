@@ -1,5 +1,5 @@
 import type { Metadata } from 'next'
-import { Geist, Geist_Mono } from 'next/font/google'
+import { Onest } from 'next/font/google'
 import { draftMode } from 'next/headers'
 import { VisualEditing } from 'next-sanity/visual-editing'
 
@@ -7,13 +7,8 @@ import { SanityLive } from '@/sanity/live'
 
 import './globals.css'
 
-const geistSans = Geist({
-  variable: '--font-geist-sans',
-  subsets: ['latin'],
-})
-
-const geistMono = Geist_Mono({
-  variable: '--font-geist-mono',
+const onest = Onest({
+  variable: '--font-onest',
   subsets: ['latin'],
 })
 
@@ -28,7 +23,7 @@ export default async function RootLayout({ children }: LayoutProps<'/'>) {
   return (
     <html
       lang="en"
-      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
+      className={`${onest.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col">
         {children}
