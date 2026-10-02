@@ -2,6 +2,8 @@ import { defineArrayMember, defineField, defineType } from 'sanity'
 
 import { BRANDS, EDITORIAL_BRAND_KEYS } from '@/brands'
 
+import { imageField } from '../fields'
+
 export const post = defineType({
   name: 'post',
   title: 'Post',
@@ -45,12 +47,10 @@ export const post = defineType({
       name: 'excerpt',
       title: 'Excerpt',
       type: 'text',
+      description: 'Shown under the headline in the Home hero. About 120-200 characters reads best.',
+      validation: (Rule) => Rule.max(200).warning('Longer than 200 characters; the hero will wrap onto more lines'),
     }),
-    defineField({
-      name: 'image',
-      title: 'Image',
-      type: 'image',
-    }),
+    imageField('image'),
     defineField({
       name: 'content',
       title: 'Content',

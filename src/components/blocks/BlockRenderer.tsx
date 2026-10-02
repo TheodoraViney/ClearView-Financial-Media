@@ -3,6 +3,7 @@ import type { BrandKey } from '@/brands'
 import { AdSlot } from './AdSlot'
 import { Cta } from './Cta'
 import { SplitLayout } from './SplitLayout'
+import { TopStories } from './TopStories'
 import type { PageBlock } from './types'
 
 export function BlockRenderer({
@@ -31,6 +32,8 @@ function Block({ block, brand }: { block: PageBlock; brand: BrandKey }) {
       return <AdSlot block={block} brand={brand} />
     case 'cta':
       return <Cta block={block} brand={brand} />
+    case 'topStories':
+      return <TopStories block={block} brand={brand} />
     case 'splitLayout':
       return (
         <SplitLayout

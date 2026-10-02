@@ -4,10 +4,11 @@ import { defineArrayMember, defineField, defineType } from 'sanity'
 import { adminLabelField } from '../fields'
 import { adSlot } from './ad-slot'
 import { cta } from './cta'
+import { topStories } from './top-stories'
 
-// Blocks allowed in the main column. Top stories and the intro join with their section tickets.
+// Blocks allowed in the main column. The intro joins with its section ticket.
 // splitLayout itself is never listed, so the layout cannot nest.
-const mainBlockTypes = [adSlot, cta]
+const mainBlockTypes = [adSlot, topStories, cta]
 
 // adSlot is a placeholder member: Sanity needs at least one type. Highlights joins with its section ticket.
 const asideBlockTypes = [adSlot]

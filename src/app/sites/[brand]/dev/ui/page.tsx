@@ -268,13 +268,24 @@ export default async function UiPage({
           </Row>
         </Group>
 
-        <Group title="SliderDots">
+        <Group title="SliderDots (toggle buttons with aria-pressed, in a labelled group)">
           <Row label="on an image" dark>
             <SliderDots
               label="Top stories"
-              labels={['Slide 1', 'Slide 2', 'Slide 3']}
+              labels={['Show story 1 of 3', 'Show story 2 of 3', 'Show story 3 of 3']}
               selected={0}
             />
+          </Row>
+          <Row label="Media children overlay, responsive aspect via className">
+            <Media alt="overlay" className="aspect-4/3 w-64 md:aspect-video">
+              <div className="flex h-full items-end justify-end p-3">
+                <SliderDots
+                  label="Top stories"
+                  labels={['Show story 1 of 3', 'Show story 2 of 3', 'Show story 3 of 3']}
+                  selected={1}
+                />
+              </div>
+            </Media>
           </Row>
         </Group>
 

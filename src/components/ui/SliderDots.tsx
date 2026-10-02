@@ -1,6 +1,7 @@
 import { cx } from './cx'
 
-// Hero slide switcher. Mobile and tablet buttons keep a 44px touch target around the 8px dot.
+// Hero slide switcher: a group of toggle buttons, the current one aria-pressed.
+// Mobile and tablet buttons keep a 44px touch target around the 8px dot.
 export function SliderDots({
   labels,
   selected,
@@ -16,7 +17,7 @@ export function SliderDots({
 }) {
   return (
     <div
-      role="tablist"
+      role="group"
       aria-label={label}
       className={cx(
         'relative flex h-6 items-center rounded-full bg-white/20 px-1 backdrop-blur-xl lg:gap-2 lg:px-3',
@@ -30,8 +31,7 @@ export function SliderDots({
           <button
             key={index}
             type="button"
-            role="tab"
-            aria-selected={active}
+            aria-pressed={active}
             aria-label={itemLabel}
             onClick={onSelect ? () => onSelect(index) : undefined}
             className="-my-2.5 flex h-11 w-7 cursor-pointer items-center justify-center lg:my-0 lg:size-2"

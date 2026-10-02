@@ -176,6 +176,11 @@
   --spacing-section-lg: var(--section-lg);
 }
 
+/* Auto-fit card grid, 260px minimum track as in the design */
+@utility grid-cols-cards {
+  grid-template-columns: repeat(auto-fit, minmax(16.25rem, 1fr));
+}
+
 body {
   background: var(--background);
   color: var(--foreground);
