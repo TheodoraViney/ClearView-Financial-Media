@@ -1,5 +1,6 @@
-import { defineField } from 'sanity'
+import { defineArrayMember, defineField } from 'sanity'
 
+import { HEADING_LEVELS, type HeadingLevel, isHeadingLevel } from '@/lib/headings'
 import { LINKABLE_TYPES, isAllowedLinkTarget } from '@/lib/links'
 
 /**
@@ -199,5 +200,97 @@ export const linkField = (
           ]
         : []),
     ],
+  })
+}
+
+type HeadingBlockValue = {
+  _type?: string
+  style?: string
+  children?: { text?: string }[]
+}
+
+/** Plain text of a heading field's first block, for Studio previews. */
+export function headingText(value: unknown): string | undefined {
+  if (!Array.isArray(value)) {
+    return undefined
+  }
+
+  const block = value[0] as HeadingBlockValue | undefined
+  const text = (block?.children ?? []).map((child) => child.text ?? '').join('').trim()
+
+  return text || undefined
+}
+
+/**
+ * A section heading typed into a block: Portable Text limited to one block
+ * with a heading style, so the editor picks the HTML level and the component
+ * sets the size. No marks, links, lists or inline objects. Document titles
+ * stay plain strings and do not use this.
+ *
+ * Sanity always adds "Normal" to a custom style list and makes the first
+ * style the editor default, so a new heading would start as Normal. The
+ * field's initial value is therefore one empty block in `defaultLevel`, and
+ * validation rejects any other style, for example text pasted as Normal.
+ */
+export const headingField = (
+  name = 'heading',
+  options: {
+    title?: string
+    defaultLevel: HeadingLevel
+    required?: boolean
+    description?: string
+    group?: string
+  },
+) => {
+  const { title = 'Heading', defaultLevel, required = false, group } = options
+  const description =
+    options.description ?? 'Choose the heading level in the style menu. The size on the page stays the same.'
+
+  return defineField({
+    name,
+    title,
+    type: 'array',
+    description,
+    group,
+    of: [
+      defineArrayMember({
+        type: 'block',
+        styles: HEADING_LEVELS.map((level) => ({ title: `Heading ${level.slice(1)}`, value: level })),
+        lists: [],
+        marks: { decorators: [], annotations: [] },
+        of: [],
+        // Enter and multi-line paste stay in the one block.
+        options: { oneLine: true },
+      }),
+    ],
+    initialValue: [
+      {
+        _type: 'block',
+        style: defaultLevel,
+        markDefs: [],
+        children: [{ _type: 'span', _key: 'span', text: '', marks: [] }],
+      },
+    ],
+    validation: (Rule) =>
+      Rule.custom((value: unknown) => {
+        const blocks = (Array.isArray(value) ? value : []) as HeadingBlockValue[]
+        const filled = blocks.filter((block) =>
+          (block.children ?? []).some((child) => (child.text ?? '').trim() !== ''),
+        )
+
+        if (filled.length === 0) {
+          return required ? 'Enter a heading' : true
+        }
+
+        if (blocks.length > 1) {
+          return 'Keep the heading to a single paragraph'
+        }
+
+        if (!isHeadingLevel(blocks[0].style)) {
+          return 'Choose a heading level (Heading 1 to Heading 6) in the style menu'
+        }
+
+        return true
+      }),
   })
 }

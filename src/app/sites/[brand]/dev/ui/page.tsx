@@ -10,6 +10,7 @@ import { Button } from '@/components/ui/Button'
 import { Checkbox } from '@/components/ui/Checkbox'
 import { Container } from '@/components/ui/Container'
 import { EmailField } from '@/components/ui/EmailField'
+import { Heading } from '@/components/ui/Heading'
 import { Icon, type IconName } from '@/components/ui/Icon'
 import { IconButton } from '@/components/ui/IconButton'
 import { Input } from '@/components/ui/Input'
@@ -325,6 +326,14 @@ export default async function UiPage({
               meta={['WealthBriefingAsia', '07 Sep']}
             />
           </div>
+        </Group>
+
+        <Group title="Heading">
+          <Row label="as h2, styled as text-heading-lg (the tag comes from the CMS, the class sets the look)">
+            <Heading as="h2" className="text-heading-lg font-medium text-pretty">
+              Connecting the global wealth management community
+            </Heading>
+          </Row>
         </Group>
 
         <Group title="ListLink">

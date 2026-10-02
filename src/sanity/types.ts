@@ -20,6 +20,49 @@ export type Link = {
   href?: string;
 };
 
+export type SanityImageAssetReference = {
+  _ref: string;
+  _type: "reference";
+  _weak?: boolean;
+  [internalGroqTypeReferenceTo]?: "sanity.imageAsset";
+};
+
+export type PublicationCardImage = {
+  asset?: SanityImageAssetReference;
+  media?: unknown; // Unable to locate the referenced type "image.media" in schema
+  hotspot?: SanityImageHotspot;
+  crop?: SanityImageCrop;
+  alt?: string;
+  _type: "image";
+};
+
+export type Publications = {
+  _type: "publications";
+  adminLabel?: string;
+  heading?: Array<{
+    children?: Array<{
+      marks?: Array<string>;
+      text?: string;
+      _type: "span";
+      _key: string;
+    }>;
+    style?: "normal" | "h1" | "h2" | "h3" | "h4" | "h5" | "h6";
+    listItem?: never;
+    markDefs?: null;
+    level?: number;
+    _type: "block";
+    _key: string;
+  }>;
+  body?: string;
+  cards?: Array<{
+    brand?: "wealthbriefing" | "wealthbriefingasia" | "familywealthreport";
+    description?: string;
+    image?: PublicationCardImage;
+    _type: "publicationCard";
+    _key: string;
+  }>;
+};
+
 export type PostReference = {
   _ref: string;
   _type: "reference";
@@ -54,6 +97,9 @@ export type SplitLayout = {
       } & TopStories)
     | ({
         _key: string;
+      } & Publications)
+    | ({
+        _key: string;
       } & Cta)
   >;
   aside?: Array<
@@ -76,13 +122,6 @@ export type Cta = {
   heading?: string;
   text?: string;
   link?: Link;
-};
-
-export type SanityImageAssetReference = {
-  _ref: string;
-  _type: "reference";
-  _weak?: boolean;
-  [internalGroqTypeReferenceTo]?: "sanity.imageAsset";
 };
 
 export type VideoGallery = {
@@ -650,6 +689,9 @@ export type Page = {
     | ({
         _key: string;
       } & TopStories)
+    | ({
+        _key: string;
+      } & Publications)
   >;
 };
 
@@ -798,12 +840,14 @@ export type Geopoint = {
 
 export type AllSanitySchemaTypes =
   | Link
+  | SanityImageAssetReference
+  | PublicationCardImage
+  | Publications
   | PostReference
   | TopStories
   | SplitLayout
   | AdSlot
   | Cta
-  | SanityImageAssetReference
   | VideoGallery
   | Agenda
   | CustomTab
@@ -864,7 +908,7 @@ export type BRAND_QUERY_RESULT = {
 
 // Source: src/sanity/queries.ts
 // Variable: HOME_PAGE_QUERY
-// Query: *[_type == "page" && brand == $brand && slug.current == "home"][0]{    _id,    title,    blocks[]{ _key, _type,   _type == "adSlot" => {   size,  label,  spacing },  _type == "topStories" => {   "slides": slides[]->{   _id,  title,  "slug": slug.current,  brands,  publishedAt,  excerpt,  "image": image{   asset,  hotspot,  crop,  alt } },  "articles": articles[]->{   _id,  title,  "slug": slug.current,  brands,  publishedAt,  excerpt,  "image": image{   asset,  hotspot,  crop,  alt } },  "latest": *[    _type == "post"    && defined(slug.current)    && ($brand == "clearview" || $brand in brands)    && !(_id in ^.slides[]._ref)    && !(_id in ^.articles[]._ref)  ] | order(publishedAt desc)[0...6]{   _id,  title,  "slug": slug.current,  brands,  publishedAt,  excerpt,  "image": image{   asset,  hotspot,  crop,  alt } } },  _type == "cta" => {   heading,  text,  link{ label, href } },  _type == "splitLayout" => {    "main": main[]{ _key, _type,   _type == "adSlot" => {   size,  label,  spacing },  _type == "topStories" => {   "slides": slides[]->{   _id,  title,  "slug": slug.current,  brands,  publishedAt,  excerpt,  "image": image{   asset,  hotspot,  crop,  alt } },  "articles": articles[]->{   _id,  title,  "slug": slug.current,  brands,  publishedAt,  excerpt,  "image": image{   asset,  hotspot,  crop,  alt } },  "latest": *[    _type == "post"    && defined(slug.current)    && ($brand == "clearview" || $brand in brands)    && !(_id in ^.slides[]._ref)    && !(_id in ^.articles[]._ref)  ] | order(publishedAt desc)[0...6]{   _id,  title,  "slug": slug.current,  brands,  publishedAt,  excerpt,  "image": image{   asset,  hotspot,  crop,  alt } } },  _type == "cta" => {   heading,  text,  link{ label, href } } },    "aside": aside[]{ _key, _type,   _type == "adSlot" => {   size,  label,  spacing } }  } }  }
+// Query: *[_type == "page" && brand == $brand && slug.current == "home"][0]{    _id,    title,    blocks[]{ _key, _type,   _type == "adSlot" => {   size,  label,  spacing },  _type == "topStories" => {   "slides": slides[]->{   _id,  title,  "slug": slug.current,  brands,  publishedAt,  excerpt,  "image": image{   asset,  hotspot,  crop,  alt } },  "articles": articles[]->{   _id,  title,  "slug": slug.current,  brands,  publishedAt,  excerpt,  "image": image{   asset,  hotspot,  crop,  alt } },  "latest": *[    _type == "post"    && defined(slug.current)    && ($brand == "clearview" || $brand in brands)    && !(_id in ^.slides[]._ref)    && !(_id in ^.articles[]._ref)  ] | order(publishedAt desc)[0...6]{   _id,  title,  "slug": slug.current,  brands,  publishedAt,  excerpt,  "image": image{   asset,  hotspot,  crop,  alt } } },  _type == "publications" => {   heading[]{ _key, style, children[]{ _key, text } },  body,  cards[]{    _key,    brand,    description,    image{   asset,  hotspot,  crop,  alt }  } },  _type == "cta" => {   heading,  text,  link{ label, href } },  _type == "splitLayout" => {    "main": main[]{ _key, _type,   _type == "adSlot" => {   size,  label,  spacing },  _type == "topStories" => {   "slides": slides[]->{   _id,  title,  "slug": slug.current,  brands,  publishedAt,  excerpt,  "image": image{   asset,  hotspot,  crop,  alt } },  "articles": articles[]->{   _id,  title,  "slug": slug.current,  brands,  publishedAt,  excerpt,  "image": image{   asset,  hotspot,  crop,  alt } },  "latest": *[    _type == "post"    && defined(slug.current)    && ($brand == "clearview" || $brand in brands)    && !(_id in ^.slides[]._ref)    && !(_id in ^.articles[]._ref)  ] | order(publishedAt desc)[0...6]{   _id,  title,  "slug": slug.current,  brands,  publishedAt,  excerpt,  "image": image{   asset,  hotspot,  crop,  alt } } },  _type == "publications" => {   heading[]{ _key, style, children[]{ _key, text } },  body,  cards[]{    _key,    brand,    description,    image{   asset,  hotspot,  crop,  alt }  } },  _type == "cta" => {   heading,  text,  link{ label, href } } },    "aside": aside[]{ _key, _type,   _type == "adSlot" => {   size,  label,  spacing } }  } }  }
 export type HOME_PAGE_QUERY_RESULT = {
   _id: string;
   title: string | null;
@@ -888,6 +932,34 @@ export type HOME_PAGE_QUERY_RESULT = {
       }
     | {
         _key: string;
+        _type: "publications";
+        heading: Array<{
+          _key: string;
+          style: "h1" | "h2" | "h3" | "h4" | "h5" | "h6" | "normal" | null;
+          children: Array<{
+            _key: string;
+            text: string | null;
+          }> | null;
+        }> | null;
+        body: string | null;
+        cards: Array<{
+          _key: string;
+          brand:
+            | "familywealthreport"
+            | "wealthbriefing"
+            | "wealthbriefingasia"
+            | null;
+          description: string | null;
+          image: {
+            asset: SanityImageAssetReference | null;
+            hotspot: SanityImageHotspot | null;
+            crop: SanityImageCrop | null;
+            alt: string | null;
+          } | null;
+        }> | null;
+      }
+    | {
+        _key: string;
         _type: "splitLayout";
         main: Array<
           | {
@@ -906,6 +978,35 @@ export type HOME_PAGE_QUERY_RESULT = {
                 label: string | null;
                 href: string | null;
               } | null;
+            }
+          | {
+              _key: string;
+              _type: "publications";
+              heading: Array<{
+                _key: string;
+                style:
+                  "h1" | "h2" | "h3" | "h4" | "h5" | "h6" | "normal" | null;
+                children: Array<{
+                  _key: string;
+                  text: string | null;
+                }> | null;
+              }> | null;
+              body: string | null;
+              cards: Array<{
+                _key: string;
+                brand:
+                  | "familywealthreport"
+                  | "wealthbriefing"
+                  | "wealthbriefingasia"
+                  | null;
+                description: string | null;
+                image: {
+                  asset: SanityImageAssetReference | null;
+                  hotspot: SanityImageHotspot | null;
+                  crop: SanityImageCrop | null;
+                  alt: string | null;
+                } | null;
+              }> | null;
             }
           | {
               _key: string;
@@ -1013,7 +1114,7 @@ export type HOME_PAGE_QUERY_RESULT = {
 
 // Source: src/sanity/queries.ts
 // Variable: PAGE_QUERY
-// Query: *[_type == "page" && slug.current == $slug && brand == $brand][0]{    _id,    title,    blocks[]{ _key, _type,   _type == "adSlot" => {   size,  label,  spacing },  _type == "topStories" => {   "slides": slides[]->{   _id,  title,  "slug": slug.current,  brands,  publishedAt,  excerpt,  "image": image{   asset,  hotspot,  crop,  alt } },  "articles": articles[]->{   _id,  title,  "slug": slug.current,  brands,  publishedAt,  excerpt,  "image": image{   asset,  hotspot,  crop,  alt } },  "latest": *[    _type == "post"    && defined(slug.current)    && ($brand == "clearview" || $brand in brands)    && !(_id in ^.slides[]._ref)    && !(_id in ^.articles[]._ref)  ] | order(publishedAt desc)[0...6]{   _id,  title,  "slug": slug.current,  brands,  publishedAt,  excerpt,  "image": image{   asset,  hotspot,  crop,  alt } } },  _type == "cta" => {   heading,  text,  link{ label, href } },  _type == "splitLayout" => {    "main": main[]{ _key, _type,   _type == "adSlot" => {   size,  label,  spacing },  _type == "topStories" => {   "slides": slides[]->{   _id,  title,  "slug": slug.current,  brands,  publishedAt,  excerpt,  "image": image{   asset,  hotspot,  crop,  alt } },  "articles": articles[]->{   _id,  title,  "slug": slug.current,  brands,  publishedAt,  excerpt,  "image": image{   asset,  hotspot,  crop,  alt } },  "latest": *[    _type == "post"    && defined(slug.current)    && ($brand == "clearview" || $brand in brands)    && !(_id in ^.slides[]._ref)    && !(_id in ^.articles[]._ref)  ] | order(publishedAt desc)[0...6]{   _id,  title,  "slug": slug.current,  brands,  publishedAt,  excerpt,  "image": image{   asset,  hotspot,  crop,  alt } } },  _type == "cta" => {   heading,  text,  link{ label, href } } },    "aside": aside[]{ _key, _type,   _type == "adSlot" => {   size,  label,  spacing } }  } }  }
+// Query: *[_type == "page" && slug.current == $slug && brand == $brand][0]{    _id,    title,    blocks[]{ _key, _type,   _type == "adSlot" => {   size,  label,  spacing },  _type == "topStories" => {   "slides": slides[]->{   _id,  title,  "slug": slug.current,  brands,  publishedAt,  excerpt,  "image": image{   asset,  hotspot,  crop,  alt } },  "articles": articles[]->{   _id,  title,  "slug": slug.current,  brands,  publishedAt,  excerpt,  "image": image{   asset,  hotspot,  crop,  alt } },  "latest": *[    _type == "post"    && defined(slug.current)    && ($brand == "clearview" || $brand in brands)    && !(_id in ^.slides[]._ref)    && !(_id in ^.articles[]._ref)  ] | order(publishedAt desc)[0...6]{   _id,  title,  "slug": slug.current,  brands,  publishedAt,  excerpt,  "image": image{   asset,  hotspot,  crop,  alt } } },  _type == "publications" => {   heading[]{ _key, style, children[]{ _key, text } },  body,  cards[]{    _key,    brand,    description,    image{   asset,  hotspot,  crop,  alt }  } },  _type == "cta" => {   heading,  text,  link{ label, href } },  _type == "splitLayout" => {    "main": main[]{ _key, _type,   _type == "adSlot" => {   size,  label,  spacing },  _type == "topStories" => {   "slides": slides[]->{   _id,  title,  "slug": slug.current,  brands,  publishedAt,  excerpt,  "image": image{   asset,  hotspot,  crop,  alt } },  "articles": articles[]->{   _id,  title,  "slug": slug.current,  brands,  publishedAt,  excerpt,  "image": image{   asset,  hotspot,  crop,  alt } },  "latest": *[    _type == "post"    && defined(slug.current)    && ($brand == "clearview" || $brand in brands)    && !(_id in ^.slides[]._ref)    && !(_id in ^.articles[]._ref)  ] | order(publishedAt desc)[0...6]{   _id,  title,  "slug": slug.current,  brands,  publishedAt,  excerpt,  "image": image{   asset,  hotspot,  crop,  alt } } },  _type == "publications" => {   heading[]{ _key, style, children[]{ _key, text } },  body,  cards[]{    _key,    brand,    description,    image{   asset,  hotspot,  crop,  alt }  } },  _type == "cta" => {   heading,  text,  link{ label, href } } },    "aside": aside[]{ _key, _type,   _type == "adSlot" => {   size,  label,  spacing } }  } }  }
 export type PAGE_QUERY_RESULT = {
   _id: string;
   title: string | null;
@@ -1037,6 +1138,34 @@ export type PAGE_QUERY_RESULT = {
       }
     | {
         _key: string;
+        _type: "publications";
+        heading: Array<{
+          _key: string;
+          style: "h1" | "h2" | "h3" | "h4" | "h5" | "h6" | "normal" | null;
+          children: Array<{
+            _key: string;
+            text: string | null;
+          }> | null;
+        }> | null;
+        body: string | null;
+        cards: Array<{
+          _key: string;
+          brand:
+            | "familywealthreport"
+            | "wealthbriefing"
+            | "wealthbriefingasia"
+            | null;
+          description: string | null;
+          image: {
+            asset: SanityImageAssetReference | null;
+            hotspot: SanityImageHotspot | null;
+            crop: SanityImageCrop | null;
+            alt: string | null;
+          } | null;
+        }> | null;
+      }
+    | {
+        _key: string;
         _type: "splitLayout";
         main: Array<
           | {
@@ -1055,6 +1184,35 @@ export type PAGE_QUERY_RESULT = {
                 label: string | null;
                 href: string | null;
               } | null;
+            }
+          | {
+              _key: string;
+              _type: "publications";
+              heading: Array<{
+                _key: string;
+                style:
+                  "h1" | "h2" | "h3" | "h4" | "h5" | "h6" | "normal" | null;
+                children: Array<{
+                  _key: string;
+                  text: string | null;
+                }> | null;
+              }> | null;
+              body: string | null;
+              cards: Array<{
+                _key: string;
+                brand:
+                  | "familywealthreport"
+                  | "wealthbriefing"
+                  | "wealthbriefingasia"
+                  | null;
+                description: string | null;
+                image: {
+                  asset: SanityImageAssetReference | null;
+                  hotspot: SanityImageHotspot | null;
+                  crop: SanityImageCrop | null;
+                  alt: string | null;
+                } | null;
+              }> | null;
             }
           | {
               _key: string;
@@ -1244,8 +1402,8 @@ export type POST_SLUGS_QUERY_RESULT = Array<{
 declare global {
   interface SanityQueries {
     '\n  *[_type == "brand" && _id == $brandId][0]{\n    _id,\n    title,\n    key,\n    domain,\n    region,\n    logo,\n    brandColor\n  }\n': BRAND_QUERY_RESULT;
-    '\n  *[_type == "page" && brand == $brand && slug.current == "home"][0]{\n    _id,\n    title,\n    blocks[]{ _key, _type, \n  _type == "adSlot" => { \n  size,\n  label,\n  spacing\n },\n  _type == "topStories" => { \n  "slides": slides[]->{ \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  alt\n }\n },\n  "articles": articles[]->{ \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  alt\n }\n },\n  "latest": *[\n    _type == "post"\n    && defined(slug.current)\n    && ($brand == "clearview" || $brand in brands)\n    && !(_id in ^.slides[]._ref)\n    && !(_id in ^.articles[]._ref)\n  ] | order(publishedAt desc)[0...6]{ \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  alt\n }\n }\n },\n  _type == "cta" => { \n  heading,\n  text,\n  link{ label, href }\n },\n  _type == "splitLayout" => {\n    "main": main[]{ _key, _type, \n  _type == "adSlot" => { \n  size,\n  label,\n  spacing\n },\n  _type == "topStories" => { \n  "slides": slides[]->{ \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  alt\n }\n },\n  "articles": articles[]->{ \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  alt\n }\n },\n  "latest": *[\n    _type == "post"\n    && defined(slug.current)\n    && ($brand == "clearview" || $brand in brands)\n    && !(_id in ^.slides[]._ref)\n    && !(_id in ^.articles[]._ref)\n  ] | order(publishedAt desc)[0...6]{ \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  alt\n }\n }\n },\n  _type == "cta" => { \n  heading,\n  text,\n  link{ label, href }\n }\n },\n    "aside": aside[]{ _key, _type, \n  _type == "adSlot" => { \n  size,\n  label,\n  spacing\n }\n }\n  }\n }\n  }\n': HOME_PAGE_QUERY_RESULT;
-    '\n  *[_type == "page" && slug.current == $slug && brand == $brand][0]{\n    _id,\n    title,\n    blocks[]{ _key, _type, \n  _type == "adSlot" => { \n  size,\n  label,\n  spacing\n },\n  _type == "topStories" => { \n  "slides": slides[]->{ \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  alt\n }\n },\n  "articles": articles[]->{ \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  alt\n }\n },\n  "latest": *[\n    _type == "post"\n    && defined(slug.current)\n    && ($brand == "clearview" || $brand in brands)\n    && !(_id in ^.slides[]._ref)\n    && !(_id in ^.articles[]._ref)\n  ] | order(publishedAt desc)[0...6]{ \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  alt\n }\n }\n },\n  _type == "cta" => { \n  heading,\n  text,\n  link{ label, href }\n },\n  _type == "splitLayout" => {\n    "main": main[]{ _key, _type, \n  _type == "adSlot" => { \n  size,\n  label,\n  spacing\n },\n  _type == "topStories" => { \n  "slides": slides[]->{ \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  alt\n }\n },\n  "articles": articles[]->{ \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  alt\n }\n },\n  "latest": *[\n    _type == "post"\n    && defined(slug.current)\n    && ($brand == "clearview" || $brand in brands)\n    && !(_id in ^.slides[]._ref)\n    && !(_id in ^.articles[]._ref)\n  ] | order(publishedAt desc)[0...6]{ \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  alt\n }\n }\n },\n  _type == "cta" => { \n  heading,\n  text,\n  link{ label, href }\n }\n },\n    "aside": aside[]{ _key, _type, \n  _type == "adSlot" => { \n  size,\n  label,\n  spacing\n }\n }\n  }\n }\n  }\n': PAGE_QUERY_RESULT;
+    '\n  *[_type == "page" && brand == $brand && slug.current == "home"][0]{\n    _id,\n    title,\n    blocks[]{ _key, _type, \n  _type == "adSlot" => { \n  size,\n  label,\n  spacing\n },\n  _type == "topStories" => { \n  "slides": slides[]->{ \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  alt\n }\n },\n  "articles": articles[]->{ \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  alt\n }\n },\n  "latest": *[\n    _type == "post"\n    && defined(slug.current)\n    && ($brand == "clearview" || $brand in brands)\n    && !(_id in ^.slides[]._ref)\n    && !(_id in ^.articles[]._ref)\n  ] | order(publishedAt desc)[0...6]{ \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  alt\n }\n }\n },\n  _type == "publications" => { \n  heading[]{ _key, style, children[]{ _key, text } },\n  body,\n  cards[]{\n    _key,\n    brand,\n    description,\n    image{ \n  asset,\n  hotspot,\n  crop,\n  alt\n }\n  }\n },\n  _type == "cta" => { \n  heading,\n  text,\n  link{ label, href }\n },\n  _type == "splitLayout" => {\n    "main": main[]{ _key, _type, \n  _type == "adSlot" => { \n  size,\n  label,\n  spacing\n },\n  _type == "topStories" => { \n  "slides": slides[]->{ \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  alt\n }\n },\n  "articles": articles[]->{ \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  alt\n }\n },\n  "latest": *[\n    _type == "post"\n    && defined(slug.current)\n    && ($brand == "clearview" || $brand in brands)\n    && !(_id in ^.slides[]._ref)\n    && !(_id in ^.articles[]._ref)\n  ] | order(publishedAt desc)[0...6]{ \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  alt\n }\n }\n },\n  _type == "publications" => { \n  heading[]{ _key, style, children[]{ _key, text } },\n  body,\n  cards[]{\n    _key,\n    brand,\n    description,\n    image{ \n  asset,\n  hotspot,\n  crop,\n  alt\n }\n  }\n },\n  _type == "cta" => { \n  heading,\n  text,\n  link{ label, href }\n }\n },\n    "aside": aside[]{ _key, _type, \n  _type == "adSlot" => { \n  size,\n  label,\n  spacing\n }\n }\n  }\n }\n  }\n': HOME_PAGE_QUERY_RESULT;
+    '\n  *[_type == "page" && slug.current == $slug && brand == $brand][0]{\n    _id,\n    title,\n    blocks[]{ _key, _type, \n  _type == "adSlot" => { \n  size,\n  label,\n  spacing\n },\n  _type == "topStories" => { \n  "slides": slides[]->{ \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  alt\n }\n },\n  "articles": articles[]->{ \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  alt\n }\n },\n  "latest": *[\n    _type == "post"\n    && defined(slug.current)\n    && ($brand == "clearview" || $brand in brands)\n    && !(_id in ^.slides[]._ref)\n    && !(_id in ^.articles[]._ref)\n  ] | order(publishedAt desc)[0...6]{ \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  alt\n }\n }\n },\n  _type == "publications" => { \n  heading[]{ _key, style, children[]{ _key, text } },\n  body,\n  cards[]{\n    _key,\n    brand,\n    description,\n    image{ \n  asset,\n  hotspot,\n  crop,\n  alt\n }\n  }\n },\n  _type == "cta" => { \n  heading,\n  text,\n  link{ label, href }\n },\n  _type == "splitLayout" => {\n    "main": main[]{ _key, _type, \n  _type == "adSlot" => { \n  size,\n  label,\n  spacing\n },\n  _type == "topStories" => { \n  "slides": slides[]->{ \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  alt\n }\n },\n  "articles": articles[]->{ \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  alt\n }\n },\n  "latest": *[\n    _type == "post"\n    && defined(slug.current)\n    && ($brand == "clearview" || $brand in brands)\n    && !(_id in ^.slides[]._ref)\n    && !(_id in ^.articles[]._ref)\n  ] | order(publishedAt desc)[0...6]{ \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  alt\n }\n }\n },\n  _type == "publications" => { \n  heading[]{ _key, style, children[]{ _key, text } },\n  body,\n  cards[]{\n    _key,\n    brand,\n    description,\n    image{ \n  asset,\n  hotspot,\n  crop,\n  alt\n }\n  }\n },\n  _type == "cta" => { \n  heading,\n  text,\n  link{ label, href }\n }\n },\n    "aside": aside[]{ _key, _type, \n  _type == "adSlot" => { \n  size,\n  label,\n  spacing\n }\n }\n  }\n }\n  }\n': PAGE_QUERY_RESULT;
     '\n  *[_type == "page" && brand == $brand && defined(slug.current) && slug.current != "home"]{\n    "slug": slug.current\n  }\n': PAGE_SLUGS_QUERY_RESULT;
     '\n  *[_type == "post" && $brand in brands] | order(publishedAt desc){\n    _id,\n    title,\n    "slug": slug.current,\n    publishedAt,\n    excerpt,\n    image\n  }\n': POSTS_QUERY_RESULT;
     '\n  *[_type == "post" && slug.current == $slug && $brand in brands][0]{\n    _id,\n    title,\n    publishedAt,\n    excerpt,\n    image,\n    content\n  }\n': POST_QUERY_RESULT;
