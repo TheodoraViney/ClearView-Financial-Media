@@ -53,6 +53,17 @@ const TOP_STORIES = /* groq */ `
   ] | order(publishedAt desc)[0...6]{ ${POST_CARD} }
 `
 
+const PUBLICATIONS = /* groq */ `
+  heading[]{ _key, style, children[]{ _key, text } },
+  body,
+  cards[]{
+    _key,
+    brand,
+    description,
+    image{ ${IMAGE} }
+  }
+`
+
 const AD_SLOT = /* groq */ `
   size,
   label,
@@ -63,6 +74,7 @@ const AD_SLOT = /* groq */ `
 const MAIN_COLUMN_BLOCKS = /* groq */ `
   _type == "adSlot" => { ${AD_SLOT} },
   _type == "topStories" => { ${TOP_STORIES} },
+  _type == "publications" => { ${PUBLICATIONS} },
   _type == "cta" => { ${CTA} }
 `
 
@@ -74,6 +86,7 @@ const ASIDE_BLOCKS = /* groq */ `
 export const BLOCKS_PROJECTION = /* groq */ `
   _type == "adSlot" => { ${AD_SLOT} },
   _type == "topStories" => { ${TOP_STORIES} },
+  _type == "publications" => { ${PUBLICATIONS} },
   _type == "cta" => { ${CTA} },
   _type == "splitLayout" => {
     "main": main[]{ _key, _type, ${MAIN_COLUMN_BLOCKS} },

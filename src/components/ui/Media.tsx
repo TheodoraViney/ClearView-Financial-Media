@@ -21,6 +21,12 @@ const THUMBS = {
   report: 'h-10 w-7',
 }
 
+// Hover zoom on the parent `group`: `true` on every breakpoint, `'lg'` from desktop only.
+const ZOOM = {
+  all: 'transition-transform duration-200 ease-smooth group-hover:scale-102',
+  lg: 'transition-transform duration-200 ease-smooth lg:group-hover:scale-102',
+}
+
 export function Media({
   src,
   alt,
@@ -37,7 +43,7 @@ export function Media({
   ratio?: keyof typeof RATIOS
   thumb?: keyof typeof THUMBS
   sizes?: string
-  zoom?: boolean
+  zoom?: boolean | 'lg'
   priority?: boolean
   className?: string
   children?: ReactNode
@@ -62,8 +68,7 @@ export function Media({
           fetchPriority={priority ? 'high' : undefined}
           className={cx(
             'object-cover',
-            zoom &&
-              'transition-transform duration-200 ease-smooth group-hover:scale-102',
+            zoom && ZOOM[zoom === 'lg' ? 'lg' : 'all'],
           )}
         />
       )}
