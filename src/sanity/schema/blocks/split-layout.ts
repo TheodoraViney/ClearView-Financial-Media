@@ -4,6 +4,7 @@ import { defineArrayMember, defineField, defineType } from 'sanity'
 import { adminLabelField } from '../fields'
 import { adSlot } from './ad-slot'
 import { cta } from './cta'
+import { highlights } from './highlights'
 import { publications } from './publications'
 import { topStories } from './top-stories'
 
@@ -11,8 +12,8 @@ import { topStories } from './top-stories'
 // splitLayout itself is never listed, so the layout cannot nest.
 const mainBlockTypes = [adSlot, topStories, publications, cta]
 
-// adSlot is a placeholder member: Sanity needs at least one type. Highlights joins with its section ticket.
-const asideBlockTypes = [adSlot]
+// Blocks allowed in the sidebar.
+const asideBlockTypes = [highlights, adSlot]
 
 /**
  * A main column with a sidebar beside it from 1280px. Below that the sidebar

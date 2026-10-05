@@ -122,9 +122,54 @@ export function resolveHref(
 
       return home ? `${brandOrigin(home)}${path}` : null
     }
-    // TODO: conferenceEvent and awardsProgramme live at /events/{slug}/ and resource at /resource/{slug}/
-    // on clearviewpublishing.com. Resolve them here once those routes exist.
+    case 'conferenceEvent':
+    case 'awardsProgramme':
+    case 'resource':
+      return sharedRecordHref(target._type, slug, currentBrand)
     default:
       return null
   }
+}
+
+/** Shared group records with a public URL, and the path prefix each one lives under. */
+const SHARED_RECORD_PREFIXES = {
+  awardsProgramme: '/events',
+  conferenceEvent: '/events',
+  resource: '/resource',
+} as const
+
+type SharedRecordType = keyof typeof SHARED_RECORD_PREFIXES
+
+const isSharedRecordType = (type: string): type is SharedRecordType =>
+  Object.hasOwn(SHARED_RECORD_PREFIXES, type)
+
+/**
+ * Href of a shared group record: awards editions and conference events at
+ * `/events/{slug}`, resources at `/resource/{slug}`. The slugs were migrated
+ * from WordPress unchanged. These records are served on ClearView Publishing,
+ * so the path is relative on the ClearView host and absolute to the ClearView
+ * origin on every other brand host.
+ *
+ * The detail pages for these types are not built yet. The links point at the
+ * final URLs on purpose and 404 until those routes exist.
+ *
+ * No trailing slash, unlike the WordPress URLs: `trailingSlash` is off in
+ * next.config, so Next would answer `/events/{slug}/` with a 308 to the
+ * slashless form, and post and page links are built without one too.
+ */
+export function sharedRecordHref(
+  type: string | null | undefined,
+  slug: string | null | undefined,
+  currentBrand: BrandKey,
+): string | null {
+  const cleanType = stegaClean(type)
+  const cleanSlug = stegaClean(slug)?.trim()
+
+  if (!cleanType || !cleanSlug || !isSharedRecordType(cleanType)) {
+    return null
+  }
+
+  const path = pathFor(cleanSlug, SHARED_RECORD_PREFIXES[cleanType])
+
+  return currentBrand === 'clearview' ? path : `${brandOrigin('clearview')}${path}`
 }

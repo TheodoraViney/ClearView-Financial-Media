@@ -9,7 +9,9 @@
  * written, published or activated.
  *
  * Why the edit screen and not the REST API or a WXR export:
- *   - the events/companies/people/acclaim/resources CPTs are not REST-exposed
+ *   - the events/companies/people/acclaim CPTs are not REST-exposed. `resource`
+ *     is (block editor), and its content, date, featured image and categories
+ *     are only there: `load-to-sanity.mjs --fetch-resources-rest` reads them
  *   - Tools -> Export needs the `export` capability, which editor does not have
  *   - the edit form carries values for both ACF and Pods fields, including the
  *     bidirectional company <-> person relation that Pods keeps in wp_podsrel

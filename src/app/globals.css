@@ -45,6 +45,8 @@
   --ad-surface: transparent;
   --ad-border: #dbdde0;
   --ad-foreground: #706f6f;
+  /* Sidebar block headings and their icons on white blocks */
+  --heading-aside: #385363;
 
   /* Responsive type and spacing roles: mobile, then md (tablet), then lg/xl (desktop) */
   --fs-display: 2.25rem;
@@ -88,6 +90,7 @@
   --ad-surface: var(--wb-blue-50);
   --ad-border: var(--wb-blue-border);
   --ad-foreground: var(--wb-blue-700);
+  --heading-aside: #1f2b32;
 }
 
 [data-brand='wealthbriefingasia'] {
@@ -102,6 +105,7 @@
   --ad-surface: var(--wba-red-50);
   --ad-border: var(--wba-red-border);
   --ad-foreground: var(--wba-red-700);
+  --heading-aside: #1f2b32;
 }
 
 [data-brand='familywealthreport'] {
@@ -116,6 +120,7 @@
   --ad-surface: var(--fwr-brand-wash);
   --ad-border: var(--fwr-brand-soft);
   --ad-foreground: var(--fwr-brand);
+  --heading-aside: #1f2b32;
 }
 
 /* Shared neutrals, names from the ClearView Figma variables */
@@ -159,6 +164,7 @@
   --color-ad-surface: var(--ad-surface);
   --color-ad-border: var(--ad-border);
   --color-ad-foreground: var(--ad-foreground);
+  --color-heading-aside: var(--heading-aside);
 
   --font-sans: var(--font-onest), ui-sans-serif, system-ui, sans-serif;
 

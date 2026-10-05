@@ -3,6 +3,7 @@ import { type ReactNode } from 'react'
 
 import { cx } from './cx'
 import { Icon } from './Icon'
+import { CHEVRON, EASE, type Motion } from './motion'
 
 const VARIANTS = {
   primary: 'bg-accent text-white hover:bg-accent-hover',
@@ -24,6 +25,8 @@ type ButtonProps = {
   size?: keyof typeof SIZES
   arrow?: boolean
   fullWidth?: boolean
+  // Hover easing and chevron shift, see motion.ts.
+  motion?: Motion
   className?: string
   children: ReactNode
 } & (
@@ -36,12 +39,14 @@ export function Button({
   size = 'md',
   arrow = false,
   fullWidth = false,
+  motion = 'smooth',
   className,
   children,
   ...rest
 }: ButtonProps) {
   const classes = cx(
-    'group inline-flex shrink-0 cursor-pointer items-center justify-center gap-2 rounded-sm px-4 text-sm leading-none transition-colors duration-180 ease-smooth',
+    'group inline-flex shrink-0 cursor-pointer items-center justify-center gap-2 rounded-sm px-4 text-sm leading-none transition-colors',
+    EASE[motion],
     VARIANTS[variant],
     SIZES[size],
     fullWidth && 'w-full',
@@ -52,10 +57,7 @@ export function Button({
     <>
       {children}
       {arrow && (
-        <Icon
-          name="chevron-right"
-          className="transition-transform duration-180 ease-smooth group-hover:translate-x-0.75"
-        />
+        <Icon name="chevron-right" className={CHEVRON[motion]} />
       )}
     </>
   )
