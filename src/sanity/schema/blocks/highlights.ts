@@ -50,16 +50,18 @@ const itemsOfSource: ReferenceFilterResolver = ({ document, parentPath }) => ({
 
 type Ref = { _ref?: string }
 
+/** The source of the highlights block a promo field sits in: path ends at promo.<field>, two levels below the block. */
+const promoSourceAt = (document: unknown, path: Path | undefined) =>
+  path === undefined ? undefined : blockSourceAt(document, path, 2)
+
 /**
  * A Research promo with a report picked takes its title and cover from the
  * report, so its own title and image become optional overrides. A resource left
  * behind after the source changed does not count: the field is hidden then.
  */
 const promoUsesReport = ({ document, parent, path }: ValidationContext) =>
-  Boolean((parent as { resource?: Ref } | undefined)?.resource?._ref) &&
-  // path ends at promo.<field>, two levels below the block.
-  path !== undefined &&
-  blockSourceAt(document, path, 2) === 'research'
+  Boolean((parent as { resource?: Ref } | undefined)?.resource?._ref) && promoSourceAt(document, path) === 'research'
+
 type Picked = { _id: string; _type: string; title?: string; category?: string }
 
 /**
@@ -92,7 +94,7 @@ export const highlights = defineType({
       name: 'items',
       title: 'Picks',
       type: 'array',
-      description: `Pick up to ${HIGHLIGHTS_ITEM_MAX}. Empty places show the next ones automatically.`,
+      description: `Pick up to ${HIGHLIGHTS_ITEM_MAX}. Empty places fill automatically: awards open for entries (nearest deadline first), upcoming events, newest research; past ones follow if there are not enough.`,
       of: [
         defineArrayMember({
           type: 'reference',
@@ -151,6 +153,7 @@ export const highlights = defineType({
       title: 'Promo',
       type: 'object',
       options: { collapsible: true, collapsed: true },
+      validation: (Rule) => Rule.required(),
       fields: [
         defineField({
           name: 'resource',
@@ -159,8 +162,13 @@ export const highlights = defineType({
           to: [{ type: 'resource' }],
           description: 'The report this promo points at. Its title, cover and download button are used unless the fields below override them.',
           options: { filter: RESEARCH_FILTER, disableNew: true },
-          // path ends at promo.resource, two levels below the block.
-          hidden: ({ document, path }) => blockSourceAt(document, path, 2) !== 'research',
+          hidden: ({ document, path }) => promoSourceAt(document, path) !== 'research',
+          validation: (Rule) =>
+            Rule.custom((value, context) =>
+              value?._ref || promoSourceAt(context.document, context.path) !== 'research'
+                ? true
+                : 'Choose the report this promo points at',
+            ),
         }),
         defineField({
           name: 'title',
@@ -177,8 +185,10 @@ export const highlights = defineType({
           title: 'Description',
           type: 'text',
           rows: 3,
-          validation: (Rule) =>
+          validation: (Rule) => [
+            Rule.required(),
             Rule.max(120).warning('Longer than 120 characters; the promo will wrap onto more lines'),
+          ],
         }),
         defineField({
           ...imageField('image', {
@@ -189,7 +199,17 @@ export const highlights = defineType({
               value?.asset || promoUsesReport(context) ? true : 'Required unless a Research report is picked',
             ),
         }),
-        linkField({ name: 'link', title: 'Link' }),
+        // Research links through the report download instead; awards and events need a destination.
+        linkField({
+          name: 'link',
+          title: 'Link',
+          withLabel: false,
+          requiredWhen: ({ document, path }) => {
+            const source = promoSourceAt(document, path)
+
+            return source === 'awards' || source === 'events'
+          },
+        }),
       ],
     }),
   ],

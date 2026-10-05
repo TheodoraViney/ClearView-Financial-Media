@@ -1,4 +1,4 @@
-import { defineArrayMember, defineField } from 'sanity'
+import { type Path, type ValidationContext, defineArrayMember, defineField } from 'sanity'
 
 import { HEADING_LEVELS, type HeadingLevel, isHeadingLevel } from '@/lib/headings'
 import { LINKABLE_TYPES, isAllowedLinkTarget } from '@/lib/links'
@@ -91,6 +91,11 @@ export const adminLabelField = defineField({
 
 type LinkKind = 'internal' | 'external'
 
+type LinkValue = { kind?: LinkKind; internal?: { _ref?: string }; external?: string; label?: string }
+
+/** What `requiredWhen` gets: the document and the path of the link object itself. */
+export type LinkRequiredContext = { document: ValidationContext['document']; path: Path }
+
 /**
  * A link to a document in the dataset or to an allowlisted address.
  *
@@ -99,6 +104,16 @@ type LinkKind = 'internal' | 'external'
  * http(s), mailto, tel and site-relative paths only, the same rule the runtime
  * guard in `src/lib/links.ts` applies, because API writes skip this
  * validation.
+ *
+ * `required` makes the link and its target mandatory always; `requiredWhen`
+ * does the same only while it returns true, for a link whose need depends on
+ * another field, e.g. the block's source.
+ *
+ * An optional link left half-filled is an error ("… or clear the link"), but
+ * only once the editor has acted on it: a label typed, or the type switched to
+ * Web address. A new block gets `{ kind: 'internal' }` from the nested initial
+ * values without anyone touching the link, and that alone must not block
+ * publishing.
  */
 export const linkField = (
   options: {
@@ -107,6 +122,8 @@ export const linkField = (
     description?: string
     group?: string
     required?: boolean
+    /** Required, object and target, only while this returns true. Ignored when `required` is set. */
+    requiredWhen?: (context: LinkRequiredContext) => boolean
     withLabel?: boolean
     /** The label has no default in this block, so the editor must type one. */
     labelRequired?: boolean
@@ -118,11 +135,17 @@ export const linkField = (
     description,
     group,
     required = false,
+    requiredWhen,
     withLabel = true,
     labelRequired = false,
   } = options
-  const kindOf = (parent: unknown): LinkKind | undefined =>
-    (parent as { kind?: LinkKind } | undefined)?.kind
+  const kindOf = (parent: unknown): LinkKind | undefined => (parent as LinkValue | undefined)?.kind
+
+  // `path` is the link object's own path; a target sub-field passes its parent's.
+  const isRequired = (document: ValidationContext['document'], path: Path | undefined) =>
+    required || Boolean(requiredWhen && path && requiredWhen({ document, path }))
+  const subFieldRequired = ({ document, path }: ValidationContext) => isRequired(document, path?.slice(0, -1))
+  const hasLabel = (parent: unknown) => Boolean((parent as LinkValue | undefined)?.label?.trim())
 
   return defineField({
     name,
@@ -131,7 +154,12 @@ export const linkField = (
     description,
     group,
     options: { collapsible: false },
-    validation: required ? (Rule) => Rule.required() : undefined,
+    validation: required
+      ? (Rule) => Rule.required()
+      : requiredWhen
+        ? (Rule) =>
+            Rule.custom((value, context) => (value || !isRequired(context.document, context.path) ? true : 'Required'))
+        : undefined,
     fields: [
       defineField({
         name: 'kind',
@@ -156,11 +184,16 @@ export const linkField = (
         hidden: ({ parent }) => kindOf(parent) !== 'internal',
         validation: (Rule) =>
           Rule.custom((value, context) => {
-            if (required && kindOf(context.parent) === 'internal' && !value) {
+            if (kindOf(context.parent) !== 'internal' || value?._ref) {
+              return true
+            }
+
+            if (subFieldRequired(context)) {
               return 'Choose a document to link to'
             }
 
-            return true
+            // Internal is the initial value, so only a typed label shows the editor started this link.
+            return hasLabel(context.parent) ? 'Choose a document or clear the link' : true
           }),
       }),
       defineField({
@@ -175,8 +208,9 @@ export const linkField = (
               return true
             }
 
-            if (!value) {
-              return required ? 'Enter an address' : true
+            if (!value?.trim()) {
+              // Web address is never the initial value: the editor chose it.
+              return subFieldRequired(context) ? 'Enter an address' : 'Enter a URL or clear the link'
             }
 
             return isAllowedLinkTarget(value.trim())
