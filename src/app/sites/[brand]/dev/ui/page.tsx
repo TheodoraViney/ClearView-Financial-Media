@@ -11,7 +11,7 @@ import { Checkbox } from '@/components/ui/Checkbox'
 import { Container } from '@/components/ui/Container'
 import { EmailField } from '@/components/ui/EmailField'
 import { Heading } from '@/components/ui/Heading'
-import { Icon, type IconName } from '@/components/ui/Icon'
+import { Icon, iconMap, type IconName } from '@/components/ui/Icon'
 import { IconButton } from '@/components/ui/IconButton'
 import { Input } from '@/components/ui/Input'
 import { ListLink } from '@/components/ui/ListLink'
@@ -66,16 +66,7 @@ const SPACING = [
   { name: 'section-lg', value: '56 / 72 / 120', className: 'w-section-lg' },
 ]
 
-const ICONS: IconName[] = [
-  'chevron-right',
-  'chevron-down',
-  'search',
-  'close',
-  'menu',
-  'menu-close',
-  'download',
-  'check',
-]
+const ICONS = Object.keys(iconMap) as IconName[]
 
 export default async function UiPage({
   params,
