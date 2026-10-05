@@ -55,9 +55,10 @@ async function CachedHome({
   variant,
   stega,
 }: { brand: BrandKey } & DynamicFetchOptions) {
+  const today = await cachedUkToday()
   const { data } = await cachedSanity({
     query: HOME_PAGE_QUERY,
-    params: { brand, today: await cachedUkToday() },
+    params: { brand, today },
     perspective,
     variant,
     stega,
@@ -74,7 +75,7 @@ async function CachedHome({
 
   return (
     <main>
-      <BlockRenderer blocks={data.blocks} brand={brand} />
+      <BlockRenderer blocks={data.blocks} brand={brand} today={today} />
     </main>
   )
 }

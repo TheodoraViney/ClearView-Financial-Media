@@ -8,12 +8,15 @@ import { SplitLayout } from './SplitLayout'
 import { TopStories } from './TopStories'
 import type { PageBlock } from './types'
 
+/** `today` is the UK date the page query ran with (`$today`), for date-dependent lines such as the awards meta. */
 export function BlockRenderer({
   blocks,
   brand,
+  today,
 }: {
   blocks: PageBlock[] | null | undefined
   brand: BrandKey
+  today: string
 }) {
   if (!blocks?.length) {
     return null
@@ -22,13 +25,13 @@ export function BlockRenderer({
   return (
     <>
       {blocks.map((block) => (
-        <Block key={block._key} block={block} brand={brand} />
+        <Block key={block._key} block={block} brand={brand} today={today} />
       ))}
     </>
   )
 }
 
-function Block({ block, brand }: { block: PageBlock; brand: BrandKey }) {
+function Block({ block, brand, today }: { block: PageBlock; brand: BrandKey; today: string }) {
   switch (block._type) {
     case 'adSlot':
       return <AdSlot block={block} brand={brand} />
@@ -39,13 +42,13 @@ function Block({ block, brand }: { block: PageBlock; brand: BrandKey }) {
     case 'publications':
       return <Publications block={block} brand={brand} />
     case 'highlights':
-      return <Highlights block={block} brand={brand} />
+      return <Highlights block={block} brand={brand} today={today} />
     case 'splitLayout':
       return (
         <SplitLayout
           block={block}
           brand={brand}
-          renderBlocks={(blocks) => <BlockRenderer blocks={blocks} brand={brand} />}
+          renderBlocks={(blocks) => <BlockRenderer blocks={blocks} brand={brand} today={today} />}
         />
       )
     default:

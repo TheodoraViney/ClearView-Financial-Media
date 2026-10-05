@@ -88,9 +88,10 @@ async function CachedPage({
   variant,
   stega,
 }: { brand: BrandKey; slug: string } & DynamicFetchOptions) {
+  const today = await cachedUkToday()
   const { data } = await cachedSanity({
     query: PAGE_QUERY,
-    params: { brand, slug, today: await cachedUkToday() },
+    params: { brand, slug, today },
     perspective,
     variant,
     stega,
@@ -103,7 +104,7 @@ async function CachedPage({
   return (
     <main>
       <h1 className="px-6 pt-10 text-3xl font-semibold">{data.title}</h1>
-      <BlockRenderer blocks={data.blocks} brand={brand} />
+      <BlockRenderer blocks={data.blocks} brand={brand} today={today} />
     </main>
   )
 }

@@ -27,6 +27,7 @@ export const publications = defineType({
       title: 'Text',
       type: 'text',
       rows: 3,
+      validation: (Rule) => Rule.required(),
     }),
     defineField({
       name: 'cards',

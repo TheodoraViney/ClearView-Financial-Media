@@ -9,10 +9,9 @@ export const IMAGE = /* groq */ `
   alt
 `
 
-/** A linkField value. `internal` is dereferenced to what resolveHref needs and nothing more. */
-export const LINK = /* groq */ `
+/** A linkField value without its label (`withLabel: false`). `internal` is dereferenced to what resolveHref needs and nothing more. */
+export const LINK_TARGET = /* groq */ `
   kind,
-  label,
   external,
   internal->{
     _type,
@@ -20,6 +19,12 @@ export const LINK = /* groq */ `
     brand,
     brands
   }
+`
+
+/** A linkField value with its label. */
+export const LINK = /* groq */ `
+  label,
+  ${LINK_TARGET}
 `
 
 /** A post as a card in a listing. */
@@ -40,6 +45,7 @@ const CTA = /* groq */ `
 `
 
 // Picks first; `latest` fills the remaining places. `^` is the topStories block, so picks are excluded.
+// The Studio unsets an emptied array, and `_id in null` is null, which would drop every post: hence the coalesce.
 // On ClearView every editorial post qualifies: post.brands never holds the clearview key.
 const TOP_STORIES = /* groq */ `
   linkLabel,
@@ -49,8 +55,8 @@ const TOP_STORIES = /* groq */ `
     _type == "post"
     && defined(slug.current)
     && ($brand == "clearview" || $brand in brands)
-    && !(_id in ^.slides[]._ref)
-    && !(_id in ^.articles[]._ref)
+    && !(_id in coalesce(^.slides[]._ref, []))
+    && !(_id in coalesce(^.articles[]._ref, []))
   ] | order(publishedAt desc)[0...6]{ ${POST_CARD} }
 `
 
@@ -97,10 +103,11 @@ const HIGHLIGHT_ITEM = /* groq */ `
 // Picks first; `fill` holds the records for the empty places, in tiers, so a block shows three items whenever records exist.
 // Each tier is its own sub-query (`[0...3]`, picks excluded; `^` is the highlights block), concatenated in tier order
 // with an array spread `...` (not an object spread); the tier conditions are disjoint, and the adapter dedupes against the picks and keeps the first three.
-// `tier` tells the adapter which meta line to show. Shared records have no brand field. `$today` is the UK calendar date
-// passed in by the page, so the cached result changes once a day instead of `now()` defeating the cache.
+// The tiers only order the fill; the adapter picks the meta line from the record's own dates. Shared records have no brand field.
+// `$today` is the UK calendar date passed in by the page, so the cached result changes once a day instead of `now()` defeating the cache.
 // The fill runs on ClearView only: the brand sites show editor picks only and never run the fill queries.
 // GROQ comparisons with null are null, and `!null` is null too, so "not open" is spelt `!(defined(x) && x >= $today)`.
+// For the same reason the picks are coalesced: the Studio unsets `items` when the last pick is removed.
 // Research runs newest first; GROQ sorts null first in desc, so an undated resource is pushed to the end.
 // Research also skips the report the promo row already shows.
 const HIGHLIGHTS = /* groq */ `
@@ -113,39 +120,39 @@ const HIGHLIGHTS = /* groq */ `
       ...*[
         _type == "awardsProgramme"
         && nominationsClosingDate >= $today
-        && !(_id in ^.items[]._ref)
-      ] | order(nominationsClosingDate asc)[0...3]{ "tier": "open", ${HIGHLIGHT_ITEM} },
+        && !(_id in coalesce(^.items[]._ref, []))
+      ] | order(nominationsClosingDate asc)[0...3]{ ${HIGHLIGHT_ITEM} },
       ...*[
         _type == "awardsProgramme"
         && !(defined(nominationsClosingDate) && nominationsClosingDate >= $today)
         && startDate >= $today
-        && !(_id in ^.items[]._ref)
-      ] | order(startDate asc)[0...3]{ "tier": "ahead", ${HIGHLIGHT_ITEM} },
+        && !(_id in coalesce(^.items[]._ref, []))
+      ] | order(startDate asc)[0...3]{ ${HIGHLIGHT_ITEM} },
       ...*[
         _type == "awardsProgramme"
         && !(defined(nominationsClosingDate) && nominationsClosingDate >= $today)
         && startDate < $today
-        && !(_id in ^.items[]._ref)
-      ] | order(startDate desc)[0...3]{ "tier": "past", ${HIGHLIGHT_ITEM} }
+        && !(_id in coalesce(^.items[]._ref, []))
+      ] | order(startDate desc)[0...3]{ ${HIGHLIGHT_ITEM} }
     ],
     $brand == "clearview" && source == "events" => [
       ...*[
         _type == "conferenceEvent"
         && coalesce(endDate, startDate) >= $today
-        && !(_id in ^.items[]._ref)
-      ] | order(startDate asc)[0...3]{ "tier": "ahead", ${HIGHLIGHT_ITEM} },
+        && !(_id in coalesce(^.items[]._ref, []))
+      ] | order(startDate asc)[0...3]{ ${HIGHLIGHT_ITEM} },
       ...*[
         _type == "conferenceEvent"
         && coalesce(endDate, startDate) < $today
-        && !(_id in ^.items[]._ref)
-      ] | order(startDate desc)[0...3]{ "tier": "past", ${HIGHLIGHT_ITEM} }
+        && !(_id in coalesce(^.items[]._ref, []))
+      ] | order(startDate desc)[0...3]{ ${HIGHLIGHT_ITEM} }
     ],
     $brand == "clearview" && source == "research" => *[
       _type == "resource"
       && category == "research"
-      && !(_id in ^.items[]._ref)
+      && !(_id in coalesce(^.items[]._ref, []))
       && _id != coalesce(^.promo.resource._ref, "")
-    ] | order(defined(publishedAt) desc, publishedAt desc, legacyWpId desc)[0...3]{ "tier": "latest", ${HIGHLIGHT_ITEM} }
+    ] | order(defined(publishedAt) desc, publishedAt desc, legacyWpId desc)[0...3]{ ${HIGHLIGHT_ITEM} }
   ),
   button{ ${LINK} },
   promo{
@@ -159,7 +166,7 @@ const HIGHLIGHTS = /* groq */ `
     title,
     description,
     "image": image{ ${IMAGE} },
-    link{ ${LINK} }
+    link{ ${LINK_TARGET} }
   }
 `
 

@@ -31,12 +31,14 @@ export const splitLayout = defineType({
       title: 'Main column',
       type: 'array',
       of: mainBlockTypes.map((blockType) => defineArrayMember({ type: blockType.name })),
+      validation: (Rule) => Rule.required().min(1).error('Add at least one block to the main column'),
     }),
     defineField({
       name: 'aside',
       title: 'Sidebar',
       type: 'array',
       of: asideBlockTypes.map((blockType) => defineArrayMember({ type: blockType.name })),
+      validation: (Rule) => Rule.required().min(1).error('Add at least one block to the sidebar'),
     }),
   ],
   preview: {

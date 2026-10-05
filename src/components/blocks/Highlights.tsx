@@ -21,9 +21,6 @@ const PROMO_IMAGE_WIDTH = 80
 
 type Block = BlockProps<'highlights'>['block']
 type HighlightRecord = NonNullable<NonNullable<Block['items']>[number]>
-type FillRecord = NonNullable<Block['fill']>[number]
-// Picks carry no tier; fill records say which fallback tier produced them.
-type Entry = HighlightRecord & { tier?: FillRecord['tier'] }
 type Source = 'awards' | 'events' | 'research'
 
 // The record type each source shows. A pick of another type (validation bypassed) is dropped.
@@ -38,27 +35,32 @@ const isSource = (value: string | null | undefined): value is Source =>
 
 // Dates and codes are cleaned before parsing or lookup; the title keeps stega for click-to-edit.
 // Dates and a country name, as events show them: "15 October 2026 | Singapore".
-function datesAndCountry(record: Entry): string[] {
+function datesAndCountry(record: HighlightRecord): string[] {
   const dates = formatDateRange(stegaClean(record.startDate), stegaClean(record.endDate))
   const country = countryName(stegaClean(record.country))
 
   return [dates, country].filter((part): part is string => Boolean(part))
 }
 
-function metaOf(record: Entry, source: Source, deadlineLabel: string | null | undefined): string[] {
+/**
+ * One rule for every award, picked or filled: open nominations show the deadline; closed or missing
+ * nominations show the ceremony date and country. `today` is the UK date the page query ran with,
+ * so the line agrees with the fill tiers and the cached result.
+ */
+function metaOf(
+  record: HighlightRecord,
+  source: Source,
+  deadlineLabel: string | null | undefined,
+  today: string,
+): string[] {
   switch (source) {
     case 'awards': {
-      // Fallback editions with nominations closed show the ceremony date instead of a deadline that has passed.
-      const tier = stegaClean(record.tier)
-
-      if (tier === 'ahead' || tier === 'past') {
-        return datesAndCountry(record)
-      }
-
-      const deadline = formatDay(stegaClean(record.nominationsClosingDate))
+      // ISO calendar dates compare as strings, as `nominationsClosingDate >= $today` does in GROQ.
+      const closing = stegaClean(record.nominationsClosingDate)
+      const deadline = closing && closing >= today ? formatDay(closing) : null
 
       if (!deadline) {
-        return []
+        return datesAndCountry(record)
       }
 
       // Cleaned only to test for emptiness; the rendered label keeps stega for click-to-edit.
@@ -77,13 +79,19 @@ function metaOf(record: Entry, source: Source, deadlineLabel: string | null | un
   }
 }
 
-function toItem(record: Entry, source: Source, brand: BrandKey, deadlineLabel: Block['deadlineLabel']): HighlightsItem {
+function toItem(
+  record: HighlightRecord,
+  source: Source,
+  brand: BrandKey,
+  deadlineLabel: Block['deadlineLabel'],
+  today: string,
+): HighlightsItem {
   return {
     key: record._id,
     title: record.title ?? '',
     // The final URL on ClearView; the detail pages are not built yet and 404 until they are.
     href: sharedRecordHref(record._type, record.slug, brand),
-    meta: metaOf(record, source, deadlineLabel),
+    meta: metaOf(record, source, deadlineLabel, today),
   }
 }
 
@@ -128,7 +136,7 @@ function toPromo(promo: Block['promo'], source: Source, brand: BrandKey): Highli
   }
 }
 
-export function Highlights({ block, brand }: BlockProps<'highlights'>) {
+export function Highlights({ block, brand, today }: BlockProps<'highlights'> & { today: string }) {
   const source = stegaClean(block.source)
 
   if (!isSource(source)) {
@@ -138,7 +146,7 @@ export function Highlights({ block, brand }: BlockProps<'highlights'>) {
   const type = SOURCE_TYPES[source]
   // Picks pointing at unpublished or deleted records dereference to null.
   const picks = (block.items ?? []).filter((record): record is HighlightRecord => record?._type === type).slice(0, ITEM_COUNT)
-  // Fill tiers arrive in order (for example open nominations, then ceremonies ahead, then past editions).
+  // Fill tiers arrive in order (for example open nominations, then ceremonies ahead, then past editions); they order, the meta rule is per record.
   // The queries already exclude the picks and keep tiers disjoint; the dedupe guards the merge anyway.
   const seen = new Set(picks.map((record) => record._id))
   const fill = (block.fill ?? []).filter((record) => {
@@ -150,7 +158,7 @@ export function Highlights({ block, brand }: BlockProps<'highlights'>) {
 
     return true
   })
-  const entries: Entry[] = [...picks, ...fill].slice(0, ITEM_COUNT)
+  const entries: HighlightRecord[] = [...picks, ...fill].slice(0, ITEM_COUNT)
 
   const buttonHref = resolveHref(block.button, brand)
   const buttonLabel = block.button?.label
@@ -160,7 +168,7 @@ export function Highlights({ block, brand }: BlockProps<'highlights'>) {
       // Surface and icon come from code by source, not from the CMS.
       variant={source}
       heading={toHeading(block.heading)}
-      items={entries.map((record) => toItem(record, source, brand, block.deadlineLabel))}
+      items={entries.map((record) => toItem(record, source, brand, block.deadlineLabel, today))}
       button={buttonHref && buttonLabel ? { label: buttonLabel, href: buttonHref } : null}
       promo={toPromo(block.promo, source, brand)}
     />
