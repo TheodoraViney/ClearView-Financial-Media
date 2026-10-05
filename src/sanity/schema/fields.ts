@@ -30,22 +30,7 @@ export const altField = defineField({
     }),
 })
 
-/**
- * Countries observed on the 255 exported Event records, minus `AF`.
- *
- * `AF` is the first option of the legacy ACF select and sits on 179 records as
- * an unset default, not as data. The loader drops it. Extend this list when the
- * client confirms the regions they actually run events in.
- */
-export const EVENT_COUNTRIES = [
-  { title: 'United Arab Emirates', value: 'AE' },
-  { title: 'Switzerland', value: 'CH' },
-  { title: 'United Kingdom', value: 'GB' },
-  { title: 'Jersey', value: 'JE' },
-  { title: 'Saudi Arabia', value: 'SA' },
-  { title: 'Singapore', value: 'SG' },
-  { title: 'United States of America', value: 'US' },
-]
+export { EVENT_COUNTRIES } from '@/lib/countries'
 
 /** `HH:mm` clock time, kept apart from the date exactly as the source stores it. */
 export const timeField = (name: string, title: string, group?: string) =>
@@ -123,10 +108,19 @@ export const linkField = (
     group?: string
     required?: boolean
     withLabel?: boolean
+    /** The label has no default in this block, so the editor must type one. */
+    labelRequired?: boolean
   } = {},
 ) => {
-  const { name = 'link', title = 'Link', description, group, required = false, withLabel = true } =
-    options
+  const {
+    name = 'link',
+    title = 'Link',
+    description,
+    group,
+    required = false,
+    withLabel = true,
+    labelRequired = false,
+  } = options
   const kindOf = (parent: unknown): LinkKind | undefined =>
     (parent as { kind?: LinkKind } | undefined)?.kind
 
@@ -137,6 +131,7 @@ export const linkField = (
     description,
     group,
     options: { collapsible: false },
+    validation: required ? (Rule) => Rule.required() : undefined,
     fields: [
       defineField({
         name: 'kind',
@@ -195,7 +190,10 @@ export const linkField = (
               name: 'label',
               title: 'Label',
               type: 'string',
-              description: 'Link text. Leave empty to use the default for this block.',
+              description: labelRequired
+                ? 'Link text.'
+                : 'Link text. Leave empty to use the default for this block.',
+              validation: labelRequired ? (Rule) => Rule.required() : undefined,
             }),
           ]
         : []),

@@ -2,6 +2,7 @@ import type { BrandKey } from '@/brands'
 
 import { AdSlot } from './AdSlot'
 import { Cta } from './Cta'
+import { Highlights } from './Highlights'
 import { Publications } from './Publications'
 import { SplitLayout } from './SplitLayout'
 import { TopStories } from './TopStories'
@@ -37,6 +38,8 @@ function Block({ block, brand }: { block: PageBlock; brand: BrandKey }) {
       return <TopStories block={block} brand={brand} />
     case 'publications':
       return <Publications block={block} brand={brand} />
+    case 'highlights':
+      return <Highlights block={block} brand={brand} />
     case 'splitLayout':
       return (
         <SplitLayout

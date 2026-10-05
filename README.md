@@ -89,9 +89,12 @@ Next treats `_`-prefixed app folders as private and the URL-encoded workaround b
 ### Caching
 
 `cacheComponents` is on.
-`src/sanity/live.ts` holds the app's only `'use cache'` boundary, `cachedSanity`.
+`src/sanity/live.ts` holds the app's two `'use cache'` boundaries.
+`cachedSanity` caches content queries.
 Sanity Live tags each cached result with the documents that produced it, so publishing a WealthBriefing-only post never expires Family Wealth Report's pages.
 Cache expiry is triggered by `<SanityLive>` in a visitor's browser.
+`cachedUkToday` caches today's UK date for one hour and is passed to queries as `$today`.
+Date-based lists, such as upcoming events and open awards, therefore roll over within an hour of UK midnight without any publish, and pages that use it revalidate hourly.
 `curl` alone never expires anything.
 In dev, `'use cache'` entries persist in `.next/dev/cache` across restarts; delete that folder after seeding content by script.
 
@@ -317,6 +320,7 @@ The `company` <-> `person` relation is bidirectional and Pods keeps those in `wp
 which WXR never exports. Verify both in the export before trusting it.
 
 The events, companies and people CPTs are not REST-exposed.
+Resources are: they use the block editor, so their content, publish date and featured image come from `/wp-json/wp/v2/resource`.
 
 Dates, venues, judges, speakers and sponsors are structured fields.
 Categories, winners, finalists and previous winners are not: they are `wysiwyg` blobs,

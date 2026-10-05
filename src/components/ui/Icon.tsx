@@ -19,7 +19,32 @@ const ICONS = {
     round: false,
   },
   check: { width: 12, height: 12, d: 'M10 3L4.5 8.5L2 6', round: false },
-} as const
+  // Filled 64-unit glyphs from the design's uploads (star-icon-8c544710, public-icon, document-icon), drawn at 32px.
+  star: {
+    width: 32,
+    height: 32,
+    viewBox: 64,
+    d: 'M32 4C34.367 18.3701 45.6299 29.633 60 32C45.6299 34.367 34.367 45.6299 32 60C29.633 45.6299 18.3701 34.367 4 32C18.3701 29.633 29.633 18.3701 32 4Z',
+    fill: true,
+  },
+  public: {
+    width: 32,
+    height: 32,
+    viewBox: 64,
+    d: 'M56 39H49.3701L47 60.333H17L14.6299 39H8V37H56V39Z M32 23C38.9138 23 44.5986 28.2622 45.2676 35H18.7324C19.4014 28.2622 25.0862 23 32 23Z M32 3.66699C36.4182 3.66704 40 7.24874 40 11.667C39.9998 16.0851 36.4181 19.6669 32 19.667C27.5818 19.667 24.0002 16.0851 24 11.667C24 7.24871 27.5817 3.66699 32 3.66699Z',
+    fill: true,
+  },
+  document: {
+    width: 32,
+    height: 32,
+    viewBox: 64,
+    d: 'M34 25H51V56H13L13 8H34V25Z M50 23H36V9L50 23Z',
+    fill: true,
+  },
+} as const satisfies Record<
+  string,
+  { width: number; height: number; d: string; round?: boolean; fill?: boolean; viewBox?: number }
+>
 
 export type IconName = keyof typeof ICONS
 
@@ -30,23 +55,29 @@ export function Icon({
   name: IconName
   className?: string
 }) {
-  const { width, height, d, round } = ICONS[name]
+  const icon: { width: number; height: number; d: string; round?: boolean; fill?: boolean; viewBox?: number } =
+    ICONS[name]
+  const { width, height, d, round, fill, viewBox } = icon
 
   return (
     <svg
       aria-hidden="true"
       width={width}
       height={height}
-      viewBox={`0 0 ${width} ${height}`}
+      viewBox={viewBox ? `0 0 ${viewBox} ${viewBox}` : `0 0 ${width} ${height}`}
       fill="none"
       className={cx('block shrink-0', className)}
     >
-      <path
-        d={d}
-        stroke="currentColor"
-        strokeWidth={name === 'check' ? 2 : 1}
-        strokeLinecap={round ? 'round' : undefined}
-      />
+      {fill ? (
+        <path d={d} fill="currentColor" />
+      ) : (
+        <path
+          d={d}
+          stroke="currentColor"
+          strokeWidth={name === 'check' ? 2 : 1}
+          strokeLinecap={round ? 'round' : undefined}
+        />
+      )}
     </svg>
   )
 }

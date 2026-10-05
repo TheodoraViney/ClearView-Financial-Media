@@ -408,7 +408,7 @@ const IGNORED_RECORD_KEYS = {
   editUrl: 'wp-admin address, derivable from legacyWpId. Not content.',
   parent: 'null on every record of every type in the dump.',
   published:
-    'WordPress post date. On an event the editorial date is startDate, and none of the eight types has a separate publish timestamp; Sanity _createdAt records the import instead.',
+    'WordPress post date. On an event the editorial date is startDate, and none of the eight types has a separate publish timestamp; Sanity _createdAt records the import instead. Resources take publishedAt from REST date_gmt (wp-resources-rest.json) instead.',
   status:
     'WordPress post status. Drives whether the document is written published or as a Sanity draft (see --unpublished), so it is consumed as behaviour rather than stored as a field.',
   thumbnailId:
@@ -785,6 +785,8 @@ function deriveAlt(role, context, options) {
     case 'acclaimThumbnail':
     case 'resourceDownloadThumbnail':
       return parent || undefined
+    case 'resourceFeaturedImage':
+      return context.curatedAlt || parent || undefined
     case 'highlightVideoThumbnail':
       return parent ? `${parent} — highlights video` : undefined
     case 'sponsorVideosThumbnail':
@@ -1330,22 +1332,134 @@ function buildAcclaim(plan, records, acclaimProgramme) {
 }
 
 /**
- * `resource-categories` never reached the dump: Resources are the one CPT on
- * the block editor, whose taxonomy panel posts over REST, so no tax_input is
- * printed into the edit screen. The category is taken from the live site
- * instead: /resource-categories/research/ listed exactly these 12 records on
- * 2026-09-30 (9 on page 1, 3 on page 2), wp-taxonomies.json counts 12 on term
- * 52 Research, and the other two terms (Webinars, Interview) hold none. A
- * resource missing from this list is a blocker, so a record added before the
- * December re-export gets looked at instead of guessed.
+ * Resources are the one CPT on the block editor. The edit screen that
+ * wp-extract.js reads holds none of what the block editor saves over REST:
+ * `record.content` is null on all 12, and the publish date, featured image and
+ * `resource-categories` terms never reach the dump either. Unlike the other
+ * CPTs, `resource` IS exposed on /wp-json/wp/v2/resource, so those four values
+ * come from there, saved by `--fetch-resources-rest` to
+ * `.migration-source/wp-resources-rest.json` and read from that file on every
+ * later run, the same way the other extracts are.
+ */
+const RESOURCES_REST_PATH = `${SOURCE_DIR}/wp-resources-rest.json`
+const WP_REST = 'https://clearviewpublishing.com/wp-json/wp/v2'
+
+/** `resource-categories` term id -> `resource.category`. 53 Webinars and 54 Interview hold no record and have no schema value. */
+const RESOURCE_CATEGORY_TERMS = { 52: 'research' }
+
+/**
+ * Fallback when wp-resources-rest.json is absent: /resource-categories/research/
+ * listed exactly these 12 records on 2026-09-30 (9 on page 1, 3 on page 2) and
+ * wp-taxonomies.json counts 12 on term 52 Research. A resource missing from this
+ * list is a blocker, so a record added before the December re-export gets looked
+ * at instead of guessed.
  */
 const RESEARCH_RESOURCES = new Set(['46443', '45793', '45521', '42959', '41440', '41249', '40105', '39971', '36571', '37454', '37458', '37498'])
 
-function buildResources(plan, records, companyIds, personIds) {
+/**
+ * Four records share `date_gmt` to the minute. That is a bulk re-import on
+ * 2025-02-14, not four reports published together; the real dates are unknown.
+ * Written as found and listed in the notes for the client to correct in Studio.
+ */
+const SUSPECT_RESOURCE_DATE = '2025-02-14T17:50'
+
+/**
+ * Alt text per featured media id. WordPress alt is empty on all 12 banners, and
+ * the title fallback says nothing about the picture, so these were written by
+ * looking at each banner: text-free abstract artwork, ≤125 characters. Used
+ * ahead of the title fallback so a re-run does not replace them.
+ */
+const RESOURCE_BANNER_ALT = {
+  46444: 'Abstract dark teal background with a wave of glowing blue dots sweeping across the right side',
+  45794: 'Abstract background fading from navy to deep red, with a wave of glowing orange lines on the right',
+  45531: 'Abstract dark navy background with glowing blue waves of dotted light along the bottom edge',
+  42974: 'Abstract navy background crossed by diagonal light beams over a dotted pattern, glowing violet and peach at right',
+  41514: 'Abstract teal background of fine pale lines converging in angular folds towards the upper right',
+  41513: 'A glowing blue wireframe padlock with a keyhole on a dark blue background',
+  41517: 'Blurred neon blue and green lines of light forming geometric shapes on a dark navy background',
+  41516: 'Abstract navy background with a curving sweep of blue, violet and coral dotted lines on the right',
+  41518: 'A wireframe hand holding a magnifying glass over blue hexagons with finance icons such as scales and a safe',
+  41520: 'A shield with a check mark inside a segmented ring, over binary digits on a teal gradient background',
+  41519: 'Glowing blue circuit-board traces rising out of mesh waves along the bottom of a dark navy background',
+  41515: 'A spiral of radiating red and grey-blue lines on a dark slate background',
+}
+
+async function getJson(url) {
+  const response = await fetch(url, { headers: { Accept: 'application/json' } })
+  if (!response.ok) throw new Error(`${response.status} ${response.statusText} — ${url}`)
+  return response.json()
+}
+
+/**
+ * `--fetch-resources-rest`: two public GETs, the resources and their featured
+ * media in one `include=` call, saved as they come. Reads only; nothing is sent
+ * to Sanity.
+ */
+async function fetchResourcesRest() {
+  const resourceFields = 'id,slug,title,date,date_gmt,modified_gmt,status,content,featured_media,resource-categories'
+  const resources = await getJson(`${WP_REST}/resource?per_page=100&_fields=${resourceFields}`)
+  if (resources.length >= 100) throw new Error('resource REST returned 100 records, the page size; paginate before trusting it')
+  const mediaIds = [...new Set(resources.map((record) => record.featured_media).filter(Boolean))]
+  const mediaFields = 'id,post,title,alt_text,mime_type,source_url,media_details'
+  const media = mediaIds.length
+    ? await getJson(`${WP_REST}/media?include=${mediaIds.join(',')}&per_page=100&_fields=${mediaFields}`)
+    : []
+
+  mkdirSync(dirname(RESOURCES_REST_PATH), { recursive: true })
+  writeFileSync(RESOURCES_REST_PATH, `${JSON.stringify({ fetchedAt: new Date().toISOString(), resources, media }, null, 2)}\n`)
+  console.log(`resources REST: ${resources.length} resources and ${media.length} media saved to ${RESOURCES_REST_PATH}`)
+}
+
+/**
+ * The REST records keyed by id, with their featured media registered in
+ * `plan.media` in the wp-media.json shape so `image()` and the asset phase
+ * treat a banner like any other attachment. Null when the file is absent.
+ */
+function loadResourcesRest(plan) {
+  if (!existsSync(RESOURCES_REST_PATH)) {
+    const warning =
+      'wp-resources-rest.json is absent: resources get no body, publishedAt or featuredImage, and category falls back to the hard-coded RESEARCH_RESOURCES list. Run with --fetch-resources-rest.'
+    console.warn(`WARNING ${warning}`)
+    plan.problems.push(warning)
+    return null
+  }
+
+  const file = readJson(RESOURCES_REST_PATH)
+  for (const media of file.media || []) {
+    const filename = String(media.source_url || '').split('/').pop()
+    plan.media[String(media.id)] ||= {
+      id: String(media.id),
+      url: media.source_url,
+      filename,
+      mimeType: media.mime_type,
+      mediaType: String(media.mime_type || '').split('/')[0],
+      width: media.media_details?.width ?? null,
+      height: media.media_details?.height ?? null,
+      altText: media.alt_text || '',
+      title: media.title?.rendered || '',
+      attachedTo: media.post ? String(media.post) : null,
+    }
+  }
+  plan.notes.push(`media: ${(file.media || []).length} resource banners added from wp-resources-rest.json (fetched ${file.fetchedAt})`)
+  return new Map((file.resources || []).map((record) => [String(record.id), record]))
+}
+
+/** Whitespace runs collapsed: partner group names arrive as "Lead  sponsor". */
+const collapseSpaces = (text) => (text ? String(text).replace(/\s{2,}/g, ' ').trim() : text)
+
+function buildResources(plan, records, companyIds, personIds, rest) {
+  if (rest && rest.size !== records.length) {
+    plan.problems.push(`wp-resources-rest.json holds ${rest.size} resources and wp-source.json ${records.length}; re-fetch so both describe the same records`)
+  }
+
   for (const record of records) {
     const seen = new Set(['rec:id', 'rec:title', 'rec:slug', 'rec:status', 'rec:content'])
     const where = `resource ${record.id}`
     const title = (record.title || '').trim()
+    const restRecord = rest?.get(String(record.id))
+    if (rest && !restRecord) {
+      plan.blockers.push({ code: 'resource-not-in-rest', message: `${where}: absent from wp-resources-rest.json. Re-run with --fetch-resources-rest.` })
+    }
 
     consume(
       seen,
@@ -1369,12 +1483,30 @@ function buildResources(plan, records, companyIds, personIds) {
 
     const partners = repeaterRows(record, F.partnerCategory)
       .map((row, index) => {
-        const name = textOf(row[F.partnerCategoryTitle])
+        const name = collapseSpaces(textOf(row[F.partnerCategoryTitle]))
         const companies = resolveRefs(plan, row[F.partnerCompanies], companyIds, `${where} partners[${index}]`)
         if (!name || !companies.length) return undefined
         return { _type: 'companyGroup', name, companies }
       })
       .filter(Boolean)
+
+    // The block editor's content, date, banner and terms, when the edit screen had none.
+    const bodyHtml = record.content ?? restRecord?.content?.rendered
+    const publishedAt = restRecord?.date_gmt ? new Date(`${restRecord.date_gmt}Z`).toISOString() : undefined
+    if (restRecord && !publishedAt) plan.problems.push(`${where}: no date_gmt in REST; publishedAt is required in the schema`)
+    if (restRecord?.date_gmt?.startsWith(SUSPECT_RESOURCE_DATE)) {
+      plan.notes.push(`${where}: publishedAt ${publishedAt} is the 2025-02-14 bulk re-import, not the real publish date`)
+    }
+    const bannerId = restRecord?.featured_media ? String(restRecord.featured_media) : undefined
+
+    let category
+    if (rest) {
+      const terms = restRecord?.['resource-categories'] || []
+      const mapped = [...new Set(terms.map((term) => RESOURCE_CATEGORY_TERMS[term]))]
+      category = mapped.length === 1 ? mapped[0] : undefined
+    } else {
+      category = RESEARCH_RESOURCES.has(String(record.id)) ? 'research' : undefined
+    }
 
     addDocument(
       plan,
@@ -1383,8 +1515,16 @@ function buildResources(plan, records, companyIds, personIds) {
         _type: 'resource',
         title,
         slug: { _type: 'slug', current: record.slug || slugify(title) },
-        category: RESEARCH_RESOURCES.has(String(record.id)) ? 'research' : undefined,
-        body: prose(record.content, { where: `${where} body`, fallbackAlt: title }, plan),
+        publishedAt,
+        featuredImage: bannerId
+          ? image(plan, bannerId, 'resourceFeaturedImage', {
+              where: `${where} featuredImage`,
+              parentTitle: title,
+              curatedAlt: RESOURCE_BANNER_ALT[bannerId],
+            })
+          : undefined,
+        category,
+        body: prose(bodyHtml, { where: `${where} body`, fallbackAlt: title }, plan),
         downloadThumbnail: thumbIsImage
           ? image(plan, thumbId, 'resourceDownloadThumbnail', { where, parentTitle: title })
           : undefined,
@@ -1399,10 +1539,12 @@ function buildResources(plan, records, companyIds, personIds) {
       }),
     )
 
-    if (!RESEARCH_RESOURCES.has(String(record.id))) {
+    if (!category) {
       plan.blockers.push({
         code: 'resource-category-unknown',
-        message: `${where}: not in RESEARCH_RESOURCES. Check which /resource-categories/ listing shows it on the live site and add it.`,
+        message: rest
+          ? `${where}: resource-categories ${JSON.stringify(restRecord?.['resource-categories'] ?? null)} map to no single value in RESOURCE_CATEGORY_TERMS. Add the term or the schema value.`
+          : `${where}: not in RESEARCH_RESOURCES. Check which /resource-categories/ listing shows it on the live site and add it.`,
       })
     }
 
@@ -2569,6 +2711,9 @@ Usage: node scripts/load-to-sanity.mjs --dataset <name> [options]
   --commit                    actually write. Without it, nothing is sent.
   --assets                    run the asset phase (needs --commit).
   --plan <path>               write the built documents to a JSON file.
+  --fetch-resources-rest      fetch /wp-json/wp/v2/resource and its featured
+                              media into .migration-source/wp-resources-rest.json
+                              before planning. Public GETs only.
 
   --accept=<code>[,<code>]    proceed despite a named blocker. Repeatable.
   --inline-foreign-images=drop|keep     default drop
@@ -2593,6 +2738,7 @@ function parseArgs(argv) {
     concurrency: 3,
     assetDelay: 300,
     production: false,
+    fetchResourcesRest: false,
     projectId: process.env.NEXT_PUBLIC_SANITY_PROJECT_ID || 'hcxqlh4h',
   }
 
@@ -2606,6 +2752,7 @@ function parseArgs(argv) {
       case '--commit': options.commit = true; break
       case '--assets': options.assets = true; break
       case '--production': options.production = true; break
+      case '--fetch-resources-rest': options.fetchResourcesRest = true; break
       case '--plan': options.plan = next(); break
       case '--accept': for (const code of next().split(',')) options.accept.add(code.trim()); break
       case '--inline-foreign-images': options.inlineForeignImages = next(); break
@@ -2650,6 +2797,8 @@ async function main(argv) {
 
   console.log(`project ${options.projectId}, dataset ${options.dataset}, ${options.commit ? 'COMMIT' : 'dry run'}`)
 
+  if (options.fetchResourcesRest) await fetchResourcesRest()
+
   const plan = newPlan(options)
   const events = readJson(`${SOURCE_DIR}/wp-events.json`)
   const source = readJson(`${SOURCE_DIR}/wp-source.json`)
@@ -2673,6 +2822,7 @@ async function main(argv) {
     plan.notes.push(`media: ${Object.keys(extra.media).length} attachments added from ${name}`)
   }
   plan.taxonomyNames = loadTaxonomyNames(plan)
+  const resourcesRest = loadResourcesRest(plan)
 
   const eventRecords = events.records
   const companyRecords = source.types.companies.records
@@ -2706,7 +2856,7 @@ async function main(argv) {
     winnersByEvent,
   })
 
-  buildResources(plan, resourceRecords, companyIds, personIds)
+  buildResources(plan, resourceRecords, companyIds, personIds, resourcesRest)
 
   if (options.unpublished === 'skip') {
     const before = plan.documents.length

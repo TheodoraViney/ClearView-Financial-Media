@@ -1,7 +1,7 @@
 import { DocumentPdfIcon } from '@sanity/icons/DocumentPdf'
 import { defineArrayMember, defineField, defineType } from 'sanity'
 
-import { altField, legacyWpIdField } from '../fields'
+import { altField, imageField, legacyWpIdField } from '../fields'
 
 /**
  * A downloadable research report or post-forum report. 12 records.
@@ -38,6 +38,19 @@ export const resource = defineType({
       options: { source: 'title', maxLength: 96 },
       description: 'Published at /resource/{slug}/. Migrated from WordPress, changing it breaks a live URL.',
       validation: (Rule) => Rule.required(),
+    }),
+    defineField({
+      name: 'publishedAt',
+      title: 'Published at',
+      type: 'datetime',
+      description: 'Orders the Research list on the site. Migrated from the WordPress publish date.',
+      initialValue: () => new Date().toISOString(),
+      validation: (Rule) => Rule.required(),
+    }),
+    imageField('featuredImage', {
+      title: 'Banner image',
+      description:
+        'Wide banner (1200×627) used when the report is shared. Migrated from the WordPress featured image.',
     }),
     defineField({
       name: 'category',
@@ -90,17 +103,28 @@ export const resource = defineType({
     }),
     legacyWpIdField,
   ],
+  orderings: [
+    {
+      title: 'Published, newest first',
+      name: 'publishedAtDesc',
+      by: [{ field: 'publishedAt', direction: 'desc' }],
+    },
+  ],
   preview: {
     select: {
       title: 'title',
       category: 'category',
       slug: 'slug.current',
+      publishedAt: 'publishedAt',
       media: 'downloadThumbnail',
     },
-    prepare({ title, category, slug, media }) {
+    prepare({ title, category, slug, publishedAt, media }) {
+      const date = typeof publishedAt === 'string' ? publishedAt.slice(0, 10) : undefined
+      const label = category || (slug ? `/resource/${slug}` : 'No category')
+
       return {
         title: title || 'Untitled resource',
-        subtitle: category || (slug ? `/resource/${slug}` : 'No category'),
+        subtitle: [label, date].filter(Boolean).join(' · '),
         media,
       }
     },

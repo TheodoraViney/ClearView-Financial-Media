@@ -6,6 +6,7 @@ import { BRANDS, isBrandKey, type BrandKey } from '@/brands'
 import { BlockRenderer } from '@/components/blocks/BlockRenderer'
 import {
   cachedSanity,
+  cachedUkToday,
   getDynamicFetchOptions,
   type DynamicFetchOptions,
 } from '@/sanity/live'
@@ -56,7 +57,7 @@ async function CachedHome({
 }: { brand: BrandKey } & DynamicFetchOptions) {
   const { data } = await cachedSanity({
     query: HOME_PAGE_QUERY,
-    params: { brand },
+    params: { brand, today: await cachedUkToday() },
     perspective,
     variant,
     stega,
