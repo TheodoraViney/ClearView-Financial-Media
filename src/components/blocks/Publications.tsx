@@ -16,7 +16,7 @@ const isEditorialKey = (key: string): key is (typeof EDITORIAL_BRAND_KEYS)[numbe
   (EDITORIAL_BRAND_KEYS as readonly string[]).includes(key)
 
 function toCard(card: Card): PublicationCard | null {
-  // Only the brand is cleaned: heading, body and description keep stega for click-to-edit.
+  // Only the brand is cleaned: heading, body, description and link label keep stega for click-to-edit.
   const key = stegaClean(card.brand)
 
   if (!key || !isBrandKey(key) || !isEditorialKey(key) || !card.image?.asset) {
@@ -36,7 +36,7 @@ function toCard(card: Card): PublicationCard | null {
       // The title sits in the same link, so the image is decorative.
       alt: '',
     },
-    linkLabel: `Visit ${title}`,
+    linkLabel: card.linkLabel ?? '',
   }
 }
 

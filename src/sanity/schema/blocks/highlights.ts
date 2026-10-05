@@ -131,6 +131,14 @@ export const highlights = defineType({
             return true
           }),
     }),
+    defineField({
+      name: 'deadlineLabel',
+      title: 'Deadline label',
+      type: 'string',
+      description: 'Shown before the nominations deadline, e.g. "Entry deadline:". Leave empty to show the date only.',
+      initialValue: 'Entry deadline:',
+      hidden: ({ parent }) => (parent as { source?: unknown } | undefined)?.source !== 'awards',
+    }),
     linkField({
       name: 'button',
       title: 'Button',

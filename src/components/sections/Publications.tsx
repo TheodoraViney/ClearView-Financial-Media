@@ -62,7 +62,7 @@ export function Publications({ heading, body, cards }: PublicationsProps) {
                     <h2 className="text-title-lg font-medium text-foreground">{card.title}</h2>
                     <p className="text-base text-pretty text-grey">{card.description}</p>
                   </div>
-                  <ArrowLink variant="default">{card.linkLabel}</ArrowLink>
+                  {card.linkLabel && <ArrowLink variant="default">{card.linkLabel}</ArrowLink>}
                 </div>
               </a>
             </li>

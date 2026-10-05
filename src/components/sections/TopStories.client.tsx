@@ -21,7 +21,7 @@ const SWIPE_THRESHOLD = 40
  * Because a `contents` box cannot carry opacity, below lg the whole hero fades; from lg only the
  * text column fades and the image swaps in place at the midpoint.
  */
-export function TopStoriesHero({ slides }: { slides: TopStory[] }) {
+export function TopStoriesHero({ slides, linkLabel }: { slides: TopStory[]; linkLabel: string }) {
   // `selected` follows the dots at once; `shown` swaps mid-fade.
   const [selected, setSelected] = useState(0)
   const [shown, setShown] = useState(0)
@@ -114,9 +114,9 @@ export function TopStoriesHero({ slides }: { slides: TopStory[] }) {
           {story.excerpt && (
             <p className="order-2 text-base text-pretty text-grey md:order-none">{story.excerpt}</p>
           )}
-          {story.href && (
+          {story.href && linkLabel && (
             <ArrowLink href={story.href} variant="accent" className="order-2 md:order-none">
-              Read article
+              {linkLabel}
             </ArrowLink>
           )}
         </div>
