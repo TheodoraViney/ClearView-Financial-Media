@@ -11,8 +11,8 @@ const brandTitle = (key: unknown) =>
   typeof key === 'string' && isBrandKey(key) ? BRANDS[key].title : undefined
 
 /**
- * Intro heading and text with a card per editorial publication. The card link
- * is not authored: the site renders "Visit {brand}" to that brand's origin.
+ * Intro heading and text with a card per editorial publication. The card links
+ * to that brand's origin; only the link label is authored.
  */
 export const publications = defineType({
   name: 'publications',
@@ -60,6 +60,13 @@ export const publications = defineType({
               ],
             }),
             imageField('image', { required: true }),
+            defineField({
+              name: 'linkLabel',
+              title: 'Link label',
+              type: 'string',
+              description: 'The link text under the card, e.g. "Visit WealthBriefing".',
+              validation: (Rule) => Rule.required(),
+            }),
           ],
           preview: {
             select: { brand: 'brand', description: 'description', media: 'image' },

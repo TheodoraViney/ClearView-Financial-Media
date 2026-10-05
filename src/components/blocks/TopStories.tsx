@@ -52,6 +52,7 @@ export function TopStories({ block, brand }: BlockProps<'topStories'>) {
 
   return (
     <TopStoriesSection
+      linkLabel={block.linkLabel ?? ''}
       slides={[...slides, ...fillSlides].map((post) => toStory(post, brand, 1600))}
       articles={[...articles, ...fillArticles].map((post) => toStory(post, brand, 160))}
     />

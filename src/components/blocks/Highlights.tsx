@@ -45,7 +45,7 @@ function datesAndCountry(record: Entry): string[] {
   return [dates, country].filter((part): part is string => Boolean(part))
 }
 
-function metaOf(record: Entry, source: Source): string[] {
+function metaOf(record: Entry, source: Source, deadlineLabel: string | null | undefined): string[] {
   switch (source) {
     case 'awards': {
       // Fallback editions with nominations closed show the ceremony date instead of a deadline that has passed.
@@ -55,10 +55,16 @@ function metaOf(record: Entry, source: Source): string[] {
         return datesAndCountry(record)
       }
 
-      // Hard-coded prefix for now: whether visible copy moves to the CMS is an open question.
       const deadline = formatDay(stegaClean(record.nominationsClosingDate))
 
-      return deadline ? [`Entry deadline: ${deadline}`] : []
+      if (!deadline) {
+        return []
+      }
+
+      // Cleaned only to test for emptiness; the rendered label keeps stega for click-to-edit.
+      const label = stegaClean(deadlineLabel)?.trim() ? deadlineLabel?.trim() : null
+
+      return [label ? `${label} ${deadline}` : deadline]
     }
     case 'events':
       return datesAndCountry(record)
@@ -71,13 +77,13 @@ function metaOf(record: Entry, source: Source): string[] {
   }
 }
 
-function toItem(record: Entry, source: Source, brand: BrandKey): HighlightsItem {
+function toItem(record: Entry, source: Source, brand: BrandKey, deadlineLabel: Block['deadlineLabel']): HighlightsItem {
   return {
     key: record._id,
     title: record.title ?? '',
     // The final URL on ClearView; the detail pages are not built yet and 404 until they are.
     href: sharedRecordHref(record._type, record.slug, brand),
-    meta: metaOf(record, source),
+    meta: metaOf(record, source, deadlineLabel),
   }
 }
 
@@ -154,7 +160,7 @@ export function Highlights({ block, brand }: BlockProps<'highlights'>) {
       // Surface and icon come from code by source, not from the CMS.
       variant={source}
       heading={toHeading(block.heading)}
-      items={entries.map((record) => toItem(record, source, brand))}
+      items={entries.map((record) => toItem(record, source, brand, block.deadlineLabel))}
       button={buttonHref && buttonLabel ? { label: buttonLabel, href: buttonHref } : null}
       promo={toPromo(block.promo, source, brand)}
     />

@@ -42,6 +42,7 @@ const CTA = /* groq */ `
 // Picks first; `latest` fills the remaining places. `^` is the topStories block, so picks are excluded.
 // On ClearView every editorial post qualifies: post.brands never holds the clearview key.
 const TOP_STORIES = /* groq */ `
+  linkLabel,
   "slides": slides[]->{ ${POST_CARD} },
   "articles": articles[]->{ ${POST_CARD} },
   "latest": *[
@@ -60,7 +61,8 @@ const PUBLICATIONS = /* groq */ `
     _key,
     brand,
     description,
-    image{ ${IMAGE} }
+    image{ ${IMAGE} },
+    linkLabel
   }
 `
 
@@ -104,6 +106,7 @@ const HIGHLIGHT_ITEM = /* groq */ `
 const HIGHLIGHTS = /* groq */ `
   source,
   heading[]{ _key, style, children[]{ _key, text } },
+  deadlineLabel,
   "items": items[]->{ ${HIGHLIGHT_ITEM} },
   "fill": select(
     $brand == "clearview" && source == "awards" => [

@@ -57,6 +57,14 @@ export const topStories = defineType({
     adminLabelField,
     postPicks('slides', 'Slides', TOP_STORIES_SLIDE_COUNT, 'articles'),
     postPicks('articles', 'Articles below', TOP_STORIES_ARTICLE_COUNT, 'slides'),
+    defineField({
+      name: 'linkLabel',
+      title: 'Link label',
+      type: 'string',
+      description: 'The link text on each slide.',
+      initialValue: 'Read article',
+      validation: (Rule) => Rule.required(),
+    }),
   ],
   preview: {
     select: { adminLabel: 'adminLabel', slides: 'slides', articles: 'articles' },
