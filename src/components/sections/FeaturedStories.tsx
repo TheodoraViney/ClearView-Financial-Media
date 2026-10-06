@@ -63,7 +63,7 @@ export function FeaturedStories({ heading, link, items, now }: FeaturedStoriesPr
               <ArticleCard
                 href={item.href}
                 title={item.title}
-                image={item.image?.src}
+                image={item.image}
                 tall={index % 2 === 1}
                 meta={[
                   item.publication,

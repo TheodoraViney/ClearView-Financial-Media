@@ -293,12 +293,14 @@ export default async function UiPage({
             <ArticleCard
               href="#"
               title="India's Spark Capital PWM Adds Eight-Person Team Of Bankers"
+              image={{ src: '', alt: 'Bankers in a meeting room' }}
               meta={['WealthBriefing', '2 hours ago']}
             />
             <ArticleCard
               href="#"
               tall
               title="Global Economy, Earnings Confound The Doubters Amid Global Storms"
+              image={{ src: '', alt: 'Storm clouds over a city skyline' }}
               meta={['WealthBriefingAsia', '4 hours ago']}
             />
           </div>
