@@ -69,6 +69,12 @@ const FEATURED_STORIES = /* groq */ `
   "posts": posts[]->{ ${POST_CARD} }
 `
 
+// Editorial figures, not counted from data. The icon is a fixed-list key the adapter validates.
+const STATS_BAR = /* groq */ `
+  heading[]{ _key, style, children[]{ _key, text } },
+  items[]{ _key, icon, value, label }
+`
+
 const PUBLICATIONS = /* groq */ `
   heading[]{ _key, style, children[]{ _key, text } },
   body,
@@ -192,6 +198,7 @@ export const BLOCKS_PROJECTION = /* groq */ `
   _type == "cta" => { ${CTA} },
   _type == "highlights" => { ${HIGHLIGHTS} },
   _type == "featuredStories" => { ${FEATURED_STORIES} },
+  _type == "statsBar" => { ${STATS_BAR} },
   _type == "splitLayout" => {
     "main": main[]{ _key, _type, ${MAIN_COLUMN_BLOCKS} },
     "aside": aside[]{ _key, _type, ${ASIDE_BLOCKS} }
