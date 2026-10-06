@@ -1,26 +1,20 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useSyncExternalStore } from 'react'
 
 import { formatRelativeTime } from '@/lib/dates'
 
-// Recount after this long so an open page keeps "15 minutes ago" honest.
-const TICK = 60 * 1000
+// The browser's clock, read once per page load so every card counts from the same moment.
+let loadedAt: string | undefined
+const browserNow = () => (loadedAt ??= new Date().toISOString())
+const subscribe = () => () => {}
 
 /**
  * "2 hours ago". The server renders against `now`, an hourly-cached clock, and hydration reuses it so the markup matches;
- * after mount the text counts from the browser's clock and updates every minute.
+ * right after hydration React switches to the browser's clock once.
  */
 export function RelativeTime({ dateTime, now }: { dateTime: string; now: string }) {
-  const [current, setCurrent] = useState(now)
-
-  useEffect(() => {
-    const update = () => setCurrent(new Date().toISOString())
-    update()
-    const interval = setInterval(update, TICK)
-
-    return () => clearInterval(interval)
-  }, [])
+  const current = useSyncExternalStore(subscribe, browserNow, () => now)
 
   return <time dateTime={dateTime}>{formatRelativeTime(dateTime, current)}</time>
 }
