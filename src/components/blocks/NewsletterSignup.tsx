@@ -21,7 +21,7 @@ function toOption(option: Option): NewsletterOption | null {
     return null
   }
 
-  return { key: option._key, label: option.label ?? '' }
+  return { key: option._key, label: option.label ?? '', defaultChecked: stegaClean(option.defaultChecked) === true }
 }
 
 export function NewsletterSignup({ block }: BlockProps<'newsletterSignup'>) {

@@ -80,7 +80,7 @@ const NEWSLETTER_SIGNUP = /* groq */ `
   heading[]{ _key, style, children[]{ _key, text } },
   body,
   preferencesLabel,
-  options[]{ _key, label },
+  options[]{ _key, label, defaultChecked },
   emailPlaceholder,
   buttonLabel,
   invalidEmailMessage,

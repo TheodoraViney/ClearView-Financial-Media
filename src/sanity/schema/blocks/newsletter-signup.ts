@@ -53,11 +53,19 @@ export const newsletterSignup = defineType({
               type: 'string',
               validation: (Rule) => Rule.required(),
             }),
+            // Optional by design: unset reads as unticked.
+            defineField({
+              name: 'defaultChecked',
+              title: 'Ticked by default',
+              type: 'boolean',
+              description: 'The box starts ticked; readers can untick it.',
+              initialValue: false,
+            }),
           ],
           preview: {
-            select: { label: 'label' },
-            prepare({ label }) {
-              return { title: label || 'Empty option' }
+            select: { label: 'label', defaultChecked: 'defaultChecked' },
+            prepare({ label, defaultChecked }) {
+              return { title: label || 'Empty option', subtitle: defaultChecked ? 'Ticked by default' : undefined }
             },
           },
         }),
@@ -112,9 +120,10 @@ export const newsletterSignup = defineType({
       name: 'noOptionMessage',
       title: 'No option chosen message',
       type: 'string',
-      description: 'Shown under the field when the reader has not chosen any option.',
+      description: 'Shown under the options when the reader has not chosen any. Keep it to one short line.',
       initialValue: 'Choose at least one update.',
-      validation: (Rule) => Rule.required(),
+      validation: (Rule) =>
+        Rule.required().max(40).warning('Longer than 40 characters; on phones the message may run into the text below'),
     }),
     imageField('image', { required: true }),
   ],
