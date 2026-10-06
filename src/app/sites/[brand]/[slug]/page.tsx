@@ -5,6 +5,7 @@ import { Suspense } from 'react'
 import { isBrandKey, type BrandKey } from '@/brands'
 import { BlockRenderer } from '@/components/blocks/BlockRenderer'
 import {
+  cachedNow,
   cachedSanity,
   cachedUkToday,
   getDynamicFetchOptions,
@@ -88,7 +89,7 @@ async function CachedPage({
   variant,
   stega,
 }: { brand: BrandKey; slug: string } & DynamicFetchOptions) {
-  const today = await cachedUkToday()
+  const [today, now] = await Promise.all([cachedUkToday(), cachedNow()])
   const { data } = await cachedSanity({
     query: PAGE_QUERY,
     params: { brand, slug, today },
@@ -104,7 +105,7 @@ async function CachedPage({
   return (
     <main>
       <h1 className="px-6 pt-10 text-3xl font-semibold">{data.title}</h1>
-      <BlockRenderer blocks={data.blocks} brand={brand} today={today} />
+      <BlockRenderer blocks={data.blocks} brand={brand} today={today} now={now} />
     </main>
   )
 }

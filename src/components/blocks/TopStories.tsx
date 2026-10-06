@@ -14,7 +14,7 @@ const ARTICLE_COUNT = 3
 type Post = NonNullable<NonNullable<BlockProps<'topStories'>['block']['latest']>[number]>
 
 // The post's own brand when it runs on the current host, otherwise the first one: the same brand resolveHref links to.
-function publicationOf(brands: BrandKey[], current: BrandKey): BrandKey | null {
+export function publicationOf(brands: BrandKey[], current: BrandKey): BrandKey | null {
   return brands.includes(current) ? current : (brands[0] ?? null)
 }
 
