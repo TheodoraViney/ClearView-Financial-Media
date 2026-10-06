@@ -203,9 +203,12 @@ body {
   font-family: var(--font-sans);
 }
 
-:focus-visible {
-  outline: 2px solid var(--focus);
-  outline-offset: 2px;
+/* In the base layer so a component's `outline-none` (fields that show focus through their ring) can override it */
+@layer base {
+  :focus-visible {
+    outline: 2px solid var(--focus);
+    outline-offset: 2px;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {

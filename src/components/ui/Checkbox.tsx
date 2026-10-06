@@ -2,13 +2,16 @@ import { type ComponentProps, type ReactNode } from 'react'
 
 import { cx } from './cx'
 import { Icon } from './Icon'
+import { EASE, type Motion } from './motion'
 
 // Native checkbox kept for forms and a11y; the visible box follows it through peer-checked.
 export function Checkbox({
   label,
+  // Box and tick easing, see motion.ts.
+  motion = 'smooth',
   className,
   ...props
-}: { label: ReactNode } & Omit<ComponentProps<'input'>, 'type'>) {
+}: { label: ReactNode; motion?: Motion } & Omit<ComponentProps<'input'>, 'type'>) {
   return (
     <label
       className={cx(
@@ -19,9 +22,17 @@ export function Checkbox({
       <input {...props} type="checkbox" className="peer sr-only" />
       <span
         aria-hidden="true"
-        className="flex size-4 shrink-0 items-center justify-center rounded-sm border border-dark bg-white text-white transition-colors duration-180 ease-smooth peer-checked:border-accent peer-checked:bg-accent peer-focus-visible:outline-2 peer-focus-visible:outline-offset-2 peer-focus-visible:outline-focus"
+        className={cx(
+          'flex size-4 shrink-0 items-center justify-center rounded-sm border border-dark bg-white text-white transition-colors peer-checked:border-accent peer-checked:bg-accent peer-focus-visible:outline-2 peer-focus-visible:outline-offset-2 peer-focus-visible:outline-focus',
+          EASE[motion],
+        )}
       >
-        <span className="scale-70 opacity-0 transition duration-180 ease-smooth group-has-checked:scale-100 group-has-checked:opacity-100">
+        <span
+          className={cx(
+            'scale-70 opacity-0 transition group-has-checked:scale-100 group-has-checked:opacity-100',
+            EASE[motion],
+          )}
+        >
           <Icon name="check" />
         </span>
       </span>

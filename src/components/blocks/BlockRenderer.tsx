@@ -4,6 +4,7 @@ import { AdSlot } from './AdSlot'
 import { Cta } from './Cta'
 import { FeaturedStories } from './FeaturedStories'
 import { Highlights } from './Highlights'
+import { NewsletterSignup } from './NewsletterSignup'
 import { Publications } from './Publications'
 import { SplitLayout } from './SplitLayout'
 import { StatsBar } from './StatsBar'
@@ -62,6 +63,8 @@ function Block({ block, brand, today, now }: { block: PageBlock; brand: BrandKey
       return <FeaturedStories block={block} brand={brand} now={now} />
     case 'statsBar':
       return <StatsBar block={block} brand={brand} />
+    case 'newsletterSignup':
+      return <NewsletterSignup block={block} brand={brand} />
     default:
       return unknownBlock(block)
   }

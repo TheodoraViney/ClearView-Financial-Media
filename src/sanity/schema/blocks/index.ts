@@ -4,12 +4,13 @@ import { adSlot } from './ad-slot'
 import { cta } from './cta'
 import { featuredStories } from './featured-stories'
 import { highlights } from './highlights'
+import { newsletterSignup } from './newsletter-signup'
 import { publications } from './publications'
 import { splitLayout } from './split-layout'
 import { statsBar } from './stats-bar'
 import { topStories } from './top-stories'
 
-export const blockTypes = [cta, adSlot, splitLayout, topStories, publications, highlights, featuredStories, statsBar]
+export const blockTypes = [cta, adSlot, splitLayout, topStories, publications, highlights, featuredStories, statsBar, newsletterSignup]
 
 export const blocksField = defineField({
   name: 'blocks',
