@@ -75,6 +75,19 @@ const STATS_BAR = /* groq */ `
   items[]{ _key, icon, value, label }
 `
 
+// UI only for now: every visible string, the validation messages included, comes from the CMS.
+const NEWSLETTER_SIGNUP = /* groq */ `
+  heading[]{ _key, style, children[]{ _key, text } },
+  body,
+  preferencesLabel,
+  options[]{ _key, label },
+  emailPlaceholder,
+  buttonLabel,
+  invalidEmailMessage,
+  noOptionMessage,
+  image{ ${IMAGE} }
+`
+
 const PUBLICATIONS = /* groq */ `
   heading[]{ _key, style, children[]{ _key, text } },
   body,
@@ -199,6 +212,7 @@ export const BLOCKS_PROJECTION = /* groq */ `
   _type == "highlights" => { ${HIGHLIGHTS} },
   _type == "featuredStories" => { ${FEATURED_STORIES} },
   _type == "statsBar" => { ${STATS_BAR} },
+  _type == "newsletterSignup" => { ${NEWSLETTER_SIGNUP} },
   _type == "splitLayout" => {
     "main": main[]{ _key, _type, ${MAIN_COLUMN_BLOCKS} },
     "aside": aside[]{ _key, _type, ${ASIDE_BLOCKS} }
