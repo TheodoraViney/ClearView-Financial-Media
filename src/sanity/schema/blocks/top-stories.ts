@@ -9,7 +9,7 @@ export const TOP_STORIES_ARTICLE_COUNT = 3
 type PostRef = { _ref?: string }
 
 // ClearView posts never carry the clearview key: the group page draws on every editorial brand.
-const postsOfPageBrand: ReferenceFilterResolver = ({ document }) => {
+export const postsOfPageBrand: ReferenceFilterResolver = ({ document }) => {
   const brand = (document as { brand?: string }).brand
 
   if (!brand || brand === 'clearview') {

@@ -2,21 +2,27 @@ import type { BrandKey } from '@/brands'
 
 import { AdSlot } from './AdSlot'
 import { Cta } from './Cta'
+import { FeaturedStories } from './FeaturedStories'
 import { Highlights } from './Highlights'
 import { Publications } from './Publications'
 import { SplitLayout } from './SplitLayout'
 import { TopStories } from './TopStories'
 import type { PageBlock } from './types'
 
-/** `today` is the UK date the page query ran with (`$today`), for date-dependent lines such as the awards meta. */
+/**
+ * `today` is the UK date the page query ran with (`$today`), for date-dependent lines such as the awards meta.
+ * `now` is the hourly-cached ISO time that server-rendered relative dates ("2 hours ago") count from.
+ */
 export function BlockRenderer({
   blocks,
   brand,
   today,
+  now,
 }: {
   blocks: PageBlock[] | null | undefined
   brand: BrandKey
   today: string
+  now: string
 }) {
   if (!blocks?.length) {
     return null
@@ -25,13 +31,13 @@ export function BlockRenderer({
   return (
     <>
       {blocks.map((block) => (
-        <Block key={block._key} block={block} brand={brand} today={today} />
+        <Block key={block._key} block={block} brand={brand} today={today} now={now} />
       ))}
     </>
   )
 }
 
-function Block({ block, brand, today }: { block: PageBlock; brand: BrandKey; today: string }) {
+function Block({ block, brand, today, now }: { block: PageBlock; brand: BrandKey; today: string; now: string }) {
   switch (block._type) {
     case 'adSlot':
       return <AdSlot block={block} brand={brand} />
@@ -48,9 +54,11 @@ function Block({ block, brand, today }: { block: PageBlock; brand: BrandKey; tod
         <SplitLayout
           block={block}
           brand={brand}
-          renderBlocks={(blocks) => <BlockRenderer blocks={blocks} brand={brand} today={today} />}
+          renderBlocks={(blocks) => <BlockRenderer blocks={blocks} brand={brand} today={today} now={now} />}
         />
       )
+    case 'featuredStories':
+      return <FeaturedStories block={block} brand={brand} now={now} />
     default:
       return unknownBlock(block)
   }

@@ -41,6 +41,16 @@ export async function cachedUkToday(): Promise<string> {
   return ukToday()
 }
 
+/**
+ * The current time as an ISO string, for relative dates ("2 hours ago") in server-rendered HTML.
+ * Same hourly boundary as cachedUkToday, so the text is at most about an hour behind; `RelativeTime` corrects it in the browser.
+ */
+export async function cachedNow(): Promise<string> {
+  'use cache'
+  cacheLife('hours')
+  return new Date().toISOString()
+}
+
 export interface DynamicFetchOptions {
   perspective: LivePerspective
   variant?: string

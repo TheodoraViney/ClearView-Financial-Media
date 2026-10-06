@@ -50,7 +50,7 @@ export const post = defineType({
       description: 'Shown under the headline in the Home hero. About 120-200 characters reads best.',
       validation: (Rule) => Rule.max(200).warning('Longer than 200 characters; the hero will wrap onto more lines'),
     }),
-    imageField('image'),
+    imageField('image', { required: true }),
     defineField({
       name: 'content',
       title: 'Content',

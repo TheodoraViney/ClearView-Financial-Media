@@ -60,6 +60,15 @@ const TOP_STORIES = /* groq */ `
   ] | order(publishedAt desc)[0...6]{ ${POST_CARD} }
 `
 
+// Exactly four hand-picked posts, no fill. Like the topStories picks, no brand filter here: the Studio
+// limits picks to the page's brand (all editorial brands on ClearView), and unpublished or deleted
+// picks dereference to null, which the adapter drops.
+const FEATURED_STORIES = /* groq */ `
+  heading[]{ _key, style, children[]{ _key, text } },
+  link{ ${LINK} },
+  "posts": posts[]->{ ${POST_CARD} }
+`
+
 const PUBLICATIONS = /* groq */ `
   heading[]{ _key, style, children[]{ _key, text } },
   body,
@@ -182,6 +191,7 @@ export const BLOCKS_PROJECTION = /* groq */ `
   _type == "publications" => { ${PUBLICATIONS} },
   _type == "cta" => { ${CTA} },
   _type == "highlights" => { ${HIGHLIGHTS} },
+  _type == "featuredStories" => { ${FEATURED_STORIES} },
   _type == "splitLayout" => {
     "main": main[]{ _key, _type, ${MAIN_COLUMN_BLOCKS} },
     "aside": aside[]{ _key, _type, ${ASIDE_BLOCKS} }

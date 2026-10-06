@@ -2,12 +2,13 @@ import { defineArrayMember, defineField } from 'sanity'
 
 import { adSlot } from './ad-slot'
 import { cta } from './cta'
+import { featuredStories } from './featured-stories'
 import { highlights } from './highlights'
 import { publications } from './publications'
 import { splitLayout } from './split-layout'
 import { topStories } from './top-stories'
 
-export const blockTypes = [cta, adSlot, splitLayout, topStories, publications, highlights]
+export const blockTypes = [cta, adSlot, splitLayout, topStories, publications, highlights, featuredStories]
 
 export const blocksField = defineField({
   name: 'blocks',

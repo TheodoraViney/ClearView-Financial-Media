@@ -115,3 +115,56 @@ export function ukToday(now: Date = new Date()): string {
 
   return `${parts.year}-${parts.month}-${parts.day}`
 }
+
+const RELATIVE = new Intl.RelativeTimeFormat('en-GB', { numeric: 'always' })
+
+const MINUTE = 60 * 1000
+const HOUR = 60 * MINUTE
+const DAY_MS = 24 * HOUR
+
+// Whole calendar months from `from` to `to`, so "2 months ago" turns over on the same day of the month.
+function monthsBetween(from: Date, to: Date): number {
+  const months = (to.getUTCFullYear() - from.getUTCFullYear()) * 12 + to.getUTCMonth() - from.getUTCMonth()
+  const dayEarlier =
+    to.getUTCDate() * DAY_MS + (to.getTime() % DAY_MS) < from.getUTCDate() * DAY_MS + (from.getTime() % DAY_MS)
+
+  return dayEarlier ? months - 1 : months
+}
+
+/**
+ * Elapsed time as "15 minutes ago", "1 hour ago", "30 days ago", "1 month ago", "1 year ago".
+ * Minutes under an hour (at least 1, so a clock slightly behind the post never says "in 2 minutes"), hours under a day,
+ * days up to 30, then months under 12, then years.
+ */
+export function formatRelativeTime(value: string | null | undefined, now: Date | number | string): string | null {
+  const date = parse(value)
+
+  if (!date) {
+    return null
+  }
+
+  const current = new Date(now)
+  const elapsed = Math.max(0, current.getTime() - date.getTime())
+
+  if (elapsed < HOUR) {
+    return RELATIVE.format(-Math.max(1, Math.floor(elapsed / MINUTE)), 'minute')
+  }
+
+  if (elapsed < DAY_MS) {
+    return RELATIVE.format(-Math.floor(elapsed / HOUR), 'hour')
+  }
+
+  const days = Math.floor(elapsed / DAY_MS)
+
+  if (days <= 30) {
+    return RELATIVE.format(-days, 'day')
+  }
+
+  const months = Math.max(1, monthsBetween(date, current))
+
+  if (months < 12) {
+    return RELATIVE.format(-months, 'month')
+  }
+
+  return RELATIVE.format(-Math.floor(months / 12), 'year')
+}

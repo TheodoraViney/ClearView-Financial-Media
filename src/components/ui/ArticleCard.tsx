@@ -6,6 +6,7 @@ import { Media } from './Media'
 import { Meta } from './Meta'
 
 // Vertical story card. Desktop uses fixed image heights that alternate (tall), smaller screens use 4:3.
+// The image takes the post image's own alt text (decision 2026-10-06). It zooms on hover from desktop only.
 export function ArticleCard({
   href,
   title,
@@ -17,18 +18,18 @@ export function ArticleCard({
   href: string
   title: string
   meta: ReactNode[]
-  image?: string | null
+  image?: { src: string; alt: string } | null
   tall?: boolean
   className?: string
 }) {
   return (
     <Link href={href} className={cx('group flex flex-col gap-4 lg:gap-0', className)}>
       <Media
-        src={image}
-        alt={title}
+        src={image?.src}
+        alt={image?.alt ?? ''}
         ratio="4/3"
-        zoom
-        sizes="(min-width: 64rem) 25vw, (min-width: 48rem) 50vw, 100vw"
+        zoom="lg"
+        sizes="(min-width: 80rem) 25vw, (min-width: 64rem) 33vw, (min-width: 48rem) 50vw, 100vw"
         className={cx('lg:aspect-auto', tall ? 'lg:h-100' : 'lg:h-70')}
       />
       <div
