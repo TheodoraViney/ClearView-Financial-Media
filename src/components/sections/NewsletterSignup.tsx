@@ -7,6 +7,7 @@ import { NewsletterForm } from './NewsletterSignup.client'
 export type NewsletterOption = {
   key: string
   label: string
+  defaultChecked: boolean
 }
 
 export type NewsletterSignupProps = {

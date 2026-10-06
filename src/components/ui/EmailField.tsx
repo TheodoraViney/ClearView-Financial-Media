@@ -57,7 +57,7 @@ export function EmailField({
           aria-describedby={statusId}
           placeholder={placeholder}
           motion={motion}
-          className="md:h-auto md:flex-1 md:bg-transparent md:px-3 md:inset-ring-0 md:focus:inset-ring-0"
+          className="md:h-auto md:flex-1 md:bg-transparent md:px-3 md:inset-ring-0 md:inset-ring-transparent md:focus:inset-ring-transparent md:aria-invalid:inset-ring-transparent"
         />
         <Button
           type="submit"

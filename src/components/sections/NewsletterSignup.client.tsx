@@ -81,16 +81,25 @@ export function NewsletterForm({
           </Heading>
         )}
 
-        <fieldset aria-invalid={optionError} aria-describedby={optionErrorId}>
+        <fieldset aria-invalid={optionError} aria-describedby={optionErrorId} className="relative">
           <legend className="mb-6 text-base font-medium text-foreground">{preferencesLabel}</legend>
           <div className="grid md:grid-cols-2 md:gap-x-6 md:gap-y-4 lg:grid-cols-1 lg:gap-4">
             {options.map((option) => (
-              <Checkbox key={option.key} name="options" value={option.key} label={option.label} motion="responsive" />
+              <Checkbox
+                key={option.key}
+                name="options"
+                value={option.key}
+                label={option.label}
+                defaultChecked={option.defaultChecked}
+                motion="responsive"
+              />
             ))}
           </div>
-          {/* Always rendered so screen readers announce the message when it appears; empty, it takes no space. */}
-          <div id={optionErrorId} role="status" aria-live="polite">
-            {optionError && <p className="mt-2 text-caption leading-5 text-error">{noOptionMessage}</p>}
+          {/* Always rendered so screen readers announce the message when it appears. Absolute, so showing it
+              moves nothing: it sits in the gap under the options (24px below lg, where the option rows already
+              end in their own padding, and 64px from lg). */}
+          <div id={optionErrorId} role="status" aria-live="polite" className="absolute inset-x-0 top-full lg:mt-2">
+            {optionError && <p className="text-caption leading-5 text-error">{noOptionMessage}</p>}
           </div>
         </fieldset>
       </div>
