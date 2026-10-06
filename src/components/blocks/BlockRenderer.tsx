@@ -6,6 +6,7 @@ import { FeaturedStories } from './FeaturedStories'
 import { Highlights } from './Highlights'
 import { Publications } from './Publications'
 import { SplitLayout } from './SplitLayout'
+import { StatsBar } from './StatsBar'
 import { TopStories } from './TopStories'
 import type { PageBlock } from './types'
 
@@ -59,6 +60,8 @@ function Block({ block, brand, today, now }: { block: PageBlock; brand: BrandKey
       )
     case 'featuredStories':
       return <FeaturedStories block={block} brand={brand} now={now} />
+    case 'statsBar':
+      return <StatsBar block={block} brand={brand} />
     default:
       return unknownBlock(block)
   }

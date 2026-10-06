@@ -12,6 +12,12 @@ import { MenuCloseIcon } from './icons/menu-close'
 import { PublicIcon } from './icons/public'
 import { SearchIcon } from './icons/search'
 import { StarIcon } from './icons/star'
+import { StatArticleIcon } from './icons/stat-article'
+import { StatGlobeIcon } from './icons/stat-globe'
+import { StatPublicIcon } from './icons/stat-public'
+import { StatSearchIcon } from './icons/stat-search'
+import { StatStarIcon } from './icons/stat-star'
+import { StatUserIcon } from './icons/stat-user'
 
 export const iconMap = {
   'chevron-right': ChevronRightIcon,
@@ -25,6 +31,12 @@ export const iconMap = {
   star: StarIcon,
   public: PublicIcon,
   document: DocumentIcon,
+  'stat-article': StatArticleIcon,
+  'stat-globe': StatGlobeIcon,
+  'stat-star': StatStarIcon,
+  'stat-public': StatPublicIcon,
+  'stat-search': StatSearchIcon,
+  'stat-user': StatUserIcon,
 } as const
 
 export type IconName = keyof typeof iconMap

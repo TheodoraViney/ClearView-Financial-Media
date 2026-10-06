@@ -192,6 +192,11 @@
   grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr));
 }
 
+/* Auto-fit tile grid, 380px minimum track (stats bar) */
+@utility grid-cols-stats {
+  grid-template-columns: repeat(auto-fit, minmax(23.75rem, 1fr));
+}
+
 body {
   background: var(--background);
   color: var(--foreground);
