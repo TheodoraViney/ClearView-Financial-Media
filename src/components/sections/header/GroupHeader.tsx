@@ -20,7 +20,7 @@ const MENU_ROW =
  */
 export function GroupHeader({ logo, homeHref, items, searchPlaceholder }: HeaderProps) {
   return (
-    <header className="relative z-40 h-14.5 border-y border-border bg-white md:h-16">
+    <header className="sticky top-0 z-40 h-header border-y border-border bg-white">
       <HeaderStateProvider>
         <Container className="flex h-full items-center justify-between gap-4 header:items-stretch header:px-0">
           <div className="flex shrink-0 items-center header:px-6">

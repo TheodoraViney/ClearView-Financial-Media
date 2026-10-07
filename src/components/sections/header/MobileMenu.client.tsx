@@ -79,7 +79,8 @@ export function MobileMenu({ className, children }: { className?: string; childr
         }
       }}
       className={cx(
-        'absolute inset-x-0 top-full mt-px flex flex-col border-b border-border bg-white px-gutter pt-2 transition-reveal duration-180 ease-out header:hidden',
+        // Capped to the viewport under the sticky header; a long menu scrolls inside the panel, not the page.
+        'absolute inset-x-0 top-full mt-px flex max-h-below-header flex-col overflow-y-auto overscroll-contain border-b border-border bg-white px-gutter pt-2 transition-reveal duration-180 ease-out header:hidden',
         open ? 'visible translate-y-0 opacity-100' : 'invisible -translate-y-1.5 opacity-0',
         className,
       )}
@@ -109,18 +110,28 @@ export function MenuGroup({ label, links }: { label: string; links: HeaderLink[]
           className={cx('transition-transform duration-180 ease-out', open && 'rotate-180')}
         />
       </button>
-      <ul id={listId} hidden={!open} className="flex flex-col border-b border-border py-1">
-        {links.map((link) => (
-          <li key={link.key}>
-            <Link
-              href={link.href}
-              className="flex min-h-11 items-center px-4 text-base leading-none text-grey transition-colors duration-180 ease-out hover:text-foreground"
-            >
-              {link.label}
-            </Link>
-          </li>
-        ))}
-      </ul>
+      {/* Height animates through the grid row; collapsed, `invisible` keeps the links out of the tab order. */}
+      <div
+        className={cx(
+          'grid transition-rows duration-180 ease-out',
+          open ? 'visible grid-rows-expand' : 'invisible grid-rows-collapse',
+        )}
+      >
+        <div className="min-h-0 overflow-hidden">
+          <ul id={listId} className="flex flex-col border-b border-border py-1">
+            {links.map((link) => (
+              <li key={link.key}>
+                <Link
+                  href={link.href}
+                  className="flex min-h-11 items-center px-4 text-base leading-none text-grey transition-colors duration-180 ease-out hover:text-foreground"
+                >
+                  {link.label}
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </div>
+      </div>
     </>
   )
 }
