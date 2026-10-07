@@ -156,6 +156,11 @@ export function SearchControl({
           name="q"
           type="search"
           aria-label="Search"
+          // No browser history popup over the field, and no autocorrect on queries
+          autoComplete="off"
+          autoCorrect="off"
+          autoCapitalize="off"
+          spellCheck={false}
           placeholder={placeholder}
           tabIndex={open ? 0 : -1}
           className={cx(

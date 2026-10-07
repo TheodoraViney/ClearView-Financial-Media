@@ -58,6 +58,8 @@
   --gutter: 1rem;
   --section: 3rem;
   --section-lg: 3.5rem;
+  /* Sticky header height, borders included: 58 mobile, 64 from md; publications 80 from the header breakpoint (below) */
+  --header-h: 3.625rem;
 
   @variant md {
     --fs-display: 2.5rem;
@@ -67,6 +69,7 @@
     --gutter: 2rem;
     --section: 4rem;
     --section-lg: 4.5rem;
+    --header-h: 4rem;
   }
 
   @variant lg {
@@ -140,6 +143,28 @@
   }
 }
 
+/*
+ * Publication headers are 80px from the header breakpoint. Set on the root, not on [data-brand],
+ * because the value is read outside the brand wrapper (scroll margins) and the brand attribute sits below it.
+ */
+:root:has(
+    [data-brand='wealthbriefing'],
+    [data-brand='wealthbriefingasia'],
+    [data-brand='familywealthreport']
+  ) {
+  @variant header {
+    --header-h: 5rem;
+  }
+}
+
+/*
+ * In-page anchors land below the sticky header. A scroll margin on page content, not scroll-padding on html:
+ * the padding made the browser scroll the page whenever focus moved into the header itself.
+ */
+main :where(*) {
+  scroll-margin-top: var(--header-h);
+}
+
 /* Shared neutrals, names from the ClearView Figma variables */
 @theme {
   /* Header desktop layout, as in the design's shared-shell masters (desktop from 1200px) */
@@ -202,6 +227,7 @@
 
   --spacing-gutter: var(--gutter);
   --spacing-header-logo: var(--header-logo);
+  --spacing-header: var(--header-h);
   --spacing-section: var(--section);
   --spacing-section-lg: var(--section-lg);
 }
@@ -240,6 +266,25 @@
   transition-property: width, right, box-shadow;
   transition-duration: 280ms, 280ms, 200ms;
   transition-timing-function: var(--ease-in-out), var(--ease-in-out), var(--ease-out);
+}
+
+/* Mobile menu panel under the sticky header: never taller than the visible viewport below it */
+@utility max-h-below-header {
+  max-height: calc(100dvh - var(--header-h));
+}
+
+/* Accordion height animation: grid rows 0fr <-> 1fr around a `min-h-0 overflow-hidden` child */
+@utility grid-rows-collapse {
+  grid-template-rows: 0fr;
+}
+
+@utility grid-rows-expand {
+  grid-template-rows: 1fr;
+}
+
+/* Visibility is transitioned so a collapsing row hides (leaves the tab order) only after it has closed */
+@utility transition-rows {
+  transition-property: grid-template-rows, visibility;
 }
 
 /* Search inputs without the browser's own clear button (the header search has its close button) */

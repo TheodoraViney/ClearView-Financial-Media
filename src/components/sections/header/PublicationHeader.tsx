@@ -76,7 +76,7 @@ export function PublicationHeader({
   const hasMenu = links.length > 0 || subscribe !== null
 
   return (
-    <header className="relative z-40 h-14.5 border-y border-border bg-white md:h-16 header:h-20">
+    <header className="sticky top-0 z-40 h-header border-y border-border bg-white">
       <HeaderStateProvider>
         <Container className="flex h-full items-center justify-between gap-6 header:px-16">
           <HeaderLogo
