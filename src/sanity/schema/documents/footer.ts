@@ -44,16 +44,16 @@ const socialField = defineField({
   name: 'social',
   title: 'Social links',
   type: 'array',
-  description: 'Icons in order. Each platform once.',
+  description: 'Icons in order, up to 6. Each address once.',
   of: [defineArrayMember({ type: 'socialLink' })],
   validation: (Rule) =>
     Rule.required()
       .min(1)
-      .max(3)
-      .custom((items: { platform?: string }[] | undefined) => {
-        const platforms = (items ?? []).map((item) => item.platform).filter(Boolean)
+      .max(6)
+      .custom((items: { url?: string }[] | undefined) => {
+        const urls = (items ?? []).map((item) => item.url).filter(Boolean)
 
-        return new Set(platforms).size === platforms.length || 'Each platform can appear only once.'
+        return new Set(urls).size === urls.length || 'Each address can appear only once.'
       }),
 })
 

@@ -31,7 +31,7 @@ export const SHELL_QUERY = defineQuery(`
         links[]{ _key, label, link{ ${LINK_TARGET} } }
       },
       socialHeading,
-      social[]{ _key, platform, url },
+      social[]{ _key, name, url, icon{ asset->{ url } } },
       copyright
     },
     "brand": *[_type == "brand" && _id == $brandId && key.current == $brand][0]{

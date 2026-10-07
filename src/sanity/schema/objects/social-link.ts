@@ -1,13 +1,7 @@
 import { ShareIcon } from '@sanity/icons/Share'
 import { defineField, defineType } from 'sanity'
 
-export const SOCIAL_PLATFORMS = [
-  { value: 'youtube', title: 'YouTube' },
-  { value: 'linkedin', title: 'LinkedIn' },
-  { value: 'x', title: 'X' },
-] as const
-
-/** One social network icon in the footer: which network and its profile address. */
+/** One social network in the footer, defined by the editor: its name, icon and profile address. */
 export const socialLink = defineType({
   name: 'socialLink',
   title: 'Social link',
@@ -15,11 +9,19 @@ export const socialLink = defineType({
   icon: ShareIcon,
   fields: [
     defineField({
-      name: 'platform',
-      title: 'Platform',
+      name: 'name',
+      title: 'Name',
       type: 'string',
-      description: 'Picks the icon and its screen-reader name.',
-      options: { list: [...SOCIAL_PLATFORMS], layout: 'radio', direction: 'horizontal' },
+      description: 'Network name, e.g. "LinkedIn". Screen readers announce it as the link text.',
+      validation: (Rule) => Rule.required(),
+    }),
+    defineField({
+      name: 'icon',
+      title: 'Icon',
+      type: 'image',
+      description:
+        'One-colour icon on a transparent background, SVG preferred. Only its shape is used: the colour comes from the brand.',
+      options: { accept: 'image/svg+xml,image/png' },
       validation: (Rule) => Rule.required(),
     }),
     defineField({
@@ -31,14 +33,12 @@ export const socialLink = defineType({
     }),
   ],
   preview: {
-    select: { platform: 'platform', url: 'url' },
-    prepare({ platform, url }) {
-      const match = SOCIAL_PLATFORMS.find((item) => item.value === platform)
-
+    select: { name: 'name', url: 'url', icon: 'icon' },
+    prepare({ name, url, icon }) {
       return {
-        title: match?.title ?? 'No platform',
+        title: name || 'No name',
         subtitle: url || 'No URL',
-        media: ShareIcon,
+        media: icon?.asset ? icon : ShareIcon,
       }
     },
   },

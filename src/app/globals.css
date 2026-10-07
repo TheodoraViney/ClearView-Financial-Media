@@ -325,6 +325,12 @@ main :where(*) {
   width: calc(100% - 2rem - 3.25rem);
 }
 
+/* Editor-uploaded icon (footer social links): the image in `--icon` is used only as a shape, filled with the text colour */
+@utility mask-icon {
+  background-color: currentColor;
+  mask: var(--icon) center / contain no-repeat;
+}
+
 /* The current page's nav link (aria-current="page") */
 @custom-variant current (&[aria-current='page']);
 

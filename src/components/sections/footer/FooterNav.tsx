@@ -1,17 +1,10 @@
 import Link from 'next/link'
+import type { CSSProperties } from 'react'
 
 import { cx } from '@/components/ui/cx'
-import { Icon } from '@/components/ui/Icon'
 import { FOOTER_EASE, type ShellVariant } from '@/components/ui/motion'
 
-import type { FooterColumn, FooterSocialLink, SocialPlatform } from './types'
-
-/** Accessible names of the social links (the links show only the icon). */
-const PLATFORM_NAMES: Record<SocialPlatform, string> = {
-  youtube: 'YouTube',
-  linkedin: 'LinkedIn',
-  x: 'X',
-}
+import type { FooterColumn, FooterSocialLink } from './types'
 
 // Per-breakpoint values from the shared-shell footer masters (mobile, md = tablet, header = desktop from 1200).
 const STYLES: Record<
@@ -78,14 +71,19 @@ export function FooterNav({
               <a
                 key={item.key}
                 href={item.href}
-                aria-label={PLATFORM_NAMES[item.platform]}
+                aria-label={item.name}
                 className={cx(
                   'flex shrink-0 items-center justify-center text-secondary transition-opacity hover:opacity-70',
                   styles.social,
                   ease,
                 )}
               >
-                <Icon name={item.platform} className="size-6" />
+                {/* The uploaded icon is only a shape (mask-icon), filled with the brand's text-secondary. */}
+                <span
+                  aria-hidden="true"
+                  className="block size-6 shrink-0 mask-icon"
+                  style={{ '--icon': `url("${item.iconSrc}")` } as CSSProperties}
+                />
               </a>
             ))}
           </div>

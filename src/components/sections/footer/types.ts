@@ -6,9 +6,8 @@ export type FooterLink = HeaderLink
 
 export type FooterColumn = { key: string; title: string; links: FooterLink[] }
 
-export type SocialPlatform = 'youtube' | 'linkedin' | 'x'
-
-export type FooterSocialLink = { key: string; platform: SocialPlatform; href: string }
+/** One social link: `name` is its accessible name, `iconSrc` the uploaded icon used as a mask. */
+export type FooterSocialLink = { key: string; name: string; href: string; iconSrc: string }
 
 export type FooterProps = {
   logo: FooterLogo | null
