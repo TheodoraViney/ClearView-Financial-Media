@@ -1,6 +1,8 @@
 import { agenda } from './agenda'
 import { companyGroup } from './company-group'
 import { customTab } from './custom-tab'
+import { navGroup } from './nav-group'
+import { navLink } from './nav-link'
 import { personGroup } from './person-group'
 import { richText } from './rich-text'
 import { videoGallery } from './video-gallery'
@@ -14,4 +16,6 @@ export const objectTypes = [
   customTab,
   agenda,
   videoGallery,
+  navLink,
+  navGroup,
 ]

@@ -1,16 +1,30 @@
 import { defineQuery } from 'next-sanity'
 
-import { BLOCKS_PROJECTION } from './fragments'
+import { BLOCKS_PROJECTION, LINK, LINK_TARGET } from './fragments'
 
-export const BRAND_QUERY = defineQuery(`
-  *[_type == "brand" && _id == $brandId][0]{
-    _id,
-    title,
-    key,
-    domain,
-    region,
-    logo,
-    brandColor
+// The site shell: the brand's header document and its Brand settings. Both ids derive from $brand
+// (headerDocumentId / brandDocumentId), and the Brand settings match is also checked against $brand.
+// navLink stores its visible text in `label`, so its link has no label of its own (LINK_TARGET).
+// brandColor feeds the layout's --brand-color until brand colours move to tokens.
+export const HEADER_QUERY = defineQuery(`
+  {
+    "header": *[_id == $headerId && _type in ["clearviewHeader", "publicationHeader"]][0]{
+      _type,
+      navigation[]{
+        _key,
+        _type,
+        label,
+        link{ ${LINK_TARGET} },
+        links[]{ _key, _type, label, link{ ${LINK_TARGET} } }
+      },
+      searchPlaceholder,
+      subscribe{ ${LINK} }
+    },
+    "brand": *[_type == "brand" && _id == $brandId && key.current == $brand][0]{
+      title,
+      brandColor,
+      logo{ asset->{ url, metadata{ dimensions{ width, height } } } }
+    }
   }
 `)
 
