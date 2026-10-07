@@ -13,6 +13,12 @@ export const EDITORIAL_BRAND_KEYS = BRAND_KEYS.filter(
 
 export const brandDocumentId = (key: BrandKey): string => `brand-${key}`
 
+/** Id of a brand's header document. One per brand, so each brand's menu can differ. */
+export const headerDocumentId = (key: BrandKey): string => `header-${key}`
+
+/** ClearView has the group header; the editorial brands each have a publication header. */
+export type HeaderType = 'clearviewHeader' | 'publicationHeader'
+
 export function isBrandKey(value: string): value is BrandKey {
   return (BRAND_KEYS as readonly string[]).includes(value)
 }
@@ -23,6 +29,8 @@ interface BrandDefaults {
   region: 'uk' | 'asia' | 'us' | 'global'
   brandColor: string
   stagingHost: string
+  /** Schema type of this brand's header document. */
+  headerType: HeaderType
 }
 
 export const BRANDS: Record<BrandKey, BrandDefaults> = {
@@ -32,6 +40,7 @@ export const BRANDS: Record<BrandKey, BrandDefaults> = {
     region: 'uk',
     brandColor: '#0B3C5D',
     stagingHost: 'wealthbriefing.vercel.app',
+    headerType: 'publicationHeader',
   },
   wealthbriefingasia: {
     title: 'WealthBriefingAsia',
@@ -39,6 +48,7 @@ export const BRANDS: Record<BrandKey, BrandDefaults> = {
     region: 'asia',
     brandColor: '#B5121B',
     stagingHost: 'wealthbriefingasia.vercel.app',
+    headerType: 'publicationHeader',
   },
   familywealthreport: {
     title: 'Family Wealth Report',
@@ -46,6 +56,7 @@ export const BRANDS: Record<BrandKey, BrandDefaults> = {
     region: 'us',
     brandColor: '#1F6F43',
     stagingHost: 'familywealthreport.vercel.app',
+    headerType: 'publicationHeader',
   },
   clearview: {
     title: 'ClearView Financial Media',
@@ -53,6 +64,7 @@ export const BRANDS: Record<BrandKey, BrandDefaults> = {
     region: 'global',
     brandColor: '#222222',
     stagingHost: 'clear-view-financial-media.vercel.app',
+    headerType: 'clearviewHeader',
   },
 }
 

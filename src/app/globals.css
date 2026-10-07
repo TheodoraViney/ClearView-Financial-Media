@@ -47,6 +47,8 @@
   --ad-foreground: #706f6f;
   /* Sidebar block headings and their icons on white blocks */
   --heading-aside: #385363;
+  /* Header logo width below the header breakpoint (the ClearView logo is 138px wide everywhere) */
+  --header-logo: 8.625rem;
 
   /* Responsive type and spacing roles: mobile, then md (tablet), then lg/xl (desktop) */
   --fs-display: 2.25rem;
@@ -91,6 +93,11 @@
   --ad-border: var(--wb-blue-border);
   --ad-foreground: var(--wb-blue-700);
   --heading-aside: #1f2b32;
+  --header-logo: 9.375rem;
+
+  @variant md {
+    --header-logo: 11rem;
+  }
 }
 
 [data-brand='wealthbriefingasia'] {
@@ -106,6 +113,11 @@
   --ad-border: var(--wba-red-border);
   --ad-foreground: var(--wba-red-700);
   --heading-aside: #1f2b32;
+  --header-logo: 10.5rem;
+
+  @variant md {
+    --header-logo: 12.3125rem;
+  }
 }
 
 [data-brand='familywealthreport'] {
@@ -121,10 +133,18 @@
   --ad-border: var(--fwr-brand-soft);
   --ad-foreground: var(--fwr-brand);
   --heading-aside: #1f2b32;
+  --header-logo: 9.375rem;
+
+  @variant md {
+    --header-logo: 11rem;
+  }
 }
 
 /* Shared neutrals, names from the ClearView Figma variables */
 @theme {
+  /* Header desktop layout, as in the design's shared-shell masters (desktop from 1200px) */
+  --breakpoint-header: 75rem;
+
   --color-dark: #1f2b32;
   --color-grey: #706f6f;
   --color-border: #e5e7eb;
@@ -147,6 +167,9 @@
   --text-title-md--line-height: 1.2;
   --text-caption: 0.8125rem;
   --text-caption--line-height: 1.4;
+
+  /* Active publication nav item: 2px bar drawn inside the bottom edge, in the text colour */
+  --inset-shadow-bar: inset 0 -2px 0 currentColor;
 }
 
 /* Tokens that resolve per brand or per breakpoint at the element */
@@ -178,6 +201,7 @@
   --text-heading-sm--line-height: 1.25;
 
   --spacing-gutter: var(--gutter);
+  --spacing-header-logo: var(--header-logo);
   --spacing-section: var(--section);
   --spacing-section-lg: var(--section-lg);
 }
@@ -196,6 +220,42 @@
 @utility grid-cols-stats {
   grid-template-columns: repeat(auto-fit, minmax(23.75rem, 1fr));
 }
+
+/* Horizontal scroll without a visible scrollbar (publication nav on narrow desktops) */
+@utility scrollbar-none {
+  scrollbar-width: none;
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+/* Fade + rise for disclosure panels; visibility is transitioned so the fade-out plays before the panel hides */
+@utility transition-reveal {
+  transition-property: opacity, translate, visibility;
+}
+
+/* Header search field: width and position 280ms ease-in-out, the open ring 200ms ease-out, as in the design */
+@utility transition-search {
+  transition-property: width, right, box-shadow;
+  transition-duration: 280ms, 280ms, 200ms;
+  transition-timing-function: var(--ease-in-out), var(--ease-in-out), var(--ease-out);
+}
+
+/* Search inputs without the browser's own clear button (the header search has its close button) */
+@utility search-cancel-none {
+  &::-webkit-search-cancel-button {
+    display: none;
+  }
+}
+
+/* Open mobile header search: the header width minus the 16px gutters and the menu button (44px + 8px gap) */
+@utility w-search-mobile {
+  width: calc(100% - 2rem - 3.25rem);
+}
+
+/* The current page's nav link (aria-current="page") */
+@custom-variant current (&[aria-current='page']);
 
 body {
   background: var(--background);

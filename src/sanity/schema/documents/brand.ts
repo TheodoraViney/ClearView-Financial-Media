@@ -41,6 +41,8 @@ export const brand = defineType({
       name: 'logo',
       title: 'Logo',
       type: 'image',
+      description: 'SVG. The site uses the brand title as its accessible name.',
+      validation: (Rule) => Rule.required(),
     }),
     defineField({
       name: 'brandColor',

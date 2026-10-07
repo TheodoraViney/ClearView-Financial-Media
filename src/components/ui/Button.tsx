@@ -10,6 +10,8 @@ const VARIANTS = {
   outline:
     'inset-ring inset-ring-secondary text-foreground hover:bg-secondary hover:text-white',
   'outline-inverse': 'inset-ring inset-ring-white text-white hover:bg-white/20',
+  // Brand-coloured label and ring (Subscribe in the publication mobile menu).
+  'outline-accent': 'inset-ring inset-ring-accent text-accent hover:bg-accent hover:text-white',
 }
 
 // 44px is the minimum touch target; the stacked newsletter button is 48px.

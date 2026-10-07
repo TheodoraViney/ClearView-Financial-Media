@@ -14,3 +14,7 @@ export const CHEVRON: Record<Motion, string> = {
   smooth: 'transition-transform duration-180 ease-smooth group-hover:translate-x-0.75',
   responsive: 'lg:transition-transform lg:duration-180 lg:ease-smooth lg:group-hover:translate-x-0.75',
 }
+
+// Header controls switch with the header layouts at the `header` breakpoint (1200), not at lg:
+// ease-out below it as in the responsive file, ease-smooth from it as in the desktop file.
+export const HEADER_EASE = 'duration-180 ease-out header:ease-smooth'

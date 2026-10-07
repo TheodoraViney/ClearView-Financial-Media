@@ -1,17 +1,23 @@
 import { draftMode } from 'next/headers'
 import { notFound } from 'next/navigation'
-import { type SanityImageSource } from '@sanity/image-url'
 import { stegaClean } from 'next-sanity'
 import { Suspense, type CSSProperties, type ReactNode } from 'react'
 
-import { BRAND_KEYS, BRANDS, brandDocumentId, isBrandKey, type BrandKey } from '@/brands'
-import { BrandHeader } from '@/components/BrandHeader'
+import {
+  BRAND_KEYS,
+  BRANDS,
+  brandDocumentId,
+  headerDocumentId,
+  isBrandKey,
+  type BrandKey,
+} from '@/brands'
+import { Header } from '@/components/blocks/Header'
 import {
   cachedSanity,
   getDynamicFetchOptions,
   type DynamicFetchOptions,
 } from '@/sanity/live'
-import { BRAND_QUERY } from '@/sanity/queries'
+import { HEADER_QUERY } from '@/sanity/queries'
 
 export function generateStaticParams() {
   return BRAND_KEYS.map((brand) => ({ brand }))
@@ -76,8 +82,12 @@ async function CachedBrandShell({
   stega,
 }: { brand: BrandKey; children: ReactNode } & DynamicFetchOptions) {
   const { data } = await cachedSanity({
-    query: BRAND_QUERY,
-    params: { brandId: brandDocumentId(brand) },
+    query: HEADER_QUERY,
+    params: {
+      brand,
+      headerId: headerDocumentId(brand),
+      brandId: brandDocumentId(brand),
+    },
     perspective,
     variant,
     stega,
@@ -86,26 +96,24 @@ async function CachedBrandShell({
   return (
     <BrandShell
       brand={brand}
-      title={data?.title ?? BRANDS[brand].title}
-      color={stegaClean(data?.brandColor) ?? BRANDS[brand].brandColor}
-      logo={data?.logo}
+      color={stegaClean(data?.brand?.brandColor) ?? BRANDS[brand].brandColor}
+      header={<Header data={data} brand={brand} />}
     >
       {children}
     </BrandShell>
   )
 }
 
+// The draft-mode Suspense fallback renders the shell without a header until the header data arrives.
 function BrandShell({
   brand,
-  title = BRANDS[brand].title,
   color = BRANDS[brand].brandColor,
-  logo,
+  header,
   children,
 }: {
   brand: BrandKey
-  title?: string
   color?: string
-  logo?: SanityImageSource | null
+  header?: ReactNode
   children: ReactNode
 }) {
   return (
@@ -114,7 +122,7 @@ function BrandShell({
       className="flex min-h-full flex-col"
       style={{ '--brand-color': color } as CSSProperties}
     >
-      <BrandHeader title={title} logo={logo} />
+      {header}
       {children}
     </div>
   )
