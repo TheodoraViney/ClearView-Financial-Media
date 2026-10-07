@@ -6,6 +6,7 @@ import { awardsProgrammeGroup } from './documents/awards-programme-group'
 import { brand } from './documents/brand'
 import { company } from './documents/company'
 import { conferenceEvent } from './documents/conference-event'
+import { clearviewFooter, publicationFooter } from './documents/footer'
 import { clearviewHeader, publicationHeader } from './documents/header'
 import { page } from './documents/page'
 import { person } from './documents/person'
@@ -17,6 +18,8 @@ export const documentTypes = [
   brand,
   clearviewHeader,
   publicationHeader,
+  clearviewFooter,
+  publicationFooter,
   page,
   post,
   awardsProgrammeGroup,

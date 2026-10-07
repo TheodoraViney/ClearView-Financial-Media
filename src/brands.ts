@@ -19,6 +19,12 @@ export const headerDocumentId = (key: BrandKey): string => `header-${key}`
 /** ClearView has the group header; the editorial brands each have a publication header. */
 export type HeaderType = 'clearviewHeader' | 'publicationHeader'
 
+/** Id of a brand's footer document. One per brand, so each brand's footer can differ. */
+export const footerDocumentId = (key: BrandKey): string => `footer-${key}`
+
+/** ClearView has the group footer; the editorial brands each have a publication footer. */
+export type FooterType = 'clearviewFooter' | 'publicationFooter'
+
 export function isBrandKey(value: string): value is BrandKey {
   return (BRAND_KEYS as readonly string[]).includes(value)
 }
@@ -31,6 +37,8 @@ interface BrandDefaults {
   stagingHost: string
   /** Schema type of this brand's header document. */
   headerType: HeaderType
+  /** Schema type of this brand's footer document. */
+  footerType: FooterType
 }
 
 export const BRANDS: Record<BrandKey, BrandDefaults> = {
@@ -41,6 +49,7 @@ export const BRANDS: Record<BrandKey, BrandDefaults> = {
     brandColor: '#0B3C5D',
     stagingHost: 'wealthbriefing.vercel.app',
     headerType: 'publicationHeader',
+    footerType: 'publicationFooter',
   },
   wealthbriefingasia: {
     title: 'WealthBriefingAsia',
@@ -49,6 +58,7 @@ export const BRANDS: Record<BrandKey, BrandDefaults> = {
     brandColor: '#B5121B',
     stagingHost: 'wealthbriefingasia.vercel.app',
     headerType: 'publicationHeader',
+    footerType: 'publicationFooter',
   },
   familywealthreport: {
     title: 'Family Wealth Report',
@@ -57,6 +67,7 @@ export const BRANDS: Record<BrandKey, BrandDefaults> = {
     brandColor: '#1F6F43',
     stagingHost: 'familywealthreport.vercel.app',
     headerType: 'publicationHeader',
+    footerType: 'publicationFooter',
   },
   clearview: {
     title: 'ClearView Financial Media',
@@ -65,6 +76,7 @@ export const BRANDS: Record<BrandKey, BrandDefaults> = {
     brandColor: '#222222',
     stagingHost: 'clear-view-financial-media.vercel.app',
     headerType: 'clearviewHeader',
+    footerType: 'clearviewFooter',
   },
 }
 

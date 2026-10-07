@@ -1,45 +1,15 @@
-import { stegaClean, type StegaBranded } from 'next-sanity'
+import { stegaClean } from 'next-sanity'
 
 import type { BrandKey } from '@/brands'
 import { GroupHeader } from '@/components/sections/header/GroupHeader'
 import { PublicationHeader } from '@/components/sections/header/PublicationHeader'
-import type { HeaderItem, HeaderLink, HeaderLogo } from '@/components/sections/header/types'
-import { resolveHref, type ResolvableLink } from '@/lib/links'
-import type { HEADER_QUERY_RESULT } from '@/sanity/types'
+import type { HeaderItem } from '@/components/sections/header/types'
+import { resolveHref } from '@/lib/links'
 
-export type HeaderData = StegaBranded<HEADER_QUERY_RESULT>
-
-type NavLinkData = { _key: string; label: string | null; link: ResolvableLink | null }
-
-function toLink(item: NavLinkData, brand: BrandKey): HeaderLink | null {
-  // Cross-brand internal targets resolve to absolute URLs; a target with no route drops the item.
-  const href = resolveHref(item.link, brand)
-
-  return href && item.label ? { key: item._key, label: item.label, href } : null
-}
-
-const isPresent = <T,>(value: T | null): value is T => value !== null
-
-function toLogo(brand: HeaderData['brand']): HeaderLogo | null {
-  const asset = brand?.logo?.asset
-  const src = stegaClean(asset?.url)
-  const dimensions = asset?.metadata?.dimensions
-
-  if (!src || !dimensions?.width || !dimensions.height) {
-    return null
-  }
-
-  // SVG logos are used as uploaded, so the asset URL goes out without image transforms.
-  return {
-    src,
-    width: dimensions.width,
-    height: dimensions.height,
-    alt: stegaClean(brand?.title) ?? '',
-  }
-}
+import { isPresent, toLink, toLogo, type ShellData } from './shell'
 
 /** Site header for the brand being rendered. The header document's type picks the layout. */
-export function Header({ data, brand }: { data: HeaderData; brand: BrandKey }) {
+export function Header({ data, brand }: { data: ShellData; brand: BrandKey }) {
   const { header } = data
 
   if (!header) {

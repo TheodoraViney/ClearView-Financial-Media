@@ -7,13 +7,14 @@ import { DocumentIcon } from '@sanity/icons/Document'
 import { DocumentPdfIcon } from '@sanity/icons/DocumentPdf'
 import { DocumentTextIcon } from '@sanity/icons/DocumentText'
 import { EarthGlobeIcon } from '@sanity/icons/EarthGlobe'
+import { InsertBelowIcon } from '@sanity/icons/InsertBelow'
 import { MenuIcon } from '@sanity/icons/Menu'
 import { StarIcon } from '@sanity/icons/Star'
 import { TagIcon } from '@sanity/icons/Tag'
 import { UserIcon } from '@sanity/icons/User'
 import type { StructureResolver } from 'sanity/structure'
 
-import { BRAND_KEYS, BRANDS, brandDocumentId, headerDocumentId } from '@/brands'
+import { BRAND_KEYS, BRANDS, brandDocumentId, footerDocumentId, headerDocumentId } from '@/brands'
 
 export const structure: StructureResolver = (S) =>
   S.list()
@@ -51,6 +52,10 @@ export const structure: StructureResolver = (S) =>
                   .title('Header')
                   .icon(MenuIcon)
                   .child(S.document().schemaType(BRANDS[key].headerType).documentId(headerDocumentId(key))),
+                S.listItem()
+                  .title('Footer')
+                  .icon(InsertBelowIcon)
+                  .child(S.document().schemaType(BRANDS[key].footerType).documentId(footerDocumentId(key))),
                 S.listItem()
                   .title('Brand settings')
                   .icon(CogIcon)

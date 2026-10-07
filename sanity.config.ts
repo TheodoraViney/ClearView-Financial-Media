@@ -28,7 +28,7 @@ const postByBrandTemplate: Template = {
  * structure (see `src/sanity/structure.ts`). No template, so they never appear
  * in "Create new document", and no duplicate or delete action.
  */
-const SINGLETON_TYPES = new Set(['clearviewHeader', 'publicationHeader'])
+const SINGLETON_TYPES = new Set(['clearviewHeader', 'publicationHeader', 'clearviewFooter', 'publicationFooter'])
 
 const SINGLETON_REMOVED_ACTIONS = new Set(['duplicate', 'delete'])
 

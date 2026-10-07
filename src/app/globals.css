@@ -49,6 +49,8 @@
   --heading-aside: #385363;
   /* Header logo width below the header breakpoint (the ClearView logo is 138px wide everywhere) */
   --header-logo: 8.625rem;
+  /* Footer logo width as the shared-shell footer masters: mobile, from md, from the header breakpoint (ClearView 180 / 220 / 220) */
+  --footer-logo: 11.25rem;
 
   /* Responsive type and spacing roles: mobile, then md (tablet), then lg/xl (desktop) */
   --fs-display: 2.25rem;
@@ -70,6 +72,7 @@
     --section: 4rem;
     --section-lg: 4.5rem;
     --header-h: 4rem;
+    --footer-logo: 13.75rem;
   }
 
   @variant lg {
@@ -97,9 +100,11 @@
   --ad-foreground: var(--wb-blue-700);
   --heading-aside: #1f2b32;
   --header-logo: 9.375rem;
+  --footer-logo: 10rem;
 
   @variant md {
     --header-logo: 11rem;
+    --footer-logo: 11rem;
   }
 }
 
@@ -117,9 +122,15 @@
   --ad-foreground: var(--wba-red-700);
   --heading-aside: #1f2b32;
   --header-logo: 10.5rem;
+  --footer-logo: 11.25rem;
 
   @variant md {
     --header-logo: 12.3125rem;
+    --footer-logo: 12.3125rem;
+  }
+
+  @variant header {
+    --footer-logo: 11rem;
   }
 }
 
@@ -137,9 +148,15 @@
   --ad-foreground: var(--fwr-brand);
   --heading-aside: #1f2b32;
   --header-logo: 9.375rem;
+  --footer-logo: 10rem;
 
   @variant md {
     --header-logo: 11rem;
+    --footer-logo: 11rem;
+  }
+
+  @variant header {
+    --footer-logo: 13.75rem;
   }
 }
 
@@ -179,6 +196,9 @@ main :where(*) {
   --color-light-blue-grey: #63788c;
 
   --container-page: 90rem;
+
+  /* ClearView footer brand column basis on desktop (410.667px in the clearview-footer master) */
+  --spacing-footer-brand: 25.6667rem;
 
   --ease-smooth: cubic-bezier(0.2, 0.65, 0.3, 1);
 
@@ -227,6 +247,7 @@ main :where(*) {
 
   --spacing-gutter: var(--gutter);
   --spacing-header-logo: var(--header-logo);
+  --spacing-footer-logo: var(--footer-logo);
   --spacing-header: var(--header-h);
   --spacing-section: var(--section);
   --spacing-section-lg: var(--section-lg);
@@ -245,6 +266,11 @@ main :where(*) {
 /* Auto-fit tile grid, 380px minimum track (stats bar) */
 @utility grid-cols-stats {
   grid-template-columns: repeat(auto-fit, minmax(23.75rem, 1fr));
+}
+
+/* ClearView footer link columns on desktop: auto-fit, 170px minimum track as in the clearview-footer master */
+@utility grid-cols-footer {
+  grid-template-columns: repeat(auto-fit, minmax(10.625rem, 1fr));
 }
 
 /* Horizontal scroll without a visible scrollbar (publication nav on narrow desktops) */
