@@ -1,5 +1,4 @@
 import { ArticleRow } from '@/components/ui/ArticleRow'
-import { cx } from '@/components/ui/cx'
 import { type MediaImage } from '@/components/ui/Media'
 
 import { TopStoriesHero } from './TopStories.client'
@@ -22,9 +21,6 @@ export type TopStoriesProps = {
   articles: TopStory[]
 }
 
-// Scroll reveal index of each mini article, the same on every breakpoint (the hero does not reveal).
-const ARTICLE_REVEAL = ['scroll-reveal-1', 'scroll-reveal-2', 'scroll-reveal-3']
-
 /**
  * Home "Top stories": the hero slider and up to three mini articles under it.
  * The slider is a client island that server-renders slide 1; the mini articles are server-only.
@@ -40,8 +36,8 @@ export function TopStories({ linkLabel, slides, articles }: TopStoriesProps) {
 
       {articles.length > 0 && (
         <ul className="flex flex-col border-t border-border lg:grid lg:grid-cols-cards lg:gap-8 lg:border-t-0">
-          {articles.map((story, index) => (
-            <li key={story.id} data-reveal className={cx('flex flex-col', ARTICLE_REVEAL[index])}>
+          {articles.map((story) => (
+            <li key={story.id} className="flex flex-col">
               <ArticleRow
                 href={story.href}
                 title={story.title}

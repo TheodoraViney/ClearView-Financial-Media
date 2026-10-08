@@ -47,8 +47,7 @@ export function NewsletterSignup({ image, ...form }: NewsletterSignupProps) {
           <Media
             image={image}
             sizes={IMAGE_SIZES}
-            reveal
-            className="scroll-reveal-1 aspect-4/3 md:aspect-3/2 xl:col-span-2 xl:aspect-auto xl:min-h-114.5"
+            className="aspect-4/3 md:aspect-3/2 xl:col-span-2 xl:aspect-auto xl:min-h-114.5"
           />
         )}
       </Container>
