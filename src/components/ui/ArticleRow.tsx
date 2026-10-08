@@ -34,7 +34,7 @@ export function ArticleRow({
 
   const content = (
     <>
-      <Media image={image && { ...image, alt: '' }} sizes={THUMB_SIZES} thumb="md" className="lg:size-9" />
+      <Media image={image} sizes={THUMB_SIZES} thumb="md" className="lg:size-9" />
       <div className="flex min-w-0 flex-1 flex-col gap-3 lg:self-stretch lg:justify-center">
         <div className="flex gap-2">
           <span className="min-w-0 flex-1 text-base leading-title font-medium text-pretty text-foreground lg:line-clamp-2">

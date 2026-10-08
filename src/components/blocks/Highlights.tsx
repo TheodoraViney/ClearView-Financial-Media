@@ -120,10 +120,7 @@ function toPromo(promo: Block['promo'], source: Source, brand: BrandKey): Highli
   return {
     title,
     description: promo.description ?? undefined,
-    image: image
-      ? // Inside the same link as the title (whole row is a link) the image is decorative; otherwise it stands alone.
-        { ...image, alt: href && !downloadHref ? '' : image.alt }
-      : undefined,
+    image: image ?? undefined,
     href,
     downloadHref,
     report: source === 'research',

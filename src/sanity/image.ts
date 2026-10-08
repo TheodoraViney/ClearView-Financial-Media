@@ -24,7 +24,7 @@ const percent = (value: number) => `${Math.round(clamp(value) * 10000) / 100}%`
  * - `width`/`height`: the pixel size after the crop. Read from the asset reference id, not from projected metadata,
  *   so the queries need no asset dereference and a raw Portable Text image works too.
  * - `position`: the hotspot as CSS `object-position`, relative to the cropped image.
- * - `alt`: the stored alt text, cleaned of stega. Callers override it where the slot is decorative.
+ * - `alt`: the field's alt, else the media library's (`coalesce` in the IMAGE fragment), cleaned of stega; empty when neither exists.
  */
 export function toImage(image: SanityImage | null | undefined): MediaImage | null {
   const match = ASSET_REF.exec(stegaClean(image?.asset?._ref) ?? '')

@@ -29,8 +29,7 @@ function toCard(card: Card): PublicationCard | null {
     description: card.description ?? '',
     // A code constant from brands.ts, not CMS input, so it needs no safeHref.
     href: brandOrigin(key),
-    // The title sits in the same link, so the image is decorative.
-    image: { ...image, alt: '' },
+    image,
     linkLabel: card.linkLabel ?? '',
   }
 }
