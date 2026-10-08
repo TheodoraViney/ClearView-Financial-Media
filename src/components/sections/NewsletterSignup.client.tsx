@@ -72,7 +72,9 @@ export function NewsletterForm({
       noValidate
       onSubmit={handleSubmit}
       onChange={handleChange}
-      className="flex flex-col gap-6 lg:gap-16 xl:justify-between xl:pr-10"
+      // Scroll reveal index 0 (the image beside it is 1), see NewsletterSignup.
+      data-reveal
+      className="flex flex-col gap-6 scroll-reveal-0 lg:gap-16 xl:justify-between xl:pr-10"
     >
       <div className="flex flex-col gap-6">
         {heading && (
