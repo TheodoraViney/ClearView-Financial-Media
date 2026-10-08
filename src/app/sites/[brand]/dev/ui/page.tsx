@@ -248,15 +248,15 @@ export default async function UiPage({
 
         <Group title="Media (no images in repo yet, light placeholder)">
           <Row label="ratios">
-            <Media alt="16/9" ratio="16/9" className="w-48" />
-            <Media alt="4/3" ratio="4/3" className="w-48" />
-            <Media alt="3/2" ratio="3/2" className="w-48" />
+            <Media ratio="16/9" className="w-48" />
+            <Media ratio="4/3" className="w-48" />
+            <Media ratio="3/2" className="w-48" />
           </Row>
           <Row label="thumbs: xs 36, sm 40, md 64/80, report 28×40">
-            <Media alt="xs" thumb="xs" />
-            <Media alt="sm" thumb="sm" />
-            <Media alt="md" thumb="md" />
-            <Media alt="report" thumb="report" />
+            <Media thumb="xs" />
+            <Media thumb="sm" />
+            <Media thumb="md" />
+            <Media thumb="report" />
           </Row>
         </Group>
 
@@ -269,7 +269,7 @@ export default async function UiPage({
             />
           </Row>
           <Row label="Media children overlay, responsive aspect via className">
-            <Media alt="overlay" className="aspect-4/3 w-64 md:aspect-video">
+            <Media className="aspect-4/3 w-64 md:aspect-video">
               <div className="flex h-full items-end justify-end p-3">
                 <SliderDots
                   label="Top stories"
@@ -293,14 +293,14 @@ export default async function UiPage({
             <ArticleCard
               href="#"
               title="India's Spark Capital PWM Adds Eight-Person Team Of Bankers"
-              image={{ src: '', alt: 'Bankers in a meeting room' }}
+              widths={{ base: '100vw' }}
               meta={['WealthBriefing', '2 hours ago']}
             />
             <ArticleCard
               href="#"
               tall
               title="Global Economy, Earnings Confound The Doubters Amid Global Storms"
-              image={{ src: '', alt: 'Storm clouds over a city skyline' }}
+              widths={{ base: '100vw' }}
               meta={['WealthBriefingAsia', '4 hours ago']}
             />
           </div>

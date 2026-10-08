@@ -2,6 +2,7 @@ import { ArrowLink } from '@/components/ui/ArrowLink'
 import { ArticleCard } from '@/components/ui/ArticleCard'
 import { Container } from '@/components/ui/Container'
 import { Heading } from '@/components/ui/Heading'
+import { type MediaImage, type MediaWidths, trackWidth } from '@/components/ui/Media'
 import { RelativeTime } from '@/components/ui/RelativeTime'
 import { type HeadingLevel } from '@/lib/headings'
 
@@ -12,7 +13,7 @@ export type FeaturedStory = {
   publication: string | null
   /** ISO date-time. */
   publishedAt: string | null
-  image: { src: string; alt: string } | null
+  image: MediaImage | null
 }
 
 export type FeaturedStoriesProps = {
@@ -24,6 +25,25 @@ export type FeaturedStoriesProps = {
 }
 
 /**
+ * Card width per breakpoint for `count` cards, matching the grid below: one column, two from md (24 gap),
+ * then auto-fit 240px tracks with 32 gaps (`grid-cols-cards-sm`): 3 tracks at 1024-1119, 4 from 1120 (70rem)
+ * with 32 gutters and from xl with 64. Fewer cards than tracks stretch (auto-fit collapses the empty ones).
+ */
+function cardWidths(count: number): MediaWidths {
+  const lg = Math.min(count, 3)
+  const wide = Math.min(count, 4)
+
+  return {
+    base: '100vw - 32px',
+    md: trackWidth(2, 24, { inset: 64 }),
+    lg: trackWidth(lg, 32, { inset: 64 }),
+    '70rem': trackWidth(wide, 32, { inset: 64 }),
+    xl: trackWidth(wide, 32, { inset: 128 }),
+    page: trackWidth(wide, 32, { px: 1440 - 128 }),
+  }
+}
+
+/**
  * Home "Featured Stories": heading with a "View all" link and four story cards.
  * One column on mobile, two on tablet, auto-fit 240px tracks on desktop where every second card is tall.
  * The link keeps its colour on hover; its chevron moves on desktop only, as in the design files.
@@ -32,6 +52,8 @@ export function FeaturedStories({ heading, link, items, now }: FeaturedStoriesPr
   if (items.length === 0) {
     return null
   }
+
+  const widths = cardWidths(items.length)
 
   return (
     <section className="py-section lg:border-t lg:border-border">
@@ -64,6 +86,7 @@ export function FeaturedStories({ heading, link, items, now }: FeaturedStoriesPr
                 href={item.href}
                 title={item.title}
                 image={item.image}
+                widths={widths}
                 tall={index % 2 === 1}
                 meta={[
                   item.publication,

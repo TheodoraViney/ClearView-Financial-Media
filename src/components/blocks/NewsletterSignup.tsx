@@ -5,13 +5,9 @@ import {
   type NewsletterOption,
 } from '@/components/sections/NewsletterSignup'
 import { toHeading } from '@/sanity/heading'
-import { urlFor } from '@/sanity/image'
+import { toImage } from '@/sanity/image'
 
 import type { BlockProps } from './types'
-
-// About 900px wide at 1440 and full width on mobile and tablet. 1600 matches the hero: near 2x on desktop
-// and 2x for a full-width image up to 800px; the source photo is wider, so `fit('max')` never upscales.
-const IMAGE_WIDTH = 1600
 
 type Option = NonNullable<BlockProps<'newsletterSignup'>['block']['options']>[number]
 
@@ -37,15 +33,8 @@ export function NewsletterSignup({ block }: BlockProps<'newsletterSignup'>) {
       buttonLabel={block.buttonLabel ?? ''}
       invalidEmailMessage={block.invalidEmailMessage ?? ''}
       noOptionMessage={block.noOptionMessage ?? ''}
-      image={
-        block.image?.asset
-          ? {
-              src: urlFor(block.image).width(IMAGE_WIDTH).fit('max').auto('format').url(),
-              // Alt is read by screen readers, not shown, so it is cleaned like the other adapters do.
-              alt: stegaClean(block.image.alt) ?? '',
-            }
-          : null
-      }
+      // Alt is read by screen readers, not shown, so toImage cleans it like the other adapters do.
+      image={toImage(block.image)}
     />
   )
 }

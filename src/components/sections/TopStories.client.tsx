@@ -4,7 +4,7 @@ import { useEffect, useRef, useState, type TouchEvent } from 'react'
 
 import { ArrowLink } from '@/components/ui/ArrowLink'
 import { cx } from '@/components/ui/cx'
-import { Media } from '@/components/ui/Media'
+import { Media, type MediaSlot } from '@/components/ui/Media'
 import { Meta } from '@/components/ui/Meta'
 import { SliderDots } from '@/components/ui/SliderDots'
 
@@ -13,6 +13,18 @@ import type { TopStory } from './TopStories'
 // The fade runs 260ms; the slide swaps at its midpoint.
 const SWAP_DELAY = 130
 const SWIPE_THRESHOLD = 40
+
+// The image box per breakpoint, matching the Media classes below. C is the content width, viewport minus both gutters
+// (16 / 32 / 64 from xl), and from xl minus the 344px sidebar (`xl:w-86`); the page stops at 1440.
+// From lg the image spans 7 of 12 grid columns with 32px gaps: 7(C - 352)/12 + 192 = 7C/12 - 13.33,
+// and its height follows the text column, 360 (`lg:min-h-90`) unless the text runs longer.
+const HERO_SLOT: MediaSlot = {
+  base: { w: '100vw - 32px', aspect: 4 / 3 },
+  md: { w: '100vw - 64px', aspect: 16 / 9 },
+  lg: { w: '58.34vw - 50.67px', h: 360 },
+  xl: { w: '58.34vw - 288.67px', h: 360 },
+  page: { w: '551.34px', h: 360 },
+}
 
 /**
  * Hero slider. Renders the current slide only, so the server HTML carries slide 1 in full.
@@ -123,9 +135,8 @@ export function TopStoriesHero({ slides, linkLabel }: { slides: TopStory[]; link
       </div>
 
       <Media
-        src={story.image?.src}
-        alt={story.image?.alt ?? ''}
-        sizes="(min-width: 64rem) 58vw, 100vw"
+        image={story.image}
+        slot={HERO_SLOT}
         priority={shown === 0}
         className="order-1 aspect-4/3 md:order-last md:aspect-video lg:col-span-7 lg:aspect-auto lg:h-full lg:min-h-90"
       >

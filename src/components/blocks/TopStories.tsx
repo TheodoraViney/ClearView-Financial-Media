@@ -4,7 +4,7 @@ import { BRANDS, isBrandKey, type BrandKey } from '@/brands'
 import { TopStories as TopStoriesSection, type TopStory } from '@/components/sections/TopStories'
 import { formatLongDate, formatShortDate } from '@/lib/dates'
 import { resolveHref } from '@/lib/links'
-import { urlFor } from '@/sanity/image'
+import { toImage } from '@/sanity/image'
 
 import type { BlockProps } from './types'
 
@@ -18,10 +18,11 @@ export function publicationOf(brands: BrandKey[], current: BrandKey): BrandKey |
   return brands.includes(current) ? current : (brands[0] ?? null)
 }
 
-function toStory(post: Post, current: BrandKey, imageWidth: number): TopStory {
+function toStory(post: Post, current: BrandKey): TopStory {
   const brands = (post.brands ?? []).map((brand) => stegaClean(brand)).filter(isBrandKey)
   const publication = publicationOf(brands, current)
   const publishedAt = stegaClean(post.publishedAt)
+  const image = toImage(post.image)
 
   return {
     id: post._id,
@@ -31,12 +32,7 @@ function toStory(post: Post, current: BrandKey, imageWidth: number): TopStory {
     date: formatLongDate(publishedAt),
     shortDate: formatShortDate(publishedAt),
     excerpt: post.excerpt ?? null,
-    image: post.image?.asset
-      ? {
-          src: urlFor(post.image).width(imageWidth).fit('max').auto('format').url(),
-          alt: stegaClean(post.image.alt) || (post.title ?? ''),
-        }
-      : null,
+    image: image && { ...image, alt: image.alt || (post.title ?? '') },
   }
 }
 
@@ -53,8 +49,8 @@ export function TopStories({ block, brand }: BlockProps<'topStories'>) {
   return (
     <TopStoriesSection
       linkLabel={block.linkLabel ?? ''}
-      slides={[...slides, ...fillSlides].map((post) => toStory(post, brand, 1600))}
-      articles={[...articles, ...fillArticles].map((post) => toStory(post, brand, 160))}
+      slides={[...slides, ...fillSlides].map((post) => toStory(post, brand))}
+      articles={[...articles, ...fillArticles].map((post) => toStory(post, brand))}
     />
   )
 }

@@ -1,7 +1,7 @@
 // GROQ projection fragments shared by the queries in ./queries.ts.
 // Explicit fields only, never `...`: a spread leaks every stored field, drafts-only data included, into the page payload.
 
-/** An image object: the asset reference for urlFor, the editor's crop and hotspot, and alt text. */
+/** An image object: the asset reference for toImage, the editor's crop and hotspot, and alt text. */
 export const IMAGE = /* groq */ `
   asset,
   hotspot,

@@ -1,4 +1,5 @@
 import { ArticleRow } from '@/components/ui/ArticleRow'
+import { type MediaImage } from '@/components/ui/Media'
 
 import { TopStoriesHero } from './TopStories.client'
 
@@ -10,7 +11,7 @@ export type TopStory = {
   date: string | null
   shortDate: string | null
   excerpt: string | null
-  image: { src: string; alt: string } | null
+  image: MediaImage | null
 }
 
 export type TopStoriesProps = {
@@ -41,7 +42,7 @@ export function TopStories({ linkLabel, slides, articles }: TopStoriesProps) {
                 href={story.href}
                 title={story.title}
                 meta={[story.publication, story.shortDate].filter((item): item is string => Boolean(item))}
-                image={story.image?.src}
+                image={story.image}
                 className="flex-1"
               />
             </li>

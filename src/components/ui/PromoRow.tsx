@@ -2,7 +2,7 @@ import Link from 'next/link'
 
 import { cx } from './cx'
 import { Icon } from './Icon'
-import { Media } from './Media'
+import { Media, type MediaImage } from './Media'
 import { CHEVRON, EASE, type Motion } from './motion'
 
 const VARIANTS = {
@@ -24,7 +24,7 @@ const VARIANTS = {
 
 // Footer row of a sidebar block. With downloadHref the title and the download chip are separate links.
 // Without href the title is plain text and, without downloadHref too, the row has no hover state or chevron.
-// `alt` defaults to decorative: in the whole-row link the title already names the image (alt rule, 2026-10-02).
+// The caller sets `image.alt`: empty in the whole-row link, where the title already names the image (alt rule, 2026-10-02).
 // `motion="responsive"` follows the responsive design file below lg: ease-out, static chevron, and a download row
 // with no row or chip hover and an instant title colour change. From lg it matches the default. See motion.ts.
 export function PromoRow({
@@ -32,7 +32,6 @@ export function PromoRow({
   title,
   description,
   image,
-  alt = '',
   report = false,
   downloadHref,
   variant = 'default',
@@ -42,8 +41,7 @@ export function PromoRow({
   href?: string | null
   title: string
   description?: string | null
-  image?: string | null
-  alt?: string
+  image?: MediaImage | null
   report?: boolean
   downloadHref?: string
   variant?: keyof typeof VARIANTS
@@ -62,7 +60,7 @@ export function PromoRow({
 
   const body = (
     <>
-      <Media src={image} alt={alt} thumb={report ? 'report' : 'sm'} />
+      <Media image={image} thumb={report ? 'report' : 'sm'} />
       <div className="flex min-w-0 flex-1 flex-col gap-2">
         <div className="flex items-start gap-2">
           {downloadHref && href ? (

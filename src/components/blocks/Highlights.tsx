@@ -10,14 +10,11 @@ import { countryName } from '@/lib/countries'
 import { formatDateRange, formatDay, formatLongDate } from '@/lib/dates'
 import { resolveHref, safeHref, sharedRecordHref } from '@/lib/links'
 import { toHeading } from '@/sanity/heading'
-import { urlFor } from '@/sanity/image'
+import { toImage } from '@/sanity/image'
 
 import type { BlockProps } from './types'
 
 const ITEM_COUNT = 3
-
-// The promo thumbnail is 40px at most; twice that for 2x screens.
-const PROMO_IMAGE_WIDTH = 80
 
 type Block = BlockProps<'highlights'>['block']
 type HighlightRecord = NonNullable<NonNullable<Block['items']>[number]>
@@ -115,7 +112,7 @@ function toPromo(promo: Block['promo'], source: Source, brand: BrandKey): Highli
     return null
   }
 
-  const image = promo.image?.asset ? promo.image : resource?.downloadThumbnail?.asset ? resource.downloadThumbnail : null
+  const image = toImage(promo.image) ?? toImage(resource?.downloadThumbnail)
   const href = resolveHref(promo.link, brand)
   // Interim until the client decides on lead capture: the PDF if present, else the form URL.
   const downloadHref = fileDownloadHref(resource?.downloadFileUrl, resource?.downloadFileName) ?? safeHref(resource?.downloadUrl)
@@ -124,11 +121,8 @@ function toPromo(promo: Block['promo'], source: Source, brand: BrandKey): Highli
     title,
     description: promo.description ?? undefined,
     image: image
-      ? {
-          src: urlFor(image).width(PROMO_IMAGE_WIDTH).fit('max').auto('format').url(),
-          // Inside the same link as the title (whole row is a link) the image is decorative; otherwise it stands alone.
-          alt: href && !downloadHref ? '' : (stegaClean(image.alt) ?? ''),
-        }
+      ? // Inside the same link as the title (whole row is a link) the image is decorative; otherwise it stands alone.
+        { ...image, alt: href && !downloadHref ? '' : image.alt }
       : undefined,
     href,
     downloadHref,
