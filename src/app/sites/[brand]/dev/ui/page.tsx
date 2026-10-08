@@ -247,16 +247,18 @@ export default async function UiPage({
         </Group>
 
         <Group title="Media (no images in repo yet, light placeholder)">
+          {/* `sizes` per box: 192 wide; narrower ratios crop the sides, height × 16/9 (144 → 256, 128 → 228). */}
           <Row label="ratios">
-            <Media ratio="16/9" className="w-48" />
-            <Media ratio="4/3" className="w-48" />
-            <Media ratio="3/2" className="w-48" />
+            <Media ratio="16/9" sizes="192px" className="w-48" />
+            <Media ratio="4/3" sizes="256px" className="w-48" />
+            <Media ratio="3/2" sizes="228px" className="w-48" />
           </Row>
           <Row label="thumbs: xs 36, sm 40, md 64/80, report 28×40">
-            <Media thumb="xs" />
-            <Media thumb="sm" />
-            <Media thumb="md" />
-            <Media thumb="report" />
+            {/* Thumb height × 16/9: 36 → 64, 40 → 72, 80 → 144. */}
+            <Media thumb="xs" sizes="64px" />
+            <Media thumb="sm" sizes="72px" />
+            <Media thumb="md" sizes="144px" />
+            <Media thumb="report" sizes="72px" />
           </Row>
         </Group>
 
@@ -269,7 +271,8 @@ export default async function UiPage({
             />
           </Row>
           <Row label="Media children overlay, responsive aspect via className">
-            <Media className="aspect-4/3 w-64 md:aspect-video">
+            {/* 256 wide, 192 high at 4:3: 192 × 16/9 ≈ 341 → 344px. */}
+            <Media sizes="344px" className="aspect-4/3 w-64 md:aspect-video">
               <div className="flex h-full items-end justify-end p-3">
                 <SliderDots
                   label="Top stories"
@@ -293,14 +296,14 @@ export default async function UiPage({
             <ArticleCard
               href="#"
               title="India's Spark Capital PWM Adds Eight-Person Team Of Bankers"
-              widths={{ base: '100vw' }}
+              sizes="(min-width: 64rem) 500px, (min-width: 48rem) 67vw, 134vw"
               meta={['WealthBriefing', '2 hours ago']}
             />
             <ArticleCard
               href="#"
               tall
               title="Global Economy, Earnings Confound The Doubters Amid Global Storms"
-              widths={{ base: '100vw' }}
+              sizes="(min-width: 64rem) 720px, (min-width: 48rem) 67vw, 134vw"
               meta={['WealthBriefingAsia', '4 hours ago']}
             />
           </div>

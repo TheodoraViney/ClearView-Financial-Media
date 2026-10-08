@@ -3,15 +3,12 @@ import { type ReactNode } from 'react'
 
 import { cx } from './cx'
 import { Icon } from './Icon'
-import { Media, type MediaImage, type MediaSlot } from './Media'
+import { Media, type MediaImage } from './Media'
 import { Meta } from './Meta'
 
-// The thumbnail is 64, 80 from md, 36 from lg (`lg:size-9` over the md thumb).
-const THUMB_SLOT: MediaSlot = {
-  base: { w: '64px', aspect: 1 },
-  md: { w: '80px', aspect: 1 },
-  lg: { w: '36px', aspect: 1 },
-}
+// Square thumb, so a landscape image is cropped at the sides: 80 high at most below lg × 16/9 ≈ 142 → 144px;
+// 36 from lg (`lg:size-9`) × 16/9 = 64 → 64px.
+const THUMB_SIZES = '(min-width: 64rem) 64px, 144px'
 
 // Horizontal story row. Mobile and tablet: divided list row; desktop: bordered card.
 // The parent list supplies the top border on mobile/tablet and the grid on desktop.
@@ -37,7 +34,7 @@ export function ArticleRow({
 
   const content = (
     <>
-      <Media image={image && { ...image, alt: '' }} slot={THUMB_SLOT} thumb="md" className="lg:size-9" />
+      <Media image={image && { ...image, alt: '' }} sizes={THUMB_SIZES} thumb="md" className="lg:size-9" />
       <div className="flex min-w-0 flex-1 flex-col gap-3 lg:self-stretch lg:justify-center">
         <div className="flex gap-2">
           <span className="min-w-0 flex-1 text-base leading-title font-medium text-pretty text-foreground lg:line-clamp-2">

@@ -1,5 +1,5 @@
 import { Container } from '@/components/ui/Container'
-import { Media, type MediaImage, type MediaSlot } from '@/components/ui/Media'
+import { Media, type MediaImage } from '@/components/ui/Media'
 import { type HeadingLevel } from '@/lib/headings'
 
 import { NewsletterForm } from './NewsletterSignup.client'
@@ -22,16 +22,10 @@ export type NewsletterSignupProps = {
   image: MediaImage | null
 }
 
-// The image box per breakpoint, matching the Media classes below. Full container width below xl
-// (viewport minus 16 / 32 gutters). From xl it spans 2 of 3 tracks with 32px gaps in a container of viewport - 128,
-// capped at 1440: 2(C - 64)/3 + 32. Its height is the row's, at least 458 (`xl:min-h-114.5`) and in practice set by
-// the form column (about 520-545 with the current copy), so 560 is used to cover a slightly longer form.
-const IMAGE_SLOT: MediaSlot = {
-  base: { w: '100vw - 32px', aspect: 4 / 3 },
-  md: { w: '100vw - 64px', aspect: 3 / 2 },
-  xl: { w: '66.67vw - 96px', h: 560 },
-  page: { w: '864px', h: 560 },
-}
+// Image sizes, cropped at the sides of a 16:9 image everywhere. Full width at 4:3 on mobile: × 4/3 → 134vw;
+// at 3:2 from md: × (16/9) / (3/2) ≈ 1.19 → 120vw. From xl two tracks (≤ 864 wide) as high as the form column,
+// 520-545 with today's copy: 545 × 16/9 ≈ 969 → 960px (within 1.05, and 2x stays on the 1920 step, not 2048).
+const IMAGE_SIZES = '(min-width: 80rem) 960px, (min-width: 48rem) 120vw, 134vw'
 
 /**
  * Home "Stay informed": a form column (heading, options, text, email field) and an image.
@@ -52,7 +46,7 @@ export function NewsletterSignup({ image, ...form }: NewsletterSignupProps) {
         {image && (
           <Media
             image={image}
-            slot={IMAGE_SLOT}
+            sizes={IMAGE_SIZES}
             className="aspect-4/3 md:aspect-3/2 xl:col-span-2 xl:aspect-auto xl:min-h-114.5"
           />
         )}

@@ -1,6 +1,6 @@
 import { ArrowLink } from '@/components/ui/ArrowLink'
 import { Heading } from '@/components/ui/Heading'
-import { Media, type MediaImage, type MediaSlot, trackWidth } from '@/components/ui/Media'
+import { Media, type MediaImage } from '@/components/ui/Media'
 import { type HeadingLevel } from '@/lib/headings'
 
 export type PublicationCard = {
@@ -18,33 +18,19 @@ export type PublicationsProps = {
   cards: PublicationCard[]
 }
 
-/**
- * Image box per breakpoint for `count` cards, matching the classes below: full width at 3:2 on mobile;
- * 2/5 of the row at 216 high (`md:h-54 md:w-2/5`) on tablet; from lg one auto-fit 260px track (`grid-cols-cards`,
- * 32 gaps), still 216 high. The block sits in the main column: gutters 32, from xl 64 plus the 344px sidebar,
- * where three tracks fit from 1316px (82.25rem) and two below. Fewer cards stretch over the empty tracks.
- */
-function imageSlot(count: number): MediaSlot {
-  const cols = Math.min(count, 3)
-  const xl = Math.min(count, 2)
-
-  return {
-    base: { w: '100vw - 32px', aspect: 3 / 2 },
-    md: { w: '40vw - 25.6px', h: 216 },
-    lg: { w: trackWidth(cols, 32, { inset: 64 }), h: 216 },
-    xl: { w: trackWidth(xl, 32, { inset: 344 + 128 }), h: 216 },
-    '82.25rem': { w: trackWidth(cols, 32, { inset: 344 + 128 }), h: 216 },
-    page: { w: trackWidth(cols, 32, { px: 1440 - 344 - 128 }), h: 216 },
-  }
-}
+// Card image sizes. Mobile: full width at 3:2, cropped at the sides: × (16/9) / (3/2) ≈ 1.19 → 120vw.
+// From md the box is 216 high, so it needs at least 216 × 16/9 = 384px. Tablet: 2/5 of a row of at most
+// 1023 − 64 → 384 → 420px. From lg the cards share an auto-fit grid and fewer cards stretch:
+// three ≤ 400px tracks → 420px, two → half the row, one → the whole row.
+const DESKTOP_SIZES = ['100vw', '50vw', '420px']
+const imageSizes = (count: number) =>
+  `(min-width: 64rem) ${DESKTOP_SIZES[Math.min(count, 3) - 1]}, (min-width: 48rem) 420px, 120vw`
 
 /**
  * Home intro: the page heading (H1 by default, the level is chosen in the CMS), a short text and one card per editorial publication.
  * Cards stack on mobile, put the image beside the text on tablet and sit in an auto-fit grid on desktop.
  */
 export function Publications({ heading, body, cards }: PublicationsProps) {
-  const slot = imageSlot(cards.length)
-
   return (
     <section className="flex flex-col gap-7 border-t border-border px-gutter py-section md:gap-10 lg:gap-16">
       <div className="flex flex-col gap-4 lg:flex-row lg:flex-wrap lg:items-end lg:gap-8">
@@ -73,7 +59,7 @@ export function Publications({ heading, body, cards }: PublicationsProps) {
               >
                 <Media
                   image={card.image}
-                  slot={slot}
+                  sizes={imageSizes(cards.length)}
                   ratio="3/2"
                   zoom="lg"
                   className="md:aspect-auto md:h-54 md:w-2/5 lg:w-full"

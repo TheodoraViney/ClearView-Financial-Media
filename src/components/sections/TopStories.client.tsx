@@ -4,7 +4,7 @@ import { useEffect, useRef, useState, type TouchEvent } from 'react'
 
 import { ArrowLink } from '@/components/ui/ArrowLink'
 import { cx } from '@/components/ui/cx'
-import { Media, type MediaSlot } from '@/components/ui/Media'
+import { Media } from '@/components/ui/Media'
 import { Meta } from '@/components/ui/Meta'
 import { SliderDots } from '@/components/ui/SliderDots'
 
@@ -14,17 +14,10 @@ import type { TopStory } from './TopStories'
 const SWAP_DELAY = 130
 const SWIPE_THRESHOLD = 40
 
-// The image box per breakpoint, matching the Media classes below. C is the content width, viewport minus both gutters
-// (16 / 32 / 64 from xl), and from xl minus the 344px sidebar (`xl:w-86`); the page stops at 1440.
-// From lg the image spans 7 of 12 grid columns with 32px gaps: 7(C - 352)/12 + 192 = 7C/12 - 13.33,
-// and its height follows the text column, 360 (`lg:min-h-90`) unless the text runs longer.
-const HERO_SLOT: MediaSlot = {
-  base: { w: '100vw - 32px', aspect: 4 / 3 },
-  md: { w: '100vw - 64px', aspect: 16 / 9 },
-  lg: { w: '58.34vw - 50.67px', h: 360 },
-  xl: { w: '58.34vw - 288.67px', h: 360 },
-  page: { w: '551.34px', h: 360 },
-}
+// Hero image sizes. Mobile: full width at 4:3, cropped at the sides: × 4/3 → 134vw. From md full width at 16:9 → 100vw.
+// From lg 7 of 12 columns (under 700 wide) and at least 360 high (`lg:min-h-90`, taller with long text):
+// 360 × 16/9 = 640, plus room for a taller text column → 720px.
+const HERO_SIZES = '(min-width: 64rem) 720px, (min-width: 48rem) 100vw, 134vw'
 
 /**
  * Hero slider. Renders the current slide only, so the server HTML carries slide 1 in full.
@@ -136,7 +129,7 @@ export function TopStoriesHero({ slides, linkLabel }: { slides: TopStory[]; link
 
       <Media
         image={story.image}
-        slot={HERO_SLOT}
+        sizes={HERO_SIZES}
         priority={shown === 0}
         className="order-1 aspect-4/3 md:order-last md:aspect-video lg:col-span-7 lg:aspect-auto lg:h-full lg:min-h-90"
       >

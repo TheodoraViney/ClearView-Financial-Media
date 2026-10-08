@@ -4,7 +4,7 @@ import { Suspense } from 'react'
 
 import { isBrandKey, type BrandKey } from '@/brands'
 import { PortableText } from '@/components/PortableText'
-import { Media, type MediaSlot } from '@/components/ui/Media'
+import { Media } from '@/components/ui/Media'
 import { toImage } from '@/sanity/image'
 import {
   cachedSanity,
@@ -14,8 +14,8 @@ import {
 import { POST_QUERY, POST_SLUGS_QUERY } from '@/sanity/queries'
 import { PLACEHOLDER_SLUG, withPlaceholder } from '@/sanity/static-params'
 
-// Prototype layout: `main` is the full viewport minus `px-6` on both sides.
-const COLUMN: MediaSlot = { base: { w: '100vw - 48px' } }
+// Prototype layout: the column is the viewport minus `px-6`, and the images keep their own aspect (no crop).
+const COLUMN_SIZES = '100vw'
 
 export async function generateStaticParams({
   params,
@@ -114,8 +114,8 @@ async function CachedPost({
           {new Date(data.publishedAt).toISOString().slice(0, 10)}
         </time>
       )}
-      {image && <Media image={{ ...image, alt: data.title ?? '' }} slot={COLUMN} natural priority />}
-      {data.content && <PortableText value={data.content} imageSlot={COLUMN} />}
+      {image && <Media image={{ ...image, alt: data.title ?? '' }} sizes={COLUMN_SIZES} natural priority />}
+      {data.content && <PortableText value={data.content} imageSizes={COLUMN_SIZES} />}
     </main>
   )
 }

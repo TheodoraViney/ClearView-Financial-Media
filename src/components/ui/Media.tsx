@@ -2,10 +2,15 @@ import Image from 'next/image'
 import { type ReactNode } from 'react'
 
 import { cx } from './cx'
-import { mediaSizes, type MediaImage, type MediaSlot } from './media-sizes'
 
-export { BREAKPOINTS, trackWidth, withBox } from './media-sizes'
-export type { MediaBox, MediaImage, MediaSlot, MediaWidths } from './media-sizes'
+/** An image after crop, from `toImage()`: the URL without a width, its pixel size, alt text and the hotspot as CSS `object-position`. */
+export type MediaImage = {
+  src: string
+  width: number
+  height: number
+  alt: string
+  position?: string
+}
 
 const RATIOS = {
   '16/9': 'aspect-video',
@@ -25,14 +30,6 @@ const THUMBS = {
   report: 'h-10 w-7',
 }
 
-// The same boxes for `sizes`; a caller that resizes a thumb through className passes its own `slot`.
-const THUMB_SLOTS: { [K in keyof typeof THUMBS]: MediaSlot } = {
-  xs: { base: { w: '36px', aspect: 1 } },
-  sm: { base: { w: '40px', aspect: 1 } },
-  md: { base: { w: '64px', aspect: 1 }, md: { w: '80px', aspect: 1 } },
-  report: { base: { w: '28px', h: 40 } },
-}
-
 // Hover zoom on the parent `group`: `true` on every breakpoint, `'lg'` from desktop only.
 const ZOOM = {
   all: 'transition-transform duration-200 ease-smooth group-hover:scale-102',
@@ -42,14 +39,14 @@ const ZOOM = {
 const isSvg = (src: string) => src.split('?', 1)[0]?.toLowerCase().endsWith('.svg') ?? false
 
 /**
- * An image in a box. `slot` describes the box per breakpoint (see MediaSlot) and must match the classes
- * that size it; `sizes` is computed from it and the image's aspect, so an `object-cover` crop never upscales.
+ * An image in a box. `sizes` is a plain upper bound of the rendered width per breakpoint (vw or px). Where the
+ * `object-cover` box crops the sides (fixed height or a ratio narrower than the image), it is box height × 16/9.
  * `natural` lets the image set its own height (full width, no crop), for article bodies.
  * The global loader (src/sanity/image-loader.ts) asks the Sanity CDN for each width; SVGs are served as they are.
  */
 export function Media({
   image,
-  slot,
+  sizes,
   ratio,
   thumb,
   natural = false,
@@ -59,7 +56,7 @@ export function Media({
   children,
 }: {
   image?: MediaImage | null
-  slot?: MediaSlot
+  sizes: string
   ratio?: keyof typeof RATIOS
   thumb?: keyof typeof THUMBS
   natural?: boolean
@@ -68,8 +65,6 @@ export function Media({
   className?: string
   children?: ReactNode
 }) {
-  const box = slot ?? (thumb ? THUMB_SLOTS[thumb] : undefined)
-  const sizes = image && box ? mediaSizes(box, image.width / image.height) : '100vw'
   const shared = {
     src: image?.src ?? '',
     sizes,

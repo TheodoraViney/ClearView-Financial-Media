@@ -27,6 +27,9 @@ const VARIANTS = {
 // The caller sets `image.alt`: empty in the whole-row link, where the title already names the image (alt rule, 2026-10-02).
 // `motion="responsive"` follows the responsive design file below lg: ease-out, static chevron, and a download row
 // with no row or chip hover and an instant title colour change. From lg it matches the default. See motion.ts.
+// Thumb 40 high (40×40, report 28×40), cropped at the sides: 40 × 16/9 ≈ 71 → 72px.
+const THUMB_SIZES = '72px'
+
 export function PromoRow({
   href,
   title,
@@ -60,7 +63,7 @@ export function PromoRow({
 
   const body = (
     <>
-      <Media image={image} thumb={report ? 'report' : 'sm'} />
+      <Media image={image} sizes={THUMB_SIZES} thumb={report ? 'report' : 'sm'} />
       <div className="flex min-w-0 flex-1 flex-col gap-2">
         <div className="flex items-start gap-2">
           {downloadHref && href ? (
