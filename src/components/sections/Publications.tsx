@@ -26,13 +26,6 @@ const DESKTOP_SIZES = ['100vw', '50vw', '420px']
 const imageSizes = (count: number) =>
   `(min-width: 64rem) ${DESKTOP_SIZES[Math.min(count, 3) - 1]}, (min-width: 48rem) 420px, 120vw`
 
-// Scroll reveal below lg only, as in the responsive design: intro 0, cards 1–3 (the desktop file does not reveal this block).
-const CARD_REVEAL = [
-  'scroll-reveal-1 lg:scroll-reveal-none',
-  'scroll-reveal-2 lg:scroll-reveal-none',
-  'scroll-reveal-3 lg:scroll-reveal-none',
-]
-
 /**
  * Home intro: the page heading (H1 by default, the level is chosen in the CMS), a short text and one card per editorial publication.
  * Cards stack on mobile, put the image beside the text on tablet and sit in an auto-fit grid on desktop.
@@ -40,10 +33,7 @@ const CARD_REVEAL = [
 export function Publications({ heading, body, cards }: PublicationsProps) {
   return (
     <section className="flex flex-col gap-7 border-t border-border px-gutter py-section md:gap-10 lg:gap-16">
-      <div
-        data-reveal
-        className="flex flex-col gap-4 scroll-reveal-0 lg:flex-row lg:flex-wrap lg:items-end lg:gap-8 lg:scroll-reveal-none"
-      >
+      <div className="flex flex-col gap-4 lg:flex-row lg:flex-wrap lg:items-end lg:gap-8">
         {heading && (
           <Heading
             as={heading.as}
@@ -61,8 +51,8 @@ export function Publications({ heading, body, cards }: PublicationsProps) {
 
       {cards.length > 0 && (
         <ul className="flex flex-col gap-6 lg:grid lg:grid-cols-cards lg:items-start lg:gap-8">
-          {cards.map((card, index) => (
-            <li key={card.key} data-reveal className={CARD_REVEAL[index]}>
+          {cards.map((card) => (
+            <li key={card.key}>
               <a
                 href={card.href}
                 className="group flex flex-col gap-5 md:flex-row md:items-center md:gap-6 lg:flex-col lg:items-stretch lg:gap-0"

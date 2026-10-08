@@ -33,17 +33,6 @@ const STYLES: Record<
   },
 }
 
-// Group footer scroll reveal, as the clearview-footer desktop master: columns 1–5 and Follow us 6, from the
-// `header` breakpoint where that layout starts (the responsive design reveals only the brand block, GroupFooter). Publication footers do not reveal.
-const COLUMN_REVEAL = [
-  'scroll-reveal-none header:scroll-reveal-1',
-  'scroll-reveal-none header:scroll-reveal-2',
-  'scroll-reveal-none header:scroll-reveal-3',
-  'scroll-reveal-none header:scroll-reveal-4',
-  'scroll-reveal-none header:scroll-reveal-5',
-]
-const FOLLOW_REVEAL = 'scroll-reveal-none header:scroll-reveal-6'
-
 /**
  * The footer's link columns and social group. As the design masters: each column is a plain
  * title over bare links (no headings, no lists), all inside one labelled nav.
@@ -61,16 +50,11 @@ export function FooterNav({
 }) {
   const styles = STYLES[variant]
   const ease = FOOTER_EASE[variant]
-  const reveal = variant === 'group'
 
   return (
     <nav aria-label="Footer" className={styles.nav}>
-      {columns.map((column, index) => (
-        <div
-          key={column.key}
-          data-reveal={reveal || undefined}
-          className={cx(styles.column, reveal && COLUMN_REVEAL[index])}
-        >
+      {columns.map((column) => (
+        <div key={column.key} className={styles.column}>
           <span className={styles.title}>{column.title}</span>
           {column.links.map((link) => (
             <Link key={link.key} href={link.href} className={cx(styles.link, ease)}>
@@ -80,7 +64,7 @@ export function FooterNav({
         </div>
       ))}
       {social.length > 0 && (
-        <div data-reveal={reveal || undefined} className={cx(styles.follow, reveal && FOLLOW_REVEAL)}>
+        <div className={styles.follow}>
           <span className="text-sm leading-copy font-medium text-foreground">{socialHeading}</span>
           <div className={styles.socialRow}>
             {social.map((item) => (

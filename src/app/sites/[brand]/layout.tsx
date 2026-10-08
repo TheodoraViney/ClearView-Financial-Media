@@ -14,7 +14,6 @@ import {
 } from '@/brands'
 import { Footer } from '@/components/blocks/Footer'
 import { Header } from '@/components/blocks/Header'
-import { RevealObserver } from '@/components/ui/RevealObserver.client'
 import {
   cachedSanity,
   getDynamicFetchOptions,
@@ -49,11 +48,9 @@ export default async function BrandLayout({
     )
   }
 
-  // Scroll reveal runs on the published site only: in draft mode and Presentation every element stays visible.
   return (
     <CachedBrandShell brand={brand} perspective="published" stega={false}>
       {children}
-      <RevealObserver />
     </CachedBrandShell>
   )
 }
