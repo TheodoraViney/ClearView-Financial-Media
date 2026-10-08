@@ -1,4 +1,5 @@
 import { Container } from '@/components/ui/Container'
+import { cx } from '@/components/ui/cx'
 import { Heading } from '@/components/ui/Heading'
 import { Icon } from '@/components/ui/Icon'
 import { type HeadingLevel } from '@/lib/headings'
@@ -17,6 +18,16 @@ export type StatsBarProps = {
   items: StatsBarItem[]
 }
 
+// Scroll reveal index per tile: 1, 2 per row below lg (as the responsive design, mobile included), 1, 2, 3 per row from lg.
+const TILE_REVEAL = [
+  'scroll-reveal-1',
+  'scroll-reveal-2',
+  'scroll-reveal-1 lg:scroll-reveal-3',
+  'scroll-reveal-2 lg:scroll-reveal-1',
+  'scroll-reveal-1 lg:scroll-reveal-2',
+  'scroll-reveal-2 lg:scroll-reveal-3',
+]
+
 /**
  * Home "At a Glance": a full-bleed dark band with a heading and up to six editorial figures.
  * One column on mobile, two on tablet, auto-fit 380px tracks on desktop.
@@ -32,16 +43,20 @@ export function StatsBar({ heading, items }: StatsBarProps) {
     <section className="bg-dark-blue-grey py-section-lg">
       <Container className="flex flex-col gap-7 md:gap-10 lg:gap-12">
         {heading && (
-          <Heading as={heading.as} className="text-heading-md font-medium text-white">
+          <Heading as={heading.as} reveal className="text-heading-md font-medium text-white scroll-reveal-0">
             {heading.text}
           </Heading>
         )}
 
         <ul className="grid gap-3 md:grid-cols-2 md:gap-6 lg:grid-cols-stats lg:gap-8">
-          {items.map((item) => (
+          {items.map((item, index) => (
             <li
               key={item.key}
-              className="flex min-h-20 rounded-sm text-white inset-ring inset-ring-white/20 transition duration-180 ease-smooth md:min-h-24 lg:hover:bg-white/5 lg:hover:inset-ring-white/40"
+              data-reveal
+              className={cx(
+                'flex min-h-20 rounded-sm text-white inset-ring inset-ring-white/20 transition duration-180 ease-smooth md:min-h-24 lg:hover:bg-white/5 lg:hover:inset-ring-white/40',
+                TILE_REVEAL[index],
+              )}
             >
               {/* An unknown icon key keeps the empty cell so the tiles stay aligned. */}
               <div className="flex w-20 shrink-0 items-center justify-center border-r border-white/20 md:w-24">

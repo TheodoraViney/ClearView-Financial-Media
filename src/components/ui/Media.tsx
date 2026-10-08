@@ -52,6 +52,7 @@ export function Media({
   natural = false,
   zoom = false,
   priority = false,
+  reveal = false,
   className,
   children,
 }: {
@@ -62,6 +63,8 @@ export function Media({
   natural?: boolean
   zoom?: boolean | 'lg'
   priority?: boolean
+  /** Marks the box for the scroll reveal (`data-reveal`); its index utilities go in className. */
+  reveal?: boolean
   className?: string
   children?: ReactNode
 }) {
@@ -78,6 +81,7 @@ export function Media({
 
   return (
     <div
+      data-reveal={reveal || undefined}
       className={cx(
         'relative shrink-0 overflow-hidden rounded-sm bg-light',
         ratio && RATIOS[ratio],

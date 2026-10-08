@@ -30,6 +30,14 @@ export type FeaturedStoriesProps = {
 const CARD_SIZES = '(min-width: 64rem) 500px, (min-width: 48rem) 67vw, 134vw'
 const TALL_CARD_SIZES = '(min-width: 64rem) 720px, (min-width: 48rem) 67vw, 134vw'
 
+// Scroll reveal index per card: one column 1, 1, 1, 1; two columns from md 1, 2, 1, 2; one row from lg 1, 2, 3, 4.
+const CARD_REVEAL = [
+  'scroll-reveal-1',
+  'scroll-reveal-1 md:scroll-reveal-2',
+  'scroll-reveal-1 lg:scroll-reveal-3',
+  'scroll-reveal-1 md:scroll-reveal-2 lg:scroll-reveal-4',
+]
+
 /**
  * Home "Featured Stories": heading with a "View all" link and four story cards.
  * One column on mobile, two on tablet, auto-fit 240px tracks on desktop where every second card is tall.
@@ -44,7 +52,7 @@ export function FeaturedStories({ heading, link, items, now }: FeaturedStoriesPr
     <section className="py-section lg:border-t lg:border-border">
       <Container className="flex flex-col gap-7 md:gap-10 lg:gap-12">
         {(heading || link) && (
-          <div className="flex flex-wrap items-end justify-between gap-x-6 gap-y-3 lg:gap-x-8">
+          <div data-reveal className="flex flex-wrap items-end justify-between gap-x-6 gap-y-3 scroll-reveal-0 lg:gap-x-8">
             {heading && (
               <Heading
                 as={heading.as}
@@ -66,7 +74,7 @@ export function FeaturedStories({ heading, link, items, now }: FeaturedStoriesPr
 
         <ul className="grid gap-8 md:grid-cols-2 md:gap-6 lg:grid-cols-cards-sm lg:items-start lg:gap-8">
           {items.map((item, index) => (
-            <li key={item.key}>
+            <li key={item.key} data-reveal className={CARD_REVEAL[index]}>
               <ArticleCard
                 href={item.href}
                 title={item.title}

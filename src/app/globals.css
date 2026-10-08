@@ -62,6 +62,10 @@
   --section-lg: 3.5rem;
   /* Sticky header height, borders included: 58 mobile, 64 from md; publications 80 from the header breakpoint (below) */
   --header-h: 3.625rem;
+  /* Scroll reveal (RevealObserver), as V2.2: rise 10 / 14 / 16px, 450ms, 70ms per index step (80 from lg) */
+  --scroll-reveal-duration: 450ms;
+  --scroll-reveal-stagger: 70ms;
+  --scroll-reveal-distance: 0.625rem;
 
   @variant md {
     --fs-display: 2.5rem;
@@ -73,12 +77,15 @@
     --section-lg: 4.5rem;
     --header-h: 4rem;
     --footer-logo: 13.75rem;
+    --scroll-reveal-distance: 0.875rem;
   }
 
   @variant lg {
     --fs-display: 3rem;
     --section: 5rem;
     --section-lg: 7.5rem;
+    --scroll-reveal-stagger: 80ms;
+    --scroll-reveal-distance: 1rem;
   }
 
   @variant xl {
@@ -285,6 +292,20 @@ main :where(*) {
 /* Fade + rise for disclosure panels; visibility is transitioned so the fade-out plays before the panel hides */
 @utility transition-reveal {
   transition-property: opacity, translate, visibility;
+}
+
+/*
+ * Scroll reveal (RevealObserver). Markup marks an element with `data-reveal` and its stagger index per breakpoint,
+ * e.g. `scroll-reveal-1 md:scroll-reveal-2 lg:scroll-reveal-4`; `scroll-reveal-none` turns it off at that breakpoint.
+ * The observer reads the index and the `--scroll-reveal-*` tokens from the element. Without the observer
+ * (no JS, reduced motion, draft mode) these utilities do nothing.
+ */
+@utility scroll-reveal-* {
+  --scroll-reveal-index: --value(integer);
+}
+
+@utility scroll-reveal-none {
+  --scroll-reveal-index: none;
 }
 
 /* Header search field: width and position 280ms ease-in-out, the open ring 200ms ease-out, as in the design */
