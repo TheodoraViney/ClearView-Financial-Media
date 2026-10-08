@@ -18,3 +18,12 @@ export const CHEVRON: Record<Motion, string> = {
 // Header controls switch with the header layouts at the `header` breakpoint (1200), not at lg:
 // ease-out below it as in the responsive file, ease-smooth from it as in the desktop file.
 export const HEADER_EASE = 'duration-180 ease-out header:ease-smooth'
+
+// Footer links and social icons, by footer type. The group (ClearView) footer follows the header:
+// ease-out below 1200, ease-smooth from it (V2.2 desktop). The publication footer masters use ease-out throughout.
+export type ShellVariant = 'group' | 'publication'
+
+export const FOOTER_EASE: Record<ShellVariant, string> = {
+  group: HEADER_EASE,
+  publication: 'duration-180 ease-out',
+}

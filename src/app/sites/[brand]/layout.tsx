@@ -7,17 +7,19 @@ import {
   BRAND_KEYS,
   BRANDS,
   brandDocumentId,
+  footerDocumentId,
   headerDocumentId,
   isBrandKey,
   type BrandKey,
 } from '@/brands'
+import { Footer } from '@/components/blocks/Footer'
 import { Header } from '@/components/blocks/Header'
 import {
   cachedSanity,
   getDynamicFetchOptions,
   type DynamicFetchOptions,
 } from '@/sanity/live'
-import { HEADER_QUERY } from '@/sanity/queries'
+import { SHELL_QUERY } from '@/sanity/queries'
 
 export function generateStaticParams() {
   return BRAND_KEYS.map((brand) => ({ brand }))
@@ -82,10 +84,11 @@ async function CachedBrandShell({
   stega,
 }: { brand: BrandKey; children: ReactNode } & DynamicFetchOptions) {
   const { data } = await cachedSanity({
-    query: HEADER_QUERY,
+    query: SHELL_QUERY,
     params: {
       brand,
       headerId: headerDocumentId(brand),
+      footerId: footerDocumentId(brand),
       brandId: brandDocumentId(brand),
     },
     perspective,
@@ -98,22 +101,26 @@ async function CachedBrandShell({
       brand={brand}
       color={stegaClean(data?.brand?.brandColor) ?? BRANDS[brand].brandColor}
       header={<Header data={data} brand={brand} />}
+      footer={<Footer data={data} brand={brand} />}
     >
       {children}
     </BrandShell>
   )
 }
 
-// The draft-mode Suspense fallback renders the shell without a header until the header data arrives.
+// The draft-mode Suspense fallback renders the shell without header and footer until the shell data arrives.
+// The footer follows the page's <main>, which each page renders inside children.
 function BrandShell({
   brand,
   color = BRANDS[brand].brandColor,
   header,
+  footer,
   children,
 }: {
   brand: BrandKey
   color?: string
   header?: ReactNode
+  footer?: ReactNode
   children: ReactNode
 }) {
   return (
@@ -124,6 +131,7 @@ function BrandShell({
     >
       {header}
       {children}
+      {footer}
     </div>
   )
 }
