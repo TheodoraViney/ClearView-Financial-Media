@@ -14,6 +14,11 @@ import type { TopStory } from './TopStories'
 const SWAP_DELAY = 130
 const SWIPE_THRESHOLD = 40
 
+// Hero image sizes. Mobile: full width at 4:3, cropped at the sides: × 4/3 → 134vw. From md full width at 16:9 → 100vw.
+// From lg 7 of 12 columns (under 700 wide) and at least 360 high (`lg:min-h-90`, taller with long text):
+// 360 × 16/9 = 640, plus room for a taller text column → 720px.
+const HERO_SIZES = '(min-width: 64rem) 720px, (min-width: 48rem) 100vw, 134vw'
+
 /**
  * Hero slider. Renders the current slide only, so the server HTML carries slide 1 in full.
  * Below lg the text wrappers are `display: contents`, which lets `order-*` place the image
@@ -123,9 +128,8 @@ export function TopStoriesHero({ slides, linkLabel }: { slides: TopStory[]; link
       </div>
 
       <Media
-        src={story.image?.src}
-        alt={story.image?.alt ?? ''}
-        sizes="(min-width: 64rem) 58vw, 100vw"
+        image={story.image}
+        sizes={HERO_SIZES}
         priority={shown === 0}
         className="order-1 aspect-4/3 md:order-last md:aspect-video lg:col-span-7 lg:aspect-auto lg:h-full lg:min-h-90"
       >

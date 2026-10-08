@@ -1,25 +1,21 @@
-import Image from 'next/image'
 import {
   PortableText as PortableTextRenderer,
   type PortableTextComponents,
   type PortableTextProps,
 } from 'next-sanity'
 
+import { Media } from '@/components/ui/Media'
 import { safeHref } from '@/lib/links'
-import { urlFor } from '@/sanity/image'
+import { toImage } from '@/sanity/image'
 
-const components: PortableTextComponents = {
+const components = (imageSizes: string): PortableTextComponents => ({
   types: {
-    image: ({ value }) =>
-      value?.asset ? (
-        <Image
-          src={urlFor(value).width(1600).fit('max').url()}
-          alt={value.alt ?? ''}
-          width={800}
-          height={600}
-          className="h-auto w-full"
-        />
-      ) : null,
+    // Full column width at the image's own aspect, nothing cropped.
+    image: ({ value }) => {
+      const image = toImage(value)
+
+      return image ? <Media image={image} sizes={imageSizes} natural /> : null
+    },
   },
   marks: {
     // The default link mark renders any stored href, javascript: included. Unsafe hrefs render as plain text.
@@ -39,8 +35,9 @@ const components: PortableTextComponents = {
       )
     },
   },
-}
+})
 
-export function PortableText({ value }: { value: PortableTextProps['value'] }) {
-  return <PortableTextRenderer value={value} components={components} />
+/** `imageSizes` is the `sizes` of the body images: an upper bound of the text column's width. */
+export function PortableText({ value, imageSizes }: { value: PortableTextProps['value']; imageSizes: string }) {
+  return <PortableTextRenderer value={value} components={components(imageSizes)} />
 }

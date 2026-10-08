@@ -3,8 +3,12 @@ import { type ReactNode } from 'react'
 
 import { cx } from './cx'
 import { Icon } from './Icon'
-import { Media } from './Media'
+import { Media, type MediaImage } from './Media'
 import { Meta } from './Meta'
+
+// Square thumb, so a landscape image is cropped at the sides: 80 high at most below lg × 16/9 ≈ 142 → 144px;
+// 36 from lg (`lg:size-9`) × 16/9 = 64 → 64px.
+const THUMB_SIZES = '(min-width: 64rem) 64px, 144px'
 
 // Horizontal story row. Mobile and tablet: divided list row; desktop: bordered card.
 // The parent list supplies the top border on mobile/tablet and the grid on desktop.
@@ -19,7 +23,7 @@ export function ArticleRow({
   href?: string | null
   title: string
   meta: ReactNode[]
-  image?: string | null
+  image?: MediaImage | null
   className?: string
 }) {
   const classes = cx(
@@ -30,7 +34,7 @@ export function ArticleRow({
 
   const content = (
     <>
-      <Media src={image} alt="" thumb="md" className="lg:size-9" />
+      <Media image={image} sizes={THUMB_SIZES} thumb="md" className="lg:size-9" />
       <div className="flex min-w-0 flex-1 flex-col gap-3 lg:self-stretch lg:justify-center">
         <div className="flex gap-2">
           <span className="min-w-0 flex-1 text-base leading-title font-medium text-pretty text-foreground lg:line-clamp-2">

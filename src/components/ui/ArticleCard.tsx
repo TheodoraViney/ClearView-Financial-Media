@@ -2,34 +2,36 @@ import Link from 'next/link'
 import { type ReactNode } from 'react'
 
 import { cx } from './cx'
-import { Media } from './Media'
+import { Media, type MediaImage } from './Media'
 import { Meta } from './Meta'
 
 // Vertical story card. Desktop uses fixed image heights that alternate (tall), smaller screens use 4:3.
 // The image takes the post image's own alt text (decision 2026-10-06). It zooms on hover from desktop only.
+// `sizes` comes from the parent grid, which decides the card width (the image is 4:3 below lg, 280 or 400 high from lg).
 export function ArticleCard({
   href,
   title,
   meta,
   image,
+  sizes,
   tall = false,
   className,
 }: {
   href: string
   title: string
   meta: ReactNode[]
-  image?: { src: string; alt: string } | null
+  image?: MediaImage | null
+  sizes: string
   tall?: boolean
   className?: string
 }) {
   return (
     <Link href={href} className={cx('group flex flex-col gap-4 lg:gap-0', className)}>
       <Media
-        src={image?.src}
-        alt={image?.alt ?? ''}
+        image={image}
+        sizes={sizes}
         ratio="4/3"
         zoom="lg"
-        sizes="(min-width: 80rem) 25vw, (min-width: 64rem) 33vw, (min-width: 48rem) 50vw, 100vw"
         className={cx('lg:aspect-auto', tall ? 'lg:h-100' : 'lg:h-70')}
       />
       <div

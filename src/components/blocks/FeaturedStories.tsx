@@ -7,15 +7,12 @@ import {
 } from '@/components/sections/FeaturedStories'
 import { resolveHref } from '@/lib/links'
 import { toHeading } from '@/sanity/heading'
-import { urlFor } from '@/sanity/image'
+import { toImage } from '@/sanity/image'
 
 import { publicationOf } from './TopStories'
 import type { BlockProps } from './types'
 
 const POST_COUNT = 4
-
-// A card is a quarter of the page on desktop and full width on mobile; twice a ~400px card for 2x screens.
-const IMAGE_WIDTH = 800
 
 type Post = NonNullable<NonNullable<BlockProps<'featuredStories'>['block']['posts']>[number]>
 
@@ -36,12 +33,7 @@ function toStory(post: Post, current: BrandKey): FeaturedStory | null {
     title: post.title ?? '',
     publication: publication ? BRANDS[publication].title : null,
     publishedAt: stegaClean(post.publishedAt) ?? null,
-    image: post.image?.asset
-      ? {
-          src: urlFor(post.image).width(IMAGE_WIDTH).fit('max').auto('format').url(),
-          alt: stegaClean(post.image.alt) ?? '',
-        }
-      : null,
+    image: toImage(post.image),
   }
 }
 

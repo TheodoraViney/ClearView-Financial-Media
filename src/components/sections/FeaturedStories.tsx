@@ -2,6 +2,7 @@ import { ArrowLink } from '@/components/ui/ArrowLink'
 import { ArticleCard } from '@/components/ui/ArticleCard'
 import { Container } from '@/components/ui/Container'
 import { Heading } from '@/components/ui/Heading'
+import { type MediaImage } from '@/components/ui/Media'
 import { RelativeTime } from '@/components/ui/RelativeTime'
 import { type HeadingLevel } from '@/lib/headings'
 
@@ -12,7 +13,7 @@ export type FeaturedStory = {
   publication: string | null
   /** ISO date-time. */
   publishedAt: string | null
-  image: { src: string; alt: string } | null
+  image: MediaImage | null
 }
 
 export type FeaturedStoriesProps = {
@@ -22,6 +23,12 @@ export type FeaturedStoriesProps = {
   /** ISO time the server-rendered relative dates count from (hourly cache); the browser recounts after mount. */
   now: string
 }
+
+// Card image sizes. Below lg the image is 4:3, cropped at the sides: full width × 4/3 → 134vw on mobile,
+// half width × 4/3 → 67vw in the two columns from md. From lg the height is fixed and the cards are narrower
+// than the crop needs: short 280 high × 16/9 ≈ 498 → 500px, tall 400 high × 16/9 ≈ 711 → 720px.
+const CARD_SIZES = '(min-width: 64rem) 500px, (min-width: 48rem) 67vw, 134vw'
+const TALL_CARD_SIZES = '(min-width: 64rem) 720px, (min-width: 48rem) 67vw, 134vw'
 
 /**
  * Home "Featured Stories": heading with a "View all" link and four story cards.
@@ -64,6 +71,7 @@ export function FeaturedStories({ heading, link, items, now }: FeaturedStoriesPr
                 href={item.href}
                 title={item.title}
                 image={item.image}
+                sizes={index % 2 === 1 ? TALL_CARD_SIZES : CARD_SIZES}
                 tall={index % 2 === 1}
                 meta={[
                   item.publication,

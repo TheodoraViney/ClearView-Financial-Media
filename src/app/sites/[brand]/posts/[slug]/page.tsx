@@ -1,11 +1,11 @@
-import Image from 'next/image'
 import { draftMode } from 'next/headers'
 import { notFound } from 'next/navigation'
 import { Suspense } from 'react'
 
 import { isBrandKey, type BrandKey } from '@/brands'
 import { PortableText } from '@/components/PortableText'
-import { urlFor } from '@/sanity/image'
+import { Media } from '@/components/ui/Media'
+import { toImage } from '@/sanity/image'
 import {
   cachedSanity,
   getDynamicFetchOptions,
@@ -13,6 +13,9 @@ import {
 } from '@/sanity/live'
 import { POST_QUERY, POST_SLUGS_QUERY } from '@/sanity/queries'
 import { PLACEHOLDER_SLUG, withPlaceholder } from '@/sanity/static-params'
+
+// Prototype layout: the column is the viewport minus `px-6`, and the images keep their own aspect (no crop).
+const COLUMN_SIZES = '100vw'
 
 export async function generateStaticParams({
   params,
@@ -101,6 +104,8 @@ async function CachedPost({
     notFound()
   }
 
+  const image = toImage(data.image)
+
   return (
     <main className="flex flex-col gap-6 px-6 py-10">
       <h1 className="text-3xl font-semibold">{data.title}</h1>
@@ -109,17 +114,8 @@ async function CachedPost({
           {new Date(data.publishedAt).toISOString().slice(0, 10)}
         </time>
       )}
-      {data.image?.asset && (
-        <Image
-          src={urlFor(data.image).width(1600).fit('max').url()}
-          alt={data.title ?? ''}
-          width={800}
-          height={450}
-          className="h-auto w-full"
-          priority
-        />
-      )}
-      {data.content && <PortableText value={data.content} />}
+      {image && <Media image={{ ...image, alt: data.title ?? '' }} sizes={COLUMN_SIZES} natural priority />}
+      {data.content && <PortableText value={data.content} imageSizes={COLUMN_SIZES} />}
     </main>
   )
 }

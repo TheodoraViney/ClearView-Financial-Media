@@ -3,6 +3,15 @@ import { type ReactNode } from 'react'
 
 import { cx } from './cx'
 
+/** An image after crop, from `toImage()`: the URL without a width, its pixel size, alt text and the hotspot as CSS `object-position`. */
+export type MediaImage = {
+  src: string
+  width: number
+  height: number
+  alt: string
+  position?: string
+}
+
 const RATIOS = {
   '16/9': 'aspect-video',
   '4/3': 'aspect-4/3',
@@ -27,27 +36,46 @@ const ZOOM = {
   lg: 'transition-transform duration-200 ease-smooth lg:group-hover:scale-102',
 }
 
+const isSvg = (src: string) => src.split('?', 1)[0]?.toLowerCase().endsWith('.svg') ?? false
+
+/**
+ * An image in a box. `sizes` is a plain upper bound of the rendered width per breakpoint (vw or px). Where the
+ * `object-cover` box crops the sides (fixed height or a ratio narrower than the image), it is box height × 16/9.
+ * `natural` lets the image set its own height (full width, no crop), for article bodies.
+ * The global loader (src/sanity/image-loader.ts) asks the Sanity CDN for each width; SVGs are served as they are.
+ */
 export function Media({
-  src,
-  alt,
+  image,
+  sizes,
   ratio,
   thumb,
-  sizes = '100vw',
+  natural = false,
   zoom = false,
   priority = false,
   className,
   children,
 }: {
-  src?: string | null
-  alt: string
+  image?: MediaImage | null
+  sizes: string
   ratio?: keyof typeof RATIOS
   thumb?: keyof typeof THUMBS
-  sizes?: string
+  natural?: boolean
   zoom?: boolean | 'lg'
   priority?: boolean
   className?: string
   children?: ReactNode
 }) {
+  const shared = {
+    src: image?.src ?? '',
+    sizes,
+    unoptimized: image ? isSvg(image.src) : false,
+    // `priority` is deprecated in Next 16; the docs recommend eager loading with a high fetch priority for the LCP image.
+    loading: priority ? ('eager' as const) : undefined,
+    fetchPriority: priority ? ('high' as const) : undefined,
+    style: image?.position ? { objectPosition: image.position } : undefined,
+  }
+  const zoomClass = zoom && ZOOM[zoom === 'lg' ? 'lg' : 'all']
+
   return (
     <div
       className={cx(
@@ -57,21 +85,12 @@ export function Media({
         className,
       )}
     >
-      {src && (
-        <Image
-          src={src}
-          alt={alt}
-          fill
-          sizes={thumb ? '80px' : sizes}
-          // `priority` is deprecated in Next 16; the docs recommend eager loading with a high fetch priority for the LCP image.
-          loading={priority ? 'eager' : undefined}
-          fetchPriority={priority ? 'high' : undefined}
-          className={cx(
-            'object-cover',
-            zoom && ZOOM[zoom === 'lg' ? 'lg' : 'all'],
-          )}
-        />
-      )}
+      {image &&
+        (natural ? (
+          <Image {...shared} alt={image.alt} width={image.width} height={image.height} className={cx('h-auto w-full', zoomClass)} />
+        ) : (
+          <Image {...shared} alt={image.alt} fill className={cx('object-cover', zoomClass)} />
+        ))}
       {children && <div className="absolute inset-0">{children}</div>}
     </div>
   )

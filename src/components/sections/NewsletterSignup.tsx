@@ -1,5 +1,5 @@
 import { Container } from '@/components/ui/Container'
-import { Media } from '@/components/ui/Media'
+import { Media, type MediaImage } from '@/components/ui/Media'
 import { type HeadingLevel } from '@/lib/headings'
 
 import { NewsletterForm } from './NewsletterSignup.client'
@@ -19,8 +19,13 @@ export type NewsletterSignupProps = {
   buttonLabel: string
   invalidEmailMessage: string
   noOptionMessage: string
-  image: { src: string; alt: string } | null
+  image: MediaImage | null
 }
+
+// Image sizes, cropped at the sides of a 16:9 image everywhere. Full width at 4:3 on mobile: × 4/3 → 134vw;
+// at 3:2 from md: × (16/9) / (3/2) ≈ 1.19 → 120vw. From xl two tracks (≤ 864 wide) as high as the form column,
+// 520-545 with today's copy: 545 × 16/9 ≈ 969 → 960px (within 1.05, and 2x stays on the 1920 step, not 2048).
+const IMAGE_SIZES = '(min-width: 80rem) 960px, (min-width: 48rem) 120vw, 134vw'
 
 /**
  * Home "Stay informed": a form column (heading, options, text, email field) and an image.
@@ -40,9 +45,8 @@ export function NewsletterSignup({ image, ...form }: NewsletterSignupProps) {
 
         {image && (
           <Media
-            src={image.src}
-            alt={image.alt}
-            sizes="(min-width: 90rem) 864px, (min-width: 80rem) 60vw, 100vw"
+            image={image}
+            sizes={IMAGE_SIZES}
             className="aspect-4/3 md:aspect-3/2 xl:col-span-2 xl:aspect-auto xl:min-h-114.5"
           />
         )}

@@ -2,6 +2,7 @@ import { Button } from '@/components/ui/Button'
 import { cx } from '@/components/ui/cx'
 import { Heading } from '@/components/ui/Heading'
 import { Icon } from '@/components/ui/Icon'
+import { type MediaImage } from '@/components/ui/Media'
 import { ListLink } from '@/components/ui/ListLink'
 import { PromoRow } from '@/components/ui/PromoRow'
 import { type HeadingLevel } from '@/lib/headings'
@@ -16,7 +17,7 @@ export type HighlightsItem = {
 export type HighlightsPromo = {
   title: string
   description?: string
-  image?: { src: string; alt: string }
+  image?: MediaImage
   href: string | null
   downloadHref: string | null
   report: boolean
@@ -131,8 +132,7 @@ export function Highlights({ variant, heading, items, button, promo }: Highlight
           href={promo.href}
           title={promo.title}
           description={promo.description}
-          image={promo.image?.src}
-          alt={promo.image?.alt}
+          image={promo.image}
           report={promo.report}
           downloadHref={promo.downloadHref ?? undefined}
           variant={styles.tone}
