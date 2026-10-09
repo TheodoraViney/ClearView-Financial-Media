@@ -1580,6 +1580,10 @@ export type Brand = {
     _type: "image";
   };
   brandColor?: string;
+  newsletter?: {
+    brevoListId?: number;
+    confirmationTemplateId?: number;
+  };
 };
 
 export type MediaFolderReference = {
@@ -7658,6 +7662,14 @@ export type POST_SLUGS_QUERY_RESULT = Array<{
   slug: string | null;
 }>;
 
+// Source: src/sanity/queries.ts
+// Variable: NEWSLETTER_SETTINGS_QUERY
+// Query: *[_type == "brand" && _id == $brandId && key.current == $brand][0].newsletter{    brevoListId,    confirmationTemplateId  }
+export type NEWSLETTER_SETTINGS_QUERY_RESULT = {
+  brevoListId: number | null;
+  confirmationTemplateId: number | null;
+} | null;
+
 // Query TypeMap
 declare global {
   interface SanityQueries {
@@ -7668,6 +7680,7 @@ declare global {
     '\n  *[_type == "post" && $brand in brands] | order(publishedAt desc){\n    _id,\n    title,\n    "slug": slug.current,\n    publishedAt,\n    excerpt,\n    image\n  }\n': POSTS_QUERY_RESULT;
     '\n  *[_type == "post" && slug.current == $slug && $brand in brands][0]{\n    _id,\n    title,\n    publishedAt,\n    excerpt,\n    image,\n    content\n  }\n': POST_QUERY_RESULT;
     '\n  *[_type == "post" && defined(slug.current) && $brand in brands]{\n    "slug": slug.current\n  }\n': POST_SLUGS_QUERY_RESULT;
+    '\n  *[_type == "brand" && _id == $brandId && key.current == $brand][0].newsletter{\n    brevoListId,\n    confirmationTemplateId\n  }\n': NEWSLETTER_SETTINGS_QUERY_RESULT;
   }
 }
 // Lets @sanity/client releases that predate the global registry read it too

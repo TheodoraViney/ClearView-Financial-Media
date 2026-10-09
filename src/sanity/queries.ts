@@ -91,3 +91,12 @@ export const POST_SLUGS_QUERY = defineQuery(`
     "slug": slug.current
   }
 `)
+
+// A publication's Brevo settings, read server-side by subscribeToPublication. Same double match as the shell:
+// the fixed id from brandDocumentId($brand) and key.current == $brand. Null fields mean not configured yet.
+export const NEWSLETTER_SETTINGS_QUERY = defineQuery(`
+  *[_type == "brand" && _id == $brandId && key.current == $brand][0].newsletter{
+    brevoListId,
+    confirmationTemplateId
+  }
+`)
