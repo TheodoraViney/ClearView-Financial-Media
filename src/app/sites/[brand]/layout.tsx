@@ -1,6 +1,7 @@
 import { draftMode } from 'next/headers'
 import { notFound } from 'next/navigation'
 import { stegaClean } from 'next-sanity'
+import { VisualEditing } from 'next-sanity/visual-editing'
 import { Suspense, type CSSProperties, type ReactNode } from 'react'
 
 import {
@@ -17,6 +18,7 @@ import { Header } from '@/components/blocks/Header'
 import {
   cachedSanity,
   getDynamicFetchOptions,
+  SanityLive,
   type DynamicFetchOptions,
 } from '@/sanity/live'
 import { SHELL_QUERY } from '@/sanity/queries'
@@ -40,18 +42,27 @@ export default async function BrandLayout({
 
   const { isEnabled: isDraftMode } = await draftMode()
 
+  // Live and Visual Editing belong to the site only. In the root layout they also ran inside /studio,
+  // which shares the draft-mode cookie, so every live event refreshed the Studio window as well.
   if (isDraftMode) {
     return (
-      <Suspense fallback={<BrandShell brand={brand}>{children}</BrandShell>}>
-        <DynamicBrandShell brand={brand}>{children}</DynamicBrandShell>
-      </Suspense>
+      <>
+        <Suspense fallback={<BrandShell brand={brand}>{children}</BrandShell>}>
+          <DynamicBrandShell brand={brand}>{children}</DynamicBrandShell>
+        </Suspense>
+        <SanityLive includeDrafts />
+        <VisualEditing />
+      </>
     )
   }
 
   return (
-    <CachedBrandShell brand={brand} perspective="published" stega={false}>
-      {children}
-    </CachedBrandShell>
+    <>
+      <CachedBrandShell brand={brand} perspective="published" stega={false}>
+        {children}
+      </CachedBrandShell>
+      <SanityLive includeDrafts={false} />
+    </>
   )
 }
 
