@@ -1,9 +1,9 @@
 'use server'
 
-import { brandOrigin } from '@/brands'
+import { brandOrigin, isEditorialBrandKey } from '@/brands'
 import { upsertContact } from '@/lib/brevo'
 import { failed, isBot, isEmail, type FormResult } from '@/lib/forms'
-import { isEditorialBrand, publicationListId, subscribeToPublication } from '@/lib/newsletter'
+import { publicationListId, subscribeToPublication } from '@/lib/newsletter'
 
 // Actions for the dev forms page. A server action is a public POST endpoint even where its page 404s,
 // so each one checks for itself that it may run: only in development or staging.
@@ -22,7 +22,7 @@ const text = (value: FormDataEntryValue | null) => (typeof value === 'string' ? 
 function publication(formData: FormData) {
   const value = text(formData.get('publication'))
 
-  return isEditorialBrand(value) ? value : null
+  return isEditorialBrandKey(value) ? value : null
 }
 
 export async function subscribeAction(_previous: FormResult, formData: FormData): Promise<FormResult> {

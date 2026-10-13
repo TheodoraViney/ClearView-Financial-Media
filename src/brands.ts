@@ -11,6 +11,8 @@ export const EDITORIAL_BRAND_KEYS = BRAND_KEYS.filter(
   (key) => key !== 'clearview',
 ) as Exclude<BrandKey, 'clearview'>[]
 
+export type EditorialBrandKey = (typeof EDITORIAL_BRAND_KEYS)[number]
+
 export const brandDocumentId = (key: BrandKey): string => `brand-${key}`
 
 /** Id of a brand's header document. One per brand, so each brand's menu can differ. */
@@ -27,6 +29,11 @@ export type FooterType = 'clearviewFooter' | 'publicationFooter'
 
 export function isBrandKey(value: string): value is BrandKey {
   return (BRAND_KEYS as readonly string[]).includes(value)
+}
+
+/** True for the three publications, which carry posts and send a newsletter; false for ClearView. */
+export function isEditorialBrandKey(value: string): value is EditorialBrandKey {
+  return (EDITORIAL_BRAND_KEYS as readonly string[]).includes(value)
 }
 
 interface BrandDefaults {

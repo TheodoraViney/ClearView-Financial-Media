@@ -13,6 +13,8 @@ export class BrevoError extends Error {
     readonly status: number,
     readonly code: string | undefined,
     message: string,
+    /** The parsed error body, e.g. the refused addresses on a failed campaign test. */
+    readonly details?: Record<string, unknown>,
   ) {
     super(message)
     this.name = 'BrevoError'
@@ -44,9 +46,17 @@ export async function brevoFetch<T>(path: string, init: { method?: string; body?
   })
 
   if (!response.ok) {
-    const error = (await response.json().catch(() => ({}))) as { code?: string; message?: string }
+    const error = (await response.json().catch(() => ({}))) as { code?: string; message?: string } & Record<
+      string,
+      unknown
+    >
 
-    throw new BrevoError(response.status, error.code, error.message ?? `Brevo request failed: ${response.status}`)
+    throw new BrevoError(
+      response.status,
+      error.code,
+      error.message ?? `Brevo request failed: ${response.status}`,
+      error,
+    )
   }
 
   // 204 and some 2xx answers have no body; parse only what is there.
@@ -98,4 +108,137 @@ export async function upsertContact({
     method: 'POST',
     body: { email, attributes, listIds, updateEnabled: true },
   })
+}
+
+/** Campaign sender. Brevo takes an email or a sender id, never both; the address must be a sender in the account. */
+export type BrevoSender = { email: string; name?: string }
+
+/** Fields shared by create and update. scheduledAt is ISO 8601 with an offset, e.g. 2026-10-10T06:00:00+01:00. */
+export type EmailCampaignFields = {
+  name: string
+  subject: string
+  sender: BrevoSender
+  /** Over 10 characters and under 1 MB. Link the unsubscribe page with href="{{ unsubscribe }}", or Brevo appends its own footer. */
+  htmlContent: string
+  listIds: number[]
+  scheduledAt?: string
+}
+
+/** Campaign status as GET /emailCampaigns/{id} reports it. queued means scheduled. */
+export type EmailCampaignStatus =
+  | 'draft'
+  | 'sent'
+  | 'archive'
+  | 'queued'
+  | 'suspended'
+  | 'in_process'
+  | 'in_review'
+  | 'cancelling'
+  | 'cancelled'
+
+/**
+ * Statuses in which a campaign may still be edited, scheduled or sent; a queued (scheduled) one is updated in place,
+ * since Brevo modifies only draft or scheduled campaigns. Anything else (sent, in_process, in_review, archive,
+ * suspended, cancelling, cancelled) may already have gone out, so the route refuses. One exception lives in
+ * ensureCampaign (src/lib/newsletter-sending.ts): a suspended campaign of an issue we cancelled, with nothing sent, is
+ * treated as editable again. The main double-send guard stays: an issue with a campaign id is updated, never given a second campaign.
+ */
+export const EMAIL_CAMPAIGN_EDITABLE_STATUSES: readonly EmailCampaignStatus[] = ['draft', 'queued']
+
+export const isEmailCampaignEditable = (status: EmailCampaignStatus) => EMAIL_CAMPAIGN_EDITABLE_STATUSES.includes(status)
+
+export type EmailCampaign = {
+  id: number
+  name: string
+  /** Absent on A/B test campaigns. */
+  subject?: string
+  status: EmailCampaignStatus
+  /** UTC, YYYY-MM-DDTHH:mm:ss.SSSZ. */
+  scheduledAt?: string
+  /** UTC; present only once status is sent. */
+  sentDate?: string
+  /** statistics.globalStats.sent: emails Brevo has sent for this campaign so far. 0 when Brevo reports none. */
+  sentCount: number
+  /** segments and excludedSegments are optional in Brevo's getCampaignRecipients; normalised to [] here. */
+  recipients: { lists: number[]; exclusionLists: number[]; segments: number[]; excludedSegments: number[] }
+}
+
+/** Creates a classic email campaign, as a draft unless scheduledAt is set (listIds are then mandatory). 201 with the id. */
+export async function createEmailCampaign({
+  name,
+  subject,
+  sender,
+  htmlContent,
+  listIds,
+  scheduledAt,
+}: EmailCampaignFields): Promise<{ id: number }> {
+  return brevoFetch<{ id: number }>('/emailCampaigns', {
+    method: 'POST',
+    body: { name, subject, sender, htmlContent, recipients: { listIds }, scheduledAt },
+  })
+}
+
+/**
+ * Updates a draft or scheduled campaign; a sent or sending one answers 400 (campaign_sent, campaign_processing).
+ * Setting scheduledAt schedules or reschedules it. 204.
+ */
+export async function updateEmailCampaign(
+  id: number,
+  { listIds, ...fields }: Partial<EmailCampaignFields>,
+): Promise<void> {
+  await brevoFetch(`/emailCampaigns/${id}`, {
+    method: 'PUT',
+    body: { ...fields, ...(listIds ? { recipients: { listIds } } : {}) },
+  })
+}
+
+/**
+ * Sends the campaign as a test to the given addresses, or to the account's test list when empty. Brevo caps tests
+ * at 50 a day. 204; on 400 the refused addresses are in the BrevoError's details (blackListedEmails, unexistingEmails,
+ * withoutListEmails).
+ */
+export async function sendEmailCampaignTest(id: number, emailTo: string[]): Promise<void> {
+  await brevoFetch(`/emailCampaigns/${id}/sendTest`, { method: 'POST', body: { emailTo } })
+}
+
+/** Sends the campaign to its lists immediately. 204; 400 when it cannot be sent, 402 when credits run out. */
+export async function sendEmailCampaignNow(id: number): Promise<void> {
+  await brevoFetch(`/emailCampaigns/${id}/sendNow`, { method: 'POST' })
+}
+
+/**
+ * Takes a scheduled campaign out of the queue by suspending it (the pause button in Brevo → Campaigns). 204.
+ * Verified 2026-10-12 on a test campaign: Brevo refuses 'draft' for a scheduled campaign ("draft is an invalid
+ * status for scheduled campaign"); 'suspended' takes it out of the queue with nothing sent, and an update with a new
+ * scheduledAt then puts it back in the queue.
+ */
+export async function unscheduleEmailCampaign(id: number): Promise<void> {
+  await brevoFetch(`/emailCampaigns/${id}/status`, { method: 'PUT', body: { status: 'suspended' } })
+}
+
+/** One campaign without its HTML, with its global statistics only (for the sent count). 404 when the id is unknown. */
+export async function getEmailCampaign(id: number): Promise<EmailCampaign> {
+  const campaign = await brevoFetch<
+    Omit<EmailCampaign, 'recipients'> & {
+      recipients: { lists: number[]; exclusionLists: number[]; segments?: number[]; excludedSegments?: number[] }
+      // Required in Brevo's schema, but every stat inside is nullable, so all of it is treated as optional.
+      statistics?: { globalStats?: { sent?: number | null } | null } | null
+    }
+  >(`/emailCampaigns/${id}?excludeHtmlContent=true&statistics=globalStats`)
+
+  return {
+    id: campaign.id,
+    name: campaign.name,
+    subject: campaign.subject,
+    status: campaign.status,
+    scheduledAt: campaign.scheduledAt,
+    sentDate: campaign.sentDate,
+    sentCount: campaign.statistics?.globalStats?.sent ?? 0,
+    recipients: {
+      lists: campaign.recipients.lists,
+      exclusionLists: campaign.recipients.exclusionLists,
+      segments: campaign.recipients.segments ?? [],
+      excludedSegments: campaign.recipients.excludedSegments ?? [],
+    },
+  }
 }
