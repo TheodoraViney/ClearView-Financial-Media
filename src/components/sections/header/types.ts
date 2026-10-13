@@ -11,4 +11,14 @@ export type HeaderProps = {
   homeHref: string
   items: HeaderItem[]
   searchPlaceholder: string
+  searchLabels: SearchLabels
+}
+
+/** Visible copy of the search suggestions popup: one heading per section, and the empty state. */
+export type SearchLabels = {
+  posts: string
+  events: string
+  awards: string
+  resources: string
+  empty: string
 }
