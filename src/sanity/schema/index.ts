@@ -8,6 +8,7 @@ import { company } from './documents/company'
 import { conferenceEvent } from './documents/conference-event'
 import { clearviewFooter, publicationFooter } from './documents/footer'
 import { clearviewHeader, publicationHeader } from './documents/header'
+import { newsletterIssue } from './documents/newsletter-issue'
 import { page } from './documents/page'
 import { person } from './documents/person'
 import { post } from './documents/post'
@@ -22,6 +23,7 @@ export const documentTypes = [
   publicationFooter,
   page,
   post,
+  newsletterIssue,
   awardsProgrammeGroup,
   awardsProgramme,
   conferenceEvent,

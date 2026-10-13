@@ -72,6 +72,14 @@ function pathFor(slug: string, prefix = ''): string {
 }
 
 /**
+ * Absolute URL of a post on a brand's own origin (`brandOrigin`), for places with no current host such as emails.
+ * Same `/posts/{slug}` path as resolveHref builds.
+ */
+export function absolutePostUrl(brand: BrandKey, slug: string): string {
+  return `${brandOrigin(brand)}${pathFor(stegaClean(slug), '/posts')}`
+}
+
+/**
  * Turns a link field into an href for the brand being rendered.
  *
  * Content on another brand resolves to an absolute URL on that brand's origin,

@@ -100,3 +100,70 @@ export const NEWSLETTER_SETTINGS_QUERY = defineQuery(`
     confirmationTemplateId
   }
 `)
+
+// A newsletter issue as the sending route reads it: both the published document and its draft, through the raw
+// perspective with a token (server only). Posts stay references here; NEWSLETTER_EMAIL_QUERY resolves them once the
+// route knows which version it sends.
+export const NEWSLETTER_ISSUE_VERSIONS_QUERY = defineQuery(`
+  *[_type == "newsletterIssue" && _id in [$id, $draftId]]{
+    _id,
+    _rev,
+    brand,
+    subject,
+    scheduledAt,
+    status,
+    brevoCampaignId,
+    sendingStartedAt,
+    sendRequestedAt,
+    "postIds": posts[]._ref
+  }
+`)
+
+// What the email and the Brevo campaign need: the publication's Brand settings and the issue's posts. Raw ids, so
+// `_id in $postIds` matches published posts only (a draft's id carries the `drafts.` prefix), and only posts that
+// are still on the issue's brand. The caller restores the issue's order.
+export const NEWSLETTER_EMAIL_QUERY = defineQuery(`
+  {
+    "brand": *[_type == "brand" && _id == $brandId && key.current == $brand][0]{
+      title,
+      logo,
+      newsletter{ brevoListId, senderEmail, senderName }
+    },
+    "posts": *[_type == "post" && _id in $postIds && $brand in brands]{
+      _id,
+      title,
+      excerpt,
+      "slug": slug.current,
+      publishedAt
+    }
+  }
+`)
+
+// The issue's versions that hold a given sending lock, with their revisions, so the route releases only its own
+// lock and only on the revision it read.
+export const NEWSLETTER_ISSUE_LOCK_HOLDERS_QUERY = defineQuery(`
+  *[_type == "newsletterIssue" && _id in [$id, $draftId] && sendingStartedAt == $lock]{ _id, _rev }
+`)
+
+// Ids of the issue's versions that exist right now, so a result write never patches a draft deleted meanwhile.
+export const NEWSLETTER_ISSUE_EXISTING_IDS_QUERY = defineQuery(`
+  *[_type == "newsletterIssue" && _id in [$id, $draftId]]._id
+`)
+
+// How many of the latest articles a new newsletter issue starts with (Brand settings → Newsletter). Null when unset;
+// the caller falls back to DEFAULT_ARTICLES_PER_ISSUE.
+export const NEWSLETTER_ARTICLES_PER_ISSUE_QUERY = defineQuery(`
+  *[_type == "brand" && _id == $brandId && key.current == $brand][0].newsletter.articlesPerIssue
+`)
+
+// The latest published posts of a brand, newest first, whether or not an earlier issue carried them. Run with the
+// published perspective, so drafts are never picked. Capped at 20 (the most Brand settings allow); the caller slices
+// to its own count.
+export const NEWSLETTER_LATEST_POST_IDS_QUERY = defineQuery(`
+  *[
+    _type == "post"
+    && $brand in brands
+    && defined(publishedAt)
+    && dateTime(publishedAt) <= dateTime(now())
+  ] | order(publishedAt desc)[0...20]._id
+`)

@@ -7,6 +7,7 @@ import { DocumentIcon } from '@sanity/icons/Document'
 import { DocumentPdfIcon } from '@sanity/icons/DocumentPdf'
 import { DocumentTextIcon } from '@sanity/icons/DocumentText'
 import { EarthGlobeIcon } from '@sanity/icons/EarthGlobe'
+import { EnvelopeIcon } from '@sanity/icons/Envelope'
 import { InsertBelowIcon } from '@sanity/icons/InsertBelow'
 import { MenuIcon } from '@sanity/icons/Menu'
 import { StarIcon } from '@sanity/icons/Star'
@@ -14,7 +15,14 @@ import { TagIcon } from '@sanity/icons/Tag'
 import { UserIcon } from '@sanity/icons/User'
 import type { StructureResolver } from 'sanity/structure'
 
-import { BRAND_KEYS, BRANDS, brandDocumentId, footerDocumentId, headerDocumentId } from '@/brands'
+import {
+  BRAND_KEYS,
+  BRANDS,
+  brandDocumentId,
+  footerDocumentId,
+  headerDocumentId,
+  isEditorialBrandKey,
+} from '@/brands'
 
 export const structure: StructureResolver = (S) =>
   S.list()
@@ -48,6 +56,23 @@ export const structure: StructureResolver = (S) =>
                       .params({ brand: key })
                       .initialValueTemplates([S.initialValueTemplateItem('post-by-brand', { brand: key })]),
                   ),
+                // ClearView sends no newsletter, so its folder has no issues list.
+                ...(isEditorialBrandKey(key)
+                  ? [
+                      S.listItem()
+                        .title('Newsletter issues')
+                        .icon(EnvelopeIcon)
+                        .child(
+                          S.documentTypeList('newsletterIssue')
+                            .title('Newsletter issues')
+                            .filter('_type == "newsletterIssue" && brand == $brand')
+                            .params({ brand: key })
+                            .initialValueTemplates([
+                              S.initialValueTemplateItem('newsletter-issue-by-brand', { brand: key }),
+                            ]),
+                        ),
+                    ]
+                  : []),
                 S.listItem()
                   .title('Header')
                   .icon(MenuIcon)

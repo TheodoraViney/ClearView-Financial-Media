@@ -593,6 +593,27 @@ export type AwardCategory = {
   description?: RichText;
 };
 
+export type NewsletterIssue = {
+  _id: string;
+  _type: "newsletterIssue";
+  _createdAt: string;
+  _updatedAt: string;
+  _rev: string;
+  brand?: string;
+  subject?: string;
+  posts?: Array<
+    {
+      _key: string;
+    } & PostReference
+  >;
+  scheduledAt?: string;
+  status?: "draft" | "scheduled" | "sent" | "cancelled";
+  sentAt?: string;
+  brevoCampaignId?: number;
+  sendingStartedAt?: string;
+  sendRequestedAt?: string;
+};
+
 export type PublicationFooter = {
   _id: string;
   _type: "publicationFooter";
@@ -1583,6 +1604,9 @@ export type Brand = {
   newsletter?: {
     brevoListId?: number;
     confirmationTemplateId?: number;
+    senderEmail?: string;
+    senderName?: string;
+    articlesPerIssue?: number;
   };
 };
 
@@ -1753,6 +1777,7 @@ export type AllSanitySchemaTypes =
   | SanityImageHotspot
   | Slug
   | AwardCategory
+  | NewsletterIssue
   | PublicationFooter
   | ClearviewFooter
   | PublicationHeader
@@ -7670,6 +7695,73 @@ export type NEWSLETTER_SETTINGS_QUERY_RESULT = {
   confirmationTemplateId: number | null;
 } | null;
 
+// Source: src/sanity/queries.ts
+// Variable: NEWSLETTER_ISSUE_VERSIONS_QUERY
+// Query: *[_type == "newsletterIssue" && _id in [$id, $draftId]]{    _id,    _rev,    brand,    subject,    scheduledAt,    status,    brevoCampaignId,    sendingStartedAt,    sendRequestedAt,    "postIds": posts[]._ref  }
+export type NEWSLETTER_ISSUE_VERSIONS_QUERY_RESULT = Array<{
+  _id: string;
+  _rev: string;
+  brand: string | null;
+  subject: string | null;
+  scheduledAt: string | null;
+  status: "cancelled" | "draft" | "scheduled" | "sent" | null;
+  brevoCampaignId: number | null;
+  sendingStartedAt: string | null;
+  sendRequestedAt: string | null;
+  postIds: Array<string> | null;
+}>;
+
+// Source: src/sanity/queries.ts
+// Variable: NEWSLETTER_EMAIL_QUERY
+// Query: {    "brand": *[_type == "brand" && _id == $brandId && key.current == $brand][0]{      title,      logo,      newsletter{ brevoListId, senderEmail, senderName }    },    "posts": *[_type == "post" && _id in $postIds && $brand in brands]{      _id,      title,      excerpt,      "slug": slug.current,      publishedAt    }  }
+export type NEWSLETTER_EMAIL_QUERY_RESULT = {
+  brand: {
+    title: string | null;
+    logo: {
+      asset?: SanityImageAssetReference;
+      media?: unknown;
+      hotspot?: SanityImageHotspot;
+      crop?: SanityImageCrop;
+      _type: "image";
+    } | null;
+    newsletter: {
+      brevoListId: number | null;
+      senderEmail: string | null;
+      senderName: string | null;
+    } | null;
+  } | null;
+  posts: Array<{
+    _id: string;
+    title: string | null;
+    excerpt: string | null;
+    slug: string | null;
+    publishedAt: string | null;
+  }>;
+};
+
+// Source: src/sanity/queries.ts
+// Variable: NEWSLETTER_ISSUE_LOCK_HOLDERS_QUERY
+// Query: *[_type == "newsletterIssue" && _id in [$id, $draftId] && sendingStartedAt == $lock]{ _id, _rev }
+export type NEWSLETTER_ISSUE_LOCK_HOLDERS_QUERY_RESULT = Array<{
+  _id: string;
+  _rev: string;
+}>;
+
+// Source: src/sanity/queries.ts
+// Variable: NEWSLETTER_ISSUE_EXISTING_IDS_QUERY
+// Query: *[_type == "newsletterIssue" && _id in [$id, $draftId]]._id
+export type NEWSLETTER_ISSUE_EXISTING_IDS_QUERY_RESULT = Array<string>;
+
+// Source: src/sanity/queries.ts
+// Variable: NEWSLETTER_ARTICLES_PER_ISSUE_QUERY
+// Query: *[_type == "brand" && _id == $brandId && key.current == $brand][0].newsletter.articlesPerIssue
+export type NEWSLETTER_ARTICLES_PER_ISSUE_QUERY_RESULT = number | null;
+
+// Source: src/sanity/queries.ts
+// Variable: NEWSLETTER_LATEST_POST_IDS_QUERY
+// Query: *[    _type == "post"    && $brand in brands    && defined(publishedAt)    && dateTime(publishedAt) <= dateTime(now())  ] | order(publishedAt desc)[0...20]._id
+export type NEWSLETTER_LATEST_POST_IDS_QUERY_RESULT = Array<string>;
+
 // Query TypeMap
 declare global {
   interface SanityQueries {
@@ -7681,6 +7773,12 @@ declare global {
     '\n  *[_type == "post" && slug.current == $slug && $brand in brands][0]{\n    _id,\n    title,\n    publishedAt,\n    excerpt,\n    image,\n    content\n  }\n': POST_QUERY_RESULT;
     '\n  *[_type == "post" && defined(slug.current) && $brand in brands]{\n    "slug": slug.current\n  }\n': POST_SLUGS_QUERY_RESULT;
     '\n  *[_type == "brand" && _id == $brandId && key.current == $brand][0].newsletter{\n    brevoListId,\n    confirmationTemplateId\n  }\n': NEWSLETTER_SETTINGS_QUERY_RESULT;
+    '\n  *[_type == "newsletterIssue" && _id in [$id, $draftId]]{\n    _id,\n    _rev,\n    brand,\n    subject,\n    scheduledAt,\n    status,\n    brevoCampaignId,\n    sendingStartedAt,\n    sendRequestedAt,\n    "postIds": posts[]._ref\n  }\n': NEWSLETTER_ISSUE_VERSIONS_QUERY_RESULT;
+    '\n  {\n    "brand": *[_type == "brand" && _id == $brandId && key.current == $brand][0]{\n      title,\n      logo,\n      newsletter{ brevoListId, senderEmail, senderName }\n    },\n    "posts": *[_type == "post" && _id in $postIds && $brand in brands]{\n      _id,\n      title,\n      excerpt,\n      "slug": slug.current,\n      publishedAt\n    }\n  }\n': NEWSLETTER_EMAIL_QUERY_RESULT;
+    '\n  *[_type == "newsletterIssue" && _id in [$id, $draftId] && sendingStartedAt == $lock]{ _id, _rev }\n': NEWSLETTER_ISSUE_LOCK_HOLDERS_QUERY_RESULT;
+    '\n  *[_type == "newsletterIssue" && _id in [$id, $draftId]]._id\n': NEWSLETTER_ISSUE_EXISTING_IDS_QUERY_RESULT;
+    '\n  *[_type == "brand" && _id == $brandId && key.current == $brand][0].newsletter.articlesPerIssue\n': NEWSLETTER_ARTICLES_PER_ISSUE_QUERY_RESULT;
+    '\n  *[\n    _type == "post"\n    && $brand in brands\n    && defined(publishedAt)\n    && dateTime(publishedAt) <= dateTime(now())\n  ] | order(publishedAt desc)[0...20]._id\n': NEWSLETTER_LATEST_POST_IDS_QUERY_RESULT;
   }
 }
 // Lets @sanity/client releases that predate the global registry read it too

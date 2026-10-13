@@ -1,15 +1,10 @@
 import 'server-only'
 
-import { brandDocumentId, BRANDS, EDITORIAL_BRAND_KEYS, type BrandKey } from '@/brands'
+import { brandDocumentId, BRANDS, type BrandKey, type EditorialBrandKey, isEditorialBrandKey } from '@/brands'
 import { client } from '@/sanity/client'
 import { NEWSLETTER_SETTINGS_QUERY } from '@/sanity/queries'
 
 import { subscribeWithDoubleOptIn, type BrevoAttributes } from './brevo'
-
-type EditorialBrandKey = (typeof EDITORIAL_BRAND_KEYS)[number]
-
-export const isEditorialBrand = (key: string): key is EditorialBrandKey =>
-  (EDITORIAL_BRAND_KEYS as readonly string[]).includes(key)
 
 // Uncached on purpose, not cachedSanity: that cache expires only when a visitor's browser runs <SanityLive>,
 // and a form action renders no page, so a changed list id could keep sending readers to the old list.
@@ -48,7 +43,7 @@ export async function subscribeToPublication({
   attributes?: BrevoAttributes
   redirectionUrl: string
 }): Promise<void> {
-  if (!isEditorialBrand(brand)) {
+  if (!isEditorialBrandKey(brand)) {
     throw new Error(`No newsletter for brand: ${brand}`)
   }
 
