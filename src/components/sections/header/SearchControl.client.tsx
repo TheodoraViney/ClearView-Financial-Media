@@ -1,12 +1,14 @@
 'use client'
 
 import Form from 'next/form'
-import { useEffect, useId, useRef, type FormEvent } from 'react'
+import { useEffect, useId, useRef, useState, type FormEvent, type KeyboardEvent } from 'react'
 
 import { cx } from '@/components/ui/cx'
 import { IconButton } from '@/components/ui/IconButton'
 
 import { HEADER_DESKTOP_QUERY, useHeaderState } from './HeaderState.client'
+import { SearchSuggestions } from './SearchSuggestions.client'
+import type { SearchLabels } from './types'
 
 /** Results page. Not built yet: the form points at the final URL and 404s until it exists. */
 const SEARCH_PATH = '/search'
@@ -46,13 +48,17 @@ const FOCUS_INSIDE = 'focus-visible:-outline-offset-2'
  * the header). From md: 360px wide, anchored to the button's slot.
  * The button submits once open; an empty submit does nothing. Escape closes and returns focus to
  * the button; a press outside or (desktop) focus leaving closes it while it is empty.
+ * Suggestions show under the field from 2 characters; a press outside or focus leaving hides them
+ * until the field is used again, and ArrowDown in the field moves to the first one.
  */
 export function SearchControl({
   variant,
   placeholder,
+  labels,
 }: {
   variant: keyof typeof VARIANTS
   placeholder: string
+  labels: SearchLabels
 }) {
   const { searchOpen: open, setSearchOpen } = useHeaderState()
   const slot = useRef<HTMLDivElement>(null)
@@ -60,6 +66,18 @@ export function SearchControl({
   const button = useRef<HTMLButtonElement>(null)
   const inputId = useId()
   const styles = VARIANTS[variant]
+  const [term, setTerm] = useState('')
+  const [suggestionsHidden, setSuggestionsHidden] = useState(false)
+  const [wasOpen, setWasOpen] = useState(open)
+
+  // The field is cleared whenever it closes (below), so the term is too. Adjusted during render, not in an effect.
+  if (open !== wasOpen) {
+    setWasOpen(open)
+
+    if (!open) {
+      setTerm('')
+    }
+  }
 
   const isEmpty = () => !input.current?.value.trim()
 
@@ -78,8 +96,14 @@ export function SearchControl({
     }
 
     const onPointerDown = (event: PointerEvent) => {
-      if (!slot.current?.contains(event.target as Node) && isEmpty()) {
+      if (slot.current?.contains(event.target as Node)) {
+        return
+      }
+
+      if (isEmpty()) {
         setSearchOpen(false)
+      } else {
+        setSuggestionsHidden(true)
       }
     }
 
@@ -96,6 +120,19 @@ export function SearchControl({
     }
   }
 
+  const showSuggestions = () => setSuggestionsHidden(false)
+
+  const onFieldKeyDown = (event: KeyboardEvent<HTMLInputElement>) => {
+    if (event.key === 'ArrowDown') {
+      const first = slot.current?.querySelector<HTMLAnchorElement>('[data-search-suggestions] a')
+
+      if (first) {
+        event.preventDefault()
+        first.focus()
+      }
+    }
+  }
+
   const onSubmit = (event: FormEvent<HTMLFormElement>) => {
     if (isEmpty()) {
       event.preventDefault()
@@ -103,27 +140,33 @@ export function SearchControl({
   }
 
   return (
-    // Below md the slot is not positioned, so the field is placed against the header.
-    <div ref={slot} className={cx('size-11 shrink-0 md:relative', styles.slot)}>
+    // Below md the slot is not positioned, so the field and the suggestions are placed against the header.
+    // Escape and focus leaving are handled on the slot, which holds both the form and the suggestions.
+    <div
+      ref={slot}
+      className={cx('size-11 shrink-0 md:relative', styles.slot)}
+      onKeyDown={(event) => {
+        if (event.key === 'Escape' && open) {
+          event.stopPropagation()
+          close(true)
+        }
+      }}
+      onBlur={(event) => {
+        if (slot.current?.contains(event.relatedTarget as Node | null)) {
+          return
+        }
+
+        if (isEmpty() && window.matchMedia(HEADER_DESKTOP_QUERY).matches) {
+          close(false)
+        } else {
+          setSuggestionsHidden(true)
+        }
+      }}
+    >
       <Form
         action={SEARCH_PATH}
         role="search"
         onSubmit={onSubmit}
-        onKeyDown={(event) => {
-          if (event.key === 'Escape' && open) {
-            event.stopPropagation()
-            close(true)
-          }
-        }}
-        onBlur={(event) => {
-          if (
-            !slot.current?.contains(event.relatedTarget as Node | null) &&
-            isEmpty() &&
-            window.matchMedia(HEADER_DESKTOP_QUERY).matches
-          ) {
-            close(false)
-          }
-        }}
         className={cx(
           'absolute top-1.5 right-17 z-10 flex h-11 items-center overflow-hidden rounded-sm bg-white inset-ring transition-search md:top-0 md:right-0',
           styles.form,
@@ -162,6 +205,12 @@ export function SearchControl({
           autoCapitalize="off"
           spellCheck={false}
           placeholder={placeholder}
+          onChange={(event) => {
+            setTerm(event.target.value)
+            showSuggestions()
+          }}
+          onFocus={showSuggestions}
+          onKeyDown={onFieldKeyDown}
           tabIndex={open ? 0 : -1}
           className={cx(
             'h-full min-w-0 flex-1 appearance-none bg-transparent pr-1 text-base leading-none text-foreground outline-none duration-200 ease-out placeholder:text-foreground/50 search-cancel-none',
@@ -181,6 +230,7 @@ export function SearchControl({
           onClick={() => close(true)}
         />
       </Form>
+      <SearchSuggestions term={term} labels={labels} hidden={!open || suggestionsHidden} onNavigate={() => close(false)} />
     </div>
   )
 }

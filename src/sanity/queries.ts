@@ -19,6 +19,7 @@ export const SHELL_QUERY = defineQuery(`
         links[]{ _key, _type, label, link{ ${LINK_TARGET} } }
       },
       searchPlaceholder,
+      searchLabels,
       subscribe{ ${LINK} }
     },
     "footer": *[_id == $footerId && _type in ["clearviewFooter", "publicationFooter"]][0]{
@@ -166,4 +167,51 @@ export const NEWSLETTER_LATEST_POST_IDS_QUERY = defineQuery(`
     && defined(publishedAt)
     && dateTime(publishedAt) <= dateTime(now())
   ] | order(publishedAt desc)[0...20]._id
+`)
+
+// Header search suggestions, read by searchSite in src/lib/search.ts. Titles only (posts: title and excerpt, the title
+// weighted 3x), never body text. $q is the user's term as a GROQ param, never interpolated, with a trailing `*` so the last
+// word matches as a prefix. $brands is the editorial keys on ClearView and the current brand elsewhere; the shared group
+// records have no brand field and show on every host. Undated records sort after dated ones (GROQ puts null first in
+// desc).
+export const SITE_SEARCH_QUERY = defineQuery(`
+  {
+    "posts": *[
+      _type == "post"
+      && defined(slug.current)
+      && count(brands[@ in $brands]) > 0
+      && (title match $q || excerpt match $q)
+    ] | score(boost(title match $q, 3), excerpt match $q)
+      | order(_score desc, defined(publishedAt) desc, publishedAt desc)[0...5]{
+        title,
+        "slug": slug.current,
+        brands,
+        publishedAt
+      },
+    "events": *[_type == "conferenceEvent" && defined(slug.current) && title match $q]
+      | score(title match $q)
+      | order(_score desc, defined(startDate) desc, startDate desc)[0...3]{
+        title,
+        "slug": slug.current,
+        startDate,
+        endDate,
+        hideDateTime
+      },
+    "awards": *[_type == "awardsProgramme" && defined(slug.current) && title match $q]
+      | score(title match $q)
+      | order(_score desc, defined(startDate) desc, startDate desc)[0...3]{
+        title,
+        "slug": slug.current,
+        startDate,
+        endDate,
+        hideDateTime
+      },
+    "resources": *[_type == "resource" && defined(slug.current) && title match $q]
+      | score(title match $q)
+      | order(_score desc, defined(publishedAt) desc, publishedAt desc)[0...3]{
+        title,
+        "slug": slug.current,
+        publishedAt
+      }
+  }
 `)

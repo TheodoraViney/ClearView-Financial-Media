@@ -70,6 +70,7 @@ export function PublicationHeader({
   homeHref,
   items,
   searchPlaceholder,
+  searchLabels,
   subscribe,
 }: PublicationHeaderProps) {
   const links = items.flatMap((item) => (item.kind === 'link' ? [item] : []))
@@ -94,7 +95,7 @@ export function PublicationHeader({
             </nav>
           )}
           <div className="flex shrink-0 items-center gap-2">
-            <SearchControl variant="publication" placeholder={searchPlaceholder} />
+            <SearchControl variant="publication" placeholder={searchPlaceholder} labels={searchLabels} />
             {subscribe && (
               <div className="hidden header:flex">
                 <Button href={subscribe.href} className="px-4.5 font-medium">

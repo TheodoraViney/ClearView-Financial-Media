@@ -124,3 +124,21 @@ export function resolveBrandFromHost(host: string): BrandKey | null {
 
   return HOST_TO_BRAND[withoutWww] ?? null
 }
+
+/**
+ * Brand for a host that maps to no brand (Vercel preview URLs): the httpOnly `brand` cookie set by
+ * /api/brand/{key}, else `DEFAULT_BRAND`, else null. Call it only after resolveBrandFromHost returned null,
+ * so a production host can never be switched by a visitor. Shared by the proxy and the /api routes it skips.
+ */
+export function fallbackBrand(cookie: string | null | undefined): BrandKey | null {
+  if (cookie && isBrandKey(cookie)) {
+    return cookie
+  }
+
+  const fromEnv = process.env.DEFAULT_BRAND
+  if (fromEnv && isBrandKey(fromEnv)) {
+    return fromEnv
+  }
+
+  return null
+}

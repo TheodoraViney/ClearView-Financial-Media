@@ -18,7 +18,7 @@ const MENU_ROW =
  * on the page gutter, and the menu is centred between them. Below it: logo, search and the menu
  * button, with groups as accordions in the menu panel.
  */
-export function GroupHeader({ logo, homeHref, items, searchPlaceholder }: HeaderProps) {
+export function GroupHeader({ logo, homeHref, items, searchPlaceholder, searchLabels }: HeaderProps) {
   return (
     <header className="sticky top-0 z-40 h-header border-y border-border bg-white">
       <HeaderStateProvider>
@@ -47,7 +47,7 @@ export function GroupHeader({ logo, homeHref, items, searchPlaceholder }: Header
             </nav>
           )}
           <div className="flex shrink-0 items-center gap-2 header:border-l header:border-border header:px-6">
-            <SearchControl variant="group" placeholder={searchPlaceholder} />
+            <SearchControl variant="group" placeholder={searchPlaceholder} labels={searchLabels} />
             {items.length > 0 && <MenuTrigger />}
           </div>
         </Container>

@@ -5,6 +5,7 @@ import { GroupHeader } from '@/components/sections/header/GroupHeader'
 import { PublicationHeader } from '@/components/sections/header/PublicationHeader'
 import type { HeaderItem } from '@/components/sections/header/types'
 import { resolveHref } from '@/lib/links'
+import { SEARCH_LABEL_DEFAULTS } from '@/lib/search-term'
 
 import { isPresent, toLink, toLogo, type ShellData } from './shell'
 
@@ -32,11 +33,19 @@ export function Header({ data, brand }: { data: ShellData; brand: BrandKey }) {
     })
     .filter(isPresent)
 
+  const labels = header.searchLabels
   const props = {
     logo: toLogo(data.brand),
     homeHref: '/',
     items,
     searchPlaceholder: header.searchPlaceholder ?? '',
+    searchLabels: {
+      posts: labels?.articles ?? SEARCH_LABEL_DEFAULTS.articles,
+      events: labels?.events ?? SEARCH_LABEL_DEFAULTS.events,
+      awards: labels?.awards ?? SEARCH_LABEL_DEFAULTS.awards,
+      resources: labels?.resources ?? SEARCH_LABEL_DEFAULTS.resources,
+      empty: labels?.nothingFound ?? SEARCH_LABEL_DEFAULTS.nothingFound,
+    },
   }
 
   if (stegaClean(header._type) === 'publicationHeader') {
