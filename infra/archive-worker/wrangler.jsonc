@@ -1,0 +1,16 @@
+{
+  "$schema": "./node_modules/wrangler/config-schema.json",
+  "name": "wb-archive",
+  "main": "src/index.ts",
+  "compatibility_date": "2026-10-01",
+  // Reached on workers.dev until the client zones move to Cloudflare. No routes yet.
+  "workers_dev": true,
+  "r2_buckets": [
+    {
+      "binding": "ARCHIVE",
+      "bucket_name": "wb-archive",
+      // Set at bucket creation and cannot change.
+      "jurisdiction": "eu"
+    }
+  ]
+}

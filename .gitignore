@@ -2,6 +2,7 @@
 
 # dependencies
 /node_modules
+/infra/*/node_modules
 /.pnp
 .pnp.*
 .yarn/*
@@ -37,6 +38,10 @@ yarn-error.log*
 
 # vercel
 .vercel
+
+# wrangler local state and build output (infra/archive-worker)
+.wrangler/
+.dev.vars*
 
 # typescript
 *.tsbuildinfo

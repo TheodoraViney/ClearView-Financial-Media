@@ -55,6 +55,26 @@ export function safeHref(value: string | null | undefined): string | null {
   return isAllowedLinkTarget(href) ? href : null
 }
 
+/**
+ * Href of content that lives on a set of brands (a post, an archived article):
+ * the relative `path` when the current brand is one of them, else an absolute
+ * URL on the first valid brand's origin, because a relative path would 404 on
+ * a brand that does not carry the content. Null when no target brand is valid.
+ */
+export function brandScopedHref(
+  path: string,
+  targetBrands: readonly (string | null | undefined)[],
+  currentBrand: BrandKey,
+): string | null {
+  if (targetBrands.includes(currentBrand)) {
+    return path
+  }
+
+  const home = targetBrands.find((brand): brand is BrandKey => !!brand && isBrandKey(brand))
+
+  return home ? `${brandOrigin(home)}${path}` : null
+}
+
 /** The shape the LINK GROQ fragment returns. */
 export type ResolvableLink = {
   kind?: string | null
@@ -120,15 +140,8 @@ export function resolveHref(
     }
     case 'post': {
       const brands = (target.brands ?? []).map((brand) => stegaClean(brand))
-      const path = pathFor(slug, '/posts')
 
-      if (brands.includes(currentBrand)) {
-        return path
-      }
-
-      const home = brands.find(isBrandKey)
-
-      return home ? `${brandOrigin(home)}${path}` : null
+      return brandScopedHref(pathFor(slug, '/posts'), brands, currentBrand)
     }
     case 'conferenceEvent':
     case 'awardsProgramme':

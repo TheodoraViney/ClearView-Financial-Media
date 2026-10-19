@@ -15,6 +15,15 @@ const nextConfig: NextConfig = {
     // Next's defaults plus 2304 and 2560, so a 2x wide slot gets a step close to its need instead of a near-original.
     deviceSizes: [640, 750, 828, 1080, 1200, 1920, 2048, 2304, 2560, 3840],
   },
+  async rewrites() {
+    const archiveOrigin = process.env.ARCHIVE_ORIGIN?.replace(/\/+$/, '')
+
+    // Images and files of archived articles, which the records reference as /archive-media/..., come from the
+    // archive Worker on every brand host. The proxy skips this prefix, so the path is never brand-rewritten.
+    return archiveOrigin
+      ? [{ source: '/archive-media/:path*', destination: `${archiveOrigin}/media/:path*` }]
+      : []
+  },
 }
 
 export default nextConfig

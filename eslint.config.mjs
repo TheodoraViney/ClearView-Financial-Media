@@ -14,6 +14,8 @@ const eslintConfig = defineConfig([
     "next-env.d.ts",
     // Sanity TypeGen output.
     "src/sanity/types.ts",
+    // Workspace packages under infra/ are not part of the Next app.
+    "infra/**",
   ]),
 ]);
 

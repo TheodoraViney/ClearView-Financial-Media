@@ -1,0 +1,14 @@
+// Local-only loader used by seed-local.mjs. Never deploy it: it writes to the bucket.
+{
+  "name": "wb-archive-seed",
+  "main": "seed-worker.js",
+  "compatibility_date": "2026-10-01",
+  "workers_dev": false,
+  "r2_buckets": [
+    {
+      "binding": "ARCHIVE",
+      "bucket_name": "wb-archive",
+      "jurisdiction": "eu"
+    }
+  ]
+}

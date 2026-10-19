@@ -26,5 +26,6 @@ export default function proxy(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ['/((?!api|studio|_next/static|_next/image|favicon.ico|.*\\..*).*)'],
+  // archive-media is rewritten to the archive Worker in next.config and must keep its path.
+  matcher: ['/((?!api|studio|archive-media/|_next/static|_next/image|favicon.ico|.*\\..*).*)'],
 }
