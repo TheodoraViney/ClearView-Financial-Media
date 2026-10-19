@@ -40,7 +40,7 @@ export async function Footer({ data, brand }: { data: ShellData; brand: BrandKey
     .filter(isPresent)
 
   const props: FooterProps = {
-    logo: toLogo(data.brand),
+    logo: toLogo(data.brand?.footerLogo?.asset ? data.brand.footerLogo : data.brand?.logo, data.brand?.title),
     description: footer.description ?? '',
     columns,
     socialHeading: footer.socialHeading ?? '',
