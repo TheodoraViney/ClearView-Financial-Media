@@ -21,9 +21,14 @@ export function toLink(item: NavLinkData, brand: BrandKey): HeaderLink | null {
 
 export const isPresent = <T,>(value: T | null): value is T => value !== null
 
-/** The brand logo from Brand settings, used by header and footer. Alt is the brand title. */
-export function toLogo(brand: ShellData['brand']): HeaderLogo | null {
-  const asset = brand?.logo?.asset
+type ShellLogo = NonNullable<ShellData['brand']>['logo']
+
+/**
+ * A logo from Brand settings, used by header and footer: the header passes `logo`, the footer its own `footerLogo`
+ * falling back to `logo`. Alt is the brand title.
+ */
+export function toLogo(logo: ShellLogo | undefined, brandTitle: string | null | undefined): HeaderLogo | null {
+  const asset = logo?.asset
   const src = stegaClean(asset?.url)
   const dimensions = asset?.metadata?.dimensions
 
@@ -36,6 +41,6 @@ export function toLogo(brand: ShellData['brand']): HeaderLogo | null {
     src,
     width: dimensions.width,
     height: dimensions.height,
-    alt: stegaClean(brand?.title) ?? '',
+    alt: stegaClean(brandTitle) ?? '',
   }
 }

@@ -35,7 +35,7 @@ export function Header({ data, brand }: { data: ShellData; brand: BrandKey }) {
 
   const labels = header.searchLabels
   const props = {
-    logo: toLogo(data.brand),
+    logo: toLogo(data.brand?.logo, data.brand?.title),
     homeHref: '/',
     items,
     searchPlaceholder: header.searchPlaceholder ?? '',

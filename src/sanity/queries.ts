@@ -38,7 +38,8 @@ export const SHELL_QUERY = defineQuery(`
     "brand": *[_type == "brand" && _id == $brandId && key.current == $brand][0]{
       title,
       brandColor,
-      logo{ asset->{ url, metadata{ dimensions{ width, height } } } }
+      logo{ asset->{ url, metadata{ dimensions{ width, height } } } },
+      footerLogo{ asset->{ url, metadata{ dimensions{ width, height } } } }
     }
   }
 `)

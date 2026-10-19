@@ -67,6 +67,13 @@ export const brand = defineType({
       validation: (Rule) => Rule.required(),
     }),
     defineField({
+      name: 'footerLogo',
+      title: 'Footer logo',
+      type: 'image',
+      group: 'brand',
+      description: 'SVG. Only when the footer shows a different lockup from the header; empty uses the Logo above.',
+    }),
+    defineField({
       name: 'brandColor',
       title: 'Brand color',
       type: 'string',
