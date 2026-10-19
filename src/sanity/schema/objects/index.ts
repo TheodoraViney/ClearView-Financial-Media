@@ -1,4 +1,5 @@
 import { agenda } from './agenda'
+import { brevoAttribute, brevoList, brevoSegment, brevoSender, brevoTemplate } from './brevo'
 import { companyGroup } from './company-group'
 import { customTab } from './custom-tab'
 import { footerColumn } from './footer-column'
@@ -22,4 +23,9 @@ export const objectTypes = [
   navGroup,
   footerColumn,
   socialLink,
+  brevoList,
+  brevoSegment,
+  brevoTemplate,
+  brevoSender,
+  brevoAttribute,
 ]

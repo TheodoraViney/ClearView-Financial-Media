@@ -74,39 +74,21 @@ const SEND_REQUEST_PENDING_MS = 10 * 60_000
 
 type IssueVersion = NEWSLETTER_ISSUE_VERSIONS_QUERY_RESULT[number]
 
+/** The Brevo segment an issue goes to. */
+type Segment = { id: number; name: string | null }
+
+/** "the segment "WB readers"", for editor messages. */
+const describeSegment = (segment: Segment) =>
+  segment.name ? `the segment "${segment.name}"` : `segment #${segment.id}`
+
 type IssueFields = Partial<{ status: IssueStatus; sentAt: string; brevoCampaignId: number; sendRequestedAt: string }>
 
 /**
  * Test mode: anything but NEXT_PUBLIC_SITE_ENV=production, missing included. Staging and development share the
- * client's live Brevo account, so there every campaign goes to the NEWSLETTER_TEST_LIST_ID list instead of the
- * publication's subscribers, and its name starts with [TEST] so it stands out in the client's Brevo.
+ * client's live Brevo account, so there every campaign name starts with [TEST] and stands out in the client's Brevo.
+ * Recipients are the issue's own segment in every environment: a test issue picks a small test segment.
  */
 const isTestMode = () => process.env.NEXT_PUBLIC_SITE_ENV !== 'production'
-
-/** The Brevo list a campaign goes to: the publication's in production, the test list everywhere else. */
-function recipientListId(brandListId: number | null | undefined, brandTitle: string): number {
-  if (!isTestMode()) {
-    if (!brandListId) {
-      throw new NewsletterActionError(
-        400,
-        `Newsletter not configured for ${brandTitle}: set the Brevo list id in Brand settings → Newsletter.`,
-      )
-    }
-
-    return brandListId
-  }
-
-  const testListId = Number(process.env.NEWSLETTER_TEST_LIST_ID)
-
-  if (!Number.isInteger(testListId) || testListId <= 0) {
-    throw new NewsletterActionError(
-      400,
-      'Test mode: this environment sends only to a test list, and NEWSLETTER_TEST_LIST_ID is not set to a Brevo list id.',
-    )
-  }
-
-  return testListId
-}
 
 const DRAFT_PREFIX = 'drafts.'
 
@@ -273,6 +255,15 @@ async function buildCampaign(issueId: string, version: IssueVersion) {
     throw new NewsletterActionError(400, 'Add a subject before sending.')
   }
 
+  // The issue's own segment, from the version being sent, like the subject and posts. Required for a test too, so
+  // every campaign is created with its recipients.
+  const segment: Segment | null =
+    typeof version.segment?.id === 'number' ? { id: version.segment.id, name: version.segment.name ?? null } : null
+
+  if (!segment) {
+    throw new NewsletterActionError(400, 'Choose a segment to send to.')
+  }
+
   const postIds = version.postIds ?? []
 
   if (postIds.length === 0) {
@@ -286,16 +277,14 @@ async function buildCampaign(issueId: string, version: IssueVersion) {
   )
 
   const brandTitle = settings?.title || BRANDS[brand].title
-  const senderEmail = settings?.newsletter?.senderEmail?.trim()
+  const senderId = settings?.senderId
 
-  if (!senderEmail) {
+  if (!senderId) {
     throw new NewsletterActionError(
       400,
-      `Newsletter not configured for ${brandTitle}: set the sender email in Brand settings → Newsletter.`,
+      `Newsletter not configured for ${brandTitle}: choose the sender in Brand settings → Newsletter.`,
     )
   }
-
-  const listId = recipientListId(settings?.newsletter?.brevoListId, brandTitle)
 
   const byId = new Map(posts.map((post) => [post._id, post]))
   const ordered = postIds.flatMap((id) => byId.get(id) ?? [])
@@ -308,17 +297,16 @@ async function buildCampaign(issueId: string, version: IssueVersion) {
     )
   }
 
-  const senderName = settings?.newsletter?.senderName?.trim()
-
   const fields: EmailCampaignFields = {
     name: `${isTestMode() ? '[TEST] ' : ''}${brandTitle} – ${subject} – ${issueId}`,
     subject,
-    sender: senderName ? { email: senderEmail, name: senderName } : { email: senderEmail },
+    // By id: Brevo then uses the sender's current name and verified address, never a stale copy from Sanity.
+    sender: { id: senderId },
     htmlContent: renderNewsletterEmail({ brand, brandTitle, logo: settings?.logo ?? null, subject, posts: ordered }),
-    listIds: [listId],
+    recipients: { segmentIds: [segment.id] },
   }
 
-  return { fields, listId }
+  return { fields, segment }
 }
 
 /**
@@ -379,6 +367,16 @@ async function ensureCampaign(
       throw new NewsletterActionError(409, 'This campaign is scheduled in Brevo. Cancel it before sending a test.')
     }
 
+    // Brevo's updateEmailCampaign says a campaign "should only be updated with listIds if listIds were used to create
+    // it", and the same for segmentIds: it cannot be moved from a list to a segment, and an update may leave the old
+    // list in place. Issues once could go to a list, so a campaign created that way is refused, never updated.
+    if (campaign.recipients.lists.length > 0) {
+      throw new NewsletterActionError(
+        409,
+        "This issue's Brevo campaign was created for a list, and Brevo cannot switch a campaign to a segment. Create a new issue to send to a segment.",
+      )
+    }
+
     await updateEmailCampaign(campaignId, fields)
 
     return campaignId
@@ -395,17 +393,24 @@ async function ensureCampaign(
 }
 
 /**
- * Re-reads the campaign from Brevo and refuses unless it targets exactly the expected list: no other list and no
- * segment. Exclusion lists and excluded segments only narrow the audience, so they are allowed. Run before
- * sendNow and before scheduledAt is set, so a campaign widened by hand in Brevo never goes out from here.
+ * Re-reads the campaign from Brevo and refuses unless it targets exactly the issue's segment and nothing else: no
+ * other segment, no list, and no exclusion list or excluded segment either, so what goes out is exactly what Studio
+ * shows. Run before sendNow and before scheduledAt is set, so a campaign changed by hand in Brevo never goes out from
+ * here.
  */
-async function verifyRecipients(campaignId: number, listId: number) {
+async function verifyRecipients(campaignId: number, segment: Segment) {
   const { recipients } = await getEmailCampaign(campaignId)
 
-  if (recipients.lists.length !== 1 || recipients.lists[0] !== listId || recipients.segments.length > 0) {
+  if (
+    recipients.segments.length !== 1 ||
+    recipients.segments[0] !== segment.id ||
+    recipients.lists.length > 0 ||
+    recipients.exclusionLists.length > 0 ||
+    recipients.excludedSegments.length > 0
+  ) {
     throw new NewsletterActionError(
       409,
-      `The Brevo campaign ${campaignId} does not target only list ${listId}. Nothing was sent or scheduled; check its recipients in Brevo → Campaigns.`,
+      `The Brevo campaign ${campaignId} does not target only ${describeSegment(segment)}. Nothing was sent or scheduled; check its recipients in Brevo → Campaigns.`,
     )
   }
 }
@@ -510,11 +515,11 @@ async function sendOrSchedule(
     scheduledAt = new Date(time).toISOString()
   }
 
-  // Content and list first, with no scheduledAt; the schedule is set only after the recipients check below.
-  const { fields, listId } = await buildCampaign(issueId, published)
+  // Content and segment first, with no scheduledAt; the schedule is set only after the recipients check below.
+  const { fields, segment } = await buildCampaign(issueId, published)
   const campaignId = await ensureCampaign(action, issueId, published, published.brevoCampaignId, fields)
 
-  await verifyRecipients(campaignId, listId)
+  await verifyRecipients(campaignId, segment)
 
   if (action === 'send') {
     // The marker is stored before sendNow, so a request that dies or times out mid-call leaves a trace the next Send

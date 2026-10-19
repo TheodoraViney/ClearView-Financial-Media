@@ -1,4 +1,4 @@
-import { type Path, type ValidationContext, defineArrayMember, defineField } from 'sanity'
+import { type ConditionalProperty, type Path, type ValidationContext, defineArrayMember, defineField } from 'sanity'
 
 import { HEADING_LEVELS, type HeadingLevel, isHeadingLevel } from '@/lib/headings'
 import { LINKABLE_TYPES, isAllowedLinkTarget } from '@/lib/links'
@@ -326,3 +326,63 @@ export const headingField = (
       }),
   })
 }
+
+type BrevoFieldOptions = {
+  title?: string
+  description?: string
+  group?: string
+  hidden?: ConditionalProperty
+  readOnly?: ConditionalProperty
+  required?: boolean
+  /** Required only while this returns true, e.g. on some documents of a type. Ignored when `required` is set. */
+  requiredWhen?: (context: ValidationContext) => boolean
+}
+
+type BrevoValue = { id?: unknown; name?: unknown } | undefined
+
+/** A field picked from the live Brevo account; see src/sanity/schema/objects/brevo.ts. */
+const brevoField =
+  (
+    type: 'brevoList' | 'brevoSegment' | 'brevoTemplate' | 'brevoSender' | 'brevoAttribute',
+    defaultTitle: string,
+    noun: string,
+  ) =>
+  (name: string, options: BrevoFieldOptions = {}) => {
+    const { required = false, requiredWhen } = options
+    // The picker always writes the key (the id, or the name for an attribute); an object without it is a leftover of
+    // a cleared or half-written value.
+    const chosen = (value: BrevoValue) =>
+      type === 'brevoAttribute' ? typeof value?.name === 'string' && value.name !== '' : typeof value?.id === 'number'
+    const message = `Choose ${/^[aeiou]/.test(noun) ? 'an' : 'a'} ${noun}`
+
+    return defineField({
+      name,
+      title: options.title ?? defaultTitle,
+      type,
+      description: options.description,
+      group: options.group,
+      hidden: options.hidden,
+      readOnly: options.readOnly,
+      validation: required
+        ? (Rule) => Rule.required().custom((value: BrevoValue) => (chosen(value) ? true : message))
+        : requiredWhen
+          ? (Rule) =>
+              Rule.custom((value: BrevoValue, context) => (chosen(value) || !requiredWhen(context) ? true : message))
+          : undefined,
+    })
+  }
+
+/** One Brevo contact list, e.g. the list a signup form adds contacts to. */
+export const brevoListField = brevoField('brevoList', 'Brevo list', 'list')
+
+/** One Brevo segment, e.g. the newsletter readers of one publication. */
+export const brevoSegmentField = brevoField('brevoSegment', 'Brevo segment', 'segment')
+
+/** One active Brevo template tagged `optin`, the double opt-in confirmation email. */
+export const brevoTemplateField = brevoField('brevoTemplate', 'Confirmation template', 'template')
+
+/** One active Brevo sender. */
+export const brevoSenderField = brevoField('brevoSender', 'Sender', 'sender')
+
+/** One yes/no Brevo contact attribute, e.g. WB_NEWSLETTER. */
+export const brevoAttributeField = brevoField('brevoAttribute', 'Brevo attribute', 'attribute')

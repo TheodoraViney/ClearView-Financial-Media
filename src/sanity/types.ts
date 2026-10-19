@@ -169,10 +169,13 @@ export type NewsletterSignup = {
   preferencesLabel?: string;
   options?: Array<{
     label?: string;
+    attribute?: BrevoAttribute;
     defaultChecked?: boolean;
     _type: "newsletterOption";
     _key: string;
   }>;
+  list?: BrevoList;
+  confirmationTemplate?: BrevoTemplate;
   emailPlaceholder?: string;
   buttonLabel?: string;
   invalidEmailMessage?: string;
@@ -354,6 +357,36 @@ export type Cta = {
   heading?: string;
   text?: string;
   link?: CtaLink;
+};
+
+export type BrevoAttribute = {
+  _type: "brevoAttribute";
+  name?: string;
+};
+
+export type BrevoSender = {
+  _type: "brevoSender";
+  id?: number;
+  name?: string;
+  email?: string;
+};
+
+export type BrevoTemplate = {
+  _type: "brevoTemplate";
+  id?: number;
+  name?: string;
+};
+
+export type BrevoSegment = {
+  _type: "brevoSegment";
+  id?: number;
+  name?: string;
+};
+
+export type BrevoList = {
+  _type: "brevoList";
+  id?: number;
+  name?: string;
 };
 
 export type SocialLink = {
@@ -614,6 +647,7 @@ export type NewsletterIssue = {
       _key: string;
     } & PostReference
   >;
+  segment?: BrevoSegment;
   scheduledAt?: string;
   status?: "draft" | "scheduled" | "sent" | "cancelled";
   sentAt?: string;
@@ -1612,10 +1646,7 @@ export type Brand = {
   };
   brandColor?: string;
   newsletter?: {
-    brevoListId?: number;
-    confirmationTemplateId?: number;
-    senderEmail?: string;
-    senderName?: string;
+    sender?: BrevoSender;
     articlesPerIssue?: number;
   };
 };
@@ -1768,6 +1799,11 @@ export type AllSanitySchemaTypes =
   | SplitLayout
   | AdSlot
   | Cta
+  | BrevoAttribute
+  | BrevoSender
+  | BrevoTemplate
+  | BrevoSegment
+  | BrevoList
   | SocialLink
   | FooterColumn
   | NavGroup
@@ -7701,21 +7737,17 @@ export type POST_SLUGS_QUERY_RESULT = Array<{
 }>;
 
 // Source: src/sanity/queries.ts
-// Variable: NEWSLETTER_SETTINGS_QUERY
-// Query: *[_type == "brand" && _id == $brandId && key.current == $brand][0].newsletter{    brevoListId,    confirmationTemplateId  }
-export type NEWSLETTER_SETTINGS_QUERY_RESULT = {
-  brevoListId: number | null;
-  confirmationTemplateId: number | null;
-} | null;
-
-// Source: src/sanity/queries.ts
 // Variable: NEWSLETTER_ISSUE_VERSIONS_QUERY
-// Query: *[_type == "newsletterIssue" && _id in [$id, $draftId]]{    _id,    _rev,    brand,    subject,    scheduledAt,    status,    brevoCampaignId,    sendingStartedAt,    sendRequestedAt,    "postIds": posts[]._ref  }
+// Query: *[_type == "newsletterIssue" && _id in [$id, $draftId]]{    _id,    _rev,    brand,    subject,    segment{ id, name },    scheduledAt,    status,    brevoCampaignId,    sendingStartedAt,    sendRequestedAt,    "postIds": posts[]._ref  }
 export type NEWSLETTER_ISSUE_VERSIONS_QUERY_RESULT = Array<{
   _id: string;
   _rev: string;
   brand: string | null;
   subject: string | null;
+  segment: {
+    id: number | null;
+    name: string | null;
+  } | null;
   scheduledAt: string | null;
   status: "cancelled" | "draft" | "scheduled" | "sent" | null;
   brevoCampaignId: number | null;
@@ -7726,7 +7758,7 @@ export type NEWSLETTER_ISSUE_VERSIONS_QUERY_RESULT = Array<{
 
 // Source: src/sanity/queries.ts
 // Variable: NEWSLETTER_EMAIL_QUERY
-// Query: {    "brand": *[_type == "brand" && _id == $brandId && key.current == $brand][0]{      title,      logo,      newsletter{ brevoListId, senderEmail, senderName }    },    "posts": *[_type == "post" && _id in $postIds && $brand in brands]{      _id,      title,      excerpt,      "slug": slug.current,      publishedAt    }  }
+// Query: {    "brand": *[_type == "brand" && _id == $brandId && key.current == $brand][0]{      title,      logo,      "senderId": newsletter.sender.id    },    "posts": *[_type == "post" && _id in $postIds && $brand in brands]{      _id,      title,      excerpt,      "slug": slug.current,      publishedAt    }  }
 export type NEWSLETTER_EMAIL_QUERY_RESULT = {
   brand: {
     title: string | null;
@@ -7737,11 +7769,7 @@ export type NEWSLETTER_EMAIL_QUERY_RESULT = {
       crop?: SanityImageCrop;
       _type: "image";
     } | null;
-    newsletter: {
-      brevoListId: number | null;
-      senderEmail: string | null;
-      senderName: string | null;
-    } | null;
+    senderId: number | null;
   } | null;
   posts: Array<{
     _id: string;
@@ -7816,9 +7844,8 @@ declare global {
     '\n  *[_type == "post" && $brand in brands] | order(publishedAt desc){\n    _id,\n    title,\n    "slug": slug.current,\n    publishedAt,\n    excerpt,\n    image\n  }\n': POSTS_QUERY_RESULT;
     '\n  *[_type == "post" && slug.current == $slug && $brand in brands][0]{\n    _id,\n    title,\n    publishedAt,\n    excerpt,\n    image,\n    content\n  }\n': POST_QUERY_RESULT;
     '\n  *[_type == "post" && defined(slug.current) && $brand in brands]{\n    "slug": slug.current\n  }\n': POST_SLUGS_QUERY_RESULT;
-    '\n  *[_type == "brand" && _id == $brandId && key.current == $brand][0].newsletter{\n    brevoListId,\n    confirmationTemplateId\n  }\n': NEWSLETTER_SETTINGS_QUERY_RESULT;
-    '\n  *[_type == "newsletterIssue" && _id in [$id, $draftId]]{\n    _id,\n    _rev,\n    brand,\n    subject,\n    scheduledAt,\n    status,\n    brevoCampaignId,\n    sendingStartedAt,\n    sendRequestedAt,\n    "postIds": posts[]._ref\n  }\n': NEWSLETTER_ISSUE_VERSIONS_QUERY_RESULT;
-    '\n  {\n    "brand": *[_type == "brand" && _id == $brandId && key.current == $brand][0]{\n      title,\n      logo,\n      newsletter{ brevoListId, senderEmail, senderName }\n    },\n    "posts": *[_type == "post" && _id in $postIds && $brand in brands]{\n      _id,\n      title,\n      excerpt,\n      "slug": slug.current,\n      publishedAt\n    }\n  }\n': NEWSLETTER_EMAIL_QUERY_RESULT;
+    '\n  *[_type == "newsletterIssue" && _id in [$id, $draftId]]{\n    _id,\n    _rev,\n    brand,\n    subject,\n    segment{ id, name },\n    scheduledAt,\n    status,\n    brevoCampaignId,\n    sendingStartedAt,\n    sendRequestedAt,\n    "postIds": posts[]._ref\n  }\n': NEWSLETTER_ISSUE_VERSIONS_QUERY_RESULT;
+    '\n  {\n    "brand": *[_type == "brand" && _id == $brandId && key.current == $brand][0]{\n      title,\n      logo,\n      "senderId": newsletter.sender.id\n    },\n    "posts": *[_type == "post" && _id in $postIds && $brand in brands]{\n      _id,\n      title,\n      excerpt,\n      "slug": slug.current,\n      publishedAt\n    }\n  }\n': NEWSLETTER_EMAIL_QUERY_RESULT;
     '\n  *[_type == "newsletterIssue" && _id in [$id, $draftId] && sendingStartedAt == $lock]{ _id, _rev }\n': NEWSLETTER_ISSUE_LOCK_HOLDERS_QUERY_RESULT;
     '\n  *[_type == "newsletterIssue" && _id in [$id, $draftId]]._id\n': NEWSLETTER_ISSUE_EXISTING_IDS_QUERY_RESULT;
     '\n  *[_type == "brand" && _id == $brandId && key.current == $brand][0].newsletter.articlesPerIssue\n': NEWSLETTER_ARTICLES_PER_ISSUE_QUERY_RESULT;

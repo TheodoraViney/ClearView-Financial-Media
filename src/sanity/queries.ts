@@ -93,15 +93,6 @@ export const POST_SLUGS_QUERY = defineQuery(`
   }
 `)
 
-// A publication's Brevo settings, read server-side by subscribeToPublication. Same double match as the shell:
-// the fixed id from brandDocumentId($brand) and key.current == $brand. Null fields mean not configured yet.
-export const NEWSLETTER_SETTINGS_QUERY = defineQuery(`
-  *[_type == "brand" && _id == $brandId && key.current == $brand][0].newsletter{
-    brevoListId,
-    confirmationTemplateId
-  }
-`)
-
 // A newsletter issue as the sending route reads it: both the published document and its draft, through the raw
 // perspective with a token (server only). Posts stay references here; NEWSLETTER_EMAIL_QUERY resolves them once the
 // route knows which version it sends.
@@ -111,6 +102,7 @@ export const NEWSLETTER_ISSUE_VERSIONS_QUERY = defineQuery(`
     _rev,
     brand,
     subject,
+    segment{ id, name },
     scheduledAt,
     status,
     brevoCampaignId,
@@ -128,7 +120,7 @@ export const NEWSLETTER_EMAIL_QUERY = defineQuery(`
     "brand": *[_type == "brand" && _id == $brandId && key.current == $brand][0]{
       title,
       logo,
-      newsletter{ brevoListId, senderEmail, senderName }
+      "senderId": newsletter.sender.id
     },
     "posts": *[_type == "post" && _id in $postIds && $brand in brands]{
       _id,
