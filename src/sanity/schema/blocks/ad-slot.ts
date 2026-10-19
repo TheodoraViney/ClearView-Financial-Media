@@ -6,12 +6,14 @@ import { adminLabelField } from '../fields'
 const AD_SLOT_SIZES = [
   { title: 'Leaderboard', value: 'leaderboard' },
   { title: 'Billboard', value: 'billboard' },
+  { title: 'MPU (300×250)', value: 'mpu' },
 ]
 
 const AD_SLOT_SPACINGS = [
   { title: 'Around', value: 'around' },
   { title: 'Below', value: 'below' },
   { title: 'Below, section size', value: 'belowSection' },
+  { title: 'Sidebar', value: 'aside' },
   { title: 'None', value: 'none' },
 ]
 

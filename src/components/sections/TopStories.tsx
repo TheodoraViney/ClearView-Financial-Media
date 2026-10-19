@@ -30,8 +30,13 @@ export function TopStories({ linkLabel, slides, articles }: TopStoriesProps) {
     return null
   }
 
+  // A Sponsored content block right after continues this section: see the before-sponsored variant in globals.css.
   return (
-    <section aria-label="Top stories" className="flex flex-col gap-7 px-gutter pb-section md:gap-10">
+    <section
+      aria-label="Top stories"
+      data-block="top-stories"
+      className="flex flex-col gap-7 px-gutter pb-section before-sponsored:pb-0 md:gap-10"
+    >
       <TopStoriesHero slides={slides} linkLabel={linkLabel} />
 
       {articles.length > 0 && (

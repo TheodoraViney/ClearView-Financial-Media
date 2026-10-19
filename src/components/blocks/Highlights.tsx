@@ -14,7 +14,8 @@ import { toImage } from '@/sanity/image'
 
 import type { BlockProps } from './types'
 
-const ITEM_COUNT = 3
+// Items per source: picks plus fill, as HIGHLIGHTS_ITEM_MAX in the schema and the fill tiers in fragments.ts.
+const ITEM_COUNT = { awards: 5, events: 5, research: 2 } as const
 
 type Block = BlockProps<'highlights'>['block']
 type HighlightRecord = NonNullable<NonNullable<Block['items']>[number]>
@@ -136,7 +137,7 @@ export function Highlights({ block, brand, today }: BlockProps<'highlights'> & {
 
   const type = SOURCE_TYPES[source]
   // Picks pointing at unpublished or deleted records dereference to null.
-  const picks = (block.items ?? []).filter((record): record is HighlightRecord => record?._type === type).slice(0, ITEM_COUNT)
+  const picks = (block.items ?? []).filter((record): record is HighlightRecord => record?._type === type).slice(0, ITEM_COUNT[source])
   // Fill tiers arrive in order (for example open nominations, then ceremonies ahead, then past editions); they order, the meta rule is per record.
   // The queries already exclude the picks and keep tiers disjoint; the dedupe guards the merge anyway.
   const seen = new Set(picks.map((record) => record._id))
@@ -149,7 +150,7 @@ export function Highlights({ block, brand, today }: BlockProps<'highlights'> & {
 
     return true
   })
-  const entries: HighlightRecord[] = [...picks, ...fill].slice(0, ITEM_COUNT)
+  const entries: HighlightRecord[] = [...picks, ...fill].slice(0, ITEM_COUNT[source])
 
   const buttonHref = resolveHref(block.button, brand)
   const buttonLabel = block.button?.label

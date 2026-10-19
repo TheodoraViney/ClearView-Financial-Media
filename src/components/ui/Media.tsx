@@ -30,10 +30,19 @@ const THUMBS = {
   report: 'h-10 w-7',
 }
 
-// Hover zoom on the parent `group`: `true` on every breakpoint, `'lg'` from desktop only.
+// Hover zoom on the parent `group`: `true` on every breakpoint, `'lg'` from desktop only, `'slow'` on every
+// breakpoint over 400ms (sponsored content image).
 const ZOOM = {
   all: 'transition-transform duration-200 ease-smooth group-hover:scale-102',
   lg: 'transition-transform duration-200 ease-smooth lg:group-hover:scale-102',
+  slow: 'transition-transform duration-400 ease-smooth group-hover:scale-102',
+}
+
+// `cover` fills the box (hotspot as object-position) over the `light` placeholder. `contain` shows the whole image
+// left-aligned with no placeholder behind it, for logos on a surface.
+const FITS = {
+  cover: { box: 'bg-light', image: 'object-cover' },
+  contain: { box: '', image: 'object-contain object-left' },
 }
 
 const isSvg = (src: string) => src.split('?', 1)[0]?.toLowerCase().endsWith('.svg') ?? false
@@ -51,6 +60,7 @@ export function Media({
   thumb,
   natural = false,
   zoom = false,
+  fit = 'cover',
   priority = false,
   className,
   children,
@@ -60,7 +70,8 @@ export function Media({
   ratio?: keyof typeof RATIOS
   thumb?: keyof typeof THUMBS
   natural?: boolean
-  zoom?: boolean | 'lg'
+  zoom?: boolean | 'lg' | 'slow'
+  fit?: keyof typeof FITS
   priority?: boolean
   className?: string
   children?: ReactNode
@@ -72,14 +83,15 @@ export function Media({
     // `priority` is deprecated in Next 16; the docs recommend eager loading with a high fetch priority for the LCP image.
     loading: priority ? ('eager' as const) : undefined,
     fetchPriority: priority ? ('high' as const) : undefined,
-    style: image?.position ? { objectPosition: image.position } : undefined,
+    style: image?.position && fit === 'cover' ? { objectPosition: image.position } : undefined,
   }
-  const zoomClass = zoom && ZOOM[zoom === 'lg' ? 'lg' : 'all']
+  const zoomClass = zoom && ZOOM[zoom === true ? 'all' : zoom]
 
   return (
     <div
       className={cx(
-        'relative shrink-0 overflow-hidden rounded-sm bg-light',
+        'relative shrink-0 overflow-hidden rounded-sm',
+        FITS[fit].box,
         ratio && RATIOS[ratio],
         thumb && THUMBS[thumb],
         className,
@@ -89,7 +101,7 @@ export function Media({
         (natural ? (
           <Image {...shared} alt={image.alt} width={image.width} height={image.height} className={cx('h-auto w-full', zoomClass)} />
         ) : (
-          <Image {...shared} alt={image.alt} fill className={cx('object-cover', zoomClass)} />
+          <Image {...shared} alt={image.alt} fill className={cx(FITS[fit].image, zoomClass)} />
         ))}
       {children && <div className="absolute inset-0">{children}</div>}
     </div>

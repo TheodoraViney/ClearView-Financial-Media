@@ -72,7 +72,7 @@ export function NewsletterForm({
       noValidate
       onSubmit={handleSubmit}
       onChange={handleChange}
-      className="flex flex-col gap-6 lg:gap-16 xl:justify-between xl:pr-10"
+      className="flex flex-col gap-6 lg:col-span-5 lg:justify-between lg:gap-16 lg:pr-10"
     >
       <div className="flex flex-col gap-6">
         {heading && (

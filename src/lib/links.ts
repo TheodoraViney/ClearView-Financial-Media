@@ -144,6 +144,7 @@ const SHARED_RECORD_PREFIXES = {
   awardsProgramme: '/events',
   conferenceEvent: '/events',
   resource: '/resource',
+  company: '/companies',
 } as const
 
 type SharedRecordType = keyof typeof SHARED_RECORD_PREFIXES
@@ -153,7 +154,8 @@ const isSharedRecordType = (type: string): type is SharedRecordType =>
 
 /**
  * Href of a shared group record: awards editions and conference events at
- * `/events/{slug}`, resources at `/resource/{slug}`. The slugs were migrated
+ * `/events/{slug}`, resources at `/resource/{slug}`, companies (a sponsored
+ * post's "Company Profile") at `/companies/{slug}`. The slugs were migrated
  * from WordPress unchanged. These records are served on ClearView Publishing,
  * so the path is relative on the ClearView host and absolute to the ClearView
  * origin on every other brand host.

@@ -69,6 +69,29 @@ const FEATURED_STORIES = /* groq */ `
   "posts": posts[]->{ ${POST_CARD} }
 `
 
+// One hand-picked post. Dereferenced through a filter rather than `->` so the brand rule applies (every editorial
+// brand on ClearView) and a post whose sponsor was removed after picking resolves to null, which renders nothing.
+// The company slug builds the "Company Profile" link (/companies/{slug}); the logo is optional.
+const SPONSORED_CONTENT = /* groq */ `
+  label,
+  link{ ${LINK} },
+  profileLabel,
+  "post": *[
+    _type == "post"
+    && _id == ^.post._ref
+    && defined(slug.current)
+    && defined(sponsor)
+    && ($brand == "clearview" || $brand in brands)
+  ][0]{
+    ${POST_CARD},
+    "sponsor": sponsor->{
+      title,
+      "slug": slug.current,
+      "logo": logo{ ${IMAGE} }
+    }
+  }
+`
+
 // Editorial figures, not counted from data. The icon is a fixed-list key the adapter validates.
 const STATS_BAR = /* groq */ `
   heading[]{ _key, style, children[]{ _key, text } },
@@ -110,6 +133,7 @@ const AD_SLOT = /* groq */ `
 const MAIN_COLUMN_BLOCKS = /* groq */ `
   _type == "adSlot" => { ${AD_SLOT} },
   _type == "topStories" => { ${TOP_STORIES} },
+  _type == "sponsoredContent" => { ${SPONSORED_CONTENT} },
   _type == "publications" => { ${PUBLICATIONS} },
   _type == "cta" => { ${CTA} }
 `
@@ -128,9 +152,10 @@ const HIGHLIGHT_ITEM = /* groq */ `
   publishedAt
 `
 
-// Picks first; `fill` holds the records for the empty places, in tiers, so a block shows three items whenever records exist.
-// Each tier is its own sub-query (`[0...3]`, picks excluded; `^` is the highlights block), concatenated in tier order
-// with an array spread `...` (not an object spread); the tier conditions are disjoint, and the adapter dedupes against the picks and keeps the first three.
+// Picks first; `fill` holds the records for the empty places, in tiers, so a block shows its full count whenever records exist.
+// Counts per source as HIGHLIGHTS_ITEM_MAX in the schema: awards and events 5 (`[0...5]` per tier), research 2 (`[0...2]`).
+// Each tier is its own sub-query (picks excluded; `^` is the highlights block), concatenated in tier order
+// with an array spread `...` (not an object spread); the tier conditions are disjoint, and the adapter dedupes against the picks and keeps the first ones up to the count.
 // The tiers only order the fill; the adapter picks the meta line from the record's own dates. Shared records have no brand field.
 // `$today` is the UK calendar date passed in by the page, so the cached result changes once a day instead of `now()` defeating the cache.
 // The fill runs on ClearView only: the brand sites show editor picks only and never run the fill queries.
@@ -149,38 +174,38 @@ const HIGHLIGHTS = /* groq */ `
         _type == "awardsProgramme"
         && nominationsClosingDate >= $today
         && !(_id in coalesce(^.items[]._ref, []))
-      ] | order(nominationsClosingDate asc)[0...3]{ ${HIGHLIGHT_ITEM} },
+      ] | order(nominationsClosingDate asc)[0...5]{ ${HIGHLIGHT_ITEM} },
       ...*[
         _type == "awardsProgramme"
         && !(defined(nominationsClosingDate) && nominationsClosingDate >= $today)
         && startDate >= $today
         && !(_id in coalesce(^.items[]._ref, []))
-      ] | order(startDate asc)[0...3]{ ${HIGHLIGHT_ITEM} },
+      ] | order(startDate asc)[0...5]{ ${HIGHLIGHT_ITEM} },
       ...*[
         _type == "awardsProgramme"
         && !(defined(nominationsClosingDate) && nominationsClosingDate >= $today)
         && startDate < $today
         && !(_id in coalesce(^.items[]._ref, []))
-      ] | order(startDate desc)[0...3]{ ${HIGHLIGHT_ITEM} }
+      ] | order(startDate desc)[0...5]{ ${HIGHLIGHT_ITEM} }
     ],
     $brand == "clearview" && source == "events" => [
       ...*[
         _type == "conferenceEvent"
         && coalesce(endDate, startDate) >= $today
         && !(_id in coalesce(^.items[]._ref, []))
-      ] | order(startDate asc)[0...3]{ ${HIGHLIGHT_ITEM} },
+      ] | order(startDate asc)[0...5]{ ${HIGHLIGHT_ITEM} },
       ...*[
         _type == "conferenceEvent"
         && coalesce(endDate, startDate) < $today
         && !(_id in coalesce(^.items[]._ref, []))
-      ] | order(startDate desc)[0...3]{ ${HIGHLIGHT_ITEM} }
+      ] | order(startDate desc)[0...5]{ ${HIGHLIGHT_ITEM} }
     ],
     $brand == "clearview" && source == "research" => *[
       _type == "resource"
       && category == "research"
       && !(_id in coalesce(^.items[]._ref, []))
       && _id != coalesce(^.promo.resource._ref, "")
-    ] | order(defined(publishedAt) desc, publishedAt desc, legacyWpId desc)[0...3]{ ${HIGHLIGHT_ITEM} }
+    ] | order(defined(publishedAt) desc, publishedAt desc, legacyWpId desc)[0...2]{ ${HIGHLIGHT_ITEM} }
   ),
   button{ ${LINK} },
   promo{
@@ -213,6 +238,7 @@ export const BLOCKS_PROJECTION = /* groq */ `
   _type == "featuredStories" => { ${FEATURED_STORIES} },
   _type == "statsBar" => { ${STATS_BAR} },
   _type == "newsletterSignup" => { ${NEWSLETTER_SIGNUP} },
+  _type == "sponsoredContent" => { ${SPONSORED_CONTENT} },
   _type == "splitLayout" => {
     "main": main[]{ _key, _type, ${MAIN_COLUMN_BLOCKS} },
     "aside": aside[]{ _key, _type, ${ASIDE_BLOCKS} }
