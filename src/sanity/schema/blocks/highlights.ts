@@ -25,7 +25,7 @@ export type HighlightsSource = (typeof HIGHLIGHTS_SOURCES)[number]['value']
 /** How many items a block shows, per source: picks plus fill. The fill tiers in src/sanity/fragments.ts use the same counts. */
 export const HIGHLIGHTS_ITEM_MAX: Record<HighlightsSource, number> = {
   awards: 5,
-  events: 5,
+  events: 4,
   research: 2,
 }
 
