@@ -2,6 +2,8 @@ import { defineField, defineType, type ValidationContext } from 'sanity'
 
 import { brandDocumentId, EDITORIAL_BRAND_KEYS } from '@/brands'
 
+import { brevoSenderField } from '../fields'
+
 // Only the three publications send a newsletter; ClearView's brand document has no Newsletter tab.
 // Matched on the fixed document id (the draft id carries a `drafts.` prefix).
 const EDITORIAL_BRAND_IDS: string[] = EDITORIAL_BRAND_KEYS.map(brandDocumentId)
@@ -82,36 +84,11 @@ export const brand = defineType({
       group: 'newsletter',
       hidden: ({ document }) => !hasNewsletter(document?._id),
       fields: [
-        defineField({
-          name: 'brevoListId',
-          title: 'Brevo list id',
-          type: 'number',
+        brevoSenderField('sender', {
+          title: 'Sender',
           description:
-            "Brevo list id — the list subscribers of this publication's daily newsletter are added to. Brevo → Contacts → Lists.",
-          validation: (Rule) =>
-            Rule.integer().positive().custom(requiredForNewsletter('Required for signup and to send the newsletter')),
-        }),
-        defineField({
-          name: 'confirmationTemplateId',
-          title: 'Confirmation template id',
-          type: 'number',
-          description:
-            "Brevo template id of the 'Confirm your subscription' email. The template must contain {{ doubleoptin }} and carry the optin tag.",
-          validation: (Rule) => Rule.integer().positive().custom(requiredForNewsletter('Required for newsletter signup')),
-        }),
-        defineField({
-          name: 'senderEmail',
-          title: 'Sender email',
-          type: 'string',
-          description:
-            'Address the newsletter is sent from, for example editor@wealthbriefing.com. Must be an existing, verified sender in Brevo → Senders.',
-          validation: (Rule) => Rule.email().custom(requiredForNewsletter('Required to send the newsletter')),
-        }),
-        defineField({
-          name: 'senderName',
-          title: 'Sender name',
-          type: 'string',
-          description: "Name shown in the inbox. Leave empty to use the Brevo sender's name.",
+            'Who the newsletter comes from: the name and address readers see. Only active senders in Brevo → Senders appear.',
+          requiredWhen: ({ document }) => hasNewsletter(document?._id),
         }),
         defineField({
           name: 'articlesPerIssue',

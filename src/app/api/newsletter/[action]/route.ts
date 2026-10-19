@@ -62,7 +62,7 @@ export async function POST(request: NextRequest, context: { params: Promise<{ ac
   }
 }
 
-/** Logs a failure like forms' failed(): status, code and message only, never the token or an address. */
+/** Logs a failure: status, code and message only, never the token or an address. */
 function failed(action: string, issueId: string, error: unknown) {
   const context = `[newsletter] ${action} ${issueId}`
 

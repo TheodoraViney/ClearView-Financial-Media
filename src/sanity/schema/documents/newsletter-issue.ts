@@ -10,6 +10,8 @@ import {
 import { isEditorialBrandKey } from '@/brands'
 import { isLockedStatus } from '@/lib/newsletter-status'
 
+import { brevoSegmentField } from '../fields'
+
 const STATUS_OPTIONS = [
   { title: 'Draft', value: 'draft' },
   { title: 'Scheduled', value: 'scheduled' },
@@ -88,6 +90,13 @@ export const newsletterIssue = defineType({
         }),
       ],
       validation: (Rule) => Rule.required().min(1).unique(),
+    }),
+    brevoSegmentField('segment', {
+      title: 'Segment',
+      description: `The Brevo segment that gets this issue, for example the publication's newsletter readers. To try an issue first, pick a small test segment. ${LOCKED_NOTE}`,
+      group: 'sending',
+      readOnly: lockedByStatus,
+      required: true,
     }),
     defineField({
       name: 'scheduledAt',

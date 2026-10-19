@@ -168,6 +168,7 @@ type IssueFields = {
   brand?: string
   subject?: string
   posts?: unknown[]
+  segment?: { id?: number; name?: string }
   scheduledAt?: string
   status?: string
   sendRequestedAt?: string
@@ -186,6 +187,19 @@ function issueState({ draft, published }: DocumentActionProps) {
 
 const brandTitle = (brand: string | undefined) =>
   brand && isEditorialBrandKey(brand) ? BRANDS[brand].title : 'this publication'
+
+const hasSegment = (issue: IssueFields | null) => typeof issue?.segment?.id === 'number'
+
+/** "the segment "WB readers"" for the confirm dialogs; the blockers make sure a segment is chosen first. */
+const segmentTitle = (issue: IssueFields | null) => {
+  const segment = issue?.segment
+
+  if (typeof segment?.id !== 'number') {
+    return 'the chosen segment'
+  }
+
+  return segment.name ? `the segment "${segment.name}"` : `segment #${segment.id}`
+}
 
 const ukDateTime = (value: string) =>
   new Date(value).toLocaleString('en-GB', {
@@ -221,6 +235,10 @@ function publishedIssueBlocker(props: DocumentActionProps): string | null {
 
   if (!published.posts?.length) {
     return 'Add at least one post and publish first.'
+  }
+
+  if (!hasSegment(published)) {
+    return 'Choose a segment and publish first.'
   }
 
   return null
@@ -339,19 +357,22 @@ RefreshNewsletterArticlesAction.displayName = 'RefreshNewsletterArticlesAction'
 
 export const SendTestNewsletterAction: DocumentActionComponent = (props) => {
   const { allowed, runningAction, run } = useNewsletterAction(props.id)
-  const { locked, draft, published } = issueState(props)
+  const { current, locked, draft, published } = issueState(props)
 
   if (!allowed) {
     return null
   }
 
+  // A test is built from the draft when there is one, so the segment is read from the same version.
   const reason = runningAction
     ? BUSY_TITLE
     : locked
       ? 'This issue is already scheduled or sent. Cancel a scheduled issue to test it again.'
       : !draft && !published
         ? 'Edit any field first.'
-        : null
+        : !hasSegment(current)
+          ? 'Choose a segment first.'
+          : null
 
   return {
     label: runningAction === 'test' ? 'Sending test…' : 'Send test',
@@ -368,7 +389,7 @@ SendTestNewsletterAction.displayName = 'SendTestNewsletterAction'
 export const SendNowNewsletterAction: DocumentActionComponent = (props) => {
   const { allowed, runningAction, run } = useNewsletterAction(props.id)
   const [confirming, setConfirming] = useState(false)
-  const { current } = issueState(props)
+  const { current, published } = issueState(props)
 
   if (!allowed) {
     return null
@@ -387,7 +408,7 @@ export const SendNowNewsletterAction: DocumentActionComponent = (props) => {
       ? {
           type: 'confirm',
           tone: 'primary',
-          message: `Send this ${brandTitle(current.brand)} issue to the newsletter list now? This cannot be undone.`,
+          message: `Send this ${brandTitle(current.brand)} issue to ${segmentTitle(published)} now? This cannot be undone.`,
           confirmButtonText: 'Send now',
           onCancel: () => setConfirming(false),
           onConfirm: () => {
@@ -425,7 +446,7 @@ export const ScheduleNewsletterAction: DocumentActionComponent = (props) => {
         ? {
             type: 'confirm',
             tone: 'primary',
-            message: `Schedule this ${brandTitle(current.brand)} issue for ${ukDateTime(scheduledAt)} (UK time)?`,
+            message: `Schedule this ${brandTitle(current.brand)} issue to ${segmentTitle(published)} for ${ukDateTime(scheduledAt)} (UK time)?`,
             confirmButtonText: 'Schedule',
             onCancel: () => setConfirming(false),
             onConfirm: () => {

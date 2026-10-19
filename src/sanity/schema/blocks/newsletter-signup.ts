@@ -1,13 +1,27 @@
 import { EnvelopeIcon } from '@sanity/icons/Envelope'
 import { defineArrayMember, defineField, defineType } from 'sanity'
 
-import { adminLabelField, headingField, headingText, imageField } from '../fields'
+import {
+  adminLabelField,
+  brevoAttributeField,
+  brevoListField,
+  brevoTemplateField,
+  headingField,
+  headingText,
+  imageField,
+} from '../fields'
 
 export const NEWSLETTER_OPTION_MAX = 8
 
 /**
  * Newsletter signup ("Stay informed"): heading, description, editor-created options, an email field and an image.
- * UI only for now: the form validates in the browser and sends nothing. All visible copy, messages included, is here.
+ * All visible copy, messages included, is here.
+ *
+ * Brevo: each option names the yes/no contact attribute a tick sets (e.g. WB_NEWSLETTER, which the newsletter
+ * segments are built on). The block names the one list every reader joins, since double opt-in needs a list, and the
+ * confirmation email Brevo sends first. The form is still UI only: it validates in the browser and sends nothing yet.
+ * None of the Brevo fields is projected to the page, so the browser never sees them: the server will read them from
+ * the block when the form is wired.
  */
 export const newsletterSignup = defineType({
   name: 'newsletterSignup',
@@ -53,6 +67,12 @@ export const newsletterSignup = defineType({
               type: 'string',
               validation: (Rule) => Rule.required(),
             }),
+            brevoAttributeField('attribute', {
+              title: 'Brevo attribute',
+              description:
+                'Readers who tick this option are saved in Brevo with this attribute set to Yes, once they confirm their email.',
+              required: true,
+            }),
             // Optional by design: unset reads as unticked.
             defineField({
               name: 'defaultChecked',
@@ -63,9 +83,12 @@ export const newsletterSignup = defineType({
             }),
           ],
           preview: {
-            select: { label: 'label', defaultChecked: 'defaultChecked' },
-            prepare({ label, defaultChecked }) {
-              return { title: label || 'Empty option', subtitle: defaultChecked ? 'Ticked by default' : undefined }
+            select: { label: 'label', defaultChecked: 'defaultChecked', attribute: 'attribute.name' },
+            prepare({ label, defaultChecked, attribute }) {
+              return {
+                title: label || 'Empty option',
+                subtitle: [attribute || 'No attribute', defaultChecked ? 'Ticked by default' : undefined].filter(Boolean).join(' · '),
+              }
             },
           },
         }),
@@ -91,7 +114,41 @@ export const newsletterSignup = defineType({
 
           return true
         }),
+        // Allowed, but most likely a copy-paste slip: two boxes would set the same attribute.
+        Rule.custom((options: { label?: string; attribute?: { name?: string } }[] | undefined) => {
+          const seen = new Map<string, string>()
+
+          for (const option of options ?? []) {
+            const name = option.attribute?.name
+
+            if (!name) {
+              continue
+            }
+
+            const other = seen.get(name)
+
+            if (other !== undefined) {
+              return `"${other}" and "${option.label?.trim() ?? ''}" both set the Brevo attribute ${name}`
+            }
+
+            seen.set(name, option.label?.trim() ?? '')
+          }
+
+          return true
+        }).warning(),
       ],
+    }),
+    brevoListField('list', {
+      title: 'Brevo list',
+      description:
+        'Every reader who signs up through this form is added to this list. Brevo needs one for the confirmation email.',
+      required: true,
+    }),
+    brevoTemplateField('confirmationTemplate', {
+      title: 'Confirmation email',
+      description:
+        'The Brevo email that asks readers to confirm their address before they are signed up. Only templates tagged optin in Brevo appear.',
+      required: true,
     }),
     defineField({
       name: 'emailPlaceholder',
