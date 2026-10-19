@@ -71,20 +71,16 @@ const VARIANTS = {
 
 /**
  * Hover motion follows the design per breakpoint: the responsive file below lg, the desktop file from lg (motion="responsive").
- * A sidebar block (Awards, Summits & events or Research): heading with icon, up to three items, a "View all" button and a promo row.
- * Beside the main column from xl the three blocks share its height; below xl they stack, and from lg to xl the list runs in columns.
+ * A sidebar block (Awards, Summits & events or Research): heading with icon, its items, a "View all" button and an optional promo row.
+ * Beside the main column from xl the blocks keep their content height, the button right under the list, and any spare
+ * height stays at the bottom of the sidebar; below xl they stack, and from lg to xl the list runs in columns.
  */
 export function Highlights({ variant, heading, items, button, promo }: HighlightsProps) {
   const styles = VARIANTS[variant]
 
   return (
-    <section className={cx('flex flex-col xl:flex-1', styles.root)}>
-      <div
-        className={cx(
-          'flex flex-col px-gutter py-10 lg:py-14 xl:flex-1 xl:p-8',
-          styles.body,
-        )}
-      >
+    <section className={cx('flex flex-col', styles.root)}>
+      <div className={cx('flex flex-col px-gutter py-10 lg:py-14 xl:p-8', styles.body)}>
         {/* Tablet and mobile let a wrapped heading grow the row; the desktop file (from lg) fixes it at 32px. */}
         {heading && (
           <div className={cx('flex min-h-8 items-center gap-4 lg:h-8', styles.heading)}>
@@ -96,11 +92,11 @@ export function Highlights({ variant, heading, items, button, promo }: Highlight
         )}
 
         {(items.length > 0 || button) && (
-          <div className={cx('flex flex-col xl:flex-1', styles.stack)}>
+          <div className={cx('flex flex-col', styles.stack)}>
             {items.length > 0 && (
               <ul
                 className={cx(
-                  'flex flex-col gap-5 lg:grid lg:grid-cols-cards lg:gap-8 xl:flex xl:flex-1 xl:gap-5',
+                  'flex flex-col gap-5 lg:grid lg:grid-cols-cards lg:gap-8 xl:flex xl:gap-5',
                   styles.list,
                 )}
               >

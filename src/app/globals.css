@@ -194,6 +194,8 @@ main :where(*) {
   --color-light: #ededed;
   --color-dark-blue-grey: #385363;
   --color-light-blue-grey: #63788c;
+  /* Sponsored content card surface */
+  --color-surface-subtle: #fafafa;
 
   --container-page: 90rem;
 
@@ -268,6 +270,11 @@ main :where(*) {
   grid-template-columns: repeat(auto-fit, minmax(23.75rem, 1fr));
 }
 
+/* Sponsored content card from lg: 200px image, the body, 200px partner column */
+@utility grid-cols-sponsored {
+  grid-template-columns: 12.5rem minmax(0, 1fr) 12.5rem;
+}
+
 /* ClearView footer link columns on desktop: auto-fit, 170px minimum track as in the clearview-footer master */
 @utility grid-cols-footer {
   grid-template-columns: repeat(auto-fit, minmax(10.625rem, 1fr));
@@ -333,6 +340,14 @@ main :where(*) {
 
 /* The current page's nav link (aria-current="page") */
 @custom-variant current (&[aria-current='page']);
+
+/*
+ * Top stories directly followed by a Sponsored content block read as one section, as in the design: the Top stories
+ * section drops its bottom padding and the sponsored block opens with the section's inner gap instead of a section's
+ * padding. Matched on the sections' data-block attributes, so either block alone keeps its own spacing.
+ */
+@custom-variant before-sponsored (&:has(+ [data-block='sponsored-content']));
+@custom-variant after-top-stories ([data-block='top-stories'] + &);
 
 body {
   background: var(--background);

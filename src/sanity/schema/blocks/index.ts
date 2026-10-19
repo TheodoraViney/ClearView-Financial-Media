@@ -7,10 +7,11 @@ import { highlights } from './highlights'
 import { newsletterSignup } from './newsletter-signup'
 import { publications } from './publications'
 import { splitLayout } from './split-layout'
+import { sponsoredContent } from './sponsored-content'
 import { statsBar } from './stats-bar'
 import { topStories } from './top-stories'
 
-export const blockTypes = [cta, adSlot, splitLayout, topStories, publications, highlights, featuredStories, statsBar, newsletterSignup]
+export const blockTypes = [cta, adSlot, splitLayout, topStories, publications, highlights, featuredStories, statsBar, newsletterSignup, sponsoredContent]
 
 export const blocksField = defineField({
   name: 'blocks',

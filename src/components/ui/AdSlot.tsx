@@ -4,9 +4,15 @@ import { cx } from './cx'
 const SIZES = {
   leaderboard: 'min-h-16 md:min-h-22.5',
   billboard: 'min-h-16 md:min-h-18 lg:min-h-22.5',
+  // 300 × 250 box, centred, narrower on a viewport that cannot fit it.
+  mpu: 'mx-auto aspect-6/5 w-75 max-w-full',
 }
 
 export type AdSlotSize = keyof typeof SIZES
+
+export function isAdSlotSize(value: unknown): value is AdSlotSize {
+  return typeof value === 'string' && Object.hasOwn(SIZES, value)
+}
 
 export function AdSlot({
   size = 'leaderboard',

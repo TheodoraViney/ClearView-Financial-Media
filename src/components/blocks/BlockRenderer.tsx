@@ -7,6 +7,7 @@ import { Highlights } from './Highlights'
 import { NewsletterSignup } from './NewsletterSignup'
 import { Publications } from './Publications'
 import { SplitLayout } from './SplitLayout'
+import { SponsoredContent } from './SponsoredContent'
 import { StatsBar } from './StatsBar'
 import { TopStories } from './TopStories'
 import type { PageBlock } from './types'
@@ -47,6 +48,8 @@ function Block({ block, brand, today, now }: { block: PageBlock; brand: BrandKey
       return <Cta block={block} brand={brand} />
     case 'topStories':
       return <TopStories block={block} brand={brand} />
+    case 'sponsoredContent':
+      return <SponsoredContent block={block} brand={brand} />
     case 'publications':
       return <Publications block={block} brand={brand} />
     case 'highlights':

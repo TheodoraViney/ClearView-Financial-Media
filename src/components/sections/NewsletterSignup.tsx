@@ -23,14 +23,15 @@ export type NewsletterSignupProps = {
 }
 
 // Image sizes, cropped at the sides of a 16:9 image everywhere. Full width at 4:3 on mobile: × 4/3 → 134vw;
-// at 3:2 from md: × (16/9) / (3/2) ≈ 1.19 → 120vw. From xl two tracks (≤ 864 wide) as high as the form column,
-// 520-545 with today's copy: 545 × 16/9 ≈ 969 → 960px (within 1.05, and 2x stays on the 1920 step, not 2048).
-const IMAGE_SIZES = '(min-width: 80rem) 960px, (min-width: 48rem) 120vw, 134vw'
+// at 3:2 from md: × (16/9) / (3/2) ≈ 1.19 → 120vw. From lg 7 of 12 columns (≤ 752 wide) as high as the form
+// column, so the height decides: from xl the form is ≤ 545 high with today's copy, 545 × 16/9 ≈ 969 → 960px;
+// at 1024–1279 the narrower form wraps to about 521: 521 × 16/9 ≈ 926 → 960px.
+const IMAGE_SIZES = '(min-width: 64rem) 960px, (min-width: 48rem) 120vw, 134vw'
 
 /**
  * Home "Stay informed": a form column (heading, options, text, email field) and an image.
- * Stacked below xl, form first. From xl a 3-track grid: the form takes one track and the image spans two,
- * filling the row height with a 458px minimum (the design's auto-fit would leave an empty cell at 1024–1279).
+ * Stacked below lg, form first. From lg a 12-column grid: the form spans 5 columns and the image 7,
+ * stretched to the form's height with no minimum of its own.
  * UI only, nothing is sent: the client form validates and shows the errors, see NewsletterSignup.client.
  */
 export function NewsletterSignup({ image, ...form }: NewsletterSignupProps) {
@@ -40,14 +41,14 @@ export function NewsletterSignup({ image, ...form }: NewsletterSignupProps) {
 
   return (
     <section className="py-section lg:pt-section-lg">
-      <Container className="grid gap-7 md:gap-10 xl:grid-cols-3 xl:gap-8">
+      <Container className="grid gap-7 md:gap-10 lg:grid-cols-12 lg:gap-8">
         <NewsletterForm {...form} />
 
         {image && (
           <Media
             image={image}
             sizes={IMAGE_SIZES}
-            className="aspect-4/3 md:aspect-3/2 xl:col-span-2 xl:aspect-auto xl:min-h-114.5"
+            className="aspect-4/3 md:aspect-3/2 lg:col-span-7 lg:aspect-auto"
           />
         )}
       </Container>

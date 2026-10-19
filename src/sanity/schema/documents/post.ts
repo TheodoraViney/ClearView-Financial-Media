@@ -52,6 +52,15 @@ export const post = defineType({
     }),
     imageField('image', { required: true }),
     defineField({
+      name: 'sponsor',
+      title: 'Sponsor',
+      type: 'reference',
+      to: [{ type: 'company' }],
+      description:
+        'Set only for sponsored content: the company that paid for this post. A post with a sponsor can appear in the "Sponsored content" block, which shows the company name, logo and a link to its profile.',
+      options: { disableNew: true },
+    }),
+    defineField({
       name: 'content',
       title: 'Content',
       type: 'array',
