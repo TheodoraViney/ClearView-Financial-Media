@@ -153,7 +153,7 @@ const HIGHLIGHT_ITEM = /* groq */ `
 `
 
 // Picks first; `fill` holds the records for the empty places, in tiers, so a block shows its full count whenever records exist.
-// Counts per source as HIGHLIGHTS_ITEM_MAX in the schema: awards and events 5 (`[0...5]` per tier), research 2 (`[0...2]`).
+// Counts per source as HIGHLIGHTS_ITEM_MAX in the schema: awards 5 (`[0...5]` per tier), events 4 (`[0...4]`), research 2 (`[0...2]`).
 // Each tier is its own sub-query (picks excluded; `^` is the highlights block), concatenated in tier order
 // with an array spread `...` (not an object spread); the tier conditions are disjoint, and the adapter dedupes against the picks and keeps the first ones up to the count.
 // The tiers only order the fill; the adapter picks the meta line from the record's own dates. Shared records have no brand field.
@@ -193,12 +193,12 @@ const HIGHLIGHTS = /* groq */ `
         _type == "conferenceEvent"
         && coalesce(endDate, startDate) >= $today
         && !(_id in coalesce(^.items[]._ref, []))
-      ] | order(startDate asc)[0...5]{ ${HIGHLIGHT_ITEM} },
+      ] | order(startDate asc)[0...4]{ ${HIGHLIGHT_ITEM} },
       ...*[
         _type == "conferenceEvent"
         && coalesce(endDate, startDate) < $today
         && !(_id in coalesce(^.items[]._ref, []))
-      ] | order(startDate desc)[0...5]{ ${HIGHLIGHT_ITEM} }
+      ] | order(startDate desc)[0...4]{ ${HIGHLIGHT_ITEM} }
     ],
     $brand == "clearview" && source == "research" => *[
       _type == "resource"

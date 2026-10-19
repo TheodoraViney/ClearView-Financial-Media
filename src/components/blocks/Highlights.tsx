@@ -15,7 +15,7 @@ import { toImage } from '@/sanity/image'
 import type { BlockProps } from './types'
 
 // Items per source: picks plus fill, as HIGHLIGHTS_ITEM_MAX in the schema and the fill tiers in fragments.ts.
-const ITEM_COUNT = { awards: 5, events: 5, research: 2 } as const
+const ITEM_COUNT = { awards: 5, events: 4, research: 2 } as const
 
 type Block = BlockProps<'highlights'>['block']
 type HighlightRecord = NonNullable<NonNullable<Block['items']>[number]>
