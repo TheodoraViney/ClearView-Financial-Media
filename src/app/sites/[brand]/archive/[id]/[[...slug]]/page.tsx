@@ -1,14 +1,13 @@
 import type { Metadata } from 'next'
 import { notFound, permanentRedirect } from 'next/navigation'
 
-import { BRANDS, brandOrigin, isBrandKey, type BrandKey } from '@/brands'
+import { BRANDS, brandOrigin, isBrandKey, isEditorialBrandKey, type EditorialBrandKey } from '@/brands'
 import { Container } from '@/components/ui/Container'
 import { Meta } from '@/components/ui/Meta'
 import {
   archiveArticlePath,
   getArchiveRecord,
   parseArchiveId,
-  rewriteArchiveLinks,
   type ArchiveEvent,
   type ArchiveRecord,
 } from '@/lib/archive'
@@ -25,21 +24,23 @@ export function generateStaticParams() {
 }
 
 /**
- * The record behind the URL, or a 404: an id that is not a legacy id, an id
- * the archive does not hold, or a brand that does not publish the article
- * (the ClearView host therefore always 404s).
+ * The record behind the URL, or a 404: a host that is not an editorial brand
+ * (ClearView carries no archive), an id that is not a legacy id, or an id the
+ * archive does not hold. Every editorial host renders every article, as the
+ * legacy sites did: each of them served all articles, whatever their
+ * publication. The canonical tag names the article's own publication.
  */
-async function loadArticle(params: Params): Promise<{ brand: BrandKey; record: ArchiveRecord; slug?: string[] }> {
+async function loadArticle(params: Params): Promise<{ brand: EditorialBrandKey; record: ArchiveRecord; slug?: string[] }> {
   const { brand, id: rawId, slug } = await params
 
-  if (!isBrandKey(brand)) {
+  if (!isEditorialBrandKey(brand)) {
     notFound()
   }
 
   const id = parseArchiveId(rawId)
   const record = id === null ? null : await getArchiveRecord(id)
 
-  if (!record || !record.publications.includes(brand)) {
+  if (!record) {
     notFound()
   }
 
@@ -87,17 +88,18 @@ export async function generateMetadata({ params }: { params: Params }): Promise<
   const description = describe(record)
   const image = imageSrc(record.media.image)
   const home = record.publications.find(isBrandKey) ?? brand
+  const canonical = `${brandOrigin(home)}${path}`
 
   return {
     title: record.title,
     description,
-    // An article in several publications renders on each of their domains; the first one is canonical.
-    alternates: { canonical: `${brandOrigin(home)}${path}` },
+    // Every editorial domain renders the article; its first publication is canonical.
+    alternates: { canonical },
     openGraph: {
       type: 'article',
       title: record.title,
       description,
-      url: `${brandOrigin(brand)}${path}`,
+      url: canonical,
       siteName: BRANDS[brand].title,
       images: image ? [{ url: image.startsWith('/') ? `${brandOrigin(brand)}${image}` : image }] : undefined,
     },
@@ -113,12 +115,13 @@ export default async function ArchiveArticlePage({ params }: { params: Params })
   }
 
   const date = formatDateRange(record.date, null)
-  const type = record.types[brand]
+  // The type under this host's brand, else under the article's first publication.
+  const type = record.types[brand] ?? record.publications.map((key) => record.types[key]).find(Boolean)
   const author = record.author?.name
   const image = imageSrc(record.media.image)
   const videoId = record.media.videoId && /^\d+$/.test(record.media.videoId) ? record.media.videoId : null
   const attachment = record.media.attachment?.path?.startsWith('/archive-media/') ? record.media.attachment : null
-  const body = record.bodyHtml ? rewriteArchiveLinks(record.bodyHtml, brand) : ''
+  const body = record.bodyHtml ?? ''
 
   return (
     <main className="py-10 md:py-16">
@@ -168,7 +171,7 @@ export default async function ArchiveArticlePage({ params }: { params: Params })
             </p>
           )}
 
-          {record.event && <EventDetails event={record.event} start={record.date} brand={brand} />}
+          {record.event && <EventDetails event={record.event} start={record.date} />}
         </article>
       </Container>
     </main>
@@ -181,12 +184,12 @@ const EVENT_SECTIONS = [
   ['sponsors', 'Sponsors'],
 ] as const
 
-function EventDetails({ event, start, brand }: { event: ArchiveEvent; start: string | null; brand: BrandKey }) {
+function EventDetails({ event, start }: { event: ArchiveEvent; start: string | null }) {
   const dates = formatDateRange(start, event.endDate?.slice(0, 10) ?? null)
   const sections = EVENT_SECTIONS.flatMap(([key, label]) => {
     const html = event[key]
 
-    return html ? [{ key, label, html: rewriteArchiveLinks(html, brand) }] : []
+    return html ? [{ key, label, html }] : []
   })
 
   if (!event.venue && !dates && !event.time && sections.length === 0) {

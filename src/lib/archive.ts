@@ -1,8 +1,5 @@
 import { cacheLife, cacheTag } from 'next/cache'
 
-import { brandScopedHref } from '@/lib/links'
-import type { BrandKey } from '@/brands'
-
 /**
  * Legacy archive articles, read from the archive Worker in front of R2.
  *
@@ -112,24 +109,4 @@ export async function getArchiveRecord(id: number): Promise<ArchiveRecord | null
 /** Canonical path of an archived article. The id identifies it; the slug is cosmetic. */
 export function archiveArticlePath(record: Pick<ArchiveRecord, 'id' | 'slug'>): string {
   return `/archive/${record.id}/${encodeURIComponent(record.slug)}`
-}
-
-/**
- * Internal archive links exactly as the export writes them: the href, then the
- * target's brand keys. Only this form is rewritten; it is our own output.
- */
-const ARCHIVE_LINK = /<a href="(\/archive\/[1-9]\d{0,8}\/[a-z0-9-]*)" data-pub="([a-z]+(?: [a-z]+)*)">/g
-
-/**
- * Points each internal archive link at a brand that serves its target: relative
- * when the current brand publishes it, else absolute on the target's first
- * brand, the same rule as `resolveHref` for posts. `data-pub` is removed. A link
- * whose brands are all unknown keeps its relative href.
- */
-export function rewriteArchiveLinks(html: string, currentBrand: BrandKey): string {
-  return html.replace(ARCHIVE_LINK, (_match, path: string, brands: string) => {
-    const href = brandScopedHref(path, brands.split(' '), currentBrand) ?? path
-
-    return `<a href="${href}">`
-  })
 }

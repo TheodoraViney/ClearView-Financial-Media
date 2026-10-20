@@ -28,7 +28,7 @@ pnpm --filter @wb/archive-worker seed:local -- --records <records dir> --media <
 pnpm --filter @wb/archive-worker dev     # http://localhost:8787
 ```
 
-`seed:local` defaults to `~/wb-archive-data/records-v7` and `~/wb-archive-data/media`.
+`seed:local` defaults to `~/wb-archive-data/records-v8` and `~/wb-archive-data/media`.
 It writes into the local R2 emulation under `.wrangler/state/v3`, the same store `wrangler dev` reads:
 
 - every `<records>/{id}.json` (files starting with `_` are skipped) as `records/{id}.json`;

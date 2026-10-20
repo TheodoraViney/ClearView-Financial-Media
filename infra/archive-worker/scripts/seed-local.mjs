@@ -52,7 +52,7 @@ const argv = process.argv.slice(2)
 const { values } = parseArgs({
   args: argv[0] === '--' ? argv.slice(1) : argv,
   options: {
-    records: { type: 'string', default: path.join(homedir(), 'wb-archive-data/records-v7') },
+    records: { type: 'string', default: path.join(homedir(), 'wb-archive-data/records-v8') },
     media: { type: 'string', default: path.join(homedir(), 'wb-archive-data/media') },
     // Batches in flight. Each batch holds up to BATCH_OBJECTS objects.
     concurrency: { type: 'string', default: '8' },

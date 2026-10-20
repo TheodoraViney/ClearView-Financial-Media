@@ -1,6 +1,8 @@
 {
   "$schema": "./node_modules/wrangler/config-schema.json",
   "name": "wb-archive",
+  // The client's Cloudflare account, so a deploy cannot land in another account the user belongs to.
+  "account_id": "028546ad92264dae71d7c04c1bb6de58",
   "main": "src/index.ts",
   "compatibility_date": "2026-10-01",
   // Reached on workers.dev until the client zones move to Cloudflare. No routes yet.
