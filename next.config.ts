@@ -3,6 +3,10 @@ import { sanity } from 'next-sanity/live/cache-life'
 
 const nextConfig: NextConfig = {
   cacheComponents: true,
+  // The legacy redirect handler reads its map shards from disk, so they must ship with its function.
+  outputFileTracingIncludes: {
+    '/sites/\\[brand\\]/legacy-article': ['./data/legacy-redirects/*.json'],
+  },
   cacheLife: {
     default: sanity,
   },
