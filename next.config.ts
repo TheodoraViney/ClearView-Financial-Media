@@ -6,6 +6,7 @@ const nextConfig: NextConfig = {
   // The legacy redirect handler reads its map shards from disk, so they must ship with its function.
   outputFileTracingIncludes: {
     '/sites/\\[brand\\]/legacy-article': ['./data/legacy-redirects/*.json'],
+    '/sites/\\[brand\\]/archive/sitemap/\\[file\\]': ['./data/archive-sitemap/**/*.json'],
   },
   cacheLife: {
     default: sanity,

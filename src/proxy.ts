@@ -41,9 +41,10 @@ export default function proxy(request: NextRequest) {
 
 export const config = {
   // archive-media is rewritten to the archive Worker in next.config and must keep its path.
-  // Dotted paths are skipped, so the legacy article paths are listed on their own.
+  // Dotted paths are skipped, so the legacy article paths and the archive sitemap are listed on their own.
   matcher: [
     '/((?!api|studio|archive-media/|_next/static|_next/image|favicon.ico|.*\\..*).*)',
+    '/archive/sitemap/:file',
     '/article.php',
     '/article.php/:path*',
     '/html/article.php',
