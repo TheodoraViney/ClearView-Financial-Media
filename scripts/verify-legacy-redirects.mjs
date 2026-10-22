@@ -20,8 +20,14 @@
  *   --status <code>    expected redirect status, default 302
  *   --sample <n>       check n random rows instead of all of them
  *   --redirects-only   skip step 2
+ *   --preview          ignore `X-Robots-Tag`, which Vercel sets to noindex on every
+ *                      preview deployment; the page's own meta robots is still checked
  *   --concurrency <n>  requests in flight, default 8
  *   --out <csv>        failures, default ~/wb-archive-data/redirects/verify-failures.csv
+ *
+ * A Vercel preview serves every domain on one host, so each request also sends
+ * the `brand` cookie for its row's domain; known hosts ignore it. A protected
+ * preview needs `VERCEL_AUTOMATION_BYPASS_SECRET` in the environment.
  *
  * Exits 1 when any row fails.
  */
@@ -43,6 +49,7 @@ const { values } = parseArgs({
     status: { type: 'string', default: '302' },
     sample: { type: 'string' },
     'redirects-only': { type: 'boolean', default: false },
+    preview: { type: 'boolean', default: false },
     concurrency: { type: 'string', default: '8' },
     out: { type: 'string', default: path.join(homedir(), 'wb-archive-data/redirects/verify-failures.csv') },
   },
@@ -84,8 +91,12 @@ function siteOrigins(mode) {
 const origins = siteOrigins(values.site)
 
 // A canonical may name the www host or the apex, and locally the dev port; compared by hostname without www.
+// On a preview it names the brand's staging host, `{key}.vercel.app` in src/brands.ts.
 const bareHostname = (url) => new URL(url).hostname.replace(/^www\./, '')
-const editorialHostnames = new Set([...origins.values()].map(bareHostname))
+const editorialHostnames = new Set([
+  ...[...origins.values()].map(bareHostname),
+  ...LEGACY_DOMAINS.map((domain) => domain.replace(/\.com$/, '.vercel.app')),
+])
 
 function csvCells(line) {
   const result = []
@@ -121,10 +132,23 @@ function csvCells(line) {
 
 const csvCell = (value) => (/[",\n]/.test(value) ? `"${value.replaceAll('"', '""')}"` : value)
 
-async function request(url) {
+const bypassSecret = process.env.VERCEL_AUTOMATION_BYPASS_SECRET
+
+function requestHeaders(domain) {
+  // Brand keys are the domains without `.com`, see src/brands.ts.
+  const headers = { cookie: `brand=${domain.replace(/\.com$/, '')}` }
+
+  if (bypassSecret) {
+    headers['x-vercel-protection-bypass'] = bypassSecret
+  }
+
+  return headers
+}
+
+async function request(url, domain) {
   for (let attempt = 1; ; attempt++) {
     try {
-      const response = await fetch(url, { redirect: 'manual' })
+      const response = await fetch(url, { redirect: 'manual', headers: requestHeaders(domain) })
       const body = response.status === 200 ? await response.text() : (await response.arrayBuffer(), '')
 
       return { status: response.status, headers: response.headers, body }
@@ -171,16 +195,16 @@ if (values.sample) {
 /** Step 2, once per distinct target URL. Resolves to null when the page passes, else the reason. */
 const targetChecks = new Map()
 
-function checkTarget(url) {
+function checkTarget(url, domain) {
   if (!targetChecks.has(url)) {
-    targetChecks.set(url, checkTargetOnce(url))
+    targetChecks.set(url, checkTargetOnce(url, domain))
   }
 
   return targetChecks.get(url)
 }
 
-async function checkTargetOnce(url) {
-  const response = await request(url)
+async function checkTargetOnce(url, domain) {
+  const response = await request(url, domain)
 
   if (response.error) {
     return `target: ${response.error}`
@@ -190,7 +214,7 @@ async function checkTargetOnce(url) {
     return `target: status ${response.status}${response.headers.get('location') ? ` -> ${response.headers.get('location')}` : ''}`
   }
 
-  const robotsHeader = response.headers.get('x-robots-tag') ?? ''
+  const robotsHeader = values.preview ? '' : (response.headers.get('x-robots-tag') ?? '')
   const robotsMeta = response.body.match(/<meta[^>]+name="robots"[^>]*>/i)?.[0] ?? ''
 
   if (/noindex/i.test(robotsHeader) || /noindex/i.test(robotsMeta)) {
@@ -221,7 +245,7 @@ async function checkRow(row) {
   const target = new URL(row.target)
   const origin = origins.get(row.domain)
   const expectedLocation = `${origin}${target.pathname}${target.search}`
-  const response = await request(`${origin}${legacy.pathname}${legacy.search}`)
+  const response = await request(`${origin}${legacy.pathname}${legacy.search}`, row.domain)
 
   if (response.error) {
     return `legacy: ${response.error}`
@@ -237,7 +261,7 @@ async function checkRow(row) {
     return `legacy: location ${location}`
   }
 
-  return values['redirects-only'] ? null : checkTarget(expectedLocation)
+  return values['redirects-only'] ? null : checkTarget(expectedLocation, row.domain)
 }
 
 const started = Date.now()
