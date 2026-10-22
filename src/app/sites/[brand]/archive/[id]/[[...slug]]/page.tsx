@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 import { notFound, permanentRedirect } from 'next/navigation'
+import { connection } from 'next/server'
 
 import { BRANDS, brandOrigin, isBrandKey, isEditorialBrandKey, type EditorialBrandKey } from '@/brands'
 import { Container } from '@/components/ui/Container'
@@ -17,11 +18,9 @@ import { formatDateRange } from '@/lib/dates'
 
 type Params = Promise<{ brand: string; id: string; slug?: string[] }>
 
-// Cache Components needs at least one sample with every param, the optional slug included. Id 0 is never valid,
-// so the sample renders the 404 and real articles render on first request.
-export function generateStaticParams() {
-  return [{ id: '0', slug: ['article'] }]
-}
+// Rendered per request, so no article page is prerendered or stored. With a stored page per visited URL, a crawl of
+// 100k articles on three hosts, or requests for made-up ids, would write an unbounded number of cache entries.
+export const instant = false
 
 /**
  * The record behind the URL, or a 404: a host that is not an editorial brand
@@ -31,6 +30,8 @@ export function generateStaticParams() {
  * publication. The canonical tag names the article's own publication.
  */
 async function loadArticle(params: Params): Promise<{ brand: EditorialBrandKey; record: ArchiveRecord; slug?: string[] }> {
+  await connection()
+
   const { brand, id: rawId, slug } = await params
 
   if (!isEditorialBrandKey(brand)) {

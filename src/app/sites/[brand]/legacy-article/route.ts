@@ -27,7 +27,9 @@ function loadShard(name: string): Promise<Record<string, string>> {
   let shard = shards.get(name)
 
   if (!shard) {
-    shard = readFile(path.join(process.cwd(), LEGACY_REDIRECTS_DIR, name), 'utf8').then(
+    // The shards ship through outputFileTracingIncludes. The ignore comment stops the bundler from tracing the
+    // whole project for this dynamic path.
+    shard = readFile(path.join(/* turbopackIgnore: true */ process.cwd(), LEGACY_REDIRECTS_DIR, name), 'utf8').then(
       (text) => JSON.parse(text) as Record<string, string>,
     )
     // A failed read is retried on the next request rather than cached.

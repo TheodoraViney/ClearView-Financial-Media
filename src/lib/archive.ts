@@ -1,4 +1,4 @@
-import { cacheLife, cacheTag } from 'next/cache'
+import { cache } from 'react'
 
 /**
  * Legacy archive articles, read from the archive Worker in front of R2.
@@ -74,26 +74,23 @@ function archiveOrigin(): string {
 }
 
 /**
- * The record for a legacy id, or null when the archive has none.
+ * The record for a legacy id, or null when the archive has none. Any other
+ * failure throws.
  *
- * Records never change once exported (a new export writes new objects), so a
- * hit is cached with the longest profile and tagged per id for a manual purge.
- * A miss is cached for an hour only, so an id added by a later export shows up
- * without a deploy. Any other failure throws and is not cached.
+ * Fetched once per request: `cache()` shares it between the metadata and the
+ * page. It is deliberately not `'use cache'`. The default in-memory handler
+ * keeps each entry's render context alive, about 0.9 MB per article against
+ * the few KB it counts, so a crawl through 100k articles exhausts the
+ * instance's memory long before the LRU evicts anything.
  */
-export async function getArchiveRecord(id: number): Promise<ArchiveRecord | null> {
-  'use cache'
-  cacheTag('archive', `archive:${id}`)
-
+export const getArchiveRecord = cache(async (id: number): Promise<ArchiveRecord | null> => {
   if (!ARCHIVE_ID.test(String(id))) {
-    cacheLife('max')
     return null
   }
 
   const response = await fetch(`${archiveOrigin()}/records/${id}`)
 
   if (response.status === 404) {
-    cacheLife('hours')
     return null
   }
 
@@ -101,10 +98,8 @@ export async function getArchiveRecord(id: number): Promise<ArchiveRecord | null
     throw new Error(`Archive record ${id}: HTTP ${response.status}`)
   }
 
-  cacheLife('max')
-
   return (await response.json()) as ArchiveRecord
-}
+})
 
 /** Canonical path of an archived article. The id identifies it; the slug is cosmetic. */
 export function archiveArticlePath(record: Pick<ArchiveRecord, 'id' | 'slug'>): string {
