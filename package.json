@@ -13,7 +13,8 @@
     "typecheck": "tsc --noEmit",
     "seed:brands": "bun scripts/seed-brands.ts",
     "redirects:build": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/build-legacy-redirects.mjs",
-    "redirects:verify": "node scripts/verify-legacy-redirects.mjs"
+    "redirects:verify": "node scripts/verify-legacy-redirects.mjs",
+    "archive:slugs": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/build-archive-slugs.mjs"
   },
   "dependencies": {
     "@sanity/client": "8.6.1",
