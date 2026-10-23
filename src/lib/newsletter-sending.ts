@@ -242,7 +242,7 @@ async function writeIssueFields(issueId: string, fields: IssueFields, unset: Arr
 }
 
 /** Everything a campaign needs from one issue version, checked. Throws a 400 naming what is missing. */
-async function buildCampaign(issueId: string, version: IssueVersion) {
+async function buildCampaign(issueId: string, version: IssueVersion, action: 'test' | 'send' | 'schedule') {
   const brand = version.brand
 
   if (!brand || !isEditorialBrandKey(brand)) {
@@ -302,11 +302,38 @@ async function buildCampaign(issueId: string, version: IssueVersion) {
     subject,
     // By id: Brevo then uses the sender's current name and verified address, never a stale copy from Sanity.
     sender: { id: senderId },
-    htmlContent: renderNewsletterEmail({ brand, brandTitle, logo: settings?.logo ?? null, subject, posts: ordered }),
+    htmlContent: renderNewsletterEmail({
+      brand,
+      brandTitle,
+      domain: settings?.domain ?? null,
+      brandColor: settings?.brandColor ?? null,
+      logo: settings?.logo ?? null,
+      copy: settings?.copy ?? null,
+      subject,
+      date: issueDate(action, version.scheduledAt),
+      posts: ordered,
+      topBanner: version.topBanner ?? null,
+      bottomBanner: version.bottomBanner ?? null,
+    }),
     recipients: { segmentIds: [segment.id] },
   }
 
   return { fields, segment }
+}
+
+/**
+ * The date under the logo. Schedule: the scheduled day. Send now: today. Test: the scheduled day while it is still
+ * ahead, else today, so a test of a stale or past date shows the day it would go out.
+ */
+function issueDate(action: 'test' | 'send' | 'schedule', scheduledAt: string | null): Date {
+  const scheduled = scheduledAt ? new Date(scheduledAt) : null
+  const valid = scheduled && !Number.isNaN(scheduled.getTime()) ? scheduled : null
+
+  if (action === 'schedule' && valid) {
+    return valid
+  }
+
+  return action === 'test' && valid && valid.getTime() > Date.now() ? valid : new Date()
 }
 
 /**
@@ -431,7 +458,7 @@ async function sendTest(
     throw new NewsletterActionError(400, 'Your Sanity account has no email address to send the test to.')
   }
 
-  const { fields } = await buildCampaign(issueId, version)
+  const { fields } = await buildCampaign(issueId, version, 'test')
   const campaignId = await ensureCampaign(
     'test',
     issueId,
@@ -516,7 +543,7 @@ async function sendOrSchedule(
   }
 
   // Content and segment first, with no scheduledAt; the schedule is set only after the recipients check below.
-  const { fields, segment } = await buildCampaign(issueId, published)
+  const { fields, segment } = await buildCampaign(issueId, published, action)
   const campaignId = await ensureCampaign(action, issueId, published, published.brevoCampaignId, fields)
 
   await verifyRecipients(campaignId, segment)
