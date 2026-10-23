@@ -1,6 +1,7 @@
 import { defineField, defineType, type ValidationContext } from 'sanity'
 
 import { brandDocumentId, EDITORIAL_BRAND_KEYS } from '@/brands'
+import { NEWSLETTER_COPY_DEFAULTS, NEWSLETTER_TITLE_PLACEHOLDER } from '@/lib/newsletter-copy'
 
 import { brevoSenderField } from '../fields'
 
@@ -12,6 +13,15 @@ const hasNewsletter = (id: string | undefined) => EDITORIAL_BRAND_IDS.includes((
 // Required on the three publications only: a plain Rule.required() would also block ClearView, where the tab is hidden.
 const requiredForNewsletter = (message: string) => (value: unknown, context: ValidationContext) =>
   value || !hasNewsletter(context.document?._id) ? true : message
+
+const emailCopy = (name: keyof typeof NEWSLETTER_COPY_DEFAULTS, title: string, description: string) =>
+  defineField({
+    name,
+    title,
+    type: 'string',
+    description,
+    initialValue: NEWSLETTER_COPY_DEFAULTS[name],
+  })
 
 export const brand = defineType({
   name: 'brand',
@@ -106,6 +116,33 @@ export const brand = defineType({
           initialValue: 4,
           validation: (Rule) =>
             Rule.integer().min(1).max(20).custom(requiredForNewsletter('Required to start a newsletter issue')),
+        }),
+        defineField({
+          name: 'copy',
+          title: 'Email copy',
+          type: 'object',
+          description: 'Labels and footer text of every newsletter email. An empty field hides its element.',
+          options: { collapsible: true, collapsed: true },
+          fields: [
+            emailCopy('featuredLabel', 'Featured label', 'Small label above the first article. Leave empty to hide it.'),
+            emailCopy('readFullStory', 'Read full story button', 'Button under the first article. Leave empty to hide it.'),
+            emailCopy(
+              'readMore',
+              'Read more link',
+              'Link under every other article. Leave empty to hide it; the headline still links to the article.',
+            ),
+            emailCopy('advertisementLabel', 'Advertisement label', 'Shown above each banner. Leave empty to hide it.'),
+            emailCopy(
+              'footerText',
+              'Footer text',
+              `Why the reader gets this email. ${NEWSLETTER_TITLE_PLACEHOLDER} is replaced with the publication title. Leave empty to hide it.`,
+            ),
+            emailCopy(
+              'unsubscribe',
+              'Unsubscribe link',
+              `Text of the unsubscribe link in the footer. Every email carries this link; left empty, it reads "${NEWSLETTER_COPY_DEFAULTS.unsubscribe}".`,
+            ),
+          ],
         }),
       ],
     }),

@@ -10,7 +10,7 @@ import {
 import { isEditorialBrandKey } from '@/brands'
 import { isLockedStatus } from '@/lib/newsletter-status'
 
-import { brevoSegmentField } from '../fields'
+import { brevoSegmentField, imageField } from '../fields'
 
 const STATUS_OPTIONS = [
   { title: 'Draft', value: 'draft' },
@@ -35,6 +35,30 @@ const postsOfIssueBrand: ReferenceFilterResolver = ({ document }) => ({
   params: { brand: (document as { brand?: string }).brand ?? '' },
   perspective: 'published',
 })
+
+/**
+ * An optional sponsor banner of the issue. Left empty, the email leaves out the banner and its Advertisement label.
+ * Shown at the image's own aspect ratio, up to the email's content width.
+ */
+const bannerField = (name: string, title: string, where: string) =>
+  defineField({
+    name,
+    title,
+    type: 'object',
+    group: 'content',
+    description: `Optional banner ${where}; leave it empty for no banner. Shown at its own proportions, up to 552 px wide (upload at twice that for sharp screens). To remove a banner, clear both its image and its link. ${LOCKED_NOTE}`,
+    readOnly: lockedByStatus,
+    fields: [
+      imageField('image', { required: true }),
+      defineField({
+        name: 'link',
+        title: 'Link',
+        type: 'url',
+        description: 'Where the banner leads, for example https://sponsor.com/offer.',
+        validation: (Rule) => Rule.required().uri({ scheme: ['http', 'https'] }),
+      }),
+    ],
+  })
 
 /**
  * One daily email of an editorial publication, sent as a Brevo email campaign.
@@ -75,6 +99,7 @@ export const newsletterIssue = defineType({
       readOnly: lockedByStatus,
       validation: (Rule) => Rule.required(),
     }),
+    bannerField('topBanner', 'Top banner', 'under the header'),
     defineField({
       name: 'posts',
       title: 'Posts',
@@ -91,6 +116,7 @@ export const newsletterIssue = defineType({
       ],
       validation: (Rule) => Rule.required().min(1).unique(),
     }),
+    bannerField('bottomBanner', 'Bottom banner', 'under the articles'),
     brevoSegmentField('segment', {
       title: 'Segment',
       description: `The Brevo segment that gets this issue, for example the publication's newsletter readers. To try an issue first, pick a small test segment. ${LOCKED_NOTE}`,
