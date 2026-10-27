@@ -37,7 +37,6 @@ async function seed() {
       key: { _type: 'slug', current: key },
       domain: brand.domain,
       region: brand.region,
-      brandColor: brand.brandColor,
     })
 
     console.log(`brand.${key} -> ${id}`)

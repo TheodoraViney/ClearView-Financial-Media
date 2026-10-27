@@ -16,8 +16,7 @@ export function Cta({
       {href && (
         <a
           href={href}
-          className="rounded px-4 py-2 text-white"
-          style={{ backgroundColor: 'var(--brand-color)' }}
+          className="rounded bg-accent px-4 py-2 text-white"
         >
           {label ?? 'Read more'}
         </a>

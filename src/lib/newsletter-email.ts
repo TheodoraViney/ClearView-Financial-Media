@@ -56,8 +56,6 @@ export type NewsletterEmailInput = {
   brandTitle: string | null
   /** Brand settings domain, shown in the footer; falls back to the code default. */
   domain: string | null
-  /** Brand settings colour; falls back to the code default. */
-  brandColor: string | null
   logo: EmailImage
   /** Brand settings → Newsletter → Email copy. An empty value hides its element; unsubscribe falls back to the default. */
   copy: Partial<Record<keyof NewsletterCopy, string | null>> | null
@@ -204,12 +202,6 @@ export function formatIssueDate(date: Date): string {
   return `${part('weekday')} ${part('day')} ${part('month')} ${part('year')}`
 }
 
-function brandColorOf(brand: EditorialBrandKey, value: string | null): string {
-  const color = stegaClean(value)?.trim()
-
-  return color && /^#[0-9a-fA-F]{6}$/.test(color) ? color : BRANDS[brand].brandColor
-}
-
 function copyOf(copy: NewsletterEmailInput['copy']): NewsletterCopy {
   const pick = (key: keyof NewsletterCopy) => stegaClean(copy?.[key])?.trim() ?? ''
 
@@ -351,7 +343,8 @@ export function renderNewsletterEmail(input: NewsletterEmailInput): string {
   const context: Context = {
     brand,
     title: stegaClean(input.brandTitle)?.trim() || BRANDS[brand].title,
-    color: brandColorOf(brand, input.brandColor),
+    // From code, the same source as the site's accent token.
+    color: BRANDS[brand].colors.accent,
     copy: copyOf(input.copy),
     logo: input.logo,
   }
