@@ -36,11 +36,23 @@ export function isEditorialBrandKey(value: string): value is EditorialBrandKey {
   return (EDITORIAL_BRAND_KEYS as readonly string[]).includes(value)
 }
 
+/**
+ * Brand colour tokens, as in the design. The single source for the site (inlined by the brand shell) and the
+ * newsletter email; the Studio shows them read-only. Other colour tokens stay in globals.css.
+ */
+export interface BrandColors {
+  accent: string
+  accentHover: string
+  accentSubtle: string
+  focus: string
+  surfaceHover: string
+}
+
 interface BrandDefaults {
   title: string
   domain: string
   region: 'uk' | 'asia' | 'us' | 'global'
-  brandColor: string
+  colors: BrandColors
   stagingHost: string
   /** Schema type of this brand's header document. */
   headerType: HeaderType
@@ -53,7 +65,13 @@ export const BRANDS: Record<BrandKey, BrandDefaults> = {
     title: 'WealthBriefing',
     domain: 'wealthbriefing.com',
     region: 'uk',
-    brandColor: '#0B3C5D',
+    colors: {
+      accent: '#174493',
+      accentHover: '#10377D',
+      accentSubtle: '#DCE6F6',
+      focus: '#2860B5',
+      surfaceHover: '#F6F9FE',
+    },
     stagingHost: 'wealthbriefing.vercel.app',
     headerType: 'publicationHeader',
     footerType: 'publicationFooter',
@@ -62,7 +80,13 @@ export const BRANDS: Record<BrandKey, BrandDefaults> = {
     title: 'WealthBriefingAsia',
     domain: 'wealthbriefingasia.com',
     region: 'asia',
-    brandColor: '#B5121B',
+    colors: {
+      accent: '#B41412',
+      accentHover: '#8E100E',
+      accentSubtle: '#F6DCDC',
+      focus: '#C8302D',
+      surfaceHover: '#FEF6F6',
+    },
     stagingHost: 'wealthbriefingasia.vercel.app',
     headerType: 'publicationHeader',
     footerType: 'publicationFooter',
@@ -71,7 +95,13 @@ export const BRANDS: Record<BrandKey, BrandDefaults> = {
     title: 'Family Wealth Report',
     domain: 'familywealthreport.com',
     region: 'us',
-    brandColor: '#1F6F43',
+    colors: {
+      accent: '#1B6B47',
+      accentHover: '#14553A',
+      accentSubtle: '#D6E8DD',
+      focus: '#2A8A5A',
+      surfaceHover: '#F3F8F5',
+    },
     stagingHost: 'familywealthreport.vercel.app',
     headerType: 'publicationHeader',
     footerType: 'publicationFooter',
@@ -80,11 +110,28 @@ export const BRANDS: Record<BrandKey, BrandDefaults> = {
     title: 'ClearView Financial Media',
     domain: 'clearviewpublishing.com',
     region: 'global',
-    brandColor: '#222222',
+    colors: {
+      accent: '#B41412',
+      accentHover: '#9A1110',
+      accentSubtle: '#E5E7EB',
+      focus: '#1F2B32',
+      surfaceHover: '#F7F7F7',
+    },
     stagingHost: 'clear-view-financial-media.vercel.app',
     headerType: 'clearviewHeader',
     footerType: 'clearviewFooter',
   },
+}
+
+/** A brand's colours as the CSS custom properties the Tailwind colour tokens read (see globals.css). */
+export function brandColorVars(colors: BrandColors): Record<string, string> {
+  return {
+    '--accent': colors.accent,
+    '--accent-hover': colors.accentHover,
+    '--accent-subtle': colors.accentSubtle,
+    '--focus': colors.focus,
+    '--surface-hover': colors.surfaceHover,
+  }
 }
 
 /**

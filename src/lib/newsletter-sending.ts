@@ -306,7 +306,6 @@ async function buildCampaign(issueId: string, version: IssueVersion, action: 'te
       brand,
       brandTitle,
       domain: settings?.domain ?? null,
-      brandColor: settings?.brandColor ?? null,
       logo: settings?.logo ?? null,
       copy: settings?.copy ?? null,
       subject,

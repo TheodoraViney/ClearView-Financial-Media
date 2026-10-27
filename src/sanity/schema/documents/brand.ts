@@ -2,6 +2,7 @@ import { defineField, defineType, type ValidationContext } from 'sanity'
 
 import { brandDocumentId, EDITORIAL_BRAND_KEYS } from '@/brands'
 import { NEWSLETTER_COPY_DEFAULTS, NEWSLETTER_TITLE_PLACEHOLDER } from '@/lib/newsletter-copy'
+import { BrandColorsInput } from '@/sanity/components/brand-colors-input'
 
 import { brevoSenderField } from '../fields'
 
@@ -83,16 +84,15 @@ export const brand = defineType({
       group: 'brand',
       description: 'SVG. Only when the footer shows a different lockup from the header; empty uses the Logo above.',
     }),
+    // Display only: the input shows BRANDS[key].colors from src/brands.ts and never writes, so this stays empty.
     defineField({
-      name: 'brandColor',
-      title: 'Brand color',
+      name: 'brandColors',
+      title: 'Brand colours',
       type: 'string',
       group: 'brand',
-      validation: (Rule) =>
-        Rule.regex(/^#[0-9a-fA-F]{6}$/, {
-          name: 'hex color',
-          invert: false,
-        }),
+      description: 'Set in code to match the design.',
+      readOnly: true,
+      components: { input: BrandColorsInput },
     }),
     defineField({
       name: 'newsletter',

@@ -6,7 +6,6 @@ import { BLOCKS_PROJECTION, LINK, LINK_TARGET } from './fragments'
 // All three ids derive from $brand (headerDocumentId / footerDocumentId / brandDocumentId), and the
 // Brand settings match is also checked against $brand.
 // navLink stores its visible text in `label`, so its link has no label of its own (LINK_TARGET).
-// brandColor feeds the layout's --brand-color until brand colours move to tokens.
 export const SHELL_QUERY = defineQuery(`
   {
     "header": *[_id == $headerId && _type in ["clearviewHeader", "publicationHeader"]][0]{
@@ -37,7 +36,6 @@ export const SHELL_QUERY = defineQuery(`
     },
     "brand": *[_type == "brand" && _id == $brandId && key.current == $brand][0]{
       title,
-      brandColor,
       logo{ asset->{ url, metadata{ dimensions{ width, height } } } },
       footerLogo{ asset->{ url, metadata{ dimensions{ width, height } } } }
     }
@@ -124,7 +122,6 @@ export const NEWSLETTER_EMAIL_QUERY = defineQuery(`
     "brand": *[_type == "brand" && _id == $brandId && key.current == $brand][0]{
       title,
       domain,
-      brandColor,
       logo,
       "senderId": newsletter.sender.id,
       "copy": newsletter.copy{ featuredLabel, readFullStory, readMore, advertisementLabel, footerText, unsubscribe }

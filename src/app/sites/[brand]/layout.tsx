@@ -1,12 +1,12 @@
 import { draftMode } from 'next/headers'
 import { notFound } from 'next/navigation'
-import { stegaClean } from 'next-sanity'
 import { VisualEditing } from 'next-sanity/visual-editing'
 import { Suspense, type CSSProperties, type ReactNode } from 'react'
 
 import {
   BRAND_KEYS,
   BRANDS,
+  brandColorVars,
   brandDocumentId,
   footerDocumentId,
   headerDocumentId,
@@ -110,7 +110,6 @@ async function CachedBrandShell({
   return (
     <BrandShell
       brand={brand}
-      color={stegaClean(data?.brand?.brandColor) ?? BRANDS[brand].brandColor}
       header={<Header data={data} brand={brand} />}
       footer={<Footer data={data} brand={brand} />}
     >
@@ -121,15 +120,14 @@ async function CachedBrandShell({
 
 // The draft-mode Suspense fallback renders the shell without header and footer until the shell data arrives.
 // The footer follows the page's <main>, which each page renders inside children.
+// Brand colours are inlined from src/brands.ts, the one source shared with the newsletter email.
 function BrandShell({
   brand,
-  color = BRANDS[brand].brandColor,
   header,
   footer,
   children,
 }: {
   brand: BrandKey
-  color?: string
   header?: ReactNode
   footer?: ReactNode
   children: ReactNode
@@ -138,7 +136,7 @@ function BrandShell({
     <div
       data-brand={brand}
       className="flex min-h-full flex-col"
-      style={{ '--brand-color': color } as CSSProperties}
+      style={brandColorVars(BRANDS[brand].colors) as CSSProperties}
     >
       {header}
       {children}
