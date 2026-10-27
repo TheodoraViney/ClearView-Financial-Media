@@ -1,7 +1,8 @@
 import { stegaClean } from 'next-sanity'
 
-import { BRANDS, brandOrigin, EDITORIAL_BRAND_KEYS, isBrandKey } from '@/brands'
+import { brandOrigin, EDITORIAL_BRAND_KEYS, isBrandKey } from '@/brands'
 import { Publications as PublicationsSection, type PublicationCard } from '@/components/sections/Publications'
+import { brandTitle } from '@/sanity/brand-title'
 import { toHeading } from '@/sanity/heading'
 import { toImage } from '@/sanity/image'
 
@@ -21,7 +22,8 @@ function toCard(card: Card): PublicationCard | null {
     return null
   }
 
-  const title = BRANDS[key].title
+  // From the brand's Brand settings, stega kept so the card title is click-to-edit.
+  const title = brandTitle(key, card.brandTitle)
 
   return {
     key: card._key,

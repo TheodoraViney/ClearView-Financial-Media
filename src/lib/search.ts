@@ -1,6 +1,7 @@
 import 'server-only'
 
-import { BRANDS, EDITORIAL_BRAND_KEYS, isBrandKey, type BrandKey } from '@/brands'
+import { EDITORIAL_BRAND_KEYS, isBrandKey, type BrandKey } from '@/brands'
+import { brandTitleIn } from '@/sanity/brand-title'
 import { client } from '@/sanity/client'
 import { SITE_SEARCH_QUERY } from '@/sanity/queries'
 
@@ -38,7 +39,7 @@ export async function searchSite(q: string | null | undefined, brand: BrandKey):
       const href = resolveHref({ kind: 'internal', internal: { _type: 'post', ...post } }, brand)
       // The brand resolveHref links to off-brand: the first one on the post. Posts never carry the ClearView key.
       const home = post.brands?.find(isBrandKey)
-      const meta = brand === 'clearview' ? home && BRANDS[home].title : formatLongDate(post.publishedAt)
+      const meta = brand === 'clearview' ? home && brandTitleIn(post.brandTitles, home) : formatLongDate(post.publishedAt)
 
       return item(post.title, href, meta)
     }),

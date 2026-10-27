@@ -1,30 +1,32 @@
+import type { Metadata } from 'next'
 import { draftMode } from 'next/headers'
 import { notFound } from 'next/navigation'
+import { stegaClean } from 'next-sanity'
 import { VisualEditing } from 'next-sanity/visual-editing'
 import { Suspense, type CSSProperties, type ReactNode } from 'react'
 
-import {
-  BRAND_KEYS,
-  BRANDS,
-  brandColorVars,
-  brandDocumentId,
-  footerDocumentId,
-  headerDocumentId,
-  isBrandKey,
-  type BrandKey,
-} from '@/brands'
+import { BRAND_KEYS, BRANDS, brandColorVars, isBrandKey, type BrandKey } from '@/brands'
 import { Footer } from '@/components/blocks/Footer'
 import { Header } from '@/components/blocks/Header'
-import {
-  cachedSanity,
-  getDynamicFetchOptions,
-  SanityLive,
-  type DynamicFetchOptions,
-} from '@/sanity/live'
-import { SHELL_QUERY } from '@/sanity/queries'
+import { fetchBrandTitle, fetchShell } from '@/sanity/brand-title'
+import { getDynamicFetchOptions, SanityLive, type DynamicFetchOptions } from '@/sanity/live'
 
 export function generateStaticParams() {
   return BRAND_KEYS.map((brand) => ({ brand }))
+}
+
+// The brand title from Brand settings names every page of the brand: the default title, and the suffix of a page that
+// sets its own. Published content only, so it shares the layout's published shell cache entry and needs no draft mode.
+export async function generateMetadata({ params }: { params: Promise<{ brand: string }> }): Promise<Metadata> {
+  const { brand } = await params
+
+  if (!isBrandKey(brand)) {
+    return {}
+  }
+
+  const title = stegaClean(await fetchBrandTitle(brand, { perspective: 'published', stega: false }))
+
+  return { title: { default: title, template: `%s | ${title}` } }
 }
 
 export default async function BrandLayout({
@@ -94,18 +96,7 @@ async function CachedBrandShell({
   variant,
   stega,
 }: { brand: BrandKey; children: ReactNode } & DynamicFetchOptions) {
-  const { data } = await cachedSanity({
-    query: SHELL_QUERY,
-    params: {
-      brand,
-      headerId: headerDocumentId(brand),
-      footerId: footerDocumentId(brand),
-      brandId: brandDocumentId(brand),
-    },
-    perspective,
-    variant,
-    stega,
-  })
+  const { data } = await fetchShell(brand, { perspective, variant, stega })
 
   return (
     <BrandShell

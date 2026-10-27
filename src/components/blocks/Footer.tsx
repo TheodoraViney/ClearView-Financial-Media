@@ -5,6 +5,7 @@ import { GroupFooter } from '@/components/sections/footer/GroupFooter'
 import { PublicationFooter } from '@/components/sections/footer/PublicationFooter'
 import type { FooterColumn, FooterProps, FooterSocialLink } from '@/components/sections/footer/types'
 import { safeHref } from '@/lib/links'
+import { brandTitle } from '@/sanity/brand-title'
 import { cachedUkToday } from '@/sanity/live'
 
 import { isPresent, toLink, toLogo, type ShellData } from './shell'
@@ -40,7 +41,11 @@ export async function Footer({ data, brand }: { data: ShellData; brand: BrandKey
     .filter(isPresent)
 
   const props: FooterProps = {
-    logo: toLogo(data.brand?.footerLogo?.asset ? data.brand.footerLogo : data.brand?.logo, data.brand?.title),
+    logo: toLogo(
+      data.brand?.footerLogo?.asset ? data.brand.footerLogo : data.brand?.logo,
+      brandTitle(brand, data.brand?.title),
+      data.brand?.logo?.alt,
+    ),
     description: footer.description ?? '',
     columns,
     socialHeading: footer.socialHeading ?? '',

@@ -1,11 +1,12 @@
 import { stegaClean } from 'next-sanity'
 
-import { BRANDS, isBrandKey, type BrandKey } from '@/brands'
+import { isBrandKey, type BrandKey } from '@/brands'
 import {
   FeaturedStories as FeaturedStoriesSection,
   type FeaturedStory,
 } from '@/components/sections/FeaturedStories'
 import { resolveHref } from '@/lib/links'
+import { brandTitleIn } from '@/sanity/brand-title'
 import { toHeading } from '@/sanity/heading'
 import { toImage } from '@/sanity/image'
 
@@ -31,7 +32,7 @@ function toStory(post: Post, current: BrandKey): FeaturedStory | null {
     key: post._id,
     href,
     title: post.title ?? '',
-    publication: publication ? BRANDS[publication].title : null,
+    publication: publication ? brandTitleIn(post.brandTitles, publication) : null,
     publishedAt: stegaClean(post.publishedAt) ?? null,
     image: toImage(post.image),
   }

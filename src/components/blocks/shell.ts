@@ -25,9 +25,14 @@ type ShellLogo = NonNullable<ShellData['brand']>['logo']
 
 /**
  * A logo from Brand settings, used by header and footer: the header passes `logo`, the footer its own `footerLogo`
- * falling back to `logo`. Alt is the brand title.
+ * falling back to `logo`. Alt is the logo's own Alternative text, else `fallbackAlt` (the footer passes the Logo's),
+ * else the brand title.
  */
-export function toLogo(logo: ShellLogo | undefined, brandTitle: string | null | undefined): HeaderLogo | null {
+export function toLogo(
+  logo: ShellLogo | undefined,
+  brandTitle: string,
+  fallbackAlt?: string | null,
+): HeaderLogo | null {
   const asset = logo?.asset
   const src = stegaClean(asset?.url)
   const dimensions = asset?.metadata?.dimensions
@@ -41,6 +46,6 @@ export function toLogo(logo: ShellLogo | undefined, brandTitle: string | null | 
     src,
     width: dimensions.width,
     height: dimensions.height,
-    alt: stegaClean(brandTitle) ?? '',
+    alt: stegaClean(logo?.alt)?.trim() || stegaClean(fallbackAlt)?.trim() || stegaClean(brandTitle),
   }
 }

@@ -6,6 +6,7 @@ import { PublicationHeader } from '@/components/sections/header/PublicationHeade
 import type { HeaderItem } from '@/components/sections/header/types'
 import { resolveHref } from '@/lib/links'
 import { SEARCH_LABEL_DEFAULTS } from '@/lib/search-term'
+import { brandTitle } from '@/sanity/brand-title'
 
 import { isPresent, toLink, toLogo, type ShellData } from './shell'
 
@@ -35,7 +36,7 @@ export function Header({ data, brand }: { data: ShellData; brand: BrandKey }) {
 
   const labels = header.searchLabels
   const props = {
-    logo: toLogo(data.brand?.logo, data.brand?.title),
+    logo: toLogo(data.brand?.logo, brandTitle(brand, data.brand?.title)),
     homeHref: '/',
     items,
     searchPlaceholder: header.searchPlaceholder ?? '',

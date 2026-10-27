@@ -1,9 +1,10 @@
 import { stegaClean } from 'next-sanity'
 
-import { BRANDS, isBrandKey, type BrandKey } from '@/brands'
+import { isBrandKey, type BrandKey } from '@/brands'
 import { TopStories as TopStoriesSection, type TopStory } from '@/components/sections/TopStories'
 import { formatLongDate, formatShortDate } from '@/lib/dates'
 import { resolveHref } from '@/lib/links'
+import { brandTitleIn } from '@/sanity/brand-title'
 import { toImage } from '@/sanity/image'
 
 import type { BlockProps } from './types'
@@ -28,7 +29,7 @@ function toStory(post: Post, current: BrandKey): TopStory {
     id: post._id,
     title: post.title ?? '',
     href: resolveHref({ kind: 'internal', internal: { _type: 'post', slug: post.slug, brands } }, current),
-    publication: publication ? BRANDS[publication].title : null,
+    publication: publication ? brandTitleIn(post.brandTitles, publication) : null,
     date: formatLongDate(publishedAt),
     shortDate: formatShortDate(publishedAt),
     excerpt: post.excerpt ?? null,

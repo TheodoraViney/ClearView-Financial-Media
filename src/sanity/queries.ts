@@ -1,6 +1,6 @@
 import { defineQuery } from 'next-sanity'
 
-import { BLOCKS_PROJECTION, LINK, LINK_TARGET } from './fragments'
+import { BLOCKS_PROJECTION, BRAND_TITLES, LINK, LINK_TARGET } from './fragments'
 
 // The site shell: the brand's header and footer documents and its Brand settings, in one round trip.
 // All three ids derive from $brand (headerDocumentId / footerDocumentId / brandDocumentId), and the
@@ -36,8 +36,8 @@ export const SHELL_QUERY = defineQuery(`
     },
     "brand": *[_type == "brand" && _id == $brandId && key.current == $brand][0]{
       title,
-      logo{ asset->{ url, metadata{ dimensions{ width, height } } } },
-      footerLogo{ asset->{ url, metadata{ dimensions{ width, height } } } }
+      logo{ "alt": asset->altText, asset->{ url, metadata{ dimensions{ width, height } } } },
+      footerLogo{ "alt": asset->altText, asset->{ url, metadata{ dimensions{ width, height } } } }
     }
   }
 `)
@@ -183,6 +183,7 @@ export const SITE_SEARCH_QUERY = defineQuery(`
         title,
         "slug": slug.current,
         brands,
+        ${BRAND_TITLES},
         publishedAt
       },
     "events": *[_type == "conferenceEvent" && defined(slug.current) && title match $q]

@@ -2,8 +2,9 @@ import { draftMode } from 'next/headers'
 import { notFound } from 'next/navigation'
 import { Suspense } from 'react'
 
-import { BRANDS, isBrandKey, type BrandKey } from '@/brands'
+import { isBrandKey, type BrandKey } from '@/brands'
 import { BlockRenderer } from '@/components/blocks/BlockRenderer'
+import { fetchBrandTitle } from '@/sanity/brand-title'
 import {
   cachedNow,
   cachedSanity,
@@ -66,9 +67,12 @@ async function CachedHome({
   })
 
   if (!data) {
+    // Same shell query and options as the layout, so the title comes from its cache entry, stega included.
+    const title = await fetchBrandTitle(brand, { perspective, variant, stega })
+
     return (
       <main className="px-6 py-16">
-        <h1 className="text-3xl font-semibold">{BRANDS[brand].title}</h1>
+        <h1 className="text-3xl font-semibold">{title}</h1>
         <p>No home page published yet.</p>
       </main>
     )

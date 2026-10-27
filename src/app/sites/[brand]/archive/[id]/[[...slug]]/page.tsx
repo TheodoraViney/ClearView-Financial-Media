@@ -2,7 +2,9 @@ import type { Metadata } from 'next'
 import { notFound, permanentRedirect } from 'next/navigation'
 import { connection } from 'next/server'
 
-import { BRANDS, brandOrigin, isBrandKey, isEditorialBrandKey, type EditorialBrandKey } from '@/brands'
+import { stegaClean } from 'next-sanity'
+
+import { brandOrigin, isBrandKey, isEditorialBrandKey, type EditorialBrandKey } from '@/brands'
 import { Container } from '@/components/ui/Container'
 import { Meta } from '@/components/ui/Meta'
 import {
@@ -13,6 +15,7 @@ import {
   type ArchiveRecord,
 } from '@/lib/archive'
 import { formatDateRange } from '@/lib/dates'
+import { fetchBrandTitle } from '@/sanity/brand-title'
 
 // Temporary template for legacy archive articles until the archive design lands.
 
@@ -47,6 +50,10 @@ async function loadArticle(params: Params): Promise<{ brand: EditorialBrandKey; 
 
   return { brand, record, slug }
 }
+
+// The brand title comes from published Brand settings through the layout's cached shell query: the archive is not CMS
+// content, so it has no draft view.
+const PUBLISHED = { perspective: 'published', stega: false } as const
 
 const DESCRIPTION_LENGTH = 160
 
@@ -90,6 +97,7 @@ export async function generateMetadata({ params }: { params: Params }): Promise<
   const image = imageSrc(record.media.image)
   const home = record.publications.find(isBrandKey) ?? brand
   const canonical = `${brandOrigin(home)}${path}`
+  const siteName = stegaClean(await fetchBrandTitle(brand, PUBLISHED))
 
   return {
     title: record.title,
@@ -101,7 +109,7 @@ export async function generateMetadata({ params }: { params: Params }): Promise<
       title: record.title,
       description,
       url: canonical,
-      siteName: BRANDS[brand].title,
+      siteName,
       images: image ? [{ url: image.startsWith('/') ? `${brandOrigin(brand)}${image}` : image }] : undefined,
     },
   }
@@ -123,6 +131,7 @@ export default async function ArchiveArticlePage({ params }: { params: Params })
   const videoId = record.media.videoId && /^\d+$/.test(record.media.videoId) ? record.media.videoId : null
   const attachment = record.media.attachment?.path?.startsWith('/archive-media/') ? record.media.attachment : null
   const body = record.bodyHtml ?? ''
+  const brandTitle = await fetchBrandTitle(brand, PUBLISHED)
 
   return (
     <main className="py-10 md:py-16">
@@ -131,7 +140,7 @@ export default async function ArchiveArticlePage({ params }: { params: Params })
           <header className="flex flex-col gap-4">
             <Meta
               items={[
-                BRANDS[brand].title,
+                brandTitle,
                 ...(type ? [type] : []),
                 ...(date && record.date ? [<time key="date" dateTime={record.date}>{date}</time>] : []),
               ]}
