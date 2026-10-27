@@ -74,7 +74,7 @@ export const brand = defineType({
       title: 'Logo',
       type: 'image',
       group: 'brand',
-      description: 'SVG. The site uses the brand title as its accessible name.',
+      description: 'SVG. Screen readers read the image\'s alt text from Media, or the brand title when it is empty.',
       validation: (Rule) => Rule.required(),
     }),
     defineField({

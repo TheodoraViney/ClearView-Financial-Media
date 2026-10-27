@@ -27,12 +27,21 @@ export const LINK = /* groq */ `
   ${LINK_TARGET}
 `
 
+/**
+ * The Brand settings titles of a post's brands, so a card's publication label follows a rename in Sanity.
+ * `^` is the post. Matched on the key, like the shell query; read with brandTitleIn() in src/sanity/brand-title.ts.
+ */
+export const BRAND_TITLES = /* groq */ `
+  "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title }
+`
+
 /** A post as a card in a listing. */
 export const POST_CARD = /* groq */ `
   _id,
   title,
   "slug": slug.current,
   brands,
+  ${BRAND_TITLES},
   publishedAt,
   excerpt,
   "image": image{ ${IMAGE} }
@@ -117,6 +126,7 @@ const PUBLICATIONS = /* groq */ `
   cards[]{
     _key,
     brand,
+    "brandTitle": *[_type == "brand" && key.current == ^.brand][0].title,
     description,
     image{ ${IMAGE} },
     linkLabel
