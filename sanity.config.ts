@@ -2,7 +2,7 @@ import { defineConfig, type DocumentActionComponent, type InitialValueResolverCo
 import { media } from 'sanity-plugin-media'
 import { structureTool } from 'sanity/structure'
 
-import { isEditorialBrandKey } from './src/brands'
+import { BRANDS, brandDocumentId, isEditorialBrandKey } from './src/brands'
 import { isLockedStatus } from './src/lib/newsletter-status'
 import { newsletterIssueActions } from './src/sanity/actions/newsletter'
 import { apiVersion, dataset, projectId } from './src/sanity/env'
@@ -19,12 +19,37 @@ const pageByBrandTemplate: Template = {
   value: ({ brand }: { brand: string }) => ({ brand }),
 }
 
+/**
+ * A post starts on the brand whose folder it is created in, with the image credit set to that brand's name: the
+ * title from its Brand settings, else the code constant. A failed lookup falls back to the constant.
+ */
 const postByBrandTemplate: Template = {
   id: 'post-by-brand',
   title: 'Post',
   schemaType: 'post',
   parameters: [{ name: 'brand', type: 'string' }],
-  value: ({ brand }: { brand: string }) => ({ brands: [brand] }),
+  value: async (params: { brand?: string } | undefined, context: InitialValueResolverContext) => {
+    const brand = params?.brand
+
+    // Posts belong to the editorial brands only; ClearView carries no articles.
+    if (!brand || !isEditorialBrandKey(brand)) {
+      return {}
+    }
+
+    let credit = BRANDS[brand].title
+
+    try {
+      const title = await context
+        .getClient({ apiVersion })
+        .fetch<string | null>('*[_id == $id][0].title', { id: brandDocumentId(brand) })
+
+      credit = title?.trim() || credit
+    } catch {
+      // Keep the code constant.
+    }
+
+    return { brands: [brand], image: { _type: 'image', credit } }
+  },
 }
 
 /**
@@ -60,7 +85,13 @@ const newsletterIssueByBrandTemplate: Template = {
  * structure (see `src/sanity/structure.ts`). No template, so they never appear
  * in "Create new document", and no duplicate or delete action.
  */
-const SINGLETON_TYPES = new Set(['clearviewHeader', 'publicationHeader', 'clearviewFooter', 'publicationFooter'])
+const SINGLETON_TYPES = new Set([
+  'clearviewHeader',
+  'publicationHeader',
+  'clearviewFooter',
+  'publicationFooter',
+  'mostRead',
+])
 
 const SINGLETON_REMOVED_ACTIONS = new Set(['duplicate', 'delete'])
 

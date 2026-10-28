@@ -27,6 +27,9 @@ export const footerDocumentId = (key: BrandKey): string => `footer-${key}`
 /** ClearView has the group footer; the editorial brands each have a publication footer. */
 export type FooterType = 'clearviewFooter' | 'publicationFooter'
 
+/** Id of an editorial brand's "Most read" list. ClearView carries no articles, so it has none. */
+export const mostReadDocumentId = (key: EditorialBrandKey): string => `most-read-${key}`
+
 export function isBrandKey(value: string): value is BrandKey {
   return (BRAND_KEYS as readonly string[]).includes(value)
 }

@@ -1,4 +1,11 @@
-import { type ConditionalProperty, type Path, type ValidationContext, defineArrayMember, defineField } from 'sanity'
+import {
+  type ConditionalProperty,
+  type FieldDefinition,
+  type Path,
+  type ValidationContext,
+  defineArrayMember,
+  defineField,
+} from 'sanity'
 
 import { HEADING_LEVELS, type HeadingLevel, isHeadingLevel } from '@/lib/headings'
 import { LINKABLE_TYPES, isAllowedLinkTarget } from '@/lib/links'
@@ -60,11 +67,18 @@ export const legacyWpIdField = defineField({
  * Image with hotspot and the alt-text rule above.
  *
  * `required` makes the asset itself mandatory; alt text is always required
- * once an asset is attached.
+ * once an asset is attached. `fields` adds fields after the alt text, such as
+ * a credit line.
  */
 export const imageField = (
   name: string,
-  options: { title?: string; description?: string; group?: string; required?: boolean } = {},
+  options: {
+    title?: string
+    description?: string
+    group?: string
+    required?: boolean
+    fields?: FieldDefinition[]
+  } = {},
 ) =>
   defineField({
     name,
@@ -73,7 +87,7 @@ export const imageField = (
     description: options.description,
     group: options.group,
     options: { hotspot: true },
-    fields: [altField],
+    fields: [altField, ...(options.fields ?? [])],
     validation: options.required ? (Rule) => Rule.required() : undefined,
   })
 

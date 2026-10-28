@@ -1,5 +1,7 @@
 import { blockTypes } from './blocks'
 import { acclaim } from './documents/acclaim'
+import { category, region, topic } from './documents/article-taxonomy'
+import { author } from './documents/author'
 import { awardCategory } from './documents/award-category'
 import { awardsProgramme } from './documents/awards-programme'
 import { awardsProgrammeGroup } from './documents/awards-programme-group'
@@ -8,6 +10,7 @@ import { company } from './documents/company'
 import { conferenceEvent } from './documents/conference-event'
 import { clearviewFooter, publicationFooter } from './documents/footer'
 import { clearviewHeader, publicationHeader } from './documents/header'
+import { mostRead } from './documents/most-read'
 import { newsletterIssue } from './documents/newsletter-issue'
 import { page } from './documents/page'
 import { person } from './documents/person'
@@ -23,6 +26,11 @@ export const documentTypes = [
   publicationFooter,
   page,
   post,
+  category,
+  topic,
+  region,
+  author,
+  mostRead,
   newsletterIssue,
   awardsProgrammeGroup,
   awardsProgramme,

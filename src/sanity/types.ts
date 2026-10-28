@@ -542,12 +542,110 @@ export type PersonGroup = {
   >;
 };
 
+export type AdBreak = {
+  _type: "adBreak";
+  adminLabel?: string;
+};
+
+export type Infographic = {
+  _type: "infographic";
+  eyebrow?: string;
+  title?: string;
+  intro?: string;
+  hub?: string;
+  groups?: Array<{
+    label?: string;
+    items?: Array<string>;
+    _type: "infographicGroup";
+    _key: string;
+  }>;
+  caption?: string;
+  source?: string;
+};
+
+export type FactBox = {
+  _type: "factBox";
+  title?: string;
+  facts?: Array<{
+    label?: string;
+    value?: string;
+    _type: "fact";
+    _key: string;
+  }>;
+  source?: string;
+  variant?: "surface" | "outline";
+};
+
+export type PullQuote = {
+  _type: "pullQuote";
+  quote?: string;
+  cite?: string;
+};
+
 export type SanityFileAssetReference = {
   _ref: string;
   _type: "reference";
   _weak?: boolean;
   [internalGroqTypeReferenceTo]?: "sanity.fileAsset";
 };
+
+export type ArticleBody = Array<
+  | {
+      children?: Array<{
+        marks?: Array<string>;
+        text?: string;
+        _type: "span";
+        _key: string;
+      }>;
+      style?: "normal" | "h2" | "h3" | "h4" | "blockquote";
+      listItem?: "bullet" | "number";
+      markDefs?: Array<{
+        href?: string;
+        openInNewTab?: boolean;
+        _type: "link";
+        _key: string;
+      }>;
+      level?: number;
+      _type: "block";
+      _key: string;
+    }
+  | {
+      asset?: SanityImageAssetReference;
+      media?: unknown;
+      hotspot?: SanityImageHotspot;
+      crop?: SanityImageCrop;
+      alt?: string;
+      _type: "image";
+      _key: string;
+    }
+  | {
+      asset?: SanityFileAssetReference;
+      media?: unknown;
+      title?: string;
+      _type: "videoFile";
+      _key: string;
+    }
+  | {
+      provider?: "vimeo" | "issuu";
+      id?: string;
+      hash?: string;
+      caption?: string;
+      _type: "embed";
+      _key: string;
+    }
+  | ({
+      _key: string;
+    } & PullQuote)
+  | ({
+      _key: string;
+    } & FactBox)
+  | ({
+      _key: string;
+    } & Infographic)
+  | ({
+      _key: string;
+    } & AdBreak)
+>;
 
 export type RichText = Array<
   | {
@@ -700,6 +798,20 @@ export type NewsletterIssue = {
   brevoCampaignId?: number;
   sendingStartedAt?: string;
   sendRequestedAt?: string;
+};
+
+export type MostRead = {
+  _id: string;
+  _type: "mostRead";
+  _createdAt: string;
+  _updatedAt: string;
+  _rev: string;
+  title?: string;
+  posts?: Array<
+    {
+      _key: string;
+    } & PostReference
+  >;
 };
 
 export type PublicationFooter = {
@@ -1601,6 +1713,34 @@ export type ConferenceEvent = {
   legacyWpId?: number;
 };
 
+export type CategoryReference = {
+  _ref: string;
+  _type: "reference";
+  _weak?: boolean;
+  [internalGroqTypeReferenceTo]?: "category";
+};
+
+export type TopicReference = {
+  _ref: string;
+  _type: "reference";
+  _weak?: boolean;
+  [internalGroqTypeReferenceTo]?: "topic";
+};
+
+export type RegionReference = {
+  _ref: string;
+  _type: "reference";
+  _weak?: boolean;
+  [internalGroqTypeReferenceTo]?: "region";
+};
+
+export type AuthorReference = {
+  _ref: string;
+  _type: "reference";
+  _weak?: boolean;
+  [internalGroqTypeReferenceTo]?: "author";
+};
+
 export type Post = {
   _id: string;
   _type: "post";
@@ -1611,6 +1751,15 @@ export type Post = {
   title?: string;
   slug?: Slug;
   publishedAt?: string;
+  category?: CategoryReference;
+  primaryTopic?: TopicReference;
+  secondaryTopics?: Array<
+    {
+      _key: string;
+    } & TopicReference
+  >;
+  region?: RegionReference;
+  author?: AuthorReference;
   excerpt?: string;
   image?: {
     asset?: SanityImageAssetReference;
@@ -1618,37 +1767,15 @@ export type Post = {
     hotspot?: SanityImageHotspot;
     crop?: SanityImageCrop;
     alt?: string;
+    credit?: string;
     _type: "image";
   };
   sponsor?: CompanyReference;
-  content?: Array<
-    | {
-        children?: Array<{
-          marks?: Array<string>;
-          text?: string;
-          _type: "span";
-          _key: string;
-        }>;
-        style?:
-          "normal" | "h1" | "h2" | "h3" | "h4" | "h5" | "h6" | "blockquote";
-        listItem?: "bullet" | "number";
-        markDefs?: Array<{
-          href?: string;
-          _type: "link";
-          _key: string;
-        }>;
-        level?: number;
-        _type: "block";
-        _key: string;
-      }
-    | {
-        asset?: SanityImageAssetReference;
-        media?: unknown;
-        hotspot?: SanityImageHotspot;
-        crop?: SanityImageCrop;
-        _type: "image";
-        _key: string;
-      }
+  content?: ArticleBody;
+  recommended?: Array<
+    {
+      _key: string;
+    } & PostReference
   >;
 };
 
@@ -1675,6 +1802,59 @@ export type Company = {
   phoneNumber?: string;
   categories?: Array<string>;
   legacyWpId?: number;
+};
+
+export type Author = {
+  _id: string;
+  _type: "author";
+  _createdAt: string;
+  _updatedAt: string;
+  _rev: string;
+  name?: string;
+  slug?: Slug;
+  jobTitle?: string;
+  city?: string;
+  photo?: {
+    asset?: SanityImageAssetReference;
+    media?: unknown;
+    hotspot?: SanityImageHotspot;
+    crop?: SanityImageCrop;
+    alt?: string;
+    _type: "image";
+  };
+  bio?: string;
+};
+
+export type Region = {
+  _id: string;
+  _type: "region";
+  _createdAt: string;
+  _updatedAt: string;
+  _rev: string;
+  title?: string;
+  slug?: Slug;
+};
+
+export type Topic = {
+  _id: string;
+  _type: "topic";
+  _createdAt: string;
+  _updatedAt: string;
+  _rev: string;
+  title?: string;
+  slug?: Slug;
+  description?: string;
+};
+
+export type Category = {
+  _id: string;
+  _type: "category";
+  _createdAt: string;
+  _updatedAt: string;
+  _rev: string;
+  title?: string;
+  slug?: Slug;
+  description?: string;
 };
 
 export type Brand = {
@@ -1884,7 +2064,12 @@ export type AllSanitySchemaTypes =
   | CompanyGroup
   | PersonReference
   | PersonGroup
+  | AdBreak
+  | Infographic
+  | FactBox
+  | PullQuote
   | SanityFileAssetReference
+  | ArticleBody
   | RichText
   | Person
   | SanityImageCrop
@@ -1892,6 +2077,7 @@ export type AllSanitySchemaTypes =
   | Slug
   | AwardCategory
   | NewsletterIssue
+  | MostRead
   | PublicationFooter
   | ClearviewFooter
   | PublicationHeader
@@ -1904,8 +2090,16 @@ export type AllSanitySchemaTypes =
   | Acclaim
   | AwardsProgrammeGroup
   | ConferenceEvent
+  | CategoryReference
+  | TopicReference
+  | RegionReference
+  | AuthorReference
   | Post
   | Company
+  | Author
+  | Region
+  | Topic
+  | Category
   | Brand
   | MediaFolderReference
   | MediaFolder
@@ -8125,6 +8319,7 @@ export type POSTS_QUERY_RESULT = Array<{
     hotspot?: SanityImageHotspot;
     crop?: SanityImageCrop;
     alt?: string;
+    credit?: string;
     _type: "image";
   } | null;
 }>;
@@ -8143,37 +8338,10 @@ export type POST_QUERY_RESULT = {
     hotspot?: SanityImageHotspot;
     crop?: SanityImageCrop;
     alt?: string;
+    credit?: string;
     _type: "image";
   } | null;
-  content: Array<
-    | {
-        children?: Array<{
-          marks?: Array<string>;
-          text?: string;
-          _type: "span";
-          _key: string;
-        }>;
-        style?:
-          "blockquote" | "h1" | "h2" | "h3" | "h4" | "h5" | "h6" | "normal";
-        listItem?: "bullet" | "number";
-        markDefs?: Array<{
-          href?: string;
-          _type: "link";
-          _key: string;
-        }>;
-        level?: number;
-        _type: "block";
-        _key: string;
-      }
-    | {
-        asset?: SanityImageAssetReference;
-        media?: unknown;
-        hotspot?: SanityImageHotspot;
-        crop?: SanityImageCrop;
-        _type: "image";
-        _key: string;
-      }
-  > | null;
+  content: ArticleBody | null;
 } | null;
 
 // Source: src/sanity/queries.ts
@@ -8261,6 +8429,7 @@ export type NEWSLETTER_EMAIL_QUERY_RESULT = {
       hotspot?: SanityImageHotspot;
       crop?: SanityImageCrop;
       alt?: string;
+      credit?: string;
       _type: "image";
     } | null;
   }>;

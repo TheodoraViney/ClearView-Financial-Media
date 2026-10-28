@@ -8,11 +8,14 @@ import { DocumentPdfIcon } from '@sanity/icons/DocumentPdf'
 import { DocumentTextIcon } from '@sanity/icons/DocumentText'
 import { EarthGlobeIcon } from '@sanity/icons/EarthGlobe'
 import { EnvelopeIcon } from '@sanity/icons/Envelope'
+import { FolderIcon } from '@sanity/icons/Folder'
 import { InsertBelowIcon } from '@sanity/icons/InsertBelow'
 import { MenuIcon } from '@sanity/icons/Menu'
 import { StarIcon } from '@sanity/icons/Star'
 import { TagIcon } from '@sanity/icons/Tag'
+import { TrendUpwardIcon } from '@sanity/icons/TrendUpward'
 import { UserIcon } from '@sanity/icons/User'
+import { UsersIcon } from '@sanity/icons/Users'
 import type { StructureResolver } from 'sanity/structure'
 
 import {
@@ -22,6 +25,7 @@ import {
   footerDocumentId,
   headerDocumentId,
   isEditorialBrandKey,
+  mostReadDocumentId,
 } from '@/brands'
 
 export const structure: StructureResolver = (S) =>
@@ -46,19 +50,19 @@ export const structure: StructureResolver = (S) =>
                       .params({ brand: key })
                       .initialValueTemplates([S.initialValueTemplateItem('page-by-brand', { brand: key })]),
                   ),
-                S.listItem()
-                  .title('Posts')
-                  .icon(DocumentTextIcon)
-                  .child(
-                    S.documentTypeList('post')
-                      .title('Posts')
-                      .filter('_type == "post" && $brand in brands')
-                      .params({ brand: key })
-                      .initialValueTemplates([S.initialValueTemplateItem('post-by-brand', { brand: key })]),
-                  ),
-                // ClearView sends no newsletter, so its folder has no issues list.
+                // ClearView carries no articles and sends no newsletter, so its folder has neither list.
                 ...(isEditorialBrandKey(key)
                   ? [
+                      S.listItem()
+                        .title('Posts')
+                        .icon(DocumentTextIcon)
+                        .child(
+                          S.documentTypeList('post')
+                            .title('Posts')
+                            .filter('_type == "post" && $brand in brands')
+                            .params({ brand: key })
+                            .initialValueTemplates([S.initialValueTemplateItem('post-by-brand', { brand: key })]),
+                        ),
                       S.listItem()
                         .title('Newsletter issues')
                         .icon(EnvelopeIcon)
@@ -81,6 +85,15 @@ export const structure: StructureResolver = (S) =>
                   .title('Footer')
                   .icon(InsertBelowIcon)
                   .child(S.document().schemaType(BRANDS[key].footerType).documentId(footerDocumentId(key))),
+                // ClearView carries no articles, so it has no Most read list.
+                ...(isEditorialBrandKey(key)
+                  ? [
+                      S.listItem()
+                        .title('Most read')
+                        .icon(TrendUpwardIcon)
+                        .child(S.document().schemaType('mostRead').documentId(mostReadDocumentId(key))),
+                    ]
+                  : []),
                 S.listItem()
                   .title('Brand settings')
                   .icon(CogIcon)
@@ -90,6 +103,20 @@ export const structure: StructureResolver = (S) =>
       ),
       S.divider(),
       S.documentTypeListItem('post').title('All Posts').icon(DocumentTextIcon),
+      // How posts are classified and who wrote them, shared by every brand.
+      S.listItem()
+        .title('Articles')
+        .icon(FolderIcon)
+        .child(
+          S.list()
+            .title('Articles')
+            .items([
+              S.documentTypeListItem('category').title('Categories').icon(FolderIcon),
+              S.documentTypeListItem('topic').title('Topics').icon(TagIcon),
+              S.documentTypeListItem('region').title('Regions').icon(EarthGlobeIcon),
+              S.documentTypeListItem('author').title('Authors').icon(UsersIcon),
+            ]),
+        ),
       S.divider(),
       // Shared records. They belong to the group, not to one brand: filtering
       // them by the host brand would hide them from clearviewpublishing.com.
