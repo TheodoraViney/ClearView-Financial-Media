@@ -6,10 +6,14 @@ import { AdSlot } from '@/components/ui/AdSlot'
 import { ArrowLink } from '@/components/ui/ArrowLink'
 import { ArticleCard } from '@/components/ui/ArticleCard'
 import { ArticleRow } from '@/components/ui/ArticleRow'
+import { Avatar } from '@/components/ui/Avatar'
+import { Breadcrumb } from '@/components/ui/Breadcrumb'
 import { Button } from '@/components/ui/Button'
 import { Checkbox } from '@/components/ui/Checkbox'
 import { Container } from '@/components/ui/Container'
+import { DefinitionList } from '@/components/ui/DefinitionList'
 import { EmailField } from '@/components/ui/EmailField'
+import { Figure } from '@/components/ui/Figure'
 import { Heading } from '@/components/ui/Heading'
 import { Icon, iconMap, type IconName } from '@/components/ui/Icon'
 import { IconButton } from '@/components/ui/IconButton'
@@ -18,6 +22,9 @@ import { ListLink } from '@/components/ui/ListLink'
 import { Media } from '@/components/ui/Media'
 import { Meta } from '@/components/ui/Meta'
 import { PromoRow } from '@/components/ui/PromoRow'
+import { PullQuote } from '@/components/ui/PullQuote'
+
+import { ActionButtonDemo } from './ActionButtonDemo.client'
 import { SliderDots } from '@/components/ui/SliderDots'
 
 // Temporary design-system review page. Open it on each brand host to compare brand tokens.
@@ -161,6 +168,19 @@ export default async function UiPage({
             <Button variant="outline" href="#" arrow fullWidth>
               View all summits &amp; events (full width)
             </Button>
+          </Row>
+          <Row label="subtle, size compact (44, 40 from 1200; article Share and Copy link)">
+            <Button variant="subtle" size="compact">
+              <Icon name="share" />
+              Share
+            </Button>
+            <Button variant="subtle" size="compact">
+              <Icon name="link" />
+              Copy link
+            </Button>
+          </Row>
+          <Row label="ActionButton (client, onClick; same variants and sizes)">
+            <ActionButtonDemo />
           </Row>
           <Row label="outline-inverse" dark>
             <Button variant="outline-inverse" href="#" arrow>
@@ -309,6 +329,25 @@ export default async function UiPage({
           </div>
         </Group>
 
+        <Group title="ArticleCard variant stacked (article Recommended: 3:2, meta above the title, accent hover)">
+          <div className="grid grid-cols-1 gap-8 md:grid-cols-2 header:grid-cols-3">
+            <ArticleCard
+              variant="stacked"
+              href="#"
+              title="Growing Demand For Private Markets Amongst Wealthy – Barclays Private Bank"
+              sizes="(min-width: 75rem) 300px, (min-width: 48rem) 50vw, 100vw"
+              meta={['Private Markets', '1 Oct 2026']}
+            />
+            <ArticleCard
+              variant="stacked"
+              href="#"
+              title="Global IPO Proceeds Hit Record, Listing Numbers Drop – EY"
+              sizes="(min-width: 75rem) 300px, (min-width: 48rem) 50vw, 100vw"
+              meta={['Capital Markets', '30 Sep 2026']}
+            />
+          </div>
+        </Group>
+
         <Group title="ArticleRow (divided below lg, bordered card from lg)">
           <div className="flex flex-col border-t border-border lg:grid lg:grid-cols-3 lg:gap-8 lg:border-t-0">
             <ArticleRow
@@ -340,6 +379,14 @@ export default async function UiPage({
               meta={['10 June 2025', 'Hong Kong']}
             />
           </Row>
+          <Row label="accent (article Most read, row padding from the parent)">
+            <ListLink
+              href="#"
+              variant="accent"
+              title="UK Taxpayers Telling HMRC Of Departure Rise Almost 33 Per Cent"
+              meta={['Tax', '30 Sep 2026']}
+            />
+          </Row>
           <Row label="inverse" dark>
             <ListLink
               href="#"
@@ -348,6 +395,41 @@ export default async function UiPage({
               meta={['Entry deadline: 30 Apr 2025']}
             />
           </Row>
+        </Group>
+
+        <Group title="Breadcrumb">
+          <Breadcrumb items={[{ label: 'Home', href: '#' }, { label: 'News', href: '#' }, { label: 'Strategy' }]} />
+        </Group>
+
+        <Group title="Avatar (40px: photo, else initials on the brand tint; text sm 13 or lg 20)">
+          <Row label="initials">
+            <Avatar name="Tom Burroughes" />
+            <Avatar name="Tom Burroughes" text="lg" />
+          </Row>
+        </Group>
+
+        <Group title="Figure (caption 13 grey under the content)">
+          <Figure caption="Image: WealthBriefing" className="max-w-182">
+            <Media sizes="728px" className="h-55 w-full md:h-75" />
+          </Figure>
+        </Group>
+
+        <Group title="PullQuote">
+          <PullQuote
+            className="max-w-182"
+            quote="The Nordic region has a sophisticated ecosystem of wealth creation shaped by innovation and entrepreneurship."
+            cite="BNP Paribas Wealth Management"
+          />
+        </Group>
+
+        <Group title="DefinitionList (stacked on mobile, 140px label column from md)">
+          <DefinitionList
+            className="max-w-182"
+            items={[
+              { key: 'audience', label: 'Audience', value: 'Ultra-high-net-worth individuals, entrepreneurs and family offices' },
+              { key: 'market', label: 'Market', value: 'Nordic wealth management' },
+            ]}
+          />
         </Group>
 
         <Group title="PromoRow">

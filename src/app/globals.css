@@ -167,6 +167,10 @@ main :where(*) {
   --color-surface-subtle: #fafafa;
 
   --container-page: 90rem;
+  /* Article text column (728) plus the share rail on both sides (2 × 68): from here the column centres at 728 and the rail shows */
+  --container-article: 54rem;
+  /* Article infographic: below 560px the groups stack under the centre box */
+  --container-infographic: 35rem;
 
   /* ClearView footer brand column basis on desktop (410.667px in the clearview-footer master) */
   --spacing-footer-brand: 25.6667rem;
@@ -183,6 +187,12 @@ main :where(*) {
   --text-title-md--line-height: 1.2;
   --text-caption: 0.8125rem;
   --text-caption--line-height: 1.4;
+  /* Article "Recommended articles" heading: 36/43.2 on every breakpoint, mobile included */
+  --text-heading-fixed: 2.25rem;
+  --text-heading-fixed--line-height: 1.2;
+  /* Article pull quote, 26/32 on every breakpoint */
+  --text-quote: 1.625rem;
+  --text-quote--line-height: 2rem;
 
   /* Active publication nav item: 2px bar drawn inside the bottom edge, in the text colour */
   --inset-shadow-bar: inset 0 -2px 0 currentColor;
@@ -247,6 +257,26 @@ main :where(*) {
 /* ClearView footer link columns on desktop: auto-fit, 170px minimum track as in the clearview-footer master */
 @utility grid-cols-footer {
   grid-template-columns: repeat(auto-fit, minmax(10.625rem, 1fr));
+}
+
+/* Article page from the header breakpoint: the main column and the 364px right rail */
+@utility grid-cols-article {
+  grid-template-columns: minmax(0, 1fr) 22.75rem;
+}
+
+/* Label / value rows of a definition list (article fact box): 140px label column */
+@utility grid-cols-definition {
+  grid-template-columns: 8.75rem minmax(0, 1fr);
+}
+
+/* Article infographic: left group, connector, centre box (128–168px), connector, right group */
+@utility grid-cols-infographic {
+  grid-template-columns: minmax(0, 1fr) 2.5rem minmax(8rem, 10.5rem) 2.5rem minmax(0, 1fr);
+}
+
+/* Sticky article rail: 32px below the sticky header */
+@utility top-rail {
+  top: calc(var(--header-h) + 2rem);
 }
 
 /* Horizontal scroll without a visible scrollbar (publication nav on narrow desktops) */
@@ -339,6 +369,20 @@ body {
     transition-duration: 1ms !important;
     animation-duration: 1ms !important;
   }
+}
+
+/*
+ * Article body spacing (Portable Text): 20px between paragraphs, 48px before a heading (h2–h4) and around the blocks the
+ * editor inserts (pull quote, fact box, infographic, banner), as the article design. Zero specificity for the
+ * default gap so the block rule wins.
+ */
+.article-flow > :where(* + *) {
+  margin-block-start: 1.25rem;
+}
+
+.article-flow > * + :is([data-flow='block'], h2, h3, h4),
+.article-flow > [data-flow='block'] + * {
+  margin-block-start: 3rem;
 }
 
 /*

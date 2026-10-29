@@ -8,6 +8,8 @@ import { EASE, type Motion } from './motion'
 const VARIANTS = {
   default: { text: 'text-foreground', hover: 'hover:text-grey' },
   inverse: { text: 'text-white', hover: 'hover:opacity-75' },
+  // Brand-coloured hover (article Most read).
+  accent: { text: 'text-foreground', hover: 'hover:text-accent' },
 }
 
 // Title plus meta line, used in the awards, events and research lists.
@@ -33,7 +35,13 @@ export function ListLink({
   const content = (
     <>
       <span className="text-base leading-title font-medium">{title}</span>
-      {meta.length > 0 && <Meta items={meta} variant={variant} />}
+      {meta.length > 0 && (
+        <Meta
+          items={meta}
+          variant={variant === 'inverse' ? 'inverse' : 'default'}
+          className={variant === 'accent' ? 'leading-none' : undefined}
+        />
+      )}
     </>
   )
 

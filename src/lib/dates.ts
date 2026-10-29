@@ -30,6 +30,16 @@ export function formatLongDate(value: string | null | undefined): string | null 
   return date ? LONG.format(date) : null
 }
 
+const NUMERIC_DAY = new Intl.DateTimeFormat('en-GB', { day: 'numeric', timeZone: TIME_ZONE })
+const YEAR = new Intl.DateTimeFormat('en-GB', { year: 'numeric', timeZone: TIME_ZONE })
+
+/** "1 Oct 2026": article cards and the Most read list. */
+export function formatMediumDate(value: string | null | undefined): string | null {
+  const date = parse(value)
+
+  return date ? `${NUMERIC_DAY.format(date)} ${MONTH.format(date)} ${YEAR.format(date)}` : null
+}
+
 /** "07 Sep" */
 export function formatShortDate(value: string | null | undefined): string | null {
   const date = parse(value)
