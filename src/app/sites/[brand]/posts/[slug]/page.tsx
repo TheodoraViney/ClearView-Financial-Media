@@ -2,20 +2,30 @@ import { draftMode } from 'next/headers'
 import { notFound } from 'next/navigation'
 import { Suspense } from 'react'
 
-import { isBrandKey, type BrandKey } from '@/brands'
-import { PortableText } from '@/components/PortableText'
-import { Media } from '@/components/ui/Media'
-import { toImage } from '@/sanity/image'
+import {
+  articlePageDocumentId,
+  isBrandKey,
+  isEditorialBrandKey,
+  mostReadDocumentId,
+  type EditorialBrandKey,
+} from '@/brands'
+import { ArticleBody } from '@/components/sections/article/ArticleBody'
+import { ArticlePage } from '@/components/sections/article/ArticlePage'
+import { PEOPLE_MOVES_CATEGORY_ID } from '@/lib/article-taxonomy'
+import { fromPost } from '@/sanity/article-view'
 import {
   cachedSanity,
   getDynamicFetchOptions,
   type DynamicFetchOptions,
 } from '@/sanity/live'
-import { POST_QUERY, POST_SLUGS_QUERY } from '@/sanity/queries'
+import { ARTICLE_PAGE_QUERY, MOST_READ_QUERY, POST_QUERY, POST_SLUGS_QUERY } from '@/sanity/queries'
 import { PLACEHOLDER_SLUG, withPlaceholder } from '@/sanity/static-params'
 
-// Prototype layout: the column is the viewport minus `px-6`, and the images keep their own aspect (no crop).
-const COLUMN_SIZES = '100vw'
+// A slug of another brand, or of no post, ends in notFound() inside the page. Instant-navigation validation (dev
+// only) then reports the page segment as "prevented from rendering". The 404 is intended, so the route opts out of
+// that validation. Build-time prerendering of the generateStaticParams slugs is unaffected: `instant` only sets
+// validation, and the archive route's `false` has a different reason (it renders per request on purpose).
+export const instant = false
 
 export async function generateStaticParams({
   params,
@@ -47,7 +57,8 @@ export default async function PostPage({
 }) {
   const { brand, slug } = await params
 
-  if (!isBrandKey(brand) || slug === PLACEHOLDER_SLUG) {
+  // Posts belong to the editorial brands only; ClearView has none.
+  if (!isEditorialBrandKey(brand) || slug === PLACEHOLDER_SLUG) {
     notFound()
   }
 
@@ -71,7 +82,7 @@ export default async function PostPage({
   )
 }
 
-async function DynamicPost({ brand, slug }: { brand: BrandKey; slug: string }) {
+async function DynamicPost({ brand, slug }: { brand: EditorialBrandKey; slug: string }) {
   const { perspective, variant, stega } = await getDynamicFetchOptions()
 
   return (
@@ -91,31 +102,42 @@ async function CachedPost({
   perspective,
   variant,
   stega,
-}: { brand: BrandKey; slug: string } & DynamicFetchOptions) {
-  const { data } = await cachedSanity({
-    query: POST_QUERY,
-    params: { brand, slug },
-    perspective,
-    variant,
-    stega,
-  })
+}: { brand: EditorialBrandKey; slug: string } & DynamicFetchOptions) {
+  const [{ data: post }, { data: mostRead }, { data: copy }] = await Promise.all([
+    cachedSanity({
+      query: POST_QUERY,
+      params: { brand, slug, peopleMoves: PEOPLE_MOVES_CATEGORY_ID },
+      perspective,
+      variant,
+      stega,
+    }),
+    cachedSanity({
+      query: MOST_READ_QUERY,
+      params: { brand, id: mostReadDocumentId(brand) },
+      perspective,
+      variant,
+      stega,
+    }),
+    cachedSanity({
+      query: ARTICLE_PAGE_QUERY,
+      params: { id: articlePageDocumentId(brand) },
+      perspective,
+      variant,
+      stega,
+    }),
+  ])
 
-  if (!data) {
+  if (!post) {
     notFound()
   }
 
-  const image = toImage(data.image)
+  const article = fromPost({
+    post,
+    mostRead,
+    copy,
+    brand,
+    body: post.content ? <ArticleBody value={post.content} /> : null,
+  })
 
-  return (
-    <main className="flex flex-col gap-6 px-6 py-10">
-      <h1 className="text-3xl font-semibold">{data.title}</h1>
-      {data.publishedAt && (
-        <time dateTime={data.publishedAt}>
-          {new Date(data.publishedAt).toISOString().slice(0, 10)}
-        </time>
-      )}
-      {image && <Media image={{ ...image, alt: data.title ?? '' }} sizes={COLUMN_SIZES} natural priority />}
-      {data.content && <PortableText value={data.content} imageSizes={COLUMN_SIZES} />}
-    </main>
-  )
+  return <ArticlePage article={article} />
 }

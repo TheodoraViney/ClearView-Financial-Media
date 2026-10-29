@@ -35,6 +35,7 @@ export const author = defineType({
       title: 'Job title',
       type: 'string',
       description: 'Shown next to the name, for example "Group Editor".',
+      validation: (Rule) => Rule.required(),
     }),
     defineField({
       name: 'city',
@@ -52,6 +53,7 @@ export const author = defineType({
       type: 'text',
       rows: 4,
       description: 'One short paragraph shown under the article.',
+      validation: (Rule) => Rule.required(),
     }),
   ],
   preview: {

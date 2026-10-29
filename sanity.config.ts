@@ -91,6 +91,7 @@ const SINGLETON_TYPES = new Set([
   'clearviewFooter',
   'publicationFooter',
   'mostRead',
+  'articlePage',
 ])
 
 const SINGLETON_REMOVED_ACTIONS = new Set(['duplicate', 'delete'])

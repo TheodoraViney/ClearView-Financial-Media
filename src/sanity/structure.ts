@@ -21,6 +21,7 @@ import type { StructureResolver } from 'sanity/structure'
 import {
   BRAND_KEYS,
   BRANDS,
+  articlePageDocumentId,
   brandDocumentId,
   footerDocumentId,
   headerDocumentId,
@@ -85,13 +86,17 @@ export const structure: StructureResolver = (S) =>
                   .title('Footer')
                   .icon(InsertBelowIcon)
                   .child(S.document().schemaType(BRANDS[key].footerType).documentId(footerDocumentId(key))),
-                // ClearView carries no articles, so it has no Most read list.
+                // ClearView carries no articles, so it has no Most read list and no Article page labels.
                 ...(isEditorialBrandKey(key)
                   ? [
                       S.listItem()
                         .title('Most read')
                         .icon(TrendUpwardIcon)
                         .child(S.document().schemaType('mostRead').documentId(mostReadDocumentId(key))),
+                      S.listItem()
+                        .title('Article page')
+                        .icon(DocumentTextIcon)
+                        .child(S.document().schemaType('articlePage').documentId(articlePageDocumentId(key))),
                     ]
                   : []),
                 S.listItem()

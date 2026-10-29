@@ -1,6 +1,6 @@
 import { defineQuery } from 'next-sanity'
 
-import { BLOCKS_PROJECTION, BRAND_TITLES, LINK, LINK_TARGET } from './fragments'
+import { ARTICLE_CARD, BLOCKS_PROJECTION, BRAND_TITLES, IMAGE, LINK, LINK_TARGET } from './fragments'
 
 // The site shell: the brand's header and footer documents and its Brand settings, in one round trip.
 // All three ids derive from $brand (headerDocumentId / footerDocumentId / brandDocumentId), and the
@@ -75,14 +75,76 @@ export const POSTS_QUERY = defineQuery(`
   }
 `)
 
+// The article page. `$peopleMoves` is the People Moves category id: a region left on another category is not returned.
+// The body keeps its Portable Text members as stored, plus the image alt fallback and the video file URL.
+// Recommended: the editor's picks on this brand (`picks`, reordered by `recommendedIds` in the adapter), then the latest
+// posts of the same category (`fill`) for the empty places. The Studio unsets an emptied array, hence the coalesce.
 export const POST_QUERY = defineQuery(`
   *[_type == "post" && slug.current == $slug && $brand in brands][0]{
     _id,
     title,
+    "slug": slug.current,
+    brands,
     publishedAt,
     excerpt,
-    image,
-    content
+    "image": image{ ${IMAGE}, credit },
+    "category": category->{ title, "slug": slug.current },
+    "primaryTopic": primaryTopic->{ title, "slug": slug.current },
+    "secondaryTopics": secondaryTopics[]->{ title, "slug": slug.current },
+    "region": select(category._ref == $peopleMoves => region->{ title, "slug": slug.current }),
+    "author": author->{ name, jobTitle, city, bio, "photo": photo{ ${IMAGE} } },
+    content[]{
+      ...,
+      _type == "image" => { "alt": coalesce(alt, asset->altText) },
+      _type == "videoFile" => { "url": asset->url, "mimeType": asset->mimeType }
+    },
+    "recommendedIds": coalesce(recommended[]._ref, []),
+    "picks": *[
+      _type == "post"
+      && _id in coalesce(^.recommended[]._ref, [])
+      && _id != ^._id
+      && $brand in brands
+      && defined(slug.current)
+    ]{ ${ARTICLE_CARD} },
+    "fill": *[
+      _type == "post"
+      && $brand in brands
+      && defined(slug.current)
+      && defined(^.category._ref)
+      && category._ref == ^.category._ref
+      && _id != ^._id
+      && !(_id in coalesce(^.recommended[]._ref, []))
+    ] | order(publishedAt desc)[0...3]{ ${ARTICLE_CARD} }
+  }
+`)
+
+// The brand's article page labels (`$id` from articlePageDocumentId). Missing until seeded: the page falls back to
+// the design texts in src/lib/article-copy.ts.
+export const ARTICLE_PAGE_QUERY = defineQuery(`
+  *[_type == "articlePage" && _id == $id][0]{
+    recommendedHeading,
+    breadcrumbHomeLabel,
+    shareLabel,
+    copyLinkLabel,
+    linkCopiedLabel,
+    readTimeSuffix,
+    imageCreditPrefix,
+    shareRailLabel
+  }
+`)
+
+// The brand's Most read list (`$id` from mostReadDocumentId). A filter, not `->`, so only posts of this brand
+// resolve; the adapter restores the editor's order from `ids`.
+export const MOST_READ_QUERY = defineQuery(`
+  *[_type == "mostRead" && _id == $id][0]{
+    title,
+    "ids": coalesce(posts[]._ref, []),
+    "posts": *[
+      _type == "post"
+      && _id in coalesce(^.posts[]._ref, [])
+      && $brand in brands
+      && defined(slug.current)
+    ]{ ${ARTICLE_CARD} }
   }
 `)
 

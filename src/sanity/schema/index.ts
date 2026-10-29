@@ -1,5 +1,6 @@
 import { blockTypes } from './blocks'
 import { acclaim } from './documents/acclaim'
+import { articlePage } from './documents/article-page'
 import { category, region, topic } from './documents/article-taxonomy'
 import { author } from './documents/author'
 import { awardCategory } from './documents/award-category'
@@ -31,6 +32,7 @@ export const documentTypes = [
   region,
   author,
   mostRead,
+  articlePage,
   newsletterIssue,
   awardsProgrammeGroup,
   awardsProgramme,

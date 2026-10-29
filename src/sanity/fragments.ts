@@ -47,6 +47,17 @@ export const POST_CARD = /* groq */ `
   "image": image{ ${IMAGE} }
 `
 
+/** A post as an article page card (Recommended, Most read): its main topic labels it. */
+export const ARTICLE_CARD = /* groq */ `
+  _id,
+  title,
+  "slug": slug.current,
+  brands,
+  publishedAt,
+  "image": image{ ${IMAGE} },
+  "topic": primaryTopic->{ title, "slug": slug.current }
+`
+
 const CTA = /* groq */ `
   heading,
   text,
