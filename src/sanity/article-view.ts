@@ -60,7 +60,7 @@ function inOrder(ids: string[], cards: Card[]): Card[] {
 // Draft mode embeds invisible stega characters in every string; they would count as words.
 const words = (text: string | null | undefined) => countWords(stegaClean(text))
 
-/** Words of the body's text: paragraphs and headings, quotes, fact boxes and infographics. */
+/** Words of the body's text: paragraphs and headings, quotes, fact boxes and infographic titles and descriptions. */
 function bodyWords(body: Body | null): number {
   return (body ?? []).reduce((total, member) => {
     switch (member._type) {
@@ -71,12 +71,7 @@ function bodyWords(body: Body | null): number {
       case 'factBox':
         return total + (member.facts ?? []).reduce((sum, fact) => sum + words(fact.label) + words(fact.value), 0)
       case 'infographic':
-        return (
-          total +
-          words(member.title) +
-          words(member.intro) +
-          (member.groups ?? []).reduce((sum, group) => sum + words(group.label) + words((group.items ?? []).join(' ')), 0)
-        )
+        return total + words(member.title) + words(member.description)
       default:
         return total
     }

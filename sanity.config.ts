@@ -92,6 +92,7 @@ const SINGLETON_TYPES = new Set([
   'publicationFooter',
   'mostRead',
   'articlePage',
+  'infographicSettings',
 ])
 
 const SINGLETON_REMOVED_ACTIONS = new Set(['duplicate', 'delete'])

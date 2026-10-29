@@ -9,13 +9,12 @@ import { cx } from '@/components/ui/cx'
 import { safeHref } from '@/lib/links'
 import { toImage } from '@/sanity/image'
 
-import { Infographic, type InfographicGroup } from './Infographic.client'
+import { GeneratedInfographic } from './GeneratedInfographic'
 
 // Body images span the text column: 728px from the header breakpoint at the widest, the viewport below it.
 const IMAGE_SIZES = '(min-width: 75rem) 864px, 100vw'
 
 type Fact = { _key: string; label?: string; value?: string }
-type Group = { _key: string; label?: string; items?: string[] }
 
 const FACT_BOX_SURFACES = {
   surface: 'bg-surface-subtle',
@@ -156,32 +155,26 @@ const components: PortableTextComponents = {
         </aside>
       )
     },
+    // Renders nothing until the block has been generated.
     infographic: ({
       value,
     }: {
-      value: { eyebrow?: string; title?: string; intro?: string; hub?: string; groups?: Group[]; caption?: string; source?: string }
-    }) => {
-      const groups: InfographicGroup[] = (value.groups ?? [])
-        .map((group) => ({ key: group._key, label: group.label ?? '', items: (group.items ?? []).filter(Boolean) }))
-        .filter((group) => group.label && group.items.length > 0)
-        .slice(0, 3)
-
-      if (!value.title || !value.hub || groups.length === 0) {
-        return null
+      value: {
+        eyebrow?: string
+        title?: string
+        description?: string
+        wide?: string
+        narrow?: string
       }
-
-      return (
-        <Infographic
-          eyebrow={value.eyebrow ?? ''}
-          title={value.title}
-          intro={value.intro}
-          hub={value.hub}
-          groups={groups}
-          caption={value.caption}
-          source={value.source}
-        />
-      )
-    },
+    }) => (
+      <GeneratedInfographic
+        eyebrow={value.eyebrow}
+        title={value.title}
+        description={value.description}
+        wide={value.wide}
+        narrow={value.narrow}
+      />
+    ),
     // The in-content banner. The editor places it; GAM fills the reserved slot.
     adBreak: () => (
       <div data-flow="block" role="complementary" aria-label="Advertisement, in article">

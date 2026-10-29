@@ -11,6 +11,7 @@ import { EnvelopeIcon } from '@sanity/icons/Envelope'
 import { FolderIcon } from '@sanity/icons/Folder'
 import { InsertBelowIcon } from '@sanity/icons/InsertBelow'
 import { MenuIcon } from '@sanity/icons/Menu'
+import { SparklesIcon } from '@sanity/icons/Sparkles'
 import { StarIcon } from '@sanity/icons/Star'
 import { TagIcon } from '@sanity/icons/Tag'
 import { TrendUpwardIcon } from '@sanity/icons/TrendUpward'
@@ -28,6 +29,7 @@ import {
   isEditorialBrandKey,
   mostReadDocumentId,
 } from '@/brands'
+import { INFOGRAPHIC_SETTINGS_ID } from '@/lib/infographic-prompt'
 
 export const structure: StructureResolver = (S) =>
   S.list()
@@ -108,7 +110,7 @@ export const structure: StructureResolver = (S) =>
       ),
       S.divider(),
       S.documentTypeListItem('post').title('All Posts').icon(DocumentTextIcon),
-      // How posts are classified and who wrote them, shared by every brand.
+      // How posts are classified and who wrote them, and what the infographic generator is told, shared by every brand.
       S.listItem()
         .title('Articles')
         .icon(FolderIcon)
@@ -120,6 +122,11 @@ export const structure: StructureResolver = (S) =>
               S.documentTypeListItem('topic').title('Topics').icon(TagIcon),
               S.documentTypeListItem('region').title('Regions').icon(EarthGlobeIcon),
               S.documentTypeListItem('author').title('Authors').icon(UsersIcon),
+              S.divider(),
+              S.listItem()
+                .title('Infographic instructions')
+                .icon(SparklesIcon)
+                .child(S.document().schemaType('infographicSettings').documentId(INFOGRAPHIC_SETTINGS_ID)),
             ]),
         ),
       S.divider(),
