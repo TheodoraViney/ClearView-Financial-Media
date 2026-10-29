@@ -151,11 +151,11 @@ main :where(*) {
   scroll-margin-top: var(--header-h);
 }
 
-/* Shared neutrals, names from the ClearView Figma variables */
-@theme {
-  /* Header desktop layout, as in the design's shared-shell masters (desktop from 1200px) */
-  --breakpoint-header: 75rem;
-
+/*
+ * Shared neutrals, names from the ClearView Figma variables. `static`: always emitted, whether or not a utility uses
+ * them, because AI-generated infographic SVGs paint with them by name (SVG_COLOR_TOKENS in src/lib/svg-sanitize.ts).
+ */
+@theme static {
   --color-dark: #1f2b32;
   --color-grey: #706f6f;
   --color-border: #e5e7eb;
@@ -165,11 +165,16 @@ main :where(*) {
   --color-light-blue-grey: #63788c;
   /* Sponsored content card surface */
   --color-surface-subtle: #fafafa;
+}
+
+@theme {
+  /* Header desktop layout, as in the design's shared-shell masters (desktop from 1200px) */
+  --breakpoint-header: 75rem;
 
   --container-page: 90rem;
   /* Article text column (728) plus the share rail on both sides (2 × 68): from here the column centres at 728 and the rail shows */
   --container-article: 54rem;
-  /* Article infographic: below 560px the groups stack under the centre box */
+  /* Article infographic: from 560px the wide SVG variant shows, below it the narrow one */
   --container-infographic: 35rem;
 
   /* ClearView footer brand column basis on desktop (410.667px in the clearview-footer master) */
@@ -267,11 +272,6 @@ main :where(*) {
 /* Label / value rows of a definition list (article fact box): 140px label column */
 @utility grid-cols-definition {
   grid-template-columns: 8.75rem minmax(0, 1fr);
-}
-
-/* Article infographic: left group, connector, centre box (128–168px), connector, right group */
-@utility grid-cols-infographic {
-  grid-template-columns: minmax(0, 1fr) 2.5rem minmax(8rem, 10.5rem) 2.5rem minmax(0, 1fr);
 }
 
 /* Sticky article rail: 32px below the sticky header */

@@ -76,7 +76,9 @@ export const POSTS_QUERY = defineQuery(`
 `)
 
 // The article page. `$peopleMoves` is the People Moves category id: a region left on another category is not returned.
-// The body keeps its Portable Text members as stored, plus the image alt fallback and the video file URL.
+// The body keeps its Portable Text members as stored, plus the image alt fallback and the video file URL. An
+// infographic sends only what the page shows: its generation metadata is left out of the page, though it stays
+// readable to anyone through the public dataset API.
 // Recommended: the editor's picks on this brand (`picks`, reordered by `recommendedIds` in the adapter), then the latest
 // posts of the same category (`fill`) for the empty places. The Studio unsets an emptied array, hence the coalesce.
 export const POST_QUERY = defineQuery(`
@@ -94,7 +96,8 @@ export const POST_QUERY = defineQuery(`
     "region": select(category._ref == $peopleMoves => region->{ title, "slug": slug.current }),
     "author": author->{ name, jobTitle, city, bio, "photo": photo{ ${IMAGE} } },
     content[]{
-      ...,
+      _type != "infographic" => { ... },
+      _type == "infographic" => { _key, _type, eyebrow, title, description, wide, narrow },
       _type == "image" => { "alt": coalesce(alt, asset->altText) },
       _type == "videoFile" => { "url": asset->url, "mimeType": asset->mimeType }
     },

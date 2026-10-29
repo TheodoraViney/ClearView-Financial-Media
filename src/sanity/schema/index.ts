@@ -11,6 +11,7 @@ import { company } from './documents/company'
 import { conferenceEvent } from './documents/conference-event'
 import { clearviewFooter, publicationFooter } from './documents/footer'
 import { clearviewHeader, publicationHeader } from './documents/header'
+import { infographicSettings } from './documents/infographic-settings'
 import { mostRead } from './documents/most-read'
 import { newsletterIssue } from './documents/newsletter-issue'
 import { page } from './documents/page'
@@ -33,6 +34,7 @@ export const documentTypes = [
   author,
   mostRead,
   articlePage,
+  infographicSettings,
   newsletterIssue,
   awardsProgrammeGroup,
   awardsProgramme,
