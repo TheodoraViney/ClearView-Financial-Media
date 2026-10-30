@@ -1,8 +1,10 @@
 import Link from 'next/link'
+import type { CSSProperties } from 'react'
 
 import { AdSlot } from '@/components/ui/AdSlot'
 import { Avatar } from '@/components/ui/Avatar'
 import { Breadcrumb, type BreadcrumbItem } from '@/components/ui/Breadcrumb'
+import { cx } from '@/components/ui/cx'
 import { Figure } from '@/components/ui/Figure'
 import { Media } from '@/components/ui/Media'
 import { Meta } from '@/components/ui/Meta'
@@ -139,12 +141,16 @@ export function ArticlePage({ article }: { article: ArticleView }) {
           )}
 
           <div className={`@container ${PAD} pt-10 md:pt-12`}>
-            {/* Reserves the share rail's height (label + three 44px buttons, 169px) so a short or empty body never lets it
-              hang over the author block or the footer. */}
-          <div className="relative flex flex-col items-center @article:min-h-43">
+            {/* Reserves the share rail's height (label + one 44px button per network and copy link) so a short or empty
+              body never lets it hang over the author block or the footer. */}
+            <div
+              className={cx('relative flex flex-col items-center', article.shareUrl && '@article:min-h-share-rail')}
+              style={{ '--share-items': article.shareLinks.length + 1 } as CSSProperties}
+            >
               {article.shareUrl && (
                 <ShareRail
                   label={copy.shareRailLabel}
+                  links={article.shareLinks}
                   className="absolute top-0 left-0 hidden w-11 flex-col items-center gap-1 pt-1 @article:flex"
                 />
               )}

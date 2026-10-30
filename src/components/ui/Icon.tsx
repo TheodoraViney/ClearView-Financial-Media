@@ -8,7 +8,6 @@ import { CloseIcon } from './icons/close'
 import { DocumentIcon } from './icons/document'
 import { DownloadIcon } from './icons/download'
 import { LinkIcon } from './icons/link'
-import { LinkedinIcon } from './icons/linkedin'
 import { MenuIcon } from './icons/menu'
 import { MenuCloseIcon } from './icons/menu-close'
 import { PublicIcon } from './icons/public'
@@ -21,7 +20,6 @@ import { StatPublicIcon } from './icons/stat-public'
 import { StatSearchIcon } from './icons/stat-search'
 import { StatStarIcon } from './icons/stat-star'
 import { StatUserIcon } from './icons/stat-user'
-import { XIcon } from './icons/x'
 
 export const iconMap = {
   'chevron-right': ChevronRightIcon,
@@ -43,8 +41,6 @@ export const iconMap = {
   'stat-user': StatUserIcon,
   share: ShareIcon,
   link: LinkIcon,
-  linkedin: LinkedinIcon,
-  x: XIcon,
 } as const
 
 export type IconName = keyof typeof iconMap

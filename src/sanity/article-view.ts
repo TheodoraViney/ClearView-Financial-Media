@@ -13,9 +13,11 @@ import {
   readingMinutes,
   type ArticleCardView,
   type ArticleLink,
+  type ArticleShareLinkView,
   type ArticleView,
 } from '@/lib/article'
 import { absolutePostUrl, resolveHref } from '@/lib/links'
+import { shareHref } from '@/lib/share-links'
 
 import { toImage } from './image'
 import type { MostReadAutoFill } from './most-read'
@@ -108,6 +110,28 @@ function toCopy(copy: PageCopy): ArticlePageCopy {
   return Object.fromEntries(keys.map((key) => [key, copy?.[key] || ARTICLE_PAGE_COPY_DEFAULTS[key]])) as ArticlePageCopy
 }
 
+// Icons are Sanity assets; anything else would land unchecked inside a CSS url().
+const SANITY_ASSET_ORIGIN = 'https://cdn.sanity.io/'
+
+/**
+ * The brand's share rail networks in the editor's order. An item whose address is not https, or that lacks a label
+ * or icon, is dropped: the Studio rule is not a guard, the Content API accepts writes that never ran it.
+ */
+function toShareLinks(copy: PageCopy, url: string, title: string): ArticleShareLinkView[] {
+  if (!url) {
+    return []
+  }
+
+  return (copy?.shareLinks ?? []).flatMap((item) => {
+    // The label becomes the link's aria-label, so it must be free of stega characters.
+    const label = stegaClean(item.label)?.trim()
+    const href = shareHref(item.url, url, title)
+    const iconSrc = stegaClean(item.icon?.asset?.url)
+
+    return label && href && iconSrc?.startsWith(SANITY_ASSET_ORIGIN) ? [{ key: item._key, label, href, iconSrc }] : []
+  })
+}
+
 /** A Sanity post as the article page's props. `body` is the rendered Portable Text. */
 export function fromPost({
   post,
@@ -132,6 +156,8 @@ export function fromPost({
     .map((card) => toCard(card, brand))
     .filter((card): card is ArticleCardView => card !== null)
 
+  const shareUrl = post.slug ? absolutePostUrl(brand, post.slug) : ''
+
   const mostReadItems = mostReadCards(post, mostRead, mostReadFill)
     .map((card) => toCard(card, brand))
     .filter((card): card is ArticleCardView => card !== null)
@@ -154,7 +180,8 @@ export function fromPost({
     hero: image ? { image, credit: post.image?.credit ?? null } : null,
     readingMinutes: readingMinutes(bodyWords(post.content)),
     body,
-    shareUrl: post.slug ? absolutePostUrl(brand, post.slug) : '',
+    shareUrl,
+    shareLinks: toShareLinks(copy, shareUrl, post.title ?? ''),
     recommended,
     mostRead:
       mostReadItems.length > 0 ? { title: mostRead?.title || MOST_READ_TITLE_DEFAULT, items: mostReadItems } : null,

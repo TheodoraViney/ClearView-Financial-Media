@@ -121,8 +121,8 @@ export const POST_QUERY = defineQuery(`
   }
 `)
 
-// The brand's article page labels (`$id` from articlePageDocumentId). Missing until seeded: the page falls back to
-// the design texts in src/lib/article-copy.ts.
+// The brand's article page labels and share rail networks (`$id` from articlePageDocumentId). Missing until seeded:
+// the page falls back to the design texts in src/lib/article-copy.ts and shows only the copy link button.
 export const ARTICLE_PAGE_QUERY = defineQuery(`
   *[_type == "articlePage" && _id == $id][0]{
     recommendedHeading,
@@ -132,7 +132,8 @@ export const ARTICLE_PAGE_QUERY = defineQuery(`
     linkCopiedLabel,
     readTimeSuffix,
     imageCreditPrefix,
-    shareRailLabel
+    shareRailLabel,
+    "shareLinks": coalesce(shareLinks[]{ _key, label, url, icon{ asset->{ url } } }, [])
   }
 `)
 
