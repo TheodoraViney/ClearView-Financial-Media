@@ -24,6 +24,9 @@ export type ArticleCardView = {
   image: MediaImage | null
 }
 
+/** A network in the share rail: the address is built and checked, the icon is an image used as a shape. */
+export type ArticleShareLinkView = { key: string; label: string; href: string; iconSrc: string }
+
 export type ArticleAuthorView = {
   name: string
   jobTitle: string | null
@@ -47,6 +50,8 @@ export type ArticleView = {
   body: ReactNode
   /** Absolute URL the share buttons send. */
   shareUrl: string
+  /** The share rail's networks in the editor's order; the copy link button follows them. */
+  shareLinks: ArticleShareLinkView[]
   recommended: ArticleCardView[]
   mostRead: { title: string; items: ArticleCardView[] } | null
   /** The page's labels from the brand's "Article page" document, design texts where it is missing. */

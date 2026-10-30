@@ -1,9 +1,10 @@
 'use client'
 
-import { createContext, useContext, useEffect, useRef, useState, type ReactNode } from 'react'
+import { createContext, useContext, useEffect, useRef, useState, type CSSProperties, type ReactNode } from 'react'
 
 import { ActionButton } from '@/components/ui/ActionButton.client'
 import { Icon } from '@/components/ui/Icon'
+import type { ArticleShareLinkView } from '@/lib/article'
 
 const COPIED_MS = 2000
 
@@ -106,32 +107,41 @@ export function ShareActions({
 const RAIL_ITEM =
   'flex size-11 items-center justify-center rounded-sm text-grey transition-colors duration-180 ease-out hover:bg-surface-hover'
 
-/** The vertical share rail left of the text column: LinkedIn, X and copy. Icon-only, so the names stay in code. */
-export function ShareRail({ label, className }: { label: string; className?: string }) {
-  const { url, title, copy } = useShare()
-  const encoded = encodeURIComponent(url)
+/**
+ * The vertical share rail left of the text column: the brand's networks from the CMS in their order, then copy link.
+ * Icon-only: each network's CMS label is its accessible name, copy link's name stays in code. The uploaded icon is
+ * only a shape (mask-icon), filled with the rail's text colour like the code icons.
+ */
+export function ShareRail({
+  label,
+  links,
+  className,
+}: {
+  label: string
+  links: ArticleShareLinkView[]
+  className?: string
+}) {
+  const { copy } = useShare()
 
   return (
     <aside aria-label="Share" className={className}>
       <span className="pb-2 text-caption leading-none text-grey">{label}</span>
-      <a
-        href={`https://www.linkedin.com/sharing/share-offsite/?url=${encoded}`}
-        target="_blank"
-        rel="noopener noreferrer"
-        aria-label="Share on LinkedIn"
-        className={RAIL_ITEM}
-      >
-        <Icon name="linkedin" className="size-5" />
-      </a>
-      <a
-        href={`https://x.com/intent/post?url=${encoded}&text=${encodeURIComponent(title)}`}
-        target="_blank"
-        rel="noopener noreferrer"
-        aria-label="Share on X"
-        className={RAIL_ITEM}
-      >
-        <Icon name="x" className="size-5" />
-      </a>
+      {links.map((link) => (
+        <a
+          key={link.key}
+          href={link.href}
+          target="_blank"
+          rel="noopener noreferrer"
+          aria-label={link.label}
+          className={RAIL_ITEM}
+        >
+          <span
+            aria-hidden="true"
+            className="block size-5 shrink-0 mask-icon"
+            style={{ '--icon': `url("${link.iconSrc}")` } as CSSProperties}
+          />
+        </a>
+      ))}
       <button
         type="button"
         onClick={() => void copy()}

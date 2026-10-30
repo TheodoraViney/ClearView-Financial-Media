@@ -274,6 +274,14 @@ main :where(*) {
   grid-template-columns: 8.75rem minmax(0, 1fr);
 }
 
+/*
+ * Height of the article's share rail, reserved beside the text so a short body never lets the rail hang over what
+ * follows: its label plus one 44px button per item in `--share-items` (the CMS networks and copy link), 4px apart.
+ */
+@utility min-h-share-rail {
+  min-height: calc(var(--spacing) * (12 * var(--share-items) + 7));
+}
+
 /* Sticky article rail: 32px below the sticky header */
 @utility top-rail {
   top: calc(var(--header-h) + 2rem);
@@ -331,7 +339,7 @@ main :where(*) {
   width: calc(100% - 2rem - 3.25rem);
 }
 
-/* Editor-uploaded icon (footer social links): the image in `--icon` is used only as a shape, filled with the text colour */
+/* Editor-uploaded icon (footer social links, article share rail): the image in `--icon` is used only as a shape, filled with the text colour */
 @utility mask-icon {
   background-color: currentColor;
   mask: var(--icon) center / contain no-repeat;

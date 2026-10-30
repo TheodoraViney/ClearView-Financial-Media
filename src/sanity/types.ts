@@ -824,6 +824,19 @@ export type ArticlePage = {
   readTimeSuffix?: string;
   imageCreditPrefix?: string;
   shareRailLabel?: string;
+  shareLinks?: Array<{
+    label?: string;
+    icon?: {
+      asset?: SanityImageAssetReference;
+      media?: unknown;
+      hotspot?: SanityImageHotspot;
+      crop?: SanityImageCrop;
+      _type: "image";
+    };
+    url?: string;
+    _type: "shareLink";
+    _key: string;
+  }>;
 };
 
 export type MostRead = {
@@ -8517,7 +8530,7 @@ export type POST_QUERY_RESULT = {
 
 // Source: src/sanity/queries.ts
 // Variable: ARTICLE_PAGE_QUERY
-// Query: *[_type == "articlePage" && _id == $id][0]{    recommendedHeading,    breadcrumbHomeLabel,    shareLabel,    copyLinkLabel,    linkCopiedLabel,    readTimeSuffix,    imageCreditPrefix,    shareRailLabel  }
+// Query: *[_type == "articlePage" && _id == $id][0]{    recommendedHeading,    breadcrumbHomeLabel,    shareLabel,    copyLinkLabel,    linkCopiedLabel,    readTimeSuffix,    imageCreditPrefix,    shareRailLabel,    "shareLinks": coalesce(shareLinks[]{ _key, label, url, icon{ asset->{ url } } }, [])  }
 export type ARTICLE_PAGE_QUERY_RESULT = {
   recommendedHeading: string | null;
   breadcrumbHomeLabel: string | null;
@@ -8527,6 +8540,18 @@ export type ARTICLE_PAGE_QUERY_RESULT = {
   readTimeSuffix: string | null;
   imageCreditPrefix: string | null;
   shareRailLabel: string | null;
+  shareLinks:
+    | Array<{
+        _key: string;
+        label: string | null;
+        url: string | null;
+        icon: {
+          asset: {
+            url: string | null;
+          } | null;
+        } | null;
+      }>
+    | Array<never>;
 } | null;
 
 // Source: src/sanity/queries.ts
@@ -8553,6 +8578,27 @@ export type MOST_READ_QUERY_RESULT = {
     } | null;
   }>;
 } | null;
+
+// Source: src/sanity/queries.ts
+// Variable: MOST_READ_LATEST_QUERY
+// Query: *[    _type == "post"    && $brand in brands    && defined(slug.current)    && slug.current != $slug  ] | order(publishedAt desc)[0...$limit]{   _id,  title,  "slug": slug.current,  brands,  publishedAt,  "image": image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },  "topic": primaryTopic->{ title, "slug": slug.current } }
+export type MOST_READ_LATEST_QUERY_RESULT = Array<{
+  _id: string;
+  title: string | null;
+  slug: string | null;
+  brands: Array<string> | null;
+  publishedAt: string | null;
+  image: {
+    asset: SanityImageAssetReference | null;
+    hotspot: SanityImageHotspot | null;
+    crop: SanityImageCrop | null;
+    alt: string | null;
+  } | null;
+  topic: {
+    title: string | null;
+    slug: string | null;
+  } | null;
+}>;
 
 // Source: src/sanity/queries.ts
 // Variable: POST_SLUGS_QUERY
@@ -8712,8 +8758,9 @@ declare global {
     '\n  *[_type == "page" && brand == $brand && defined(slug.current) && slug.current != "home"]{\n    "slug": slug.current\n  }\n': PAGE_SLUGS_QUERY_RESULT;
     '\n  *[_type == "post" && $brand in brands] | order(publishedAt desc){\n    _id,\n    title,\n    "slug": slug.current,\n    publishedAt,\n    excerpt,\n    image\n  }\n': POSTS_QUERY_RESULT;
     '\n  *[_type == "post" && slug.current == $slug && $brand in brands][0]{\n    _id,\n    title,\n    "slug": slug.current,\n    brands,\n    publishedAt,\n    excerpt,\n    "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n, credit },\n    "category": category->{ title, "slug": slug.current },\n    "primaryTopic": primaryTopic->{ title, "slug": slug.current },\n    "secondaryTopics": secondaryTopics[]->{ title, "slug": slug.current },\n    "region": select(category._ref == $peopleMoves => region->{ title, "slug": slug.current }),\n    "author": author->{ name, jobTitle, city, bio, "photo": photo{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n } },\n    content[]{\n      _type != "infographic" => { ... },\n      _type == "infographic" => { _key, _type, eyebrow, title, description, wide, narrow },\n      _type == "image" => { "alt": coalesce(alt, asset->altText) },\n      _type == "videoFile" => { "url": asset->url, "mimeType": asset->mimeType }\n    },\n    "recommendedIds": coalesce(recommended[]._ref, []),\n    "picks": *[\n      _type == "post"\n      && _id in coalesce(^.recommended[]._ref, [])\n      && _id != ^._id\n      && $brand in brands\n      && defined(slug.current)\n    ]{ \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  publishedAt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n  "topic": primaryTopic->{ title, "slug": slug.current }\n },\n    "fill": *[\n      _type == "post"\n      && $brand in brands\n      && defined(slug.current)\n      && defined(^.category._ref)\n      && category._ref == ^.category._ref\n      && _id != ^._id\n      && !(_id in coalesce(^.recommended[]._ref, []))\n    ] | order(publishedAt desc)[0...3]{ \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  publishedAt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n  "topic": primaryTopic->{ title, "slug": slug.current }\n }\n  }\n': POST_QUERY_RESULT;
-    '\n  *[_type == "articlePage" && _id == $id][0]{\n    recommendedHeading,\n    breadcrumbHomeLabel,\n    shareLabel,\n    copyLinkLabel,\n    linkCopiedLabel,\n    readTimeSuffix,\n    imageCreditPrefix,\n    shareRailLabel\n  }\n': ARTICLE_PAGE_QUERY_RESULT;
+    '\n  *[_type == "articlePage" && _id == $id][0]{\n    recommendedHeading,\n    breadcrumbHomeLabel,\n    shareLabel,\n    copyLinkLabel,\n    linkCopiedLabel,\n    readTimeSuffix,\n    imageCreditPrefix,\n    shareRailLabel,\n    "shareLinks": coalesce(shareLinks[]{ _key, label, url, icon{ asset->{ url } } }, [])\n  }\n': ARTICLE_PAGE_QUERY_RESULT;
     '\n  *[_type == "mostRead" && _id == $id][0]{\n    title,\n    "ids": coalesce(posts[]._ref, []),\n    "posts": *[\n      _type == "post"\n      && _id in coalesce(^.posts[]._ref, [])\n      && $brand in brands\n      && defined(slug.current)\n    ]{ \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  publishedAt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n  "topic": primaryTopic->{ title, "slug": slug.current }\n }\n  }\n': MOST_READ_QUERY_RESULT;
+    '\n  *[\n    _type == "post"\n    && $brand in brands\n    && defined(slug.current)\n    && slug.current != $slug\n  ] | order(publishedAt desc)[0...$limit]{ \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  publishedAt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n  "topic": primaryTopic->{ title, "slug": slug.current }\n }\n': MOST_READ_LATEST_QUERY_RESULT;
     '\n  *[_type == "post" && defined(slug.current) && $brand in brands]{\n    "slug": slug.current\n  }\n': POST_SLUGS_QUERY_RESULT;
     '\n  *[_type == "newsletterIssue" && _id in [$id, $draftId]]{\n    _id,\n    _rev,\n    brand,\n    subject,\n    topBanner{ image, link },\n    bottomBanner{ image, link },\n    segment{ id, name },\n    scheduledAt,\n    status,\n    brevoCampaignId,\n    sendingStartedAt,\n    sendRequestedAt,\n    "postIds": posts[]._ref\n  }\n': NEWSLETTER_ISSUE_VERSIONS_QUERY_RESULT;
     '\n  {\n    "brand": *[_type == "brand" && _id == $brandId && key.current == $brand][0]{\n      title,\n      domain,\n      logo,\n      "senderId": newsletter.sender.id,\n      "copy": newsletter.copy{ featuredLabel, readFullStory, readMore, advertisementLabel, footerText, unsubscribe }\n    },\n    "posts": *[_type == "post" && _id in $postIds && $brand in brands]{\n      _id,\n      title,\n      excerpt,\n      "slug": slug.current,\n      publishedAt,\n      image\n    }\n  }\n': NEWSLETTER_EMAIL_QUERY_RESULT;
