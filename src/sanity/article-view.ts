@@ -2,7 +2,12 @@ import { stegaClean, type StegaBranded } from 'next-sanity'
 import { type ReactNode } from 'react'
 
 import { isBrandKey, type EditorialBrandKey } from '@/brands'
-import { ARTICLE_PAGE_COPY_DEFAULTS, type ArticlePageCopy } from '@/lib/article-copy'
+import {
+  ARTICLE_PAGE_COPY_DEFAULTS,
+  MOST_READ_COUNT,
+  MOST_READ_TITLE_DEFAULT,
+  type ArticlePageCopy,
+} from '@/lib/article-copy'
 import {
   countWords,
   readingMinutes,
@@ -13,6 +18,7 @@ import {
 import { absolutePostUrl, resolveHref } from '@/lib/links'
 
 import { toImage } from './image'
+import type { MostReadAutoFill } from './most-read'
 import type { ARTICLE_PAGE_QUERY_RESULT, MOST_READ_QUERY_RESULT, POST_QUERY_RESULT } from './types'
 
 // Query results as cachedSanity returns them: strings may carry stega in draft mode.
@@ -57,6 +63,23 @@ function inOrder(ids: string[], cards: Card[]): Card[] {
   return ids.flatMap((id) => byId.get(id) ?? [])
 }
 
+/**
+ * Most read: the editor's picks in their order, then the auto source for the empty places. The article being read is
+ * left out and a post shows once.
+ */
+function mostReadCards(post: Post, mostRead: MostRead, fill: StegaBranded<MostReadAutoFill>): Card[] {
+  const picks = mostRead ? inOrder(mostRead.ids, mostRead.posts) : []
+  const byId = new Map<string, Card>()
+
+  for (const card of [...picks, ...fill]) {
+    if (card._id !== post._id && !byId.has(card._id)) {
+      byId.set(card._id, card)
+    }
+  }
+
+  return [...byId.values()].slice(0, MOST_READ_COUNT)
+}
+
 // Draft mode embeds invisible stega characters in every string; they would count as words.
 const words = (text: string | null | undefined) => countWords(stegaClean(text))
 
@@ -89,12 +112,14 @@ function toCopy(copy: PageCopy): ArticlePageCopy {
 export function fromPost({
   post,
   mostRead,
+  mostReadFill,
   copy,
   brand,
   body,
 }: {
   post: Post
   mostRead: MostRead
+  mostReadFill: StegaBranded<MostReadAutoFill>
   copy: PageCopy
   brand: EditorialBrandKey
   body: ReactNode
@@ -107,13 +132,9 @@ export function fromPost({
     .map((card) => toCard(card, brand))
     .filter((card): card is ArticleCardView => card !== null)
 
-  const mostReadItems = mostRead
-    ? inOrder(mostRead.ids, mostRead.posts)
-        // The article being read is left out of its own sidebar; the rest keep the editor's order.
-        .filter((card) => card._id !== post._id)
-        .map((card) => toCard(card, brand))
-        .filter((card): card is ArticleCardView => card !== null)
-    : []
+  const mostReadItems = mostReadCards(post, mostRead, mostReadFill)
+    .map((card) => toCard(card, brand))
+    .filter((card): card is ArticleCardView => card !== null)
 
   return {
     title: post.title ?? '',
@@ -135,7 +156,8 @@ export function fromPost({
     body,
     shareUrl: post.slug ? absolutePostUrl(brand, post.slug) : '',
     recommended,
-    mostRead: mostRead?.title && mostReadItems.length > 0 ? { title: mostRead.title, items: mostReadItems } : null,
+    mostRead:
+      mostReadItems.length > 0 ? { title: mostRead?.title || MOST_READ_TITLE_DEFAULT, items: mostReadItems } : null,
     copy: toCopy(copy),
   }
 }

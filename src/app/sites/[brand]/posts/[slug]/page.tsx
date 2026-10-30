@@ -18,6 +18,7 @@ import {
   getDynamicFetchOptions,
   type DynamicFetchOptions,
 } from '@/sanity/live'
+import { mostReadAutoFill } from '@/sanity/most-read'
 import { ARTICLE_PAGE_QUERY, MOST_READ_QUERY, POST_QUERY, POST_SLUGS_QUERY } from '@/sanity/queries'
 import { PLACEHOLDER_SLUG, withPlaceholder } from '@/sanity/static-params'
 
@@ -103,7 +104,7 @@ async function CachedPost({
   variant,
   stega,
 }: { brand: EditorialBrandKey; slug: string } & DynamicFetchOptions) {
-  const [{ data: post }, { data: mostRead }, { data: copy }] = await Promise.all([
+  const [{ data: post }, { data: mostRead }, mostReadFill, { data: copy }] = await Promise.all([
     cachedSanity({
       query: POST_QUERY,
       params: { brand, slug, peopleMoves: PEOPLE_MOVES_CATEGORY_ID },
@@ -118,6 +119,7 @@ async function CachedPost({
       variant,
       stega,
     }),
+    mostReadAutoFill({ brand, slug, perspective, variant, stega }),
     cachedSanity({
       query: ARTICLE_PAGE_QUERY,
       params: { id: articlePageDocumentId(brand) },
@@ -134,6 +136,7 @@ async function CachedPost({
   const article = fromPost({
     post,
     mostRead,
+    mostReadFill,
     copy,
     brand,
     body: post.content ? <ArticleBody value={post.content} /> : null,

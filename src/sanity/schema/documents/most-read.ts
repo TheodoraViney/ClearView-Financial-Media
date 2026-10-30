@@ -2,6 +2,7 @@ import { TrendUpwardIcon } from '@sanity/icons/TrendUpward'
 import { defineArrayMember, defineField, defineType } from 'sanity'
 
 import { BRANDS, isEditorialBrandKey } from '@/brands'
+import { MOST_READ_COUNT, MOST_READ_TITLE_DEFAULT } from '@/lib/article-copy'
 
 /*
  * The "Most read" list in the article and articles-list sidebars, one
@@ -10,7 +11,8 @@ import { BRANDS, isEditorialBrandKey } from '@/brands'
  * of Brand settings: that document feeds every page of the brand, so editing
  * the list there would expire them all.
  *
- * Curated by the editor for now; a measured source may replace it later.
+ * Always shown: the editor's picks come first, in their order, and the places they leave empty are filled with the
+ * brand's latest posts (`mostReadAutoFill` in `src/sanity/most-read.ts`). A measured source may replace "latest" later.
  */
 
 const brandKeyOf = (id: string | undefined): string =>
@@ -26,14 +28,15 @@ export const mostRead = defineType({
       name: 'title',
       title: 'Title',
       type: 'string',
-      initialValue: 'Most read',
+      initialValue: MOST_READ_TITLE_DEFAULT,
       validation: (Rule) => Rule.required(),
     }),
     defineField({
       name: 'posts',
       title: 'Posts',
       type: 'array',
-      description: 'Up to five posts of this brand, in the order shown.',
+      description:
+        'Optional. Up to five posts of this brand, shown first in this order. Empty places fill automatically with the latest articles.',
       of: [
         defineArrayMember({
           type: 'reference',
@@ -47,7 +50,7 @@ export const mostRead = defineType({
           },
         }),
       ],
-      validation: (Rule) => Rule.required().min(1).max(5).unique(),
+      validation: (Rule) => Rule.max(MOST_READ_COUNT).unique(),
     }),
   ],
   preview: {
@@ -58,7 +61,7 @@ export const mostRead = defineType({
 
       return {
         title: `Most read — ${isEditorialBrandKey(key) ? BRANDS[key].title : key}`,
-        subtitle: `${count} ${count === 1 ? 'post' : 'posts'}`,
+        subtitle: count > 0 ? `${count} ${count === 1 ? 'post' : 'posts'}, then the latest` : 'Latest posts',
         media: TrendUpwardIcon,
       }
     },

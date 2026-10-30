@@ -136,8 +136,9 @@ export const ARTICLE_PAGE_QUERY = defineQuery(`
   }
 `)
 
-// The brand's Most read list (`$id` from mostReadDocumentId). A filter, not `->`, so only posts of this brand
-// resolve; the adapter restores the editor's order from `ids`.
+// The brand's Most read picks (`$id` from mostReadDocumentId), 0 to 5. A filter, not `->`, so only posts of this
+// brand resolve; the adapter restores the editor's order from `ids`. The Studio unsets an emptied array, hence the
+// coalesce. The places left empty come from the auto source (src/sanity/most-read.ts).
 export const MOST_READ_QUERY = defineQuery(`
   *[_type == "mostRead" && _id == $id][0]{
     title,
@@ -149,6 +150,17 @@ export const MOST_READ_QUERY = defineQuery(`
       && defined(slug.current)
     ]{ ${ARTICLE_CARD} }
   }
+`)
+
+// Most read's auto source for now: the brand's latest posts, the article being read left out by `$slug`. `$limit`
+// covers a full list after the adapter drops the editor's picks from it.
+export const MOST_READ_LATEST_QUERY = defineQuery(`
+  *[
+    _type == "post"
+    && $brand in brands
+    && defined(slug.current)
+    && slug.current != $slug
+  ] | order(publishedAt desc)[0...$limit]{ ${ARTICLE_CARD} }
 `)
 
 export const POST_SLUGS_QUERY = defineQuery(`

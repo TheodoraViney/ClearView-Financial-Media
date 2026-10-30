@@ -15,3 +15,9 @@ export const ARTICLE_PAGE_COPY_DEFAULTS = {
 } as const
 
 export type ArticlePageCopy = { [K in keyof typeof ARTICLE_PAGE_COPY_DEFAULTS]: string }
+
+// The Most read heading's initial value in the Studio, and the page's fallback while a brand's document is missing.
+export const MOST_READ_TITLE_DEFAULT = 'Most read'
+
+// Places in the Most read list: the editor's picks first, the auto source fills the rest.
+export const MOST_READ_COUNT = 5
