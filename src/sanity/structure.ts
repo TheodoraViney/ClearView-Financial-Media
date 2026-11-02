@@ -29,6 +29,7 @@ import {
   isEditorialBrandKey,
   mostReadDocumentId,
 } from '@/brands'
+import { BRIEF_SETTINGS_ID } from '@/lib/brief-prompt'
 import { INFOGRAPHIC_SETTINGS_ID } from '@/lib/infographic-prompt'
 
 export const structure: StructureResolver = (S) =>
@@ -110,7 +111,7 @@ export const structure: StructureResolver = (S) =>
       ),
       S.divider(),
       S.documentTypeListItem('post').title('All Posts').icon(DocumentTextIcon),
-      // How posts are classified and who wrote them, and what the infographic generator is told, shared by every brand.
+      // How posts are classified and who wrote them, and what the infographic and brief generators are told, shared by every brand.
       S.listItem()
         .title('Articles')
         .icon(FolderIcon)
@@ -127,6 +128,10 @@ export const structure: StructureResolver = (S) =>
                 .title('Infographic instructions')
                 .icon(SparklesIcon)
                 .child(S.document().schemaType('infographicSettings').documentId(INFOGRAPHIC_SETTINGS_ID)),
+              S.listItem()
+                .title('Brief instructions')
+                .icon(SparklesIcon)
+                .child(S.document().schemaType('briefSettings').documentId(BRIEF_SETTINGS_ID)),
             ]),
         ),
       S.divider(),

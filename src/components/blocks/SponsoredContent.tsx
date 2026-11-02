@@ -32,6 +32,7 @@ export function SponsoredContent({ block, brand }: BlockProps<'sponsoredContent'
 
   return (
     <SponsoredContentSection
+      look={brand === 'clearview' ? 'group' : 'publication'}
       label={block.label ?? ''}
       link={linkHref && linkLabel ? { href: linkHref, label: linkLabel } : null}
       post={{

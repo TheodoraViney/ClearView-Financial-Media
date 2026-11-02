@@ -82,14 +82,22 @@ export function formatDay(value: string | null | undefined): string | null {
   return date ? `${date.day} ${date.month} ${date.year}` : null
 }
 
-const longDay = ({ day, monthLong, year }: CalendarDate) => `${day} ${monthLong} ${year}`
+const dayOf = ({ day, month, monthLong, year }: CalendarDate, style: MonthStyle) =>
+  `${day} ${style === 'short' ? month : monthLong} ${year}`
+
+type MonthStyle = 'long' | 'short'
 
 /**
- * A calendar date range with full month names, sharing what both ends have in common:
- * "15 May 2026", "15–16 May 2026", "30 April – 2 May 2026", "30 December 2026 – 2 January 2027".
+ * A calendar date range, sharing what both ends have in common. Full month names by default:
+ * "15 May 2026", "15–16 May 2026", "30 April – 2 May 2026", "30 December 2026 – 2 January 2027";
+ * `month: 'short'` gives "18 Nov 2026", "15–16 Oct 2026" (publication homes).
  * A missing or unreadable end renders the start alone.
  */
-export function formatDateRange(start: string | null | undefined, end: string | null | undefined): string | null {
+export function formatDateRange(
+  start: string | null | undefined,
+  end: string | null | undefined,
+  { month = 'long' }: { month?: MonthStyle } = {},
+): string | null {
   const from = parseCalendarDate(start)
   const to = parseCalendarDate(end)
 
@@ -98,18 +106,39 @@ export function formatDateRange(start: string | null | undefined, end: string | 
   }
 
   if (!to || start === end) {
-    return longDay(from)
+    return dayOf(from, month)
   }
 
   if (from.year !== to.year) {
-    return `${longDay(from)} – ${longDay(to)}`
+    return `${dayOf(from, month)} – ${dayOf(to, month)}`
   }
+
+  const fromMonth = month === 'short' ? from.month : from.monthLong
+  const toMonth = month === 'short' ? to.month : to.monthLong
 
   if (from.monthLong !== to.monthLong) {
-    return `${from.day} ${from.monthLong} – ${to.day} ${to.monthLong} ${to.year}`
+    return `${from.day} ${fromMonth} – ${to.day} ${toMonth} ${to.year}`
   }
 
-  return `${from.day}–${to.day} ${to.monthLong} ${to.year}`
+  return `${from.day}–${to.day} ${toMonth} ${to.year}`
+}
+
+/**
+ * The last Friday on or before a UK calendar date ("2026-11-02" → "2026-10-30"), as a calendar date: the Weekly
+ * Roundup edition date (the design schedules the roundup on Fridays).
+ */
+export function lastFriday(today: string): string | null {
+  const match = CALENDAR_DATE.exec(today)
+
+  if (!match) {
+    return null
+  }
+
+  const date = new Date(Date.UTC(Number(match[1]), Number(match[2]) - 1, Number(match[3])))
+  // getUTCDay: 0 Sunday … 5 Friday.
+  date.setUTCDate(date.getUTCDate() - ((date.getUTCDay() + 2) % 7))
+
+  return date.toISOString().slice(0, 10)
 }
 
 const UK_CALENDAR = new Intl.DateTimeFormat('en-GB', {

@@ -4,6 +4,7 @@ import { articleBody } from './article-body'
 import { brevoAttribute, brevoList, brevoSegment, brevoSender, brevoTemplate } from './brevo'
 import { companyGroup } from './company-group'
 import { customTab } from './custom-tab'
+import { exploreCard } from './explore-card'
 import { factBox } from './fact-box'
 import { footerColumn } from './footer-column'
 import { infographic } from './infographic'
@@ -33,6 +34,7 @@ export const objectTypes = [
   navGroup,
   footerColumn,
   socialLink,
+  exploreCard,
   brevoList,
   brevoSegment,
   brevoTemplate,

@@ -1,30 +1,31 @@
 import { DocumentsIcon } from '@sanity/icons/Documents'
-import { defineArrayMember, defineField, defineType, type ReferenceFilterResolver } from 'sanity'
+import { defineArrayMember, defineField, defineType } from 'sanity'
+
+import { AutoFillPicksInput } from '@/sanity/components/auto-fill-picks-input'
 
 import { adminLabelField } from '../fields'
+import { postsOfPageBrand, TOP_STORIES_ARTICLE_COUNT, TOP_STORIES_SLIDE_COUNT, topStoriesSlideCount } from './shared'
 
-export const TOP_STORIES_SLIDE_COUNT = 3
-export const TOP_STORIES_ARTICLE_COUNT = 3
+export { postsOfPageBrand, TOP_STORIES_ARTICLE_COUNT, TOP_STORIES_SLIDE_COUNT, topStoriesSlideCount }
 
 type PostRef = { _ref?: string }
 
-// ClearView posts never carry the clearview key: the group page draws on every editorial brand.
-export const postsOfPageBrand: ReferenceFilterResolver = ({ document }) => {
-  const brand = (document as { brand?: string }).brand
+const pageBrandOf = (document: unknown) => (document as { brand?: string } | undefined)?.brand
 
-  if (!brand || brand === 'clearview') {
-    return {}
-  }
-
-  return { filter: '$brand in brands', params: { brand } }
-}
-
-const postPicks = (name: string, title: string, max: number, other: string) =>
+const postPicks = (
+  name: string,
+  title: string,
+  max: number | ((brand: unknown) => number),
+  other: string,
+  description = `Up to ${typeof max === 'number' ? max : TOP_STORIES_SLIDE_COUNT}. Empty places fill with the latest posts.`,
+) =>
   defineField({
     name,
     title,
     type: 'array',
-    description: `Up to ${max}. Empty places fill with the latest posts.`,
+    // Lists what the site fills automatically right now, with Pin buttons.
+    components: { input: AutoFillPicksInput },
+    description,
     of: [
       defineArrayMember({
         type: 'reference',
@@ -33,9 +34,15 @@ const postPicks = (name: string, title: string, max: number, other: string) =>
       }),
     ],
     validation: (Rule) =>
-      Rule.max(max)
-        .unique()
+      Rule.unique()
         .custom((picks, context) => {
+          const limit = typeof max === 'number' ? max : max(pageBrandOf(context.document))
+          const count = (picks as PostRef[] | undefined)?.length ?? 0
+
+          if (count > limit) {
+            return limit === 1 ? 'Publication homes show one lead story' : `Up to ${limit}; remove ${count - limit}`
+          }
+
           const others = (context.parent as Record<string, PostRef[] | undefined>)?.[other] ?? []
           const otherIds = new Set(others.map((ref) => ref._ref))
           const clash = (picks as PostRef[] | undefined)?.some((ref) => otherIds.has(ref._ref))
@@ -45,8 +52,10 @@ const postPicks = (name: string, title: string, max: number, other: string) =>
   })
 
 /**
- * Hero slider with three smaller articles beneath it. Picks come first; the
- * page query fills the remaining places with the latest posts of the brand.
+ * Lead stories with three smaller articles beneath them. ClearView runs up to
+ * three lead stories as a slider; a publication home shows one, with a label
+ * above the articles. Picks come first; the page query fills the remaining
+ * places with the latest posts of the brand.
  */
 export const topStories = defineType({
   name: 'topStories',
@@ -55,7 +64,26 @@ export const topStories = defineType({
   icon: DocumentsIcon,
   fields: [
     adminLabelField,
-    postPicks('slides', 'Slides', TOP_STORIES_SLIDE_COUNT, 'articles'),
+    postPicks(
+      'slides',
+      'Slides',
+      topStoriesSlideCount,
+      'articles',
+      `The lead story. ClearView: up to ${TOP_STORIES_SLIDE_COUNT}, shown as a slider. Publication homes: one. Empty places fill with the latest posts.`,
+    ),
+    // Publication homes only: the ClearView home has no label above its articles.
+    defineField({
+      name: 'label',
+      title: 'Articles label',
+      type: 'string',
+      description: 'Shown above the articles below the lead story.',
+      initialValue: 'Top Stories',
+      hidden: ({ document }) => pageBrandOf(document) === 'clearview',
+      validation: (Rule) =>
+        Rule.custom((value: string | undefined, context) =>
+          pageBrandOf(context.document) === 'clearview' || value?.trim() ? true : 'Required',
+        ),
+    }),
     postPicks('articles', 'Articles below', TOP_STORIES_ARTICLE_COUNT, 'slides'),
     defineField({
       name: 'linkLabel',

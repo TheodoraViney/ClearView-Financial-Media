@@ -5,11 +5,14 @@ import { CheckIcon } from './icons/check'
 import { ChevronDownIcon } from './icons/chevron-down'
 import { ChevronRightIcon } from './icons/chevron-right'
 import { CloseIcon } from './icons/close'
+import { CommentIcon } from './icons/comment'
 import { DocumentIcon } from './icons/document'
 import { DownloadIcon } from './icons/download'
+import { GlassesIcon } from './icons/glasses'
 import { LinkIcon } from './icons/link'
 import { MenuIcon } from './icons/menu'
 import { MenuCloseIcon } from './icons/menu-close'
+import { PeopleMovesIcon } from './icons/people-moves'
 import { PublicIcon } from './icons/public'
 import { SearchIcon } from './icons/search'
 import { ShareIcon } from './icons/share'
@@ -33,6 +36,9 @@ export const iconMap = {
   star: StarIcon,
   public: PublicIcon,
   document: DocumentIcon,
+  glasses: GlassesIcon,
+  comment: CommentIcon,
+  'people-moves': PeopleMovesIcon,
   'stat-article': StatArticleIcon,
   'stat-globe': StatGlobeIcon,
   'stat-star': StatStarIcon,

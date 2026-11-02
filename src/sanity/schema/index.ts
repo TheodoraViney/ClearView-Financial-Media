@@ -7,6 +7,7 @@ import { awardCategory } from './documents/award-category'
 import { awardsProgramme } from './documents/awards-programme'
 import { awardsProgrammeGroup } from './documents/awards-programme-group'
 import { brand } from './documents/brand'
+import { briefSettings } from './documents/brief-settings'
 import { company } from './documents/company'
 import { conferenceEvent } from './documents/conference-event'
 import { clearviewFooter, publicationFooter } from './documents/footer'
@@ -35,6 +36,7 @@ export const documentTypes = [
   mostRead,
   articlePage,
   infographicSettings,
+  briefSettings,
   newsletterIssue,
   awardsProgrammeGroup,
   awardsProgramme,

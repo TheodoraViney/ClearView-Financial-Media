@@ -5,7 +5,7 @@
  * Studio and in scripts.
  */
 
-type PlainBlock = {
+export type PlainBlock = {
   _type: string
   style?: string | null
   listItem?: string | null

@@ -5,7 +5,7 @@ import { isAdSlotSize } from '@/components/ui/AdSlot'
 
 import type { BlockProps } from './types'
 
-export function AdSlot({ block }: BlockProps<'adSlot'>) {
+export function AdSlot({ block, brand }: BlockProps<'adSlot'>) {
   const size = stegaClean(block.size)
   const spacing = stegaClean(block.spacing)
 
@@ -14,6 +14,7 @@ export function AdSlot({ block }: BlockProps<'adSlot'>) {
       size={isAdSlotSize(size) ? size : 'leaderboard'}
       label={block.label ?? undefined}
       spacing={isAdSlotSpacing(spacing) ? spacing : 'around'}
+      look={brand === 'clearview' ? 'group' : 'publication'}
     />
   )
 }

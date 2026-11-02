@@ -72,7 +72,8 @@ export function MobileMenu({ className, children }: { className?: string; childr
     <nav
       ref={panel}
       id={menuId}
-      aria-label="Primary"
+      // Distinct from the desktop nav ("Primary"): both landmarks are in the DOM.
+      aria-label="Primary, mobile"
       onClick={(event) => {
         if ((event.target as Element).closest('a')) {
           setMenuOpen(false)

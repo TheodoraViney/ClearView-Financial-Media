@@ -2,14 +2,20 @@ import type { BrandKey } from '@/brands'
 
 import { AdSlot } from './AdSlot'
 import { Cta } from './Cta'
+import { ExploreGrid } from './ExploreGrid'
 import { FeaturedStories } from './FeaturedStories'
 import { Highlights } from './Highlights'
 import { NewsletterSignup } from './NewsletterSignup'
+import { PostBriefs } from './PostBriefs'
+import { PostCards } from './PostCards'
 import { Publications } from './Publications'
 import { SplitLayout } from './SplitLayout'
 import { SponsoredContent } from './SponsoredContent'
 import { StatsBar } from './StatsBar'
+import { SubscribeBanner } from './SubscribeBanner'
+import { TopPicks } from './TopPicks'
 import { TopStories } from './TopStories'
+import { WeeklyRoundup } from './WeeklyRoundup'
 import type { PageBlock } from './types'
 
 /**
@@ -68,6 +74,19 @@ function Block({ block, brand, today, now }: { block: PageBlock; brand: BrandKey
       return <StatsBar block={block} brand={brand} />
     case 'newsletterSignup':
       return <NewsletterSignup block={block} brand={brand} />
+    // Publication home blocks (WB / WBA / FWR).
+    case 'postCards':
+      return <PostCards block={block} brand={brand} />
+    case 'postBriefs':
+      return <PostBriefs block={block} brand={brand} />
+    case 'weeklyRoundup':
+      return <WeeklyRoundup block={block} brand={brand} today={today} />
+    case 'topPicks':
+      return <TopPicks block={block} brand={brand} />
+    case 'exploreGrid':
+      return <ExploreGrid block={block} brand={brand} today={today} />
+    case 'subscribeBanner':
+      return <SubscribeBanner block={block} brand={brand} />
     default:
       return unknownBlock(block)
   }

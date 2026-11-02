@@ -1,7 +1,10 @@
 import { defineArrayMember, defineField, defineType } from 'sanity'
 
 import { BRANDS, EDITORIAL_BRAND_KEYS } from '@/brands'
+import { BRIEF_MAX_CHARS } from '@/lib/brief-prompt'
 import { PEOPLE_MOVES_CATEGORY_ID } from '@/lib/article-taxonomy'
+
+import { BriefTextInput } from '@/sanity/components/brief-text-input'
 
 import { imageField } from '../fields'
 
@@ -174,6 +177,17 @@ export const post = defineType({
       name: 'content',
       title: 'Content',
       type: 'articleBody',
+    }),
+    defineField({
+      name: 'briefText',
+      title: 'Brief',
+      type: 'text',
+      rows: 5,
+      description:
+        'Five sentences shown in News in Brief. Write it or use Generate brief. Empty: the standfirst is shown.',
+      components: { input: BriefTextInput },
+      validation: (Rule) =>
+        Rule.max(BRIEF_MAX_CHARS).warning('The home shows the brief in full; about five sentences reads best'),
     }),
     defineField({
       name: 'recommended',
