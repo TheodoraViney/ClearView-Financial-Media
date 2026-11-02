@@ -14,6 +14,8 @@ const AD_SLOT_SPACINGS = [
   { title: 'Below', value: 'below' },
   { title: 'Below, section size', value: 'belowSection' },
   { title: 'Sidebar', value: 'aside' },
+  { title: 'Above only (publication Banner 1)', value: 'top' },
+  { title: 'Rule above (publication Banner 3)', value: 'divided' },
   { title: 'None', value: 'none' },
 ]
 

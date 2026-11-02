@@ -2,7 +2,7 @@ import { BillIcon } from '@sanity/icons/Bill'
 import { defineField, defineType, type ReferenceFilterResolver } from 'sanity'
 
 import { adminLabelField, linkField } from '../fields'
-import { postsOfPageBrand } from './top-stories'
+import { postsOfPageBrand } from './shared'
 
 // Only sponsored posts can be picked: the page brand's posts (every editorial brand on ClearView) that have a sponsor.
 const sponsoredPostsOfPageBrand: ReferenceFilterResolver = async (context) => {

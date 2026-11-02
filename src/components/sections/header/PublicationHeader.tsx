@@ -19,9 +19,12 @@ export type PublicationHeaderProps = HeaderProps & {
 type NavLinkComponent = ComponentType<{ href: string; className?: string; children: ReactNode }>
 
 // Hover and the current page both take the brand accent; the current item adds weight and a bottom bar.
-// The negative focus offset keeps the outline inside the scrolling list, which clips overflow.
+// The link fills the header height (for the current bar), so its keyboard outline is drawn on the label instead:
+// 2px outside the text as everywhere on the site. The list pads 4px at the sides (cancelled by a negative margin, so
+// nothing moves) because it scrolls and clips overflow.
 const NAV_LINK =
-  'flex h-full items-center text-sm leading-none whitespace-nowrap text-foreground transition-colors duration-180 ease-smooth hover:text-accent focus-visible:-outline-offset-2 current:font-medium current:text-accent current:inset-shadow-bar'
+  'group flex h-full items-center text-sm leading-none whitespace-nowrap text-foreground transition-colors duration-180 ease-smooth hover:text-accent focus-visible:outline-none current:font-medium current:text-accent current:inset-shadow-bar'
+const NAV_LABEL = 'group-focus-visible:outline-2 group-focus-visible:outline-offset-2 group-focus-visible:outline-focus'
 
 // Mobile menu rows: the current page takes the accent, without the bar.
 const MENU_ROW =
@@ -43,7 +46,7 @@ function NavItems({
       {links.map((link) => (
         <li key={link.key} className="flex flex-col">
           <LinkComponent href={link.href} className={linkClassName}>
-            {link.label}
+            <span className={NAV_LABEL}>{link.label}</span>
           </LinkComponent>
         </li>
       ))}
@@ -83,14 +86,14 @@ export function PublicationHeader({
           <HeaderLogo
             logo={logo}
             homeHref={homeHref}
-            className="h-auto w-header-logo header:h-10 header:w-auto"
+            className="h-header-logo-height w-header-logo header:h-10 header:w-auto"
           />
           {links.length > 0 && (
             <nav aria-label="Primary" className="hidden min-w-0 flex-1 self-stretch header:flex">
               <CurrentNavItems
                 links={links}
                 linkClassName={NAV_LINK}
-                className="flex min-w-0 flex-1 items-stretch justify-center-safe gap-7 overflow-x-auto scrollbar-none"
+                className="-mx-1 flex min-w-0 flex-1 items-stretch justify-center-safe gap-7 overflow-x-auto px-1 scrollbar-none"
               />
             </nav>
           )}

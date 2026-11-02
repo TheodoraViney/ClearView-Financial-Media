@@ -35,7 +35,7 @@ export const BRAND_TITLES = /* groq */ `
   "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title }
 `
 
-/** A post as a card in a listing. */
+/** A post as a card in a listing. The category labels the card on the publication homes ("category | date"). */
 export const POST_CARD = /* groq */ `
   _id,
   title,
@@ -44,8 +44,37 @@ export const POST_CARD = /* groq */ `
   ${BRAND_TITLES},
   publishedAt,
   excerpt,
-  "image": image{ ${IMAGE} }
+  "image": image{ ${IMAGE} },
+  "category": category->{ title, "slug": slug.current }
 `
+
+/**
+ * A post as a News in Brief row: the card plus its main topic (the row's label; the category when
+ * a post has none) and its brief. An empty brief shows the card's `excerpt` (standfirst) instead.
+ */
+export const POST_BRIEF = /* groq */ `
+  ${POST_CARD},
+  "topic": primaryTopic->{ title },
+  briefText
+`
+
+/**
+ * The fill of a post list block: the brand's latest posts for the empty places, picks excluded. `field` is the
+ * block's picks array (`^` is the block), `extra` an added condition such as the block's category (`"true"` for none). The slice is a
+ * literal maximum; the adapter cuts it to the block's count. The picks are coalesced: the Studio unsets an emptied
+ * array, and `_id in null` is null, which would drop every post. Generic with `as const` so a query built with it
+ * keeps its literal type: defineQuery() looks the result type up by the exact string.
+ */
+export const postListFill = <F extends string, M extends number, E extends string>(field: F, max: M, extra: E) =>
+  /* groq */ `
+  *[
+    _type == "post"
+    && defined(slug.current)
+    && $brand in brands
+    && ${extra}
+    && !(_id in coalesce(^.${field}[]._ref, []))
+  ] | order(publishedAt desc)[0...${max}]
+` as const
 
 /** A post as an article page card (Recommended, Most read): its main topic labels it. */
 export const ARTICLE_CARD = /* groq */ `
@@ -64,24 +93,40 @@ const CTA = /* groq */ `
   link{ label, href }
 `
 
+// Pick filters: a picked post shows only while it still runs on the page brand (its brands can change after picking);
+// on ClearView every editorial post qualifies, as in its fills. Records of other types (Explore awards, events,
+// research) carry no brand and pass. Unpublished or deleted picks dereference to null and drop out here as well.
+// Exported for the Studio panel, which dereferences picks the same way.
+export const BRAND_POST_PICK = /* groq */ `[$brand in @->brands]`
+export const ANY_EDITORIAL_POST_PICK = /* groq */ `[$brand == "clearview" || $brand in @->brands]`
+export const BRAND_ITEM_PICK = /* groq */ `[@->_type != "post" || $brand in @->brands]`
+
+// The fill queries below are exported (`*_FILL`) for the Studio "Shown automatically now" panel
+// (src/sanity/components/auto-fill-picks-input.tsx), which runs them with the same `$brand` / `$today` and the block as
+// `^`, so Studio and site share one source of truth.
+
 // Picks first; `latest` fills the remaining places. `^` is the topStories block, so picks are excluded.
 // The Studio unsets an emptied array, and `_id in null` is null, which would drop every post: hence the coalesce.
 // On ClearView every editorial post qualifies: post.brands never holds the clearview key.
-const TOP_STORIES = /* groq */ `
-  linkLabel,
-  "slides": slides[]->{ ${POST_CARD} },
-  "articles": articles[]->{ ${POST_CARD} },
-  "latest": *[
+export const TOP_STORIES_FILL = /* groq */ `*[
     _type == "post"
     && defined(slug.current)
     && ($brand == "clearview" || $brand in brands)
     && !(_id in coalesce(^.slides[]._ref, []))
     && !(_id in coalesce(^.articles[]._ref, []))
-  ] | order(publishedAt desc)[0...6]{ ${POST_CARD} }
+  ] | order(publishedAt desc)[0...6]`
+
+// `label` ("Top Stories") shows on the publication homes only; ClearView leaves it unset.
+const TOP_STORIES = /* groq */ `
+  linkLabel,
+  label,
+  "slides": slides${ANY_EDITORIAL_POST_PICK}->{ ${POST_CARD} },
+  "articles": articles${ANY_EDITORIAL_POST_PICK}->{ ${POST_CARD} },
+  "latest": ${TOP_STORIES_FILL}{ ${POST_CARD} }
 `
 
-// Exactly four hand-picked posts, no fill. Like the topStories picks, no brand filter here: the Studio
-// limits picks to the page's brand (all editorial brands on ClearView), and unpublished or deleted
+// Exactly four hand-picked posts, no fill. No brand filter here: the block runs on ClearView, where every
+// editorial post qualifies (the Studio limits picks to the page's brand), and unpublished or deleted
 // picks dereference to null, which the adapter drops.
 const FEATURED_STORIES = /* groq */ `
   heading[]{ _key, style, children[]{ _key, text } },
@@ -150,14 +195,59 @@ const AD_SLOT = /* groq */ `
   spacing
 `
 
+// News Analysis and News in Brief: picks, then the brand's latest posts of the block's category.
+// Picks dereference through BRAND_POST_PICK: a post taken off the page brand after picking drops out.
+const POST_LIST = /* groq */ `
+  heading[]{ _key, style, children[]{ _key, text } },
+  link{ ${LINK} }
+`
+
+/** News Analysis fill: the brand's latest posts of the block's category. */
+export const POST_LIST_FILL = postListFill('posts', 6, 'defined(^.category._ref) && category._ref == ^.category._ref')
+
+/** News in Brief fill: the brand's latest posts, any category. */
+export const POST_BRIEFS_FILL = postListFill('posts', 6, 'true')
+
+const POST_CARDS = /* groq */ `
+  ${POST_LIST},
+  "category": category->{ title, "slug": slug.current },
+  "posts": posts${BRAND_POST_PICK}->{ ${POST_CARD} },
+  "latest": ${POST_LIST_FILL}{ ${POST_CARD} }
+` as const
+
+const POST_BRIEFS = /* groq */ `
+  ${POST_LIST},
+  count,
+  "posts": posts${BRAND_POST_PICK}->{ ${POST_BRIEF} },
+  "latest": ${POST_BRIEFS_FILL}{ ${POST_BRIEF} }
+` as const
+
+/** Weekly Roundup fill: the brand's latest posts. */
+export const WEEKLY_ROUNDUP_FILL = postListFill('posts', 8, 'true')
+
+// Static card copy plus four posts: picks, then the brand's latest. The edition date is the last Friday, from `$today` in the adapter.
+const WEEKLY_ROUNDUP = /* groq */ `
+  heading[]{ _key, style, children[]{ _key, text } },
+  label,
+  title,
+  summary,
+  button{ ${LINK} },
+  listLabel,
+  "posts": posts${BRAND_POST_PICK}->{ ${POST_CARD} },
+  "latest": ${WEEKLY_ROUNDUP_FILL}{ ${POST_CARD} }
+` as const
+
 // adminLabel is CMS-only and deliberately not projected.
 const MAIN_COLUMN_BLOCKS = /* groq */ `
   _type == "adSlot" => { ${AD_SLOT} },
   _type == "topStories" => { ${TOP_STORIES} },
   _type == "sponsoredContent" => { ${SPONSORED_CONTENT} },
+  _type == "postCards" => { ${POST_CARDS} },
+  _type == "postBriefs" => { ${POST_BRIEFS} },
+  _type == "weeklyRoundup" => { ${WEEKLY_ROUNDUP} },
   _type == "publications" => { ${PUBLICATIONS} },
   _type == "cta" => { ${CTA} }
-`
+` as const
 
 // What the adapter needs to build an item's title and meta line. Shared records carry no brand.
 const HIGHLIGHT_ITEM = /* groq */ `
@@ -173,61 +263,68 @@ const HIGHLIGHT_ITEM = /* groq */ `
   publishedAt
 `
 
-// Picks first; `fill` holds the records for the empty places, in tiers, so a block shows its full count whenever records exist.
-// Counts per source as HIGHLIGHTS_ITEM_MAX in the schema: awards 5 (`[0...5]` per tier), events 4 (`[0...4]`), research 2 (`[0...2]`).
-// Each tier is its own sub-query (picks excluded; `^` is the highlights block), concatenated in tier order
-// with an array spread `...` (not an object spread); the tier conditions are disjoint, and the adapter dedupes against the picks and keeps the first ones up to the count.
-// The tiers only order the fill; the adapter picks the meta line from the record's own dates. Shared records have no brand field.
+// The fill tiers of the awards, events and research sources, shared by the highlights block and the Explore cards, as
+// `select()` branches on the `source` field. `^` is the block or card: its picks (`items`) are excluded.
+// Each tier fetches the most a block can show per source (HIGHLIGHTS_ITEM_MAX in the schema: awards 5 `[0...5]`, events 4
+// `[0...4]`, research 3 `[0...3]`); the adapter cuts to the block's count.
+// Each tier is its own sub-query, concatenated in tier order with an array spread `...` (not an object spread); the tier
+// conditions are disjoint, and the adapter dedupes against the picks and keeps the first ones up to the count.
+// The tiers only order the fill; the adapter picks the meta line from the record's own dates.
+// Shared records have no brand field, so every brand gets the same group-wide lists.
 // `$today` is the UK calendar date passed in by the page, so the cached result changes once a day instead of `now()` defeating the cache.
-// The fill runs on ClearView only: the brand sites show editor picks only and never run the fill queries.
 // GROQ comparisons with null are null, and `!null` is null too, so "not open" is spelt `!(defined(x) && x >= $today)`.
 // For the same reason the picks are coalesced: the Studio unsets `items` when the last pick is removed.
 // Research runs newest first; GROQ sorts null first in desc, so an undated resource is pushed to the end.
-// Research also skips the report the promo row already shows.
+// Research also skips the report a highlights promo row already shows (an Explore card has no promo).
+export const RECORD_FILL_BRANCHES = /* groq */ `
+  source == "awards" => [
+    ...*[
+      _type == "awardsProgramme"
+      && nominationsClosingDate >= $today
+      && !(_id in coalesce(^.items[]._ref, []))
+    ] | order(nominationsClosingDate asc)[0...5]{ ${HIGHLIGHT_ITEM} },
+    ...*[
+      _type == "awardsProgramme"
+      && !(defined(nominationsClosingDate) && nominationsClosingDate >= $today)
+      && startDate >= $today
+      && !(_id in coalesce(^.items[]._ref, []))
+    ] | order(startDate asc)[0...5]{ ${HIGHLIGHT_ITEM} },
+    ...*[
+      _type == "awardsProgramme"
+      && !(defined(nominationsClosingDate) && nominationsClosingDate >= $today)
+      && startDate < $today
+      && !(_id in coalesce(^.items[]._ref, []))
+    ] | order(startDate desc)[0...5]{ ${HIGHLIGHT_ITEM} }
+  ],
+  source == "events" => [
+    ...*[
+      _type == "conferenceEvent"
+      && coalesce(endDate, startDate) >= $today
+      && !(_id in coalesce(^.items[]._ref, []))
+    ] | order(startDate asc)[0...4]{ ${HIGHLIGHT_ITEM} },
+    ...*[
+      _type == "conferenceEvent"
+      && coalesce(endDate, startDate) < $today
+      && !(_id in coalesce(^.items[]._ref, []))
+    ] | order(startDate desc)[0...4]{ ${HIGHLIGHT_ITEM} }
+  ],
+  source == "research" => *[
+    _type == "resource"
+    && category == "research"
+    && !(_id in coalesce(^.items[]._ref, []))
+    && _id != coalesce(^.promo.resource._ref, "")
+  ] | order(defined(publishedAt) desc, publishedAt desc, legacyWpId desc)[0...3]{ ${HIGHLIGHT_ITEM} }
+`
+
+// Picks first; `fill` holds the records for the empty places (RECORD_FILL_BRANCHES), on every brand.
+// `count` is optional: empty keeps the ClearView counts (HIGHLIGHTS_DEFAULT_COUNT in the schema).
 const HIGHLIGHTS = /* groq */ `
   source,
+  count,
   heading[]{ _key, style, children[]{ _key, text } },
   deadlineLabel,
   "items": items[]->{ ${HIGHLIGHT_ITEM} },
-  "fill": select(
-    $brand == "clearview" && source == "awards" => [
-      ...*[
-        _type == "awardsProgramme"
-        && nominationsClosingDate >= $today
-        && !(_id in coalesce(^.items[]._ref, []))
-      ] | order(nominationsClosingDate asc)[0...5]{ ${HIGHLIGHT_ITEM} },
-      ...*[
-        _type == "awardsProgramme"
-        && !(defined(nominationsClosingDate) && nominationsClosingDate >= $today)
-        && startDate >= $today
-        && !(_id in coalesce(^.items[]._ref, []))
-      ] | order(startDate asc)[0...5]{ ${HIGHLIGHT_ITEM} },
-      ...*[
-        _type == "awardsProgramme"
-        && !(defined(nominationsClosingDate) && nominationsClosingDate >= $today)
-        && startDate < $today
-        && !(_id in coalesce(^.items[]._ref, []))
-      ] | order(startDate desc)[0...5]{ ${HIGHLIGHT_ITEM} }
-    ],
-    $brand == "clearview" && source == "events" => [
-      ...*[
-        _type == "conferenceEvent"
-        && coalesce(endDate, startDate) >= $today
-        && !(_id in coalesce(^.items[]._ref, []))
-      ] | order(startDate asc)[0...4]{ ${HIGHLIGHT_ITEM} },
-      ...*[
-        _type == "conferenceEvent"
-        && coalesce(endDate, startDate) < $today
-        && !(_id in coalesce(^.items[]._ref, []))
-      ] | order(startDate desc)[0...4]{ ${HIGHLIGHT_ITEM} }
-    ],
-    $brand == "clearview" && source == "research" => *[
-      _type == "resource"
-      && category == "research"
-      && !(_id in coalesce(^.items[]._ref, []))
-      && _id != coalesce(^.promo.resource._ref, "")
-    ] | order(defined(publishedAt) desc, publishedAt desc, legacyWpId desc)[0...2]{ ${HIGHLIGHT_ITEM} }
-  ),
+  "fill": select(${RECORD_FILL_BRANCHES}),
   button{ ${LINK} },
   promo{
     resource->{
@@ -249,6 +346,63 @@ const ASIDE_BLOCKS = /* groq */ `
   _type == "adSlot" => { ${AD_SLOT} }
 `
 
+// Picks (a sponsor set after picking is flagged, and the adapter drops it), then the brand's newest unsponsored posts:
+// the last seven days first, older ones after, so the block stays full while posts exist. `$today` keeps it cacheable.
+/** Top Picks fill tiers: unsponsored posts of the last seven days, then older ones. */
+export const TOP_PICKS_FILL_RECENT = postListFill(
+  'posts',
+  6,
+  '!defined(sponsor) && dateTime(publishedAt) >= dateTime($today + "T00:00:00Z") - 60*60*24*7',
+)
+export const TOP_PICKS_FILL_OLDER = postListFill(
+  'posts',
+  6,
+  '!defined(sponsor) && dateTime(publishedAt) < dateTime($today + "T00:00:00Z") - 60*60*24*7',
+)
+
+const TOP_PICKS = /* groq */ `
+  heading[]{ _key, style, children[]{ _key, text } },
+  link{ ${LINK} },
+  "posts": posts${BRAND_POST_PICK}->{ ${POST_CARD}, "sponsored": defined(sponsor) },
+  "fill": [
+    ...${TOP_PICKS_FILL_RECENT}{ ${POST_CARD} },
+    ...${TOP_PICKS_FILL_OLDER}{ ${POST_CARD} }
+  ]
+` as const
+
+// One Explore card: picks, then the fill of its source. `^` is the card. Posts come from the card's category on the
+// page brand; awards, events and research run the same tiers as the highlights block (RECORD_FILL_BRANCHES).
+const EXPLORE_ITEM = /* groq */ `
+  _type == "post" => { _type, ${POST_CARD} },
+  _type != "post" => { ${HIGHLIGHT_ITEM} }
+`
+
+/** Explore card fill for the posts source: the brand's latest posts of the card's category. */
+export const EXPLORE_POSTS_FILL = postListFill('items', 6, 'defined(^.category._ref) && category._ref == ^.category._ref')
+
+const EXPLORE_GRID = /* groq */ `
+  cards[]{
+    _key,
+    heading[]{ _key, style, children[]{ _key, text } },
+    icon,
+    source,
+    count,
+    deadlineLabel,
+    button{ ${LINK} },
+    "items": items${BRAND_ITEM_PICK}->{ ${EXPLORE_ITEM} },
+    "fill": select(
+      source == "posts" => ${EXPLORE_POSTS_FILL}{ _type, ${POST_CARD} },
+      ${RECORD_FILL_BRANCHES}
+    )
+  }
+` as const
+
+const SUBSCRIBE_BANNER = /* groq */ `
+  heading[]{ _key, style, children[]{ _key, text } },
+  description,
+  cta{ ${LINK} }
+`
+
 /** One member of a page's `blocks[]`. Use as `blocks[]{ _key, _type, ${BLOCKS_PROJECTION} }`. */
 export const BLOCKS_PROJECTION = /* groq */ `
   _type == "adSlot" => { ${AD_SLOT} },
@@ -260,8 +414,14 @@ export const BLOCKS_PROJECTION = /* groq */ `
   _type == "statsBar" => { ${STATS_BAR} },
   _type == "newsletterSignup" => { ${NEWSLETTER_SIGNUP} },
   _type == "sponsoredContent" => { ${SPONSORED_CONTENT} },
+  _type == "postCards" => { ${POST_CARDS} },
+  _type == "postBriefs" => { ${POST_BRIEFS} },
+  _type == "weeklyRoundup" => { ${WEEKLY_ROUNDUP} },
+  _type == "topPicks" => { ${TOP_PICKS} },
+  _type == "exploreGrid" => { ${EXPLORE_GRID} },
+  _type == "subscribeBanner" => { ${SUBSCRIBE_BANNER} },
   _type == "splitLayout" => {
     "main": main[]{ _key, _type, ${MAIN_COLUMN_BLOCKS} },
     "aside": aside[]{ _key, _type, ${ASIDE_BLOCKS} }
   }
-`
+` as const

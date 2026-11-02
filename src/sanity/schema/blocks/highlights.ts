@@ -1,7 +1,4 @@
-import { CalendarIcon } from '@sanity/icons/Calendar'
-import { DocumentPdfIcon } from '@sanity/icons/DocumentPdf'
 import { SparklesIcon } from '@sanity/icons/Sparkles'
-import { StarIcon } from '@sanity/icons/Star'
 import {
   type Path,
   type ReferenceFilterResolver,
@@ -12,29 +9,28 @@ import {
   getValueAtPath,
 } from 'sanity'
 
+import { AutoFillPicksInput } from '@/sanity/components/auto-fill-picks-input'
+
 import { adminLabelField, headingField, headingText, imageField, linkField } from '../fields'
+import {
+  HIGHLIGHTS_DEFAULT_COUNT,
+  HIGHLIGHTS_ITEM_MAX,
+  HIGHLIGHTS_SOURCES,
+  type HighlightsSource,
+  highlightsCount,
+  highlightsSourceOf,
+} from './shared'
 
-export const HIGHLIGHTS_SOURCES = [
-  { value: 'awards', title: 'Awards', type: 'awardsProgramme', icon: StarIcon },
-  { value: 'events', title: 'Summits & events', type: 'conferenceEvent', icon: CalendarIcon },
-  { value: 'research', title: 'Research', type: 'resource', icon: DocumentPdfIcon },
-] as const
+export { HIGHLIGHTS_DEFAULT_COUNT, HIGHLIGHTS_ITEM_MAX, HIGHLIGHTS_SOURCES, highlightsCount, highlightsSourceOf }
+export type { HighlightsSource }
 
-export type HighlightsSource = (typeof HIGHLIGHTS_SOURCES)[number]['value']
-
-/** How many items a block shows, per source: picks plus fill. The fill tiers in src/sanity/fragments.ts use the same counts. */
-export const HIGHLIGHTS_ITEM_MAX: Record<HighlightsSource, number> = {
-  awards: 5,
-  events: 4,
-  research: 2,
-}
-
-const sourceOf = (value: unknown) => HIGHLIGHTS_SOURCES.find((source) => source.value === value)
+const sourceOf = highlightsSourceOf
 
 // Research is a resource category; other resource categories never show here.
-const RESEARCH_FILTER = '_type == "resource" && category == "research"'
+export const RESEARCH_FILTER = '_type == "resource" && category == "research"'
 
-const filterFor = (source: unknown) => {
+/** The reference filter for records of a source; every highlights type when the source is not set. */
+export const filterFor = (source: unknown) => {
   const match = sourceOf(source)
 
   if (!match) {
@@ -77,13 +73,22 @@ type PromoValue = {
   link?: { internal?: Ref; external?: string }
 }
 
+/** The page brand of the document the block sits in. */
+const pageBrandOf = (document: unknown) => (document as { brand?: unknown } | undefined)?.brand
+
 /**
- * Whether the promo row must be complete. Events always show one; on awards and research it is optional and is
+ * Events must show a promo row on ClearView pages only: the publication homes have none
+ * (Family Wealth Report's Forums and Summits).
+ */
+const eventsPromoRequired = (source: unknown, document: unknown) => source === 'events' && pageBrandOf(document) === 'clearview'
+
+/**
+ * Whether the promo row must be complete. Events on ClearView pages always show one; elsewhere it is optional and is
  * checked only once the editor has started it, so an untouched promo (or the link type a new block starts with)
  * never blocks publishing.
  */
-const promoRequired = (source: unknown, promo: PromoValue | undefined) =>
-  source === 'events' ||
+const promoRequired = (source: unknown, promo: PromoValue | undefined, document: unknown) =>
+  eventsPromoRequired(source, document) ||
   Boolean(
     promo?.resource?._ref ||
       promo?.title?.trim() ||
@@ -95,7 +100,7 @@ const promoRequired = (source: unknown, promo: PromoValue | undefined) =>
 
 /** promoRequired for a field inside the promo: the path ends at promo.<field>, and the parent is the promo. */
 const promoFieldRequired = ({ document, path, parent }: ValidationContext) =>
-  promoRequired(promoSourceAt(document, path), parent as PromoValue | undefined)
+  promoRequired(promoSourceAt(document, path), parent as PromoValue | undefined, document)
 
 /**
  * Three instances sit in the Two columns sidebar: Awards, Summits & events and
@@ -124,10 +129,32 @@ export const highlights = defineType({
     }),
     headingField('heading', { title: 'Heading', defaultLevel: 'h2', required: true }),
     defineField({
+      name: 'count',
+      title: 'Number of items',
+      type: 'number',
+      description: `How many items the block shows. Leave empty for ${HIGHLIGHTS_DEFAULT_COUNT.awards} awards, ${HIGHLIGHTS_DEFAULT_COUNT.events} events or ${HIGHLIGHTS_DEFAULT_COUNT.research} research reports. At most ${HIGHLIGHTS_ITEM_MAX.awards} awards, ${HIGHLIGHTS_ITEM_MAX.events} events or ${HIGHLIGHTS_ITEM_MAX.research} research reports.`,
+      validation: (Rule) =>
+        Rule.integer()
+          .min(1)
+          .custom((value: number | undefined, context) => {
+            const source = sourceOf((context.parent as { source?: unknown } | undefined)?.source)
+
+            if (value === undefined || !source) {
+              return true
+            }
+
+            const max = HIGHLIGHTS_ITEM_MAX[source.value]
+
+            return value <= max ? true : `${source.title} shows up to ${max} items`
+          }),
+    }),
+    defineField({
       name: 'items',
       title: 'Picks',
       type: 'array',
-      description: `Pick up to ${HIGHLIGHTS_ITEM_MAX.awards} awards, ${HIGHLIGHTS_ITEM_MAX.events} events or ${HIGHLIGHTS_ITEM_MAX.research} research reports. Empty places fill automatically: awards open for entries (nearest deadline first), upcoming events, newest research; past ones follow if there are not enough.`,
+      // Lists what the site fills automatically right now, with Pin buttons.
+      components: { input: AutoFillPicksInput },
+      description: `Pick up to the number of items above. Empty places fill automatically: awards open for entries (nearest deadline first), upcoming events, newest research; past ones follow if there are not enough.`,
       of: [
         defineArrayMember({
           type: 'reference',
@@ -137,14 +164,15 @@ export const highlights = defineType({
       ],
       validation: (Rule) =>
         Rule.unique().custom(async (items, context) => {
-          const source = sourceOf((context.parent as { source?: unknown } | undefined)?.source)
+          const parent = context.parent as { source?: unknown; count?: unknown } | undefined
+          const source = sourceOf(parent?.source)
           const ids = ((items as Ref[] | undefined) ?? []).flatMap((ref) => (ref._ref ? [ref._ref] : []))
 
           if (!source || ids.length === 0) {
             return true
           }
 
-          const max = HIGHLIGHTS_ITEM_MAX[source.value]
+          const max = highlightsCount(source.value, parent?.count)
 
           if ((items as Ref[]).length > max) {
             return `${source.title} shows up to ${max} items; remove ${(items as Ref[]).length - max}`
@@ -189,11 +217,14 @@ export const highlights = defineType({
       name: 'promo',
       title: 'Promo',
       type: 'object',
-      description: 'The row at the bottom of the block. Required for Summits & events; optional for Awards and Research.',
+      description:
+        'The row at the bottom of the block. Required for Summits & events on the ClearView home; optional otherwise.',
       options: { collapsible: true, collapsed: true },
       validation: (Rule) =>
         Rule.custom((value, context) =>
-          value || (context.parent as { source?: unknown } | undefined)?.source !== 'events' ? true : 'Required',
+          value || !eventsPromoRequired((context.parent as { source?: unknown } | undefined)?.source, context.document)
+            ? true
+            : 'Required',
         ),
       fields: [
         defineField({
@@ -255,7 +286,7 @@ export const highlights = defineType({
             const source = promoSourceAt(document, path)
             const promo = getValueAtPath(document, path.slice(0, -1)) as PromoValue | undefined
 
-            return source === 'events' || (source === 'awards' && promoRequired(source, promo))
+            return promoRequired(source, promo, document) && (source === 'events' || source === 'awards')
           },
         }),
       ],

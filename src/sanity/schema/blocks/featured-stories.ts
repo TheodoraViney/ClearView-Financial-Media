@@ -2,7 +2,7 @@ import { ThListIcon } from '@sanity/icons/ThList'
 import { defineArrayMember, defineField, defineType } from 'sanity'
 
 import { adminLabelField, headingField, headingText, linkField } from '../fields'
-import { postsOfPageBrand } from './top-stories'
+import { postsOfPageBrand } from './shared'
 
 export const FEATURED_STORIES_POST_COUNT = 4
 

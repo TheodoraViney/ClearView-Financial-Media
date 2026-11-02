@@ -11,6 +11,9 @@ import { Meta } from './Meta'
 // `variant="stacked"` is the article page's recommended card: 3:2 image on every breakpoint, meta above the title,
 // brand-coloured hover and a slow zoom. Its source order is title, meta, image, so the link's accessible name starts
 // with the title; `order-first` draws the image, then the meta, above the title.
+// `variant="pick"` is the publication home's Top Picks card: 16:10 image, meta (accent category with `metaAccent`, then the
+// date, both 500), a 20/24 headline clamped to 3 lines and the summary clamped to 2; brand-coloured hover, slow zoom.
+// Same source order trick as `stacked`.
 export function ArticleCard({
   href,
   title,
@@ -19,6 +22,8 @@ export function ArticleCard({
   sizes,
   tall = false,
   variant = 'featured',
+  summary,
+  metaAccent = false,
   className,
 }: {
   href: string
@@ -27,9 +32,31 @@ export function ArticleCard({
   image?: MediaImage | null
   sizes: string
   tall?: boolean
-  variant?: 'featured' | 'stacked'
+  variant?: 'featured' | 'stacked' | 'pick'
+  /** `pick` only. */
+  summary?: string | null
+  /** `pick` only: the first meta item is the category, drawn in the accent. */
+  metaAccent?: boolean
   className?: string
 }) {
+  if (variant === 'pick') {
+    return (
+      <Link
+        href={href}
+        className={cx('group flex flex-col gap-4 text-foreground transition-colors duration-180 ease-out hover:text-accent', className)}
+      >
+        <div className="flex min-w-0 flex-col gap-3">
+          <span className="line-clamp-3 text-title-lg font-medium">{title}</span>
+          {meta.length > 0 && (
+            <Meta items={meta} accentFirst={metaAccent} className="order-first leading-none font-medium" />
+          )}
+          {summary && <span className="line-clamp-2 text-sm text-grey">{summary}</span>}
+        </div>
+        <Media image={image} sizes={sizes} zoom="slow" className="order-first aspect-16/10 w-full" />
+      </Link>
+    )
+  }
+
   if (variant === 'stacked') {
     return (
       <Link

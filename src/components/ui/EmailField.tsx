@@ -11,6 +11,7 @@ export type EmailFieldStatus = 'idle' | 'error' | 'success'
 const RING_EASE: Record<Motion, string> = {
   smooth: 'md:duration-180 md:ease-smooth',
   responsive: 'md:duration-180 md:ease-out lg:ease-smooth',
+  out: 'md:duration-180 md:ease-out',
 }
 
 // Stacked on mobile, button inside the field from md up. The caller owns the <form>.

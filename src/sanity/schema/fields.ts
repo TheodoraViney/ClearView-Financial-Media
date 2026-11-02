@@ -283,12 +283,14 @@ export const headingField = (
   options: {
     title?: string
     defaultLevel: HeadingLevel
+    /** The heading text a new block starts with, e.g. the design copy. Empty when not set. */
+    initialText?: string
     required?: boolean
     description?: string
     group?: string
   },
 ) => {
-  const { title = 'Heading', defaultLevel, required = false, group } = options
+  const { title = 'Heading', defaultLevel, initialText = '', required = false, group } = options
   const description =
     options.description ?? 'Choose the heading level in the style menu. The size on the page stays the same.'
 
@@ -314,7 +316,7 @@ export const headingField = (
         _type: 'block',
         style: defaultLevel,
         markDefs: [],
-        children: [{ _type: 'span', _key: 'span', text: '', marks: [] }],
+        children: [{ _type: 'span', _key: 'span', text: initialText, marks: [] }],
       },
     ],
     validation: (Rule) =>

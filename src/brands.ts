@@ -64,6 +64,19 @@ interface BrandDefaults {
   headerType: HeaderType
   /** Schema type of this brand's footer document. */
   footerType: FooterType
+  /**
+   * Home lists whose items show no meta line under the title, as this brand's design: the sidebar and Explore
+   * awards and research items, and the Explore post items. Empty or missing: every list shows its meta.
+   */
+  listsWithoutMeta?: readonly ListWithoutMeta[]
+}
+
+/** A home list that a brand can draw without meta lines (see `listsWithoutMeta`). */
+export type ListWithoutMeta = 'awards' | 'research' | 'posts'
+
+/** Whether a brand's home draws this list's items without a meta line. */
+export function showsListMeta(brand: BrandKey, list: ListWithoutMeta): boolean {
+  return !BRANDS[brand].listsWithoutMeta?.includes(list)
 }
 
 export const BRANDS: Record<BrandKey, BrandDefaults> = {
@@ -111,6 +124,8 @@ export const BRANDS: Record<BrandKey, BrandDefaults> = {
     stagingHost: 'familywealthreport.vercel.app',
     headerType: 'publicationHeader',
     footerType: 'publicationFooter',
+    // Forums and Summits (events) keep their "date | place" line.
+    listsWithoutMeta: ['awards', 'research', 'posts'],
   },
   clearview: {
     title: 'ClearView Financial Media',

@@ -1,0 +1,150 @@
+import { type PlainBlock, portableTextToPlain } from './portable-text-plain'
+
+/*
+ * The "Generate brief" request and response, used by the Studio button on `post.briefText`
+ * (src/sanity/components/brief-text-input.tsx).
+ *
+ * The prompt is two halves, as for the infographic. The editorial half (the five-sentence structure, facts, style)
+ * lives in the shared `brief-settings` document, so editors change it without a deploy. The technical half below is
+ * the contract the field holds the output to: plain text, one paragraph, the length cap and the JSON shape.
+ */
+
+/** The shared "Brief instructions" document, one for every brand. */
+export const BRIEF_SETTINGS_ID = 'brief-settings'
+
+/** How long a brief may be, in characters. The field warns above it; the home shows the brief in full. */
+export const BRIEF_MAX_CHARS = 700
+
+/** Shorter articles give the model nothing to summarise. */
+export const MIN_BRIEF_ARTICLE_CHARS = 200
+/** Longer text is cut: it costs the same credit, and a five-sentence brief rarely needs more. */
+const MAX_ARTICLE_CHARS = 20_000
+
+const TEMPERATURE = 0.2
+
+// ---------------------------------------------------------------------------------------------------------------
+// Technical contract
+
+const BRIEF_TECHNICAL_CONTRACT = `# Technical rules
+
+- The brief is plain text: one paragraph, no line breaks, no Markdown, no bullet points, no headings, no emoji.
+- No quotation marks around the brief and no label before it (no "Brief:").
+- At most ${BRIEF_MAX_CHARS} characters including spaces. Shorten sentences rather than drop one.
+- Type punctuation as characters (’, –, £, €); no HTML entities.
+
+## Output
+
+Return only one JSON object, no Markdown fences and no text before or after it:
+
+{"brief": "..."}
+
+\`brief\` is the five-sentence brief as one JSON string.
+
+Before answering, check: exactly five sentences in the order of the instructions above, every fact stated in the article, British English, the headline not repeated, at most ${BRIEF_MAX_CHARS} characters.`
+
+// ---------------------------------------------------------------------------------------------------------------
+// Request
+
+/** The article as the model reads it. */
+export type BriefArticle = { title: string; text: string }
+
+/** Title, standfirst and body of a post, as plain text. */
+export function postToBriefArticle(post: {
+  title?: string | null
+  excerpt?: string | null
+  content?: readonly PlainBlock[] | null
+}): BriefArticle {
+  return {
+    title: post.title?.trim() ?? '',
+    text: [post.excerpt?.trim(), portableTextToPlain(post.content)].filter(Boolean).join('\n\n'),
+  }
+}
+
+/**
+ * The instruction holds only $variables, so a "$" in the instructions or the article ("$44.6bn") is never read as a
+ * template variable. Agent Actions requires the word JSON in the instruction when the format is 'json'.
+ */
+const INSTRUCTION = [
+  '$instructions',
+  '',
+  '$contract',
+  '',
+  '---',
+  'ARTICLE HEADLINE: $title',
+  '',
+  'ARTICLE TEXT:',
+  '$article',
+  '---',
+  '',
+  'Return only the JSON object described above.',
+].join('\n')
+
+const constant = (value: string) => ({ type: 'constant' as const, value })
+
+/** The Prompt action request (`client.agent.action.prompt`, apiVersion `vX`). One request, one AI credit. */
+export function buildBriefRequest({ instructions, article }: { instructions: string; article: BriefArticle }) {
+  return {
+    instruction: INSTRUCTION,
+    instructionParams: {
+      instructions: constant(instructions),
+      contract: constant(BRIEF_TECHNICAL_CONTRACT),
+      title: constant(article.title),
+      article: constant(article.text.slice(0, MAX_ARTICLE_CHARS)),
+    },
+    format: 'json' as const,
+    temperature: TEMPERATURE,
+  }
+}
+
+// ---------------------------------------------------------------------------------------------------------------
+// Response
+
+type BriefParseResult = { ok: true; value: string } | { ok: false; error: string }
+
+/** The model sometimes returns the JSON as a string, possibly fenced. */
+function toObject(response: unknown): Record<string, unknown> | null {
+  if (response && typeof response === 'object' && !Array.isArray(response)) {
+    return response as Record<string, unknown>
+  }
+
+  if (typeof response === 'string') {
+    const unfenced = response.trim().replace(/^```(?:json)?\s*/i, '').replace(/```$/, '')
+
+    try {
+      return toObject(JSON.parse(unfenced))
+    } catch {
+      return null
+    }
+  }
+
+  return null
+}
+
+/** One paragraph of plain text: whitespace collapsed, Markdown emphasis and wrapping quotation marks removed. */
+export function cleanBrief(text: string): string {
+  const plain = text.replace(/\s+/g, ' ').replace(/\*\*|__|`/g, '').trim()
+
+  // Quotation marks around the whole brief, only as a matched pair ("…", “…”, ‘…’). A lone closing ’ can end a
+  // sentence ("the clients’"), so a brief that only ends with one keeps it.
+  const wrapped = /^(?:"(.*)"|“(.*)”|‘(.*)’)$/.exec(plain)
+  const inner = wrapped?.slice(1).find((group) => group !== undefined)
+
+  return (inner ?? plain).trim()
+}
+
+/** The Prompt action's answer, checked: a non-empty brief as one paragraph of plain text. */
+export function parseBriefResponse(response: unknown): BriefParseResult {
+  const json = toObject(response)
+
+  if (!json) {
+    return { ok: false, error: 'The answer was cut off or was not JSON. Try again.' }
+  }
+
+  const brief = typeof json.brief === 'string' ? cleanBrief(json.brief) : ''
+
+  if (!brief) {
+    return { ok: false, error: 'The answer has no brief. Try again.' }
+  }
+
+  return { ok: true, value: brief }
+}

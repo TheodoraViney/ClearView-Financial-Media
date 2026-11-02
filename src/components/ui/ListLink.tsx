@@ -21,6 +21,7 @@ export function ListLink({
   meta,
   variant = 'default',
   motion = 'smooth',
+  metaClassName,
   className,
 }: {
   href?: string | null
@@ -28,6 +29,8 @@ export function ListLink({
   meta: ReactNode[]
   variant?: keyof typeof VARIANTS
   motion?: Motion
+  // Extra classes for the meta line, e.g. `leading-none` where the design sets it 13/13 (Explore cards).
+  metaClassName?: string
   className?: string
 }) {
   const classes = cx('flex flex-col gap-2', VARIANTS[variant].text, href && VARIANTS[variant].hover, className)
@@ -39,7 +42,7 @@ export function ListLink({
         <Meta
           items={meta}
           variant={variant === 'inverse' ? 'inverse' : 'default'}
-          className={variant === 'accent' ? 'leading-none' : undefined}
+          className={cx(variant === 'accent' && 'leading-none', metaClassName)}
         />
       )}
     </>
