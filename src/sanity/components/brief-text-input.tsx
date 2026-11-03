@@ -80,7 +80,7 @@ export function BriefTextInput(props: StringInputProps) {
       setStatus({
         kind: 'done',
         message: over
-          ? `Wrote the brief, but it is ${brief.length} characters, over the ${BRIEF_MAX_CHARS} limit. Shorten it before publishing.`
+          ? `Wrote the brief, but it is ${brief.length} characters, over the ${BRIEF_MAX_CHARS} limit that fits three lines in News in Brief. Shorten it before publishing.`
           : 'Wrote the brief. Check it against the article before publishing.',
       })
     },

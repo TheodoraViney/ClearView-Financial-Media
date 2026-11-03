@@ -12,8 +12,14 @@ import { type PlainBlock, portableTextToPlain } from './portable-text-plain'
 /** The shared "Brief instructions" document, one for every brand. */
 export const BRIEF_SETTINGS_ID = 'brief-settings'
 
-/** How long a brief may be, in characters. The field warns above it; the home shows the brief in full. */
-export const BRIEF_MAX_CHARS = 700
+/**
+ * How long a brief may be, in characters. News in Brief clamps the brief to three lines; at 1440 its text column is
+ * 925px of Onest 16/22.4, which holds about 370 characters of English news text in three lines. The cap is about 95%
+ * of that, so a brief within it fits three lines without an ellipsis. The field warns above it.
+ */
+export const BRIEF_MAX_CHARS = 350
+/** The length the generator aims for, so a brief fills the three lines instead of stopping at two. Not validated. */
+export const BRIEF_TARGET_MIN_CHARS = 300
 
 /** Shorter articles give the model nothing to summarise. */
 export const MIN_BRIEF_ARTICLE_CHARS = 200
@@ -29,7 +35,9 @@ const BRIEF_TECHNICAL_CONTRACT = `# Technical rules
 
 - The brief is plain text: one paragraph, no line breaks, no Markdown, no bullet points, no headings, no emoji.
 - No quotation marks around the brief and no label before it (no "Brief:").
-- At most ${BRIEF_MAX_CHARS} characters including spaces. Shorten sentences rather than drop one.
+- Length: between ${BRIEF_TARGET_MIN_CHARS} and ${BRIEF_MAX_CHARS} characters in total, including spaces (about ${Math.round(BRIEF_TARGET_MIN_CHARS / 5)}–${Math.round(BRIEF_MAX_CHARS / 5)} per sentence). The site shows three lines, which this range fills; anything longer is cut.
+- Fill the range with facts from the article: names, figures, dates, places, what happens next. Never pad it with filler, repetition or general statements. If the article truly has too little to say, a shorter brief is fine.
+- Over the range, shorten sentences rather than drop one.
 - Type punctuation as characters (’, –, £, €); no HTML entities.
 
 ## Output
@@ -40,7 +48,7 @@ Return only one JSON object, no Markdown fences and no text before or after it:
 
 \`brief\` is the five-sentence brief as one JSON string.
 
-Before answering, check: exactly five sentences in the order of the instructions above, every fact stated in the article, British English, the headline not repeated, at most ${BRIEF_MAX_CHARS} characters.`
+Before answering, check: exactly five sentences in the order of the instructions above, every fact stated in the article, British English, the headline not repeated, between ${BRIEF_TARGET_MIN_CHARS} and ${BRIEF_MAX_CHARS} characters in total. Under ${BRIEF_TARGET_MIN_CHARS}: add a concrete fact from the article, if it has one. Over ${BRIEF_MAX_CHARS}: shorten the sentences. Then check again.`
 
 // ---------------------------------------------------------------------------------------------------------------
 // Request
