@@ -402,6 +402,9 @@ main :where(*) {
 /* The current page's nav link (aria-current="page") */
 @custom-variant current (&[aria-current='page']);
 
+/* A native select still on its placeholder option (value ""), which shows grey (`Select`) */
+@custom-variant unselected (&:has(> option[value='']:checked));
+
 /*
  * Top stories directly followed by a Sponsored content block read as one section, as in the design: the Top stories
  * section drops its bottom padding and the sponsored block opens with the section's inner gap instead of a section's

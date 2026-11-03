@@ -1,6 +1,7 @@
 import 'server-only'
 
 import { BrevoError } from './brevo'
+import { HONEYPOT_FIELD } from './honeypot'
 
 /**
  * Shared server helpers for the site's forms. Rate limiting is deliberately not done here:
@@ -14,9 +15,6 @@ const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 
 export const isEmail = (value: FormDataEntryValue | null): value is string =>
   typeof value === 'string' && EMAIL_PATTERN.test(value.trim())
-
-/** Name of the hidden field people never see. Bots that fill every input fill this one too. */
-export const HONEYPOT_FIELD = 'company_website'
 
 /** True when the honeypot is filled. Callers answer success without sending anything, so the bot learns nothing. */
 export const isBot = (formData: FormData) => {

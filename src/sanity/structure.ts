@@ -9,6 +9,7 @@ import { DocumentTextIcon } from '@sanity/icons/DocumentText'
 import { EarthGlobeIcon } from '@sanity/icons/EarthGlobe'
 import { EnvelopeIcon } from '@sanity/icons/Envelope'
 import { FolderIcon } from '@sanity/icons/Folder'
+import { InboxIcon } from '@sanity/icons/Inbox'
 import { InsertBelowIcon } from '@sanity/icons/InsertBelow'
 import { MenuIcon } from '@sanity/icons/Menu'
 import { SparklesIcon } from '@sanity/icons/Sparkles'
@@ -22,12 +23,14 @@ import type { StructureResolver } from 'sanity/structure'
 import {
   BRAND_KEYS,
   BRANDS,
+  SUBSCRIBE_FORM_SETTINGS_ID,
   articlePageDocumentId,
   brandDocumentId,
   footerDocumentId,
   headerDocumentId,
   isEditorialBrandKey,
   mostReadDocumentId,
+  subscribeModalDocumentId,
 } from '@/brands'
 import { BRIEF_SETTINGS_ID } from '@/lib/brief-prompt'
 import { INFOGRAPHIC_SETTINGS_ID } from '@/lib/infographic-prompt'
@@ -89,6 +92,10 @@ export const structure: StructureResolver = (S) =>
                   .title('Footer')
                   .icon(InsertBelowIcon)
                   .child(S.document().schemaType(BRANDS[key].footerType).documentId(footerDocumentId(key))),
+                S.listItem()
+                  .title('Subscribe pop-up')
+                  .icon(EnvelopeIcon)
+                  .child(S.document().schemaType('subscribeModal').documentId(subscribeModalDocumentId(key))),
                 // ClearView carries no articles, so it has no Most read list and no Article page labels.
                 ...(isEditorialBrandKey(key)
                   ? [
@@ -132,6 +139,20 @@ export const structure: StructureResolver = (S) =>
                 .title('Brief instructions')
                 .icon(SparklesIcon)
                 .child(S.document().schemaType('briefSettings').documentId(BRIEF_SETTINGS_ID)),
+            ]),
+        ),
+      // What every subscribe form shares: the Brevo list and the confirmation email.
+      S.listItem()
+        .title('Forms')
+        .icon(InboxIcon)
+        .child(
+          S.list()
+            .title('Forms')
+            .items([
+              S.listItem()
+                .title('Subscribe form settings')
+                .icon(CogIcon)
+                .child(S.document().schemaType('subscribeFormSettings').documentId(SUBSCRIBE_FORM_SETTINGS_ID)),
             ]),
         ),
       S.divider(),

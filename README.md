@@ -95,6 +95,8 @@ Sanity Live tags each cached result with the documents that produced it, so publ
 Cache expiry is triggered by `<SanityLive>` in a visitor's browser.
 `cachedUkToday` caches today's UK date for one hour and is passed to queries as `$today`.
 Date-based lists, such as upcoming events and open awards, therefore roll over within an hour of UK midnight without any publish, and pages that use it revalidate hourly.
+`cachedSubscribeOptions` in `src/lib/subscribe-options.ts` caches the subscribe pop-up's Country and Industry lists from Brevo for hours.
+The brand layout reads it, so every page revalidates at least hourly. A Brevo failure is not cached; the two fields are hidden until the next read.
 `curl` alone never expires anything.
 In dev, `'use cache'` entries persist in `.next/dev/cache` across restarts; delete that folder after seeding content by script.
 

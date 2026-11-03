@@ -1,10 +1,10 @@
 import { defineQuery } from 'next-sanity'
 
-import { ARTICLE_CARD, BLOCKS_PROJECTION, BRAND_TITLES, IMAGE, LINK, LINK_TARGET } from './fragments'
+import { ARTICLE_CARD, BLOCKS_PROJECTION, BRAND_TITLES, IMAGE, LINK, LINK_TARGET, SUBSCRIBE_MODAL } from './fragments'
 
-// The site shell: the brand's header and footer documents and its Brand settings, in one round trip.
-// All three ids derive from $brand (headerDocumentId / footerDocumentId / brandDocumentId), and the
-// Brand settings match is also checked against $brand.
+// The site shell: the brand's header and footer documents, its Brand settings and its subscribe pop-up, in one round
+// trip. Those ids derive from $brand (headerDocumentId / footerDocumentId / brandDocumentId /
+// subscribeModalDocumentId), and the Brand settings match is also checked against $brand.
 // navLink stores its visible text in `label`, so its link has no label of its own (LINK_TARGET).
 export const SHELL_QUERY = defineQuery(`
   {
@@ -19,6 +19,7 @@ export const SHELL_QUERY = defineQuery(`
       },
       searchPlaceholder,
       searchLabels,
+      subscribeLabel,
       subscribe{ ${LINK} }
     },
     "footer": *[_id == $footerId && _type in ["clearviewFooter", "publicationFooter"]][0]{
@@ -38,7 +39,8 @@ export const SHELL_QUERY = defineQuery(`
       title,
       logo{ "alt": asset->altText, asset->{ url, metadata{ dimensions{ width, height } } } },
       footerLogo{ "alt": asset->altText, asset->{ url, metadata{ dimensions{ width, height } } } }
-    }
+    },
+    "subscribeModal": *[_id == $subscribeModalId && _type == "subscribeModal"][0]{ ${SUBSCRIBE_MODAL} }
   }
 `)
 
@@ -289,5 +291,19 @@ export const SITE_SEARCH_QUERY = defineQuery(`
         "slug": slug.current,
         publishedAt
       }
+  }
+`)
+
+// What POST /api/subscribe checks a signup against, read uncached and published (src/lib/subscribe-server.ts): the
+// brand's pop-up interests with their Brevo attributes, and the shared list and confirmation email.
+export const SUBSCRIBE_CONFIG_QUERY = defineQuery(`
+  {
+    "modal": *[_id == $subscribeModalId && _type == "subscribeModal"][0]{
+      interests[]{ _key, "attribute": attribute.name, locked }
+    },
+    "settings": *[_id == $subscribeSettingsId && _type == "subscribeFormSettings"][0]{
+      "listId": list.id,
+      "templateId": confirmationTemplate.id
+    }
   }
 `)

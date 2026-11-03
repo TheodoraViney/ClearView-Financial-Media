@@ -4,7 +4,6 @@ import type { BrandKey } from '@/brands'
 import { GroupHeader } from '@/components/sections/header/GroupHeader'
 import { PublicationHeader } from '@/components/sections/header/PublicationHeader'
 import type { HeaderItem } from '@/components/sections/header/types'
-import { resolveHref } from '@/lib/links'
 import { SEARCH_LABEL_DEFAULTS } from '@/lib/search-term'
 import { brandTitle } from '@/sanity/brand-title'
 
@@ -50,15 +49,13 @@ export function Header({ data, brand }: { data: ShellData; brand: BrandKey }) {
   }
 
   if (stegaClean(header._type) === 'publicationHeader') {
-    const subscribeHref = resolveHref(header.subscribe, brand)
-    const subscribeLabel = header.subscribe?.label
+    // The old link's label until every header has the new label field. Without the brand's pop-up document there is
+    // nothing to open, so no Subscribe button.
+    const subscribeLabel = data.subscribeModal
+      ? [header.subscribeLabel, header.subscribe?.label].find((label) => stegaClean(label)?.trim())
+      : undefined
 
-    return (
-      <PublicationHeader
-        {...props}
-        subscribe={subscribeHref && subscribeLabel ? { label: subscribeLabel, href: subscribeHref } : null}
-      />
-    )
+    return <PublicationHeader {...props} subscribe={subscribeLabel ? { label: subscribeLabel } : null} />
   }
 
   return <GroupHeader {...props} />

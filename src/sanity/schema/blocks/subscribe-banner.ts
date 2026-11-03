@@ -4,8 +4,8 @@ import { defineField, defineType } from 'sanity'
 import { adminLabelField, headingField, headingText, linkField } from '../fields'
 
 /**
- * A publication's newsletter call to action: heading, a short description and one button. Not the ClearView
- * "Stay informed" form (`newsletterSignup`). The button links out until the Subscribe modal is built.
+ * A publication's newsletter call to action: heading, a short description and one button that opens the subscribe
+ * pop-up. Not the ClearView "Stay informed" form (`newsletterSignup`).
  */
 export const subscribeBanner = defineType({
   name: 'subscribeBanner',
@@ -27,8 +27,20 @@ export const subscribeBanner = defineType({
       ],
     }),
     defineField({
-      ...linkField({ name: 'cta', title: 'Button', required: true, labelRequired: true }),
-      initialValue: { kind: 'internal', label: 'Subscribe to the daily newsletter' },
+      name: 'buttonLabel',
+      title: 'Button label',
+      type: 'string',
+      description: 'Label of the button that opens the subscribe pop-up.',
+      initialValue: 'Subscribe to the daily newsletter',
+      validation: (Rule) => Rule.required(),
+    }),
+    // Replaced by buttonLabel: the button opens the pop-up, so it has no target. Read by the site until the label is
+    // copied over and this field cleared on every banner, then removed.
+    defineField({
+      ...linkField({ name: 'cta', title: 'Button link (old)' }),
+      deprecated: { reason: 'The button opens the subscribe pop-up; its label is Button label above.' },
+      readOnly: true,
+      hidden: ({ value }) => value === undefined,
     }),
   ],
   preview: {

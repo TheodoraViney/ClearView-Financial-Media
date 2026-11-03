@@ -94,6 +94,8 @@ const SINGLETON_TYPES = new Set([
   'articlePage',
   'infographicSettings',
   'briefSettings',
+  'subscribeModal',
+  'subscribeFormSettings',
 ])
 
 const SINGLETON_REMOVED_ACTIONS = new Set(['duplicate', 'delete'])
