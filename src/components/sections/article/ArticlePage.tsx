@@ -19,6 +19,12 @@ import { RecommendedArticles } from './RecommendedArticles'
 // Side padding of the main column: 16 / 32, and 64 from the header breakpoint (the article design's desktop starts at 1200).
 const PAD = 'px-gutter header:px-16'
 
+// Space under the main column's last section, above the footer.
+const END = 'pb-16 md:pb-20'
+
+// The hero box: fixed height per breakpoint, the 728px text column once the column has room for it.
+const HERO_BOX = 'mx-auto h-55 w-full md:h-75 header:h-90 header:@article:max-w-182'
+
 // The hero's rendered width per layout:
 // - from 1356px (84.75rem) the column has room for the 728px text column: 728px;
 // - 1200–1355: the main column (viewport − 364px rail) minus 2 × 64px padding = 100vw − 492px (30.75rem);
@@ -38,6 +44,10 @@ export function ArticlePage({ article }: { article: ArticleView }) {
   const time = date && article.publishedAt ? <time dateTime={article.publishedAt}>{date}</time> : null
   const author = article.author
   const { copy } = article
+  const hasAuthorModule = Boolean(author?.bio)
+  const hasRecommended = article.recommended.length > 0
+  // The main column's last section carries the space above the footer, as Recommended articles does.
+  const last = hasRecommended ? 'recommended' : hasAuthorModule ? 'author' : 'body'
 
   const breadcrumb: BreadcrumbItem[] = [
     { label: copy.breadcrumbHomeLabel, href: '/' },
@@ -124,23 +134,34 @@ export function ArticlePage({ article }: { article: ArticleView }) {
             </div>
           </header>
 
-          {article.hero && (
+          {article.hero ? (
             <div className={`@container ${PAD} pt-8 md:pt-10`}>
               <Figure
                 caption={article.hero.credit ? `${copy.imageCreditPrefix} ${article.hero.credit}` : null}
                 captionClassName="mx-auto w-full header:@article:max-w-182"
               >
-                <Media
-                  image={article.hero.image}
-                  sizes={HERO_SIZES}
-                  priority
-                  className="mx-auto h-55 w-full md:h-75 header:h-90 header:@article:max-w-182"
-                />
+                <Media image={article.hero.image} sizes={HERO_SIZES} priority className={HERO_BOX} />
               </Figure>
             </div>
+          ) : (
+            article.heroPlaceholder && (
+              <div className={`@container ${PAD} pt-8 md:pt-10`}>
+                <div className={cx(HERO_BOX, 'flex items-center justify-center rounded-sm bg-light')}>
+                  {/* Decorative: the header already names the brand. An SVG from the CMS, served as is, as in the header. */}
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    src={article.heroPlaceholder.src}
+                    width={article.heroPlaceholder.width}
+                    height={article.heroPlaceholder.height}
+                    alt=""
+                    className="block h-8 w-auto opacity-40 md:h-10"
+                  />
+                </div>
+              </div>
+            )
           )}
 
-          <div className={`@container ${PAD} pt-10 md:pt-12`}>
+          <div className={cx(`@container ${PAD} pt-10 md:pt-12`, last === 'body' && END)}>
             {/* Reserves the share rail's height (label + one 44px button per network and copy link) so a short or empty
               body never lets it hang over the author block or the footer. */}
             <div
@@ -158,16 +179,17 @@ export function ArticlePage({ article }: { article: ArticleView }) {
             </div>
           </div>
 
-          {author && (
-            <div className={`@container flex flex-col items-center ${PAD} pt-12 md:pt-14`}>
+          {/* Only with a bio: archive authors have a name at most, which the byline above already shows. */}
+          {author && hasAuthorModule && (
+            <div className={cx(`@container flex flex-col items-center ${PAD} pt-12 md:pt-14`, last === 'author' && END)}>
               <div className="w-full @article:max-w-182">
                 <AuthorModule author={author} />
               </div>
             </div>
           )}
 
-          {article.recommended.length > 0 && (
-            <div className={`mt-16 border-t border-border ${PAD} pt-10 pb-16 md:pb-20`}>
+          {hasRecommended && (
+            <div className={`mt-16 border-t border-border ${PAD} pt-10 ${END}`}>
               <RecommendedArticles heading={copy.recommendedHeading} items={article.recommended} />
             </div>
           )}

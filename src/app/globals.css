@@ -460,67 +460,77 @@ body {
 
 /*
  * Archive article bodies: HTML from the archive export, limited to p, br, strong, em, u, a, lists, blockquote,
- * h2-h4, tables, img, figure, figcaption, sup, sub, hr and video or podcast iframes. Zero specificity, so a
- * utility on the container still wins.
+ * h2-h4, tables, img, figure, figcaption, sup, sub, hr and video or podcast iframes. The same typography and spacing
+ * as a post body (ArticleBody and `.article-flow`). Zero specificity, so a utility on the container still wins.
  */
 .archive-prose {
+  font-size: var(--text-base);
   line-height: var(--leading-copy);
+  text-wrap: pretty;
   overflow-wrap: break-word;
 
-  :where(p, ul, ol, blockquote, figure, table, hr, iframe) {
-    margin-block: 0 1em;
+  :where(p, ul, ol, blockquote, figure, table, hr, iframe, h2, h3, h4) {
+    margin-block: 0 1.25rem;
   }
 
   :where(:last-child) {
     margin-block-end: 0;
   }
 
+  :where(* + h2, * + h3, * + h4) {
+    margin-block-start: 3rem;
+  }
+
   :where(h2, h3, h4) {
-    margin-block: 1.5em 0.5em;
     font-weight: 500;
-    line-height: var(--leading-heading);
     color: var(--foreground);
   }
 
   :where(h2) {
-    font-size: var(--fs-heading-sm);
+    font-size: var(--text-title-lg);
+    line-height: var(--text-title-lg--line-height);
   }
 
   :where(h3) {
-    font-size: var(--text-title-lg);
+    font-size: var(--text-title-md);
+    line-height: var(--text-title-md--line-height);
+    text-wrap: balance;
   }
 
   :where(h4) {
-    font-size: var(--text-title-md);
+    line-height: var(--leading-title);
   }
 
   :where(a) {
-    color: var(--accent);
+    color: var(--color-accent);
     text-decoration: underline;
+    text-decoration-color: var(--color-accent-subtle);
+    text-underline-offset: 3px;
+    transition: opacity 180ms ease-out;
   }
 
   :where(a:hover) {
-    color: var(--accent-hover);
+    opacity: 0.6;
   }
 
   :where(ul) {
-    padding-inline-start: 1.5em;
+    padding-inline-start: 1.5rem;
     list-style: disc;
   }
 
   :where(ol) {
-    padding-inline-start: 1.5em;
+    padding-inline-start: 1.5rem;
     list-style: decimal;
   }
 
   :where(li + li) {
-    margin-block-start: 0.25em;
+    margin-block-start: 0.5rem;
   }
 
   :where(blockquote) {
-    border-inline-start: 3px solid var(--color-border);
-    padding-inline-start: 1em;
-    color: var(--color-dark-blue-grey);
+    border-inline-start: 2px solid var(--color-border);
+    padding-inline-start: 1rem;
+    color: var(--color-grey);
   }
 
   :where(img) {
@@ -541,6 +551,7 @@ body {
     aspect-ratio: 16 / 9;
     height: auto;
     border: 0;
+    border-radius: var(--radius-sm);
   }
 
   /* The libsyn podcast player is a fixed-height strip, not a video. */

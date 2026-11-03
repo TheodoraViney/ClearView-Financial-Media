@@ -16,6 +16,7 @@ import {
   type ArticleShareLinkView,
   type ArticleView,
 } from '@/lib/article'
+import { archiveCanonicalUrl, archivePlainText, type ArchiveRecord } from '@/lib/archive'
 import { absolutePostUrl, resolveHref } from '@/lib/links'
 import { shareHref } from '@/lib/share-links'
 
@@ -66,15 +67,15 @@ function inOrder(ids: string[], cards: Card[]): Card[] {
 }
 
 /**
- * Most read: the editor's picks in their order, then the auto source for the empty places. The article being read is
- * left out and a post shows once.
+ * Most read: the editor's picks in their order, then the auto source for the empty places. The post being read
+ * (`currentId`, none on an archive page) is left out and a post shows once.
  */
-function mostReadCards(post: Post, mostRead: MostRead, fill: StegaBranded<MostReadAutoFill>): Card[] {
+function mostReadCards(currentId: string | null, mostRead: MostRead, fill: StegaBranded<MostReadAutoFill>): Card[] {
   const picks = mostRead ? inOrder(mostRead.ids, mostRead.posts) : []
   const byId = new Map<string, Card>()
 
   for (const card of [...picks, ...fill]) {
-    if (card._id !== post._id && !byId.has(card._id)) {
+    if (card._id !== currentId && !byId.has(card._id)) {
       byId.set(card._id, card)
     }
   }
@@ -158,10 +159,6 @@ export function fromPost({
 
   const shareUrl = post.slug ? absolutePostUrl(brand, post.slug) : ''
 
-  const mostReadItems = mostReadCards(post, mostRead, mostReadFill)
-    .map((card) => toCard(card, brand))
-    .filter((card): card is ArticleCardView => card !== null)
-
   return {
     title: post.title ?? '',
     standfirst: post.excerpt,
@@ -183,8 +180,75 @@ export function fromPost({
     shareUrl,
     shareLinks: toShareLinks(copy, shareUrl, post.title ?? ''),
     recommended,
-    mostRead:
-      mostReadItems.length > 0 ? { title: mostRead?.title || MOST_READ_TITLE_DEFAULT, items: mostReadItems } : null,
+    mostRead: toMostRead(post._id, mostRead, mostReadFill, brand),
+    copy: toCopy(copy),
+  }
+}
+
+function toMostRead(
+  currentId: string | null,
+  mostRead: MostRead,
+  fill: StegaBranded<MostReadAutoFill>,
+  brand: EditorialBrandKey,
+): ArticleView['mostRead'] {
+  const items = mostReadCards(currentId, mostRead, fill)
+    .map((card) => toCard(card, brand))
+    .filter((card): card is ArticleCardView => card !== null)
+
+  return items.length > 0 ? { title: mostRead?.title || MOST_READ_TITLE_DEFAULT, items } : null
+}
+
+/** Archive media under `/archive-media/`, the only image source the archive page loads. */
+const archiveMedia = (value: string | null | undefined) => (value?.startsWith('/archive-media/') ? value : null)
+
+/**
+ * An archived article as the article page's props. `body` is the rendered archive HTML. Everything the record lacks
+ * stays empty and the page leaves it out:
+ * - no category or topic until the client approves the mapping from legacy categories, so the breadcrumb is Home only;
+ * - the author is the byline only (name, job title, city): the legacy company has no place in the design, and the
+ *   legacy photos sit on the old domains, not in the archive;
+ * - no Recommended articles.
+ */
+export function fromArchiveRecord({
+  record,
+  mostRead,
+  mostReadFill,
+  copy,
+  brand,
+  logo,
+  body,
+}: {
+  record: ArchiveRecord
+  mostRead: MostRead
+  mostReadFill: StegaBranded<MostReadAutoFill>
+  copy: PageCopy
+  brand: EditorialBrandKey
+  /** The brand logo for the grey plate in the hero's place when the record has no image. */
+  logo: { src: string; width: number; height: number } | null
+  body: ReactNode
+}): ArticleView {
+  const image = archiveMedia(record.media.image)
+  const shareUrl = archiveCanonicalUrl(record, brand)
+  const author = record.author
+
+  return {
+    title: record.title,
+    standfirst: record.standfirst,
+    publishedAt: record.date,
+    category: null,
+    topic: null,
+    author: author?.name
+      ? { name: author.name, jobTitle: author.jobTitle, city: author.location, bio: null, photo: null }
+      : null,
+    // Archive media has no stored size. The hero box is `fill` and never reads it.
+    hero: image ? { image: { src: image, width: 0, height: 0, alt: '' }, credit: null } : null,
+    heroPlaceholder: logo,
+    readingMinutes: readingMinutes(countWords(archivePlainText(record.bodyHtml ?? ''))),
+    body,
+    shareUrl,
+    shareLinks: toShareLinks(copy, shareUrl, record.title),
+    recommended: [],
+    mostRead: toMostRead(null, mostRead, mostReadFill, brand),
     copy: toCopy(copy),
   }
 }
