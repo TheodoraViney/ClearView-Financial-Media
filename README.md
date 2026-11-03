@@ -363,7 +363,9 @@ Measured on 40 archive articles.
 Byline 40 of 40. Date 40 of 40. Job title 25 of 40. Firm 1 of 40.
 All three together 0 of 40.
 
-Do not render job title or employer on archive pages.
+On the full archive: name 98.7%, job title 57.7%, city 28%, firm 2.8%.
+Archive pages show the name, job title and city where a record has them.
+The firm is never shown: the article design has no place for it.
 Do not build an archive author facet around them.
 The CMS author template is unaffected, because it holds post-launch content only.
 

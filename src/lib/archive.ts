@@ -1,5 +1,7 @@
 import { cache } from 'react'
 
+import { brandOrigin, isBrandKey, type BrandKey } from '@/brands'
+
 /**
  * Legacy archive articles, read from the archive Worker in front of R2.
  *
@@ -36,7 +38,8 @@ export type ArchiveEvent = {
 
 /**
  * One archived article as the export writes it. Only the fields the site uses
- * are typed. `author.jobTitle` and `author.company` exist but are never rendered.
+ * are typed. The author fields are per-article columns in the legacy table, not
+ * a shared author record.
  */
 export type ArchiveRecord = {
   id: number
@@ -50,7 +53,7 @@ export type ArchiveRecord = {
   publications: string[]
   /** Type label per brand, such as "Breaking News". */
   types: Record<string, string>
-  author: { name: string | null; [key: string]: unknown } | null
+  author: { name: string | null; jobTitle: string | null; location: string | null; [key: string]: unknown } | null
   media: {
     /** `/archive-media/...` or an external https URL. */
     image: string | null
@@ -104,4 +107,24 @@ export const getArchiveRecord = cache(async (id: number): Promise<ArchiveRecord 
 /** Canonical path of an archived article. The id identifies it; the slug is cosmetic. */
 export function archiveArticlePath(record: Pick<ArchiveRecord, 'id' | 'slug'>): string {
   return `/archive/${record.id}/${encodeURIComponent(record.slug)}`
+}
+
+/**
+ * Absolute canonical URL of an archived article. Every editorial domain renders it; the article's first publication
+ * is canonical, else the brand being rendered.
+ */
+export function archiveCanonicalUrl(record: Pick<ArchiveRecord, 'id' | 'slug' | 'publications'>, brand: BrandKey): string {
+  const home = record.publications.find(isBrandKey) ?? brand
+
+  return `${brandOrigin(home)}${archiveArticlePath(record)}`
+}
+
+const ENTITIES: Record<string, string> = { amp: '&', lt: '<', gt: '>', quot: '"', '#39': "'", nbsp: ' ' }
+
+/** Archive body HTML as plain text, for the meta description and the reading time. The body comes from the export allowlist. */
+export function archivePlainText(html: string): string {
+  return html
+    .replace(/<[^>]*>/g, ' ')
+    .replace(/&(amp|lt|gt|quot|#39|nbsp);/g, (_match, name: string) => ENTITIES[name])
+    .replace(/\s+/g, ' ')
 }

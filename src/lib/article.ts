@@ -44,6 +44,8 @@ export type ArticleView = {
   topic: ArticleLink | null
   author: ArticleAuthorView | null
   hero: { image: MediaImage; credit: string | null } | null
+  /** Shown in the hero's place when there is no hero: the brand logo on a grey plate. Archive articles only. */
+  heroPlaceholder?: { src: string; width: number; height: number } | null
   /** Rounded up, at least 1; null when the body has no text to count. */
   readingMinutes: number | null
   /** The rendered body: Portable Text for posts, sanitized HTML for archive records. */

@@ -4,20 +4,25 @@ import { connection } from 'next/server'
 
 import { stegaClean } from 'next-sanity'
 
-import { brandOrigin, isBrandKey, isEditorialBrandKey, type EditorialBrandKey } from '@/brands'
-import { Container } from '@/components/ui/Container'
-import { Meta } from '@/components/ui/Meta'
+import { articlePageDocumentId, brandOrigin, isEditorialBrandKey, mostReadDocumentId, type EditorialBrandKey } from '@/brands'
+import { toLogo } from '@/components/blocks/shell'
+import { ArchiveBody } from '@/components/sections/article/ArchiveBody'
+import { ArticlePage } from '@/components/sections/article/ArticlePage'
 import {
   archiveArticlePath,
+  archiveCanonicalUrl,
+  archivePlainText,
   getArchiveRecord,
   parseArchiveId,
-  type ArchiveEvent,
   type ArchiveRecord,
 } from '@/lib/archive'
-import { formatDateRange } from '@/lib/dates'
-import { fetchBrandTitle } from '@/sanity/brand-title'
+import { fromArchiveRecord } from '@/sanity/article-view'
+import { brandTitle, fetchBrandTitle, fetchShell } from '@/sanity/brand-title'
+import { cachedSanity, type DynamicFetchOptions } from '@/sanity/live'
+import { mostReadAutoFill } from '@/sanity/most-read'
+import { ARTICLE_PAGE_QUERY, MOST_READ_QUERY } from '@/sanity/queries'
 
-// Temporary template for legacy archive articles until the archive design lands.
+// Legacy archive articles on the article template (src/components/sections/article/ArticlePage.tsx).
 
 type Params = Promise<{ brand: string; id: string; slug?: string[] }>
 
@@ -51,15 +56,16 @@ async function loadArticle(params: Params): Promise<{ brand: EditorialBrandKey; 
   return { brand, record, slug }
 }
 
-// The brand title comes from published Brand settings through the layout's cached shell query: the archive is not CMS
-// content, so it has no draft view.
-const PUBLISHED = { perspective: 'published', stega: false } as const
+// The brand's shell, Article page copy and Most read come from published Sanity content through cached queries: the
+// archive is not CMS content, so it has no draft view. None of these queries takes the article id, so the cache holds
+// a few entries per brand, however many archive URLs are crawled.
+const PUBLISHED: DynamicFetchOptions = { perspective: 'published', stega: false }
 
 const DESCRIPTION_LENGTH = 160
 
 /** The standfirst, else the start of the body as plain text, cut at a word near 160 characters. */
 function describe(record: ArchiveRecord): string | undefined {
-  const text = (record.standfirst ?? plainText(record.bodyHtml)).trim()
+  const text = (record.standfirst ?? archivePlainText(record.bodyHtml)).trim()
 
   if (!text) {
     return undefined
@@ -75,16 +81,6 @@ function describe(record: ArchiveRecord): string | undefined {
   return `${(boundary > 80 ? cut.slice(0, boundary) : cut).replace(/[\s,.;:]+$/, '')}…`
 }
 
-const ENTITIES: Record<string, string> = { amp: '&', lt: '<', gt: '>', quot: '"', '#39': "'", nbsp: ' ' }
-
-/** Body HTML to plain text for a meta description. The body comes from the export allowlist. */
-function plainText(html: string): string {
-  return html
-    .replace(/<[^>]*>/g, ' ')
-    .replace(/&(amp|lt|gt|quot|#39|nbsp);/g, (_match, name: string) => ENTITIES[name])
-    .replace(/\s+/g, ' ')
-}
-
 /** A featured image the page can load: our archive media, or an external image over https. */
 function imageSrc(value: string | null | undefined): string | null {
   return value && (value.startsWith('/archive-media/') || value.startsWith('https://')) ? value : null
@@ -92,11 +88,9 @@ function imageSrc(value: string | null | undefined): string | null {
 
 export async function generateMetadata({ params }: { params: Params }): Promise<Metadata> {
   const { brand, record } = await loadArticle(params)
-  const path = archiveArticlePath(record)
   const description = describe(record)
   const image = imageSrc(record.media.image)
-  const home = record.publications.find(isBrandKey) ?? brand
-  const canonical = `${brandOrigin(home)}${path}`
+  const canonical = archiveCanonicalUrl(record, brand)
   const siteName = stegaClean(await fetchBrandTitle(brand, PUBLISHED))
 
   return {
@@ -123,120 +117,23 @@ export default async function ArchiveArticlePage({ params }: { params: Params })
     permanentRedirect(archiveArticlePath(record))
   }
 
-  const date = formatDateRange(record.date, null)
-  // The type under this host's brand, else under the article's first publication.
-  const type = record.types[brand] ?? record.publications.map((key) => record.types[key]).find(Boolean)
-  const author = record.author?.name
-  const image = imageSrc(record.media.image)
-  const videoId = record.media.videoId && /^\d+$/.test(record.media.videoId) ? record.media.videoId : null
-  const attachment = record.media.attachment?.path?.startsWith('/archive-media/') ? record.media.attachment : null
-  const body = record.bodyHtml ?? ''
-  const brandTitle = await fetchBrandTitle(brand, PUBLISHED)
+  const [{ data: shell }, { data: mostRead }, mostReadFill, { data: copy }] = await Promise.all([
+    fetchShell(brand, PUBLISHED),
+    cachedSanity({ query: MOST_READ_QUERY, params: { brand, id: mostReadDocumentId(brand) }, ...PUBLISHED }),
+    // No post is being read: an empty slug excludes none.
+    mostReadAutoFill({ brand, slug: '', ...PUBLISHED }),
+    cachedSanity({ query: ARTICLE_PAGE_QUERY, params: { id: articlePageDocumentId(brand) }, ...PUBLISHED }),
+  ])
 
-  return (
-    <main className="py-10 md:py-16">
-      <Container>
-        <article className="mx-auto flex max-w-3xl flex-col gap-6">
-          <header className="flex flex-col gap-4">
-            <Meta
-              items={[
-                brandTitle,
-                ...(type ? [type] : []),
-                ...(date && record.date ? [<time key="date" dateTime={record.date}>{date}</time>] : []),
-              ]}
-            />
-            <h1 className="text-heading-lg font-medium text-pretty text-foreground">{record.title}</h1>
-            {record.standfirst && <p className="text-title-lg text-dark-blue-grey">{record.standfirst}</p>}
-            {/* Name only: archive job titles and firms are too sparse to show. */}
-            {author && <p className="text-caption text-grey">By {author}</p>}
-          </header>
-
-          {videoId ? (
-            <div className="aspect-video w-full">
-              <iframe
-                src={`https://player.vimeo.com/video/${videoId}`}
-                title={`Video: ${record.title}`}
-                loading="lazy"
-                allow="fullscreen; picture-in-picture"
-                allowFullScreen
-                className="size-full border-0"
-              />
-            </div>
-          ) : (
-            image && (
-              // Archive media is served as is from R2; the Sanity image loader cannot resize it.
-              // eslint-disable-next-line @next/next/no-img-element
-              <img src={image} alt={record.title} className="h-auto max-w-full self-start" />
-            )
-          )}
-
-          {body && <div className="archive-prose" dangerouslySetInnerHTML={{ __html: body }} />}
-
-          {attachment && (
-            <p>
-              <a href={attachment.path ?? undefined} className="font-medium text-accent underline hover:text-accent-hover" download>
-                Download {attachment.filetype === 'application/pdf' ? 'PDF' : 'file'}
-                {attachment.filename && <span className="sr-only">: {attachment.filename}</span>}
-              </a>
-            </p>
-          )}
-
-          {record.event && <EventDetails event={record.event} start={record.date} />}
-        </article>
-      </Container>
-    </main>
-  )
-}
-
-const EVENT_SECTIONS = [
-  ['agenda', 'Agenda'],
-  ['speakers', 'Speakers'],
-  ['sponsors', 'Sponsors'],
-] as const
-
-function EventDetails({ event, start }: { event: ArchiveEvent; start: string | null }) {
-  const dates = formatDateRange(start, event.endDate?.slice(0, 10) ?? null)
-  const sections = EVENT_SECTIONS.flatMap(([key, label]) => {
-    const html = event[key]
-
-    return html ? [{ key, label, html }] : []
+  const article = fromArchiveRecord({
+    record,
+    mostRead,
+    mostReadFill,
+    copy,
+    brand,
+    logo: toLogo(shell.brand?.logo, brandTitle(brand, shell.brand?.title)),
+    body: <ArchiveBody html={record.bodyHtml ?? ''} videoId={record.media.videoId} title={record.title} />,
   })
 
-  if (!event.venue && !dates && !event.time && sections.length === 0) {
-    return null
-  }
-
-  return (
-    <section aria-labelledby="event-details" className="flex flex-col gap-4 border-t border-border pt-6">
-      <h2 id="event-details" className="text-heading-sm font-medium text-foreground">
-        Event details
-      </h2>
-      <dl className="grid grid-cols-[auto_1fr] gap-x-4 gap-y-1">
-        {dates && (
-          <>
-            <dt className="text-grey">Date</dt>
-            <dd>{dates}</dd>
-          </>
-        )}
-        {event.time && (
-          <>
-            <dt className="text-grey">Time</dt>
-            <dd>{event.time}</dd>
-          </>
-        )}
-        {event.venue && (
-          <>
-            <dt className="text-grey">Venue</dt>
-            <dd>{event.venue}</dd>
-          </>
-        )}
-      </dl>
-      {sections.map(({ key, label, html }) => (
-        <div key={key} className="flex flex-col gap-2">
-          <h3 className="text-title-lg font-medium text-foreground">{label}</h3>
-          <div className="archive-prose" dangerouslySetInnerHTML={{ __html: html }} />
-        </div>
-      ))}
-    </section>
-  )
+  return <ArticlePage article={article} />
 }
