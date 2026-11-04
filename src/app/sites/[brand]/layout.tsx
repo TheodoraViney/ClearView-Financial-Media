@@ -10,6 +10,7 @@ import { Footer } from '@/components/blocks/Footer'
 import { Header } from '@/components/blocks/Header'
 import { toSubscribeModal } from '@/components/blocks/subscribe-modal'
 import { SubscribeModalProvider } from '@/components/sections/subscribe/SubscribeModalProvider.client'
+import { InPageDialogs } from '@/components/ui/Dialog.client'
 import type { SubscribeModalData } from '@/components/sections/subscribe/types'
 import { subscribeOptions } from '@/lib/subscribe-options'
 import { fetchBrandTitle, fetchShell } from '@/sanity/brand-title'
@@ -50,12 +51,15 @@ export default async function BrandLayout({
 
   // Live and Visual Editing belong to the site only. In the root layout they also ran inside /studio,
   // which shares the draft-mode cookie, so every live event refreshed the Studio window as well.
+  // InPageDialogs keeps dialogs out of the top layer so Sanity's overlays can sit above them; draft mode only.
   if (isDraftMode) {
     return (
       <>
-        <Suspense fallback={<BrandShell brand={brand}>{children}</BrandShell>}>
-          <DynamicBrandShell brand={brand}>{children}</DynamicBrandShell>
-        </Suspense>
+        <InPageDialogs>
+          <Suspense fallback={<BrandShell brand={brand}>{children}</BrandShell>}>
+            <DynamicBrandShell brand={brand}>{children}</DynamicBrandShell>
+          </Suspense>
+        </InPageDialogs>
         <SanityLive includeDrafts />
         <VisualEditing />
       </>
