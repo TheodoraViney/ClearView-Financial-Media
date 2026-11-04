@@ -12,7 +12,7 @@ import {
 import { ArticleBody } from '@/components/sections/article/ArticleBody'
 import { ArticlePage } from '@/components/sections/article/ArticlePage'
 import { PEOPLE_MOVES_CATEGORY_ID } from '@/lib/article-taxonomy'
-import { fromPost } from '@/sanity/article-view'
+import { fromPost, inContentAdUnit } from '@/sanity/article-view'
 import {
   cachedSanity,
   getDynamicFetchOptions,
@@ -139,7 +139,7 @@ async function CachedPost({
     mostReadFill,
     copy,
     brand,
-    body: post.content ? <ArticleBody value={post.content} /> : null,
+    body: post.content ? <ArticleBody value={post.content} inContentAdUnit={inContentAdUnit(copy)} /> : null,
   })
 
   return <ArticlePage article={article} />

@@ -1,3 +1,4 @@
+import { BlockElementIcon } from '@sanity/icons/BlockElement'
 import { BookIcon } from '@sanity/icons/Book'
 import { BookmarkIcon } from '@sanity/icons/Bookmark'
 import { CalendarIcon } from '@sanity/icons/Calendar'
@@ -182,4 +183,7 @@ export const structure: StructureResolver = (S) =>
       S.divider(),
       S.documentTypeListItem('company').title('Companies').icon(CaseIcon),
       S.documentTypeListItem('person').title('People').icon(UserIcon),
+      S.divider(),
+      // The Publisher's Google Ad Manager units, shared by every brand: ad slots and article pages pick from it.
+      S.documentTypeListItem('adUnit').title('Ad units').icon(BlockElementIcon),
     ])

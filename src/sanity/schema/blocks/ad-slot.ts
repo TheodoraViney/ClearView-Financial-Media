@@ -1,7 +1,7 @@
 import { BlockElementIcon } from '@sanity/icons/BlockElement'
 import { defineField, defineType } from 'sanity'
 
-import { adminLabelField } from '../fields'
+import { adUnitField, adminLabelField } from '../fields'
 
 const AD_SLOT_SIZES = [
   { title: 'Leaderboard', value: 'leaderboard' },
@@ -21,10 +21,8 @@ const AD_SLOT_SPACINGS = [
 
 /**
  * A reserved banner position. Reserves the design height so the ad never
- * shifts layout when it fills.
- *
- * TODO: Google Ad Manager ad unit path and sizes per position, read with the
- * brand's ad unit prefix, arrive with the GAM foundation ticket.
+ * shifts layout when it fills. The Size is the design's; the ad unit is picked
+ * from the shared Ad units list and must match it.
  */
 export const adSlot = defineType({
   name: 'adSlot',
@@ -40,6 +38,10 @@ export const adSlot = defineType({
       options: { list: AD_SLOT_SIZES, layout: 'radio', direction: 'horizontal' },
       initialValue: 'leaderboard',
       validation: (Rule) => Rule.required(),
+    }),
+    adUnitField({
+      description: 'The Google Ad Manager unit this slot shows. Only units that fit the Size are listed.',
+      position: (parent) => (parent as { size?: string } | undefined)?.size,
     }),
     defineField({
       name: 'label',
@@ -58,11 +60,11 @@ export const adSlot = defineType({
     }),
   ],
   preview: {
-    select: { adminLabel: 'adminLabel', label: 'label', size: 'size' },
-    prepare({ adminLabel, label, size }) {
+    select: { adminLabel: 'adminLabel', label: 'label', size: 'size', unit: 'unit.code' },
+    prepare({ adminLabel, label, size, unit }) {
       return {
         title: adminLabel || label || 'Ad slot',
-        subtitle: ['Ad slot', size].filter(Boolean).join(' · '),
+        subtitle: ['Ad slot', size, unit].filter(Boolean).join(' · '),
       }
     },
   },

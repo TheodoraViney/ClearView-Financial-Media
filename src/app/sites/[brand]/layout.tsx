@@ -11,7 +11,9 @@ import { Header } from '@/components/blocks/Header'
 import { toSubscribeModal } from '@/components/blocks/subscribe-modal'
 import { SubscribeModalProvider } from '@/components/sections/subscribe/SubscribeModalProvider.client'
 import { InPageDialogs } from '@/components/ui/Dialog.client'
+import { GptLoader } from '@/components/ui/Gpt.client'
 import type { SubscribeModalData } from '@/components/sections/subscribe/types'
+import { GAM_NETWORK_CODE } from '@/lib/gam'
 import { subscribeOptions } from '@/lib/subscribe-options'
 import { fetchBrandTitle, fetchShell } from '@/sanity/brand-title'
 import { getDynamicFetchOptions, SanityLive, type DynamicFetchOptions } from '@/sanity/live'
@@ -55,11 +57,14 @@ export default async function BrandLayout({
   if (isDraftMode) {
     return (
       <>
-        <InPageDialogs>
-          <Suspense fallback={<BrandShell brand={brand}>{children}</BrandShell>}>
-            <DynamicBrandShell brand={brand}>{children}</DynamicBrandShell>
-          </Suspense>
-        </InPageDialogs>
+        {/* data-preview: what only editors see, such as the ad slots' placeholder labels. No box of its own. */}
+        <div data-preview className="contents">
+          <InPageDialogs>
+            <Suspense fallback={<BrandShell brand={brand}>{children}</BrandShell>}>
+              <DynamicBrandShell brand={brand}>{children}</DynamicBrandShell>
+            </Suspense>
+          </InPageDialogs>
+        </div>
         <SanityLive includeDrafts />
         <VisualEditing />
       </>
@@ -72,6 +77,8 @@ export default async function BrandLayout({
         {children}
       </CachedBrandShell>
       <SanityLive includeDrafts={false} />
+      {/* Ads on the live site only: in draft mode and Presentation the slots stay placeholders. */}
+      {GAM_NETWORK_CODE && <GptLoader publication={brand} />}
     </>
   )
 }

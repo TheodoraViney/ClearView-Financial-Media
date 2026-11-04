@@ -1,11 +1,12 @@
 import { PortableText, stegaClean, type PortableTextComponents, type PortableTextProps } from 'next-sanity'
 
-import { AdSlot } from '@/components/ui/AdSlot'
+import { AD_SLOT_FITS, AD_SLOT_UNSET, AdSlot } from '@/components/ui/AdSlot'
 import { DefinitionList } from '@/components/ui/DefinitionList'
 import { Figure } from '@/components/ui/Figure'
 import { Media } from '@/components/ui/Media'
 import { PullQuote } from '@/components/ui/PullQuote'
 import { cx } from '@/components/ui/cx'
+import type { AdUnitView } from '@/lib/gam'
 import { safeHref } from '@/lib/links'
 import { toImage } from '@/sanity/image'
 
@@ -175,20 +176,36 @@ const components: PortableTextComponents = {
         narrow={value.narrow}
       />
     ),
-    // The in-content banner. The editor places it; GAM fills the reserved slot.
-    adBreak: () => (
-      <div data-flow="block" role="complementary" aria-label="Advertisement, in article">
-        <AdSlot size="leaderboard" />
-      </div>
-    ),
   },
 }
 
-/** A post's Portable Text body in the article column. Spacing between members comes from `.article-flow`. */
-export function ArticleBody({ value }: { value: PortableTextProps['value'] }) {
+/**
+ * A post's Portable Text body in the article column. Spacing between members comes from `.article-flow`.
+ * `inContentAdUnit` is the brand's unit for the in-content banners (`adBreak`), which the editor only places.
+ */
+export function ArticleBody({
+  value,
+  inContentAdUnit,
+}: {
+  value: PortableTextProps['value']
+  inContentAdUnit?: AdUnitView | null
+}) {
+  const withAds: PortableTextComponents = {
+    ...components,
+    types: {
+      ...components.types,
+      adBreak: () => (
+        <div data-flow="block" role="complementary" aria-label="Advertisement, in article" className={inContentAdUnit ? AD_SLOT_FITS.leaderboard : AD_SLOT_UNSET}>
+          <AdSlot size="leaderboard" unit={inContentAdUnit} />
+        </div>
+      ),
+    },
+  }
+
   return (
-    <div className="article-flow min-w-0">
-      <PortableText value={value} components={components} />
+    // A container for the in-content banners, which hide where the column is narrower than 728.
+    <div className="article-flow @container min-w-0">
+      <PortableText value={value} components={withAds} />
     </div>
   )
 }

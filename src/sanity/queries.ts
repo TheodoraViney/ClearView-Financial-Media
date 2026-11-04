@@ -135,7 +135,10 @@ export const ARTICLE_PAGE_QUERY = defineQuery(`
     readTimeSuffix,
     imageCreditPrefix,
     shareRailLabel,
-    "shareLinks": coalesce(shareLinks[]{ _key, label, url, icon{ asset->{ url } } }, [])
+    "shareLinks": coalesce(shareLinks[]{ _key, label, url, icon{ asset->{ url } } }, []),
+    "topAdUnit": topAdUnit->{ code, size },
+    "sidebarAdUnit": sidebarAdUnit->{ code, size },
+    "inContentAdUnit": inContentAdUnit->{ code, size }
   }
 `)
 

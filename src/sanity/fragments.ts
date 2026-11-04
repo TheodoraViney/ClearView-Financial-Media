@@ -199,7 +199,8 @@ const PUBLICATIONS = /* groq */ `
 const AD_SLOT = /* groq */ `
   size,
   label,
-  spacing
+  spacing,
+  "unit": unit->{ code, size }
 `
 
 // News Analysis and News in Brief: picks, then the brand's latest posts of the block's category.

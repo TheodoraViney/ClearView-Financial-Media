@@ -1,5 +1,6 @@
 import { blockTypes } from './blocks'
 import { acclaim } from './documents/acclaim'
+import { adUnit } from './documents/ad-unit'
 import { articlePage } from './documents/article-page'
 import { category, region, topic } from './documents/article-taxonomy'
 import { author } from './documents/author'
@@ -50,6 +51,7 @@ export const documentTypes = [
   person,
   acclaim,
   resource,
+  adUnit,
 ]
 
 export const schemaTypes = [...documentTypes, ...objectTypes, ...blockTypes]

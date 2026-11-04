@@ -1,7 +1,7 @@
 import Link from 'next/link'
 import type { CSSProperties } from 'react'
 
-import { AdSlot } from '@/components/ui/AdSlot'
+import { AD_SLOT_FITS, AD_SLOT_UNSET, AdSlot } from '@/components/ui/AdSlot'
 import { Avatar } from '@/components/ui/Avatar'
 import { Breadcrumb, type BreadcrumbItem } from '@/components/ui/Breadcrumb'
 import { cx } from '@/components/ui/cx'
@@ -58,10 +58,14 @@ export function ArticlePage({ article }: { article: ArticleView }) {
 
   return (
     <main className="mx-auto w-full max-w-page header:grid header:grid-cols-article">
-      <div className="flex min-w-0 flex-col">
+      {/* The column divider is the main column's right border: on the rail it would take 1px of the 300px banner. */}
+      <div className="flex min-w-0 flex-col header:border-r header:border-border">
         <ShareProvider url={article.shareUrl} title={article.title} linkCopiedLabel={copy.linkCopiedLabel}>
-          <div role="complementary" aria-label="Advertisement, top" className={`${PAD} pt-6 md:pt-10`}>
-            <AdSlot size="leaderboard" />
+          {/* Hidden with its spacing and landmark where the column is narrower than the 728 × 90 banner, or with no unit. */}
+          <div className={cx(`@container ${PAD}`, !article.ads.top && AD_SLOT_UNSET)}>
+            <div role="complementary" aria-label="Advertisement, top" className={cx('pt-6 md:pt-10', article.ads.top && AD_SLOT_FITS.leaderboard)}>
+              <AdSlot size="leaderboard" unit={article.ads.top} />
+            </div>
           </div>
 
           <header className={`flex flex-col gap-6 ${PAD} pt-8 md:pt-10`}>
@@ -198,11 +202,13 @@ export function ArticlePage({ article }: { article: ArticleView }) {
 
       <aside
         aria-label="Sidebar"
-        className="border-t border-border px-gutter pt-10 pb-16 header:border-t-0 header:border-l header:p-8"
+        className="border-t border-border px-gutter pt-10 pb-16 header:border-t-0 header:p-8"
       >
         {/* The sidebar is already a complementary landmark: its banner gets no landmark of its own. */}
         <div className="flex flex-col gap-8 header:sticky header:top-rail">
-          <AdSlot size="mpu" />
+          <div className={cx(!article.ads.sidebar && AD_SLOT_UNSET)}>
+            <AdSlot size="mpu" unit={article.ads.sidebar} />
+          </div>
           {article.mostRead && <MostRead title={article.mostRead.title} items={article.mostRead.items} />}
         </div>
       </aside>
