@@ -197,6 +197,8 @@ main :where(*) {
   --container-article: 54rem;
   /* Article infographic: from 560px the wide SVG variant shows, below it the narrow one */
   --container-infographic: 35rem;
+  /* A 728 × 90 banner box: in a narrower container it is hidden, as the legacy sites hide the leaderboard on phones */
+  --container-leaderboard: 45.5rem;
 
   /* ClearView footer brand column basis on desktop (410.667px in the clearview-footer master) */
   --spacing-footer-brand: 25.6667rem;

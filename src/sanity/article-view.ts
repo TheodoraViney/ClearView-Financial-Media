@@ -17,6 +17,7 @@ import {
   type ArticleView,
 } from '@/lib/article'
 import { archiveCanonicalUrl, archivePlainText, type ArchiveRecord } from '@/lib/archive'
+import { toAdUnitView, type AdUnitView } from '@/lib/gam'
 import { absolutePostUrl, resolveHref } from '@/lib/links'
 import { shareHref } from '@/lib/share-links'
 
@@ -104,6 +105,16 @@ function bodyWords(body: Body | null): number {
   }, 0)
 }
 
+/** The brand's top and sidebar banner units. The in-content unit goes to the post body, which renders its banners. */
+function toArticleAds(copy: PageCopy): ArticleView['ads'] {
+  return { top: toAdUnitView(stegaClean(copy?.topAdUnit)), sidebar: toAdUnitView(stegaClean(copy?.sidebarAdUnit)) }
+}
+
+/** The brand's in-content banner unit, for the post body's `adBreak` banners. */
+export function inContentAdUnit(copy: PageCopy): AdUnitView | null {
+  return toAdUnitView(stegaClean(copy?.inContentAdUnit))
+}
+
 /** The brand's labels, each falling back to the design text while the document or the field is missing. */
 function toCopy(copy: PageCopy): ArticlePageCopy {
   const keys = Object.keys(ARTICLE_PAGE_COPY_DEFAULTS) as (keyof ArticlePageCopy)[]
@@ -182,6 +193,7 @@ export function fromPost({
     recommended,
     mostRead: toMostRead(post._id, mostRead, mostReadFill, brand),
     copy: toCopy(copy),
+    ads: toArticleAds(copy),
   }
 }
 
@@ -250,5 +262,6 @@ export function fromArchiveRecord({
     recommended: [],
     mostRead: toMostRead(null, mostRead, mostReadFill, brand),
     copy: toCopy(copy),
+    ads: toArticleAds(copy),
   }
 }
