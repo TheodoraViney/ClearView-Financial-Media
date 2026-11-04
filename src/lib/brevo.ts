@@ -68,6 +68,41 @@ export async function brevoFetch<T>(path: string, init: { method?: string; body?
 /** Contact attribute values as Brevo accepts them; a string array is for multiple-choice attributes. */
 export type BrevoAttributes = Record<string, string | number | boolean | string[]>
 
+/** A contact as GET /contacts/{identifier} answers it, reduced to what the signup forms read. */
+export type BrevoContact = {
+  /** Attribute values by name; multiple-choice ones as string arrays. Brevo leaves out attributes with no value. */
+  attributes: Record<string, unknown>
+  listIds: number[]
+  emailBlacklisted: boolean
+}
+
+/** One contact by email address, or null when Brevo has no such contact (404). Read only. */
+export async function getContact(email: string): Promise<BrevoContact | null> {
+  try {
+    const contact = await brevoFetch<{
+      attributes?: Record<string, unknown> | null
+      listIds?: number[] | null
+      emailBlacklisted?: boolean | null
+    }>(`/contacts/${encodeURIComponent(email)}?identifierType=email_id`)
+
+    return {
+      attributes: contact?.attributes ?? {},
+      listIds: contact?.listIds ?? [],
+      emailBlacklisted: contact?.emailBlacklisted === true,
+    }
+  } catch (error) {
+    if (error instanceof BrevoError && error.status === 404) {
+      return null
+    }
+
+    throw error
+  }
+}
+
+/** True when Brevo refused a request because of the email address itself (400 invalid_parameter naming the email). */
+export const isInvalidEmailError = (error: unknown) =>
+  error instanceof BrevoError && error.status === 400 && error.code === 'invalid_parameter' && /email/i.test(error.message)
+
 /**
  * Starts double opt-in: Brevo emails the confirmation template and adds the contact to the lists only after
  * the click, then sends the reader to redirectionUrl. 201 for a new contact, 204 for an existing one.
@@ -246,8 +281,8 @@ export async function getEmailCampaign(id: number): Promise<EmailCampaign> {
 }
 
 // ---------------------------------------------------------------------------------------------------------------
-// Read-only lookups for the Studio pickers (GET /api/brevo/{lists|segments|templates|senders|attributes}). Shapes
-// verified on the live account on 2026-10-15.
+// Read-only lookups for the Studio pickers (GET /api/brevo/{lists|segments|templates|senders|attributes}) and the
+// subscribe pop-up's option lists. Shapes verified on the live account on 2026-10-15.
 
 /** Stops a runaway pagination loop; the account has 80 lists and 7 templates today. */
 const MAX_ITEMS = 2_000
@@ -389,4 +424,27 @@ export async function listBooleanAttributes(): Promise<BrevoAttribute[]> {
     )
     .map(({ name }) => ({ name }))
     .sort(byName)
+}
+
+/**
+ * The options of the named multiple-choice contact attributes (category normal), such as COUNTRY, each in Brevo's
+ * order, from one request; null for a name the account has no such attribute for. Brevo stores an option as plain
+ * text, which is both its label and the value a contact takes. Not paginated by Brevo.
+ */
+export async function listAttributeOptions<Name extends string>(
+  names: readonly Name[],
+): Promise<Record<Name, string[] | null>> {
+  const { attributes = [] } = await brevoFetch<{
+    attributes?: Array<{ name: string; category?: string; type?: string; multiCategoryOptions?: string[] }>
+  }>('/contacts/attributes')
+
+  const options = (name: Name) => {
+    const attribute = attributes.find(
+      (candidate) => candidate.name === name && candidate.category === 'normal' && candidate.type === 'multiple-choice',
+    )
+
+    return attribute ? (attribute.multiCategoryOptions ?? []).filter((option) => typeof option === 'string') : null
+  }
+
+  return Object.fromEntries(names.map((name) => [name, options(name)])) as Record<Name, string[] | null>
 }

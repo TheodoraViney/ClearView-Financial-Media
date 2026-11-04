@@ -19,6 +19,8 @@ import { page } from './documents/page'
 import { person } from './documents/person'
 import { post } from './documents/post'
 import { resource } from './documents/resource'
+import { subscribeFormSettings } from './documents/subscribe-form-settings'
+import { subscribeModal } from './documents/subscribe-modal'
 import { objectTypes } from './objects'
 
 export const documentTypes = [
@@ -37,6 +39,8 @@ export const documentTypes = [
   articlePage,
   infographicSettings,
   briefSettings,
+  subscribeModal,
+  subscribeFormSettings,
   newsletterIssue,
   awardsProgrammeGroup,
   awardsProgramme,

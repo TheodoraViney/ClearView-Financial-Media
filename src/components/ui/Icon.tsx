@@ -2,6 +2,7 @@ import type { SVGProps } from 'react'
 
 import { cx } from './cx'
 import { CheckIcon } from './icons/check'
+import { CheckSmIcon } from './icons/check-sm'
 import { ChevronDownIcon } from './icons/chevron-down'
 import { ChevronRightIcon } from './icons/chevron-right'
 import { CloseIcon } from './icons/close'
@@ -15,6 +16,7 @@ import { MenuCloseIcon } from './icons/menu-close'
 import { PeopleMovesIcon } from './icons/people-moves'
 import { PublicIcon } from './icons/public'
 import { SearchIcon } from './icons/search'
+import { SelectChevronIcon } from './icons/select-chevron'
 import { ShareIcon } from './icons/share'
 import { StarIcon } from './icons/star'
 import { StatArticleIcon } from './icons/stat-article'
@@ -33,6 +35,8 @@ export const iconMap = {
   'menu-close': MenuCloseIcon,
   download: DownloadIcon,
   check: CheckIcon,
+  'check-sm': CheckSmIcon,
+  'select-chevron': SelectChevronIcon,
   star: StarIcon,
   public: PublicIcon,
   document: DocumentIcon,

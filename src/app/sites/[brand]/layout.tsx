@@ -8,6 +8,10 @@ import { Suspense, type CSSProperties, type ReactNode } from 'react'
 import { BRAND_KEYS, BRANDS, brandColorVars, isBrandKey, type BrandKey } from '@/brands'
 import { Footer } from '@/components/blocks/Footer'
 import { Header } from '@/components/blocks/Header'
+import { toSubscribeModal } from '@/components/blocks/subscribe-modal'
+import { SubscribeModalProvider } from '@/components/sections/subscribe/SubscribeModalProvider.client'
+import type { SubscribeModalData } from '@/components/sections/subscribe/types'
+import { subscribeOptions } from '@/lib/subscribe-options'
 import { fetchBrandTitle, fetchShell } from '@/sanity/brand-title'
 import { getDynamicFetchOptions, SanityLive, type DynamicFetchOptions } from '@/sanity/live'
 
@@ -96,42 +100,52 @@ async function CachedBrandShell({
   variant,
   stega,
 }: { brand: BrandKey; children: ReactNode } & DynamicFetchOptions) {
-  const { data } = await fetchShell(brand, { perspective, variant, stega })
+  const [{ data }, options] = await Promise.all([fetchShell(brand, { perspective, variant, stega }), subscribeOptions()])
 
   return (
     <BrandShell
       brand={brand}
       header={<Header data={data} brand={brand} />}
       footer={<Footer data={data} brand={brand} />}
+      subscribe={toSubscribeModal(data, brand, options) ?? undefined}
     >
       {children}
     </BrandShell>
   )
 }
 
-// The draft-mode Suspense fallback renders the shell without header and footer until the shell data arrives.
+// The draft-mode Suspense fallback renders the shell without header and footer until the shell data arrives, and
+// without the subscribe pop-up, so its triggers render nothing until then; so does a brand without its pop-up document.
 // The footer follows the page's <main>, which each page renders inside children.
 // Brand colours are inlined from src/brands.ts, the one source shared with the newsletter email.
 function BrandShell({
   brand,
   header,
   footer,
+  subscribe,
   children,
 }: {
   brand: BrandKey
   header?: ReactNode
   footer?: ReactNode
+  subscribe?: SubscribeModalData
   children: ReactNode
 }) {
+  const content = (
+    <>
+      {header}
+      {children}
+      {footer}
+    </>
+  )
+
   return (
     <div
       data-brand={brand}
       className="flex min-h-full flex-col"
       style={brandColorVars(BRANDS[brand].colors) as CSSProperties}
     >
-      {header}
-      {children}
-      {footer}
+      {subscribe ? <SubscribeModalProvider data={subscribe}>{content}</SubscribeModalProvider> : content}
     </div>
   )
 }

@@ -1,6 +1,13 @@
 import { stegaClean } from 'next-sanity'
 
-import { BRANDS, brandDocumentId, footerDocumentId, headerDocumentId, type BrandKey } from '@/brands'
+import {
+  BRANDS,
+  brandDocumentId,
+  footerDocumentId,
+  headerDocumentId,
+  subscribeModalDocumentId,
+  type BrandKey,
+} from '@/brands'
 
 import { cachedSanity, type DynamicFetchOptions } from './live'
 import { SHELL_QUERY } from './queries'
@@ -23,7 +30,7 @@ export function brandTitleIn(titles: BrandTitles, key: BrandKey): string {
 }
 
 /**
- * The site shell query (header, footer, Brand settings), through the same `cachedSanity` call as the brand layout,
+ * The site shell query (header, footer, Brand settings, subscribe pop-up), through the same `cachedSanity` call as the brand layout,
  * so a page or metadata that also needs the brand title shares the layout's cache entry instead of adding a fetch.
  */
 export function fetchShell(brand: BrandKey, { perspective, variant, stega }: DynamicFetchOptions) {
@@ -34,6 +41,7 @@ export function fetchShell(brand: BrandKey, { perspective, variant, stega }: Dyn
       headerId: headerDocumentId(brand),
       footerId: footerDocumentId(brand),
       brandId: brandDocumentId(brand),
+      subscribeModalId: subscribeModalDocumentId(brand),
     },
     perspective,
     variant,

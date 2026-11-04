@@ -163,12 +163,19 @@ const STATS_BAR = /* groq */ `
   items[]{ _key, icon, value, label }
 `
 
-// UI only for now: every visible string, the validation messages included, comes from the CMS.
+// Every visible string, the validation messages included, comes from the CMS.
+// `interestKey`: the brand pop-up's interest with the same Brevo attribute, which a tick on this option pre-ticks in the
+// pop-up. The id is subscribeModalDocumentId($brand); the attribute name itself never reaches the page.
 const NEWSLETTER_SIGNUP = /* groq */ `
   heading[]{ _key, style, children[]{ _key, text } },
   body,
   preferencesLabel,
-  options[]{ _key, label, defaultChecked },
+  options[]{
+    _key,
+    label,
+    defaultChecked,
+    "interestKey": *[_type == "subscribeModal" && _id == "subscribe-modal-" + $brand][0].interests[attribute.name == ^.attribute.name][0]._key
+  },
   emailPlaceholder,
   buttonLabel,
   invalidEmailMessage,
@@ -400,7 +407,45 @@ const EXPLORE_GRID = /* groq */ `
 const SUBSCRIBE_BANNER = /* groq */ `
   heading[]{ _key, style, children[]{ _key, text } },
   description,
+  buttonLabel,
   cta{ ${LINK} }
+`
+
+/**
+ * A brand's subscribe pop-up: copy, interests without their Brevo attributes, and the privacy link target. The
+ * Brevo names never reach the page; the server reads them from the document.
+ */
+export const SUBSCRIBE_MODAL = /* groq */ `
+  title,
+  description,
+  firstNameLabel,
+  lastNameLabel,
+  emailLabel,
+  emailPlaceholder,
+  companyLabel,
+  jobTitleLabel,
+  countryLabel,
+  countryPlaceholder,
+  industryLabel,
+  industryPlaceholder,
+  optionalMarker,
+  requiredMarker,
+  interestsLegend,
+  interests[]{ _key, label, locked, defaultChecked },
+  consentText,
+  privacyLinkLabel,
+  privacyLink{ ${LINK_TARGET} },
+  submitLabel,
+  firstNameError,
+  lastNameError,
+  emailMissingError,
+  emailInvalidError,
+  consentError,
+  noPublicationError,
+  genericError,
+  successTitle,
+  successText,
+  closeLabel
 `
 
 /** One member of a page's `blocks[]`. Use as `blocks[]{ _key, _type, ${BLOCKS_PROJECTION} }`. */

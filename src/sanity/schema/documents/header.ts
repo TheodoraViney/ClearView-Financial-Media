@@ -93,11 +93,21 @@ export const publicationHeader = defineType({
     }),
     searchPlaceholderField,
     searchLabelsField,
-    linkField({
-      name: 'subscribe',
+    defineField({
+      name: 'subscribeLabel',
       title: 'Subscribe button',
-      required: true,
-      labelRequired: true,
+      type: 'string',
+      description: 'Label of the button that opens the subscribe pop-up.',
+      initialValue: 'Subscribe',
+      validation: (Rule) => Rule.required(),
+    }),
+    // Replaced by subscribeLabel: the button opens the pop-up, so it has no target. Read by the site until the
+    // label is copied over and this field cleared on every header, then removed.
+    defineField({
+      ...linkField({ name: 'subscribe', title: 'Subscribe link (old)' }),
+      deprecated: { reason: 'The button opens the subscribe pop-up; its label is Subscribe button above.' },
+      readOnly: true,
+      hidden: ({ value }) => value === undefined,
     }),
   ],
   preview: headerPreview,

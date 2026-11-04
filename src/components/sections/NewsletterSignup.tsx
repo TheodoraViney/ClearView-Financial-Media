@@ -8,6 +8,8 @@ export type NewsletterOption = {
   key: string
   label: string
   defaultChecked: boolean
+  // The pop-up interest this option ticks when the pop-up opens; null when the pop-up has no such interest.
+  interestKey: string | null
 }
 
 export type NewsletterSignupProps = {
@@ -32,7 +34,7 @@ const IMAGE_SIZES = '(min-width: 64rem) 960px, (min-width: 48rem) 120vw, 134vw'
  * Home "Stay informed": a form column (heading, options, text, email field) and an image.
  * Stacked below lg, form first. From lg a 12-column grid: the form spans 5 columns and the image 7,
  * stretched to the form's height with no minimum of its own.
- * UI only, nothing is sent: the client form validates and shows the errors, see NewsletterSignup.client.
+ * The client form validates, then opens the subscribe pop-up with its email and ticks, see NewsletterSignup.client.
  */
 export function NewsletterSignup({ image, ...form }: NewsletterSignupProps) {
   if (form.options.length === 0) {

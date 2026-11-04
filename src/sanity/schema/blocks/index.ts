@@ -1,5 +1,7 @@
 import { defineArrayMember, defineField } from 'sanity'
 
+import { PageBlocksInput } from '@/sanity/components/page-blocks-input'
+
 import { adSlot } from './ad-slot'
 import { cta } from './cta'
 import { exploreGrid } from './explore-grid'
@@ -63,4 +65,6 @@ export const blocksField = defineField({
   type: 'array',
   of: blockTypes.map((blockType) => defineArrayMember({ type: blockType.name })),
   options: { insertMenu: { groups: INSERT_MENU_GROUPS, views: [{ name: 'list' }] } },
+  // Leaves out the blocks the page brand cannot use (ClearView-only ones) from the insert menus.
+  components: { input: PageBlocksInput },
 })

@@ -1,19 +1,20 @@
 import Link from 'next/link'
 import { Suspense, type ComponentType, type ReactNode } from 'react'
 
-import { Button } from '@/components/ui/Button'
 import { Container } from '@/components/ui/Container'
 import { cx } from '@/components/ui/cx'
 
 import { CurrentLink } from './CurrentLink.client'
 import { HeaderLogo } from './HeaderLogo'
+import { HeaderSubscribe } from './HeaderSubscribe.client'
 import { HeaderStateProvider } from './HeaderState.client'
 import { MenuTrigger, MobileMenu } from './MobileMenu.client'
 import { SearchControl } from './SearchControl.client'
 import type { HeaderLink, HeaderProps } from './types'
 
 export type PublicationHeaderProps = HeaderProps & {
-  subscribe: Omit<HeaderLink, 'key'> | null
+  // Subscribe opens the subscribe pop-up.
+  subscribe: { label: string } | null
 }
 
 type NavLinkComponent = ComponentType<{ href: string; className?: string; children: ReactNode }>
@@ -101,9 +102,7 @@ export function PublicationHeader({
             <SearchControl variant="publication" placeholder={searchPlaceholder} labels={searchLabels} />
             {subscribe && (
               <div className="hidden header:flex">
-                <Button href={subscribe.href} className="px-4.5 font-medium">
-                  {subscribe.label}
-                </Button>
+                <HeaderSubscribe placement="bar">{subscribe.label}</HeaderSubscribe>
               </div>
             )}
             {hasMenu && <MenuTrigger />}
@@ -114,16 +113,7 @@ export function PublicationHeader({
             {links.length > 0 && <CurrentNavItems links={links} linkClassName={MENU_ROW} />}
             {subscribe && (
               <div className={cx('flex flex-col', links.length > 0 && 'mt-5')}>
-                <Button
-                  href={subscribe.href}
-                  variant="outline-accent"
-                  size="lg"
-                  fullWidth
-                  motion="responsive"
-                  className="font-medium"
-                >
-                  {subscribe.label}
-                </Button>
+                <HeaderSubscribe placement="menu">{subscribe.label}</HeaderSubscribe>
               </div>
             )}
           </MobileMenu>

@@ -10,10 +10,12 @@ import { Avatar } from '@/components/ui/Avatar'
 import { Breadcrumb } from '@/components/ui/Breadcrumb'
 import { Button } from '@/components/ui/Button'
 import { Checkbox } from '@/components/ui/Checkbox'
+import { CheckboxGroup } from '@/components/ui/CheckboxGroup'
 import { Container } from '@/components/ui/Container'
 import { DefinitionList } from '@/components/ui/DefinitionList'
 import { EmailField } from '@/components/ui/EmailField'
 import { Figure } from '@/components/ui/Figure'
+import { FormField } from '@/components/ui/FormField'
 import { Heading } from '@/components/ui/Heading'
 import { Icon, iconMap, type IconName } from '@/components/ui/Icon'
 import { IconButton } from '@/components/ui/IconButton'
@@ -23,6 +25,7 @@ import { Media } from '@/components/ui/Media'
 import { Meta } from '@/components/ui/Meta'
 import { PromoRow } from '@/components/ui/PromoRow'
 import { PullQuote } from '@/components/ui/PullQuote'
+import { Select } from '@/components/ui/Select'
 
 import { ActionButtonDemo } from './ActionButtonDemo.client'
 import { SliderDots } from '@/components/ui/SliderDots'
@@ -263,6 +266,59 @@ export default async function UiPage({
             <Checkbox label="WealthBriefingAsia" defaultChecked />
             <Checkbox label="Family Wealth Report" defaultChecked />
             <Checkbox label="Awards" />
+          </div>
+        </Group>
+
+        <Group title="Form field kit, size sm (subscribe pop-up)">
+          <div className="grid max-w-130 gap-6">
+            <div className="grid gap-6 header:grid-cols-2 header:gap-x-4">
+              <FormField label="First name" required>
+                {(control) => <Input {...control} size="sm" />}
+              </FormField>
+              <FormField label="Last name" required error="Enter your last name.">
+                {(control) => <Input {...control} size="sm" />}
+              </FormField>
+            </div>
+            <FormField label="Email address" required>
+              {(control) => <Input {...control} size="sm" type="email" placeholder="name@company.com" />}
+            </FormField>
+            <div className="grid gap-6 header:grid-cols-2 header:gap-x-4">
+              <FormField label="Country" marker="Optional">
+                {(control) => (
+                  <Select
+                    {...control}
+                    defaultValue=""
+                    placeholder="Select country"
+                    options={[
+                      { key: 'gb', label: 'United Kingdom' },
+                      { key: 'ch', label: 'Switzerland' },
+                    ]}
+                  />
+                )}
+              </FormField>
+              <FormField label="Industry type" marker="Optional">
+                {(control) => (
+                  <Select
+                    {...control}
+                    defaultValue="fo"
+                    placeholder="Select industry type"
+                    options={[
+                      { key: 'fo', label: 'Family Office' },
+                      { key: 'other', label: 'Other' },
+                    ]}
+                  />
+                )}
+              </FormField>
+            </div>
+            <CheckboxGroup legend="Interests">
+              <Checkbox size="sm" label="WealthBriefing Daily News" locked marker="Required" />
+              <Checkbox size="sm" label="Awards" />
+              <Checkbox size="sm" label="Research" defaultChecked />
+            </CheckboxGroup>
+            <CheckboxGroup legend="Group error" error="Choose at least one newsletter.">
+              <Checkbox size="sm" label="WealthBriefing" />
+            </CheckboxGroup>
+            <Checkbox size="sm" aria-invalid label="I agree to receive email updates and accept the Privacy Policy, a consent text long enough to wrap." />
           </div>
         </Group>
 

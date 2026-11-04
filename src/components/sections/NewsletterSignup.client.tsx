@@ -5,18 +5,16 @@ import { useId, useState, type ChangeEvent, type FormEvent } from 'react'
 import { Checkbox } from '@/components/ui/Checkbox'
 import { EmailField } from '@/components/ui/EmailField'
 import { Heading } from '@/components/ui/Heading'
+import { isEmailAddress } from '@/lib/subscribe'
 
 import type { NewsletterSignupProps } from './NewsletterSignup'
-
-// Something@something.something, no spaces. The real check belongs to the mail service once sending exists.
-const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
-
-const isEmail = (value: FormDataEntryValue | null) => typeof value === 'string' && EMAIL_PATTERN.test(value.trim())
+import { useSubscribeModal } from './subscribe/SubscribeModalProvider.client'
 
 /**
- * The text column of "Stay informed" as one real form. UI only: submit never reloads and never sends.
+ * The text column of "Stay informed" as one real form. Submit never reloads and sends nothing itself.
  * It validates the email and that one option is ticked, shows both errors at once, moves focus to the
- * first invalid control, and clears each error as soon as that field is fixed. A valid submit does nothing.
+ * first invalid control, and clears each error as soon as that field is fixed. A valid submit opens the
+ * subscribe pop-up with the email, its interests ticked as these options are; focus comes back to the button on close.
  * Below lg one 24px stack; from lg two groups as in the desktop file (options, then text and field),
  * pushed apart in the xl two-column layout so the field sits at the image bottom.
  */
@@ -33,6 +31,7 @@ export function NewsletterForm({
   const [emailError, setEmailError] = useState(false)
   const [optionError, setOptionError] = useState(false)
   const optionErrorId = useId()
+  const subscribe = useSubscribeModal()
 
   const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()
@@ -40,7 +39,8 @@ export function NewsletterForm({
     const form = event.currentTarget
     const data = new FormData(form)
     const optionInvalid = data.getAll('options').length === 0
-    const emailInvalid = !isEmail(data.get('email'))
+    // The pop-up's own check, length included, so an address it would refuse never opens it.
+    const emailInvalid = !isEmailAddress(data.get('email'))
 
     setOptionError(optionInvalid)
     setEmailError(emailInvalid)
@@ -50,7 +50,19 @@ export function NewsletterForm({
 
     if (firstInvalid) {
       form.querySelector<HTMLInputElement>(firstInvalid)?.focus()
+      return
     }
+
+    const ticked = data.getAll('options')
+    const submitter = (event.nativeEvent as SubmitEvent).submitter
+
+    subscribe?.open({
+      returnFocus: submitter instanceof HTMLElement ? submitter : null,
+      prefill: {
+        email: String(data.get('email') ?? '').trim(),
+        interests: options.flatMap((option) => (option.interestKey && ticked.includes(option.key) ? [option.interestKey] : [])),
+      },
+    })
   }
 
   // Inputs bubble their change events to the form; an error clears only once its field is valid.
@@ -58,7 +70,7 @@ export function NewsletterForm({
     const target = event.target as unknown as HTMLInputElement
     const data = new FormData(event.currentTarget)
 
-    if (target.name === 'email' && emailError && isEmail(data.get('email'))) {
+    if (target.name === 'email' && emailError && isEmailAddress(data.get('email'))) {
       setEmailError(false)
     }
 

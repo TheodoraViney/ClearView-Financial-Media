@@ -10,24 +10,33 @@ import {
   headingText,
   imageField,
 } from '../fields'
+import { blockAllowedOnBrand } from './shared'
 
 export const NEWSLETTER_OPTION_MAX = 8
 
 /**
- * Newsletter signup ("Stay informed"): heading, description, editor-created options, an email field and an image.
- * All visible copy, messages included, is here.
+ * Newsletter signup ("Stay informed"), ClearView pages only: heading, description, editor-created options, an email
+ * field and an image. All visible copy, messages included, is here.
  *
- * Brevo: each option names the yes/no contact attribute a tick sets (e.g. WB_NEWSLETTER, which the newsletter
- * segments are built on). The block names the one list every reader joins, since double opt-in needs a list, and the
- * confirmation email Brevo sends first. The form is still UI only: it validates in the browser and sends nothing yet.
- * None of the Brevo fields is projected to the page, so the browser never sees them: the server will read them from
- * the block when the form is wired.
+ * The button opens the ClearView Subscribe pop-up, which has its own options. Each option here names a Brevo yes/no
+ * contact attribute (e.g. WB_NEWSLETTER); a tick pre-ticks the pop-up option with the same attribute. What is sent
+ * is the pop-up's choice. No attribute is projected to the page: the query matches them to the pop-up's keys.
  */
 export const newsletterSignup = defineType({
   name: 'newsletterSignup',
   title: 'Newsletter signup',
   type: 'object',
   icon: EnvelopeIcon,
+  // ClearView only: a publication's own signup is the Subscribe pop-up. The insert menu hides it elsewhere; this
+  // catches a pasted or duplicated block. A page with no brand yet is flagged by its Brand field.
+  validation: (Rule) =>
+    Rule.custom((_, context) => {
+      const brand = (context.document as { brand?: unknown } | undefined)?.brand
+
+      return !brand || blockAllowedOnBrand('newsletterSignup', brand)
+        ? true
+        : 'Newsletter signup is for ClearView pages only; remove it from this page'
+    }),
   fields: [
     adminLabelField,
     headingField('heading', { title: 'Heading', defaultLevel: 'h2', required: true }),
@@ -70,7 +79,7 @@ export const newsletterSignup = defineType({
             brevoAttributeField('attribute', {
               title: 'Brevo attribute',
               description:
-                'Readers who tick this option are saved in Brevo with this attribute set to Yes, once they confirm their email.',
+                'Ticking this option ticks the Subscribe pop-up option with the same attribute when the pop-up opens.',
               required: true,
             }),
             // Optional by design: unset reads as unticked.
@@ -138,18 +147,19 @@ export const newsletterSignup = defineType({
         }).warning(),
       ],
     }),
-    brevoListField('list', {
-      title: 'Brevo list',
-      description:
-        'Every reader who signs up through this form is added to this list. Brevo needs one for the confirmation email.',
-      required: true,
-    }),
-    brevoTemplateField('confirmationTemplate', {
-      title: 'Confirmation email',
-      description:
-        'The Brevo email that asks readers to confirm their address before they are signed up. Only templates tagged optin in Brevo appear.',
-      required: true,
-    }),
+    // Moved to Subscribe form settings, shared by every form. Kept, read only, until cleared on every block, then removed.
+    {
+      ...brevoListField('list', { title: 'Brevo list (old)', readOnly: true, hidden: ({ value }) => value === undefined }),
+      deprecated: { reason: 'Every subscribe form now uses the list in Forms → Subscribe form settings.' },
+    },
+    {
+      ...brevoTemplateField('confirmationTemplate', {
+        title: 'Confirmation email (old)',
+        readOnly: true,
+        hidden: ({ value }) => value === undefined,
+      }),
+      deprecated: { reason: 'Every subscribe form now uses the email in Forms → Subscribe form settings.' },
+    },
     defineField({
       name: 'emailPlaceholder',
       title: 'Email placeholder',

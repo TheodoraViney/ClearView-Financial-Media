@@ -14,6 +14,13 @@ export const TOP_STORIES_ARTICLE_COUNT = 3
 /** Lead stories per page brand: the ClearView home runs a slider of up to three, a publication home shows one. */
 export const topStoriesSlideCount = (brand: unknown): number => (brand === 'clearview' ? TOP_STORIES_SLIDE_COUNT : 1)
 
+/** Blocks only ClearView pages carry, by type name. Newsletter signup ("Stay informed") picks between publications. */
+const CLEARVIEW_ONLY_BLOCK_TYPES: readonly string[] = ['newsletterSignup']
+
+/** Whether a page of this brand can carry the block. A page with no brand yet is offered no ClearView-only block. */
+export const blockAllowedOnBrand = (type: string, brand: unknown): boolean =>
+  !CLEARVIEW_ONLY_BLOCK_TYPES.includes(type) || brand === 'clearview'
+
 // ClearView posts never carry the clearview key: the group page draws on every editorial brand.
 export const postsOfPageBrand: ReferenceFilterResolver = ({ document }) => {
   const brand = (document as { brand?: string }).brand

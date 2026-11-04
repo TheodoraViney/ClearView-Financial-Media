@@ -33,6 +33,12 @@ export const mostReadDocumentId = (key: EditorialBrandKey): string => `most-read
 /** Id of an editorial brand's "Article page" document: the article template's labels. */
 export const articlePageDocumentId = (key: EditorialBrandKey): string => `article-page-${key}`
 
+/** Id of a brand's subscribe pop-up document: its copy and interests. One per brand, ClearView included. */
+export const subscribeModalDocumentId = (key: BrandKey): string => `subscribe-modal-${key}`
+
+/** Id of the one subscribe form settings document, shared by every brand: the Brevo list and confirmation email. */
+export const SUBSCRIBE_FORM_SETTINGS_ID = 'subscribe-form-settings'
+
 export function isBrandKey(value: string): value is BrandKey {
   return (BRAND_KEYS as readonly string[]).includes(value)
 }
