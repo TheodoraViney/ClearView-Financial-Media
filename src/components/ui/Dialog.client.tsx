@@ -1,8 +1,57 @@
 'use client'
 
-import { useEffect, useRef, type ReactNode } from 'react'
+import { createContext, use, useEffect, useRef, type KeyboardEvent, type ReactNode } from 'react'
 
+import { cx } from './cx'
 import { IconButton } from './IconButton'
+
+const InPageDialogsContext = createContext(false)
+
+/**
+ * Draft mode only (the brand layout mounts it around the draft shell, never on the live site). `showModal()` puts the
+ * dialog in the browser top layer, above Sanity's click-to-edit overlays, so nothing inside it could be edited from
+ * Presentation. Inside this provider a dialog opens with `show()` instead, stays in the page under the overlays
+ * (z-50, above the sticky header's z-40, far below Sanity's), and does itself what the top layer did: Escape and the
+ * Tab trap. Same markup and look otherwise.
+ */
+export function InPageDialogs({ children }: { children: ReactNode }) {
+  return <InPageDialogsContext value>{children}</InPageDialogsContext>
+}
+
+const FOCUSABLE =
+  'a[href], button:not([disabled]), input:not([disabled]):not([type="hidden"]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])'
+
+/** In-page dialog only: Escape closes, Tab and Shift+Tab wrap inside the dialog. */
+function handleInPageKeys(event: KeyboardEvent<HTMLDialogElement>, onClose: () => void) {
+  if (event.key === 'Escape') {
+    event.preventDefault()
+    onClose()
+    return
+  }
+
+  if (event.key !== 'Tab') {
+    return
+  }
+
+  const stops = [...event.currentTarget.querySelectorAll<HTMLElement>(FOCUSABLE)].filter(
+    (element) => element.getClientRects().length > 0 && !element.closest('[aria-hidden="true"]'),
+  )
+  const first = stops[0]
+  const last = stops.at(-1)
+  const active = document.activeElement
+
+  if (!first || !last) {
+    return
+  }
+
+  if (event.shiftKey && (active === first || !event.currentTarget.contains(active) || active === event.currentTarget)) {
+    event.preventDefault()
+    last.focus()
+  } else if (!event.shiftKey && (active === last || !event.currentTarget.contains(active))) {
+    event.preventDefault()
+    first.focus()
+  }
+}
 
 /**
  * A modal dialog on the native `<dialog>` with `showModal()`: top layer, the page behind inert (focus stays inside),
@@ -10,7 +59,7 @@ import { IconButton } from './IconButton'
  * md) and scrolls; the card (max 520, padding 24 / 32 from md) is centred and moves to the top when taller than the
  * viewport. Closes with ×, Escape and a press on the overlay. On open it focuses the element marked `data-autofocus`
  * (else the first focusable one) and locks the page scroll; on close it returns focus to `returnFocus`, else to the
- * element focused before. No animation, as in the design.
+ * element focused before. No animation, as in the design. Inside `InPageDialogs` (draft mode) it opens with `show()`.
  */
 export function Dialog({
   open,
@@ -31,6 +80,7 @@ export function Dialog({
   returnFocus?: HTMLElement | null
   children: ReactNode
 }) {
+  const inPage = use(InPageDialogsContext)
   const dialog = useRef<HTMLDialogElement>(null)
   const pressStartedOnOverlay = useRef(false)
   // The latest callbacks, read from the effects without re-running them.
@@ -60,7 +110,11 @@ export function Dialog({
     }
 
     if (!element.open) {
-      element.showModal()
+      if (inPage) {
+        element.show()
+      } else {
+        element.showModal()
+      }
     }
 
     element.querySelector<HTMLElement>('[data-autofocus]')?.focus()
@@ -79,7 +133,7 @@ export function Dialog({
         target.focus()
       }
     }
-  }, [open])
+  }, [open, inPage])
 
   return (
     <dialog
@@ -89,6 +143,9 @@ export function Dialog({
       tabIndex={-1}
       aria-labelledby={labelledBy}
       aria-describedby={describedBy}
+      // In page (draft mode) the browser no longer marks it modal, so say it.
+      aria-modal={inPage || undefined}
+      onKeyDown={inPage ? (event) => handleInPageKeys(event, latest.current.onClose) : undefined}
       // Escape: keep the element open until the state closes it, so both stay in step.
       onCancel={(event) => {
         event.preventDefault()
@@ -112,7 +169,10 @@ export function Dialog({
 
         pressStartedOnOverlay.current = false
       }}
-      className="fixed inset-0 m-0 size-full max-h-none max-w-none items-start overflow-y-auto overscroll-contain border-0 bg-foreground/48 p-4 text-foreground outline-none backdrop:bg-transparent open:flex md:p-8"
+      className={cx(
+        'fixed inset-0 m-0 size-full max-h-none max-w-none items-start overflow-y-auto overscroll-contain border-0 bg-foreground/48 p-4 text-foreground outline-none backdrop:bg-transparent open:flex md:p-8',
+        inPage && 'z-50',
+      )}
     >
       <div className="relative m-auto flex w-full max-w-130 flex-col gap-6 rounded-sm border border-border bg-white p-6 md:p-8">
         <IconButton
