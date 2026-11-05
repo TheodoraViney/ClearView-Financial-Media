@@ -9,9 +9,8 @@ import { absolutePostUrl } from './links'
 import { NEWSLETTER_COPY_DEFAULTS, NEWSLETTER_TITLE_PLACEHOLDER, type NewsletterCopy } from './newsletter-copy'
 
 /**
- * HTML of a newsletter issue: the Classic layout. A 600 px white column with the logo and date, an optional top banner,
- * the first post as the featured story, every other post as a row with a thumbnail, an optional bottom banner and a
- * footer.
+ * HTML of a newsletter issue: the Classic layout. A 600 px white column with the logo and date, the first post as the
+ * featured story, every other post as a row with a thumbnail, and a footer.
  *
  * Email-safe: nested presentation tables, inline styles, Arial and Georgia only, and a ghost table that holds Outlook
  * at 600 px. The one <style> block only stacks the article rows on narrow screens. Every CMS value is HTML-escaped,
@@ -48,8 +47,6 @@ export type NewsletterEmailPost = {
   image: EmailImage
 }
 
-export type NewsletterEmailBanner = { image: EmailImage; link: string | null } | null
-
 export type NewsletterEmailInput = {
   brand: EditorialBrandKey
   /** Brand settings title; falls back to the code default. */
@@ -63,8 +60,6 @@ export type NewsletterEmailInput = {
   /** The issue date shown under the logo. */
   date: Date
   posts: NewsletterEmailPost[]
-  topBanner: NewsletterEmailBanner
-  bottomBanner: NewsletterEmailBanner
 }
 
 /** What the section helpers share, cleaned once. */
@@ -173,21 +168,6 @@ function imageCropped(image: EmailImage, width: number, height: number): SizedIm
   return src ? { src, width, height, alt: media.alt } : null
 }
 
-/** An image at its own aspect ratio, as wide as it is up to `maxWidth`. For banners. */
-function imageNatural(image: EmailImage, maxWidth: number): SizedImage | null {
-  const media = toImage(image)
-
-  if (!media || media.width <= 0 || media.height <= 0) {
-    return null
-  }
-
-  const width = Math.min(media.width, maxWidth)
-  const height = Math.round((width * media.height) / media.width)
-  const src = cdnUrl(new URL(media.src), { w: width * RETINA, fit: 'max', q: IMAGE_QUALITY })
-
-  return src ? { src, width, height, alt: media.alt } : null
-}
-
 /** "Thursday 15 October 2026", UK time. */
 export function formatIssueDate(date: Date): string {
   const parts = new Intl.DateTimeFormat('en-GB', {
@@ -209,7 +189,6 @@ function copyOf(copy: NewsletterEmailInput['copy']): NewsletterCopy {
     featuredLabel: pick('featuredLabel'),
     readFullStory: pick('readFullStory'),
     readMore: pick('readMore'),
-    advertisementLabel: pick('advertisementLabel'),
     footerText: pick('footerText'),
     // Never hidden: Brevo and the law need an unsubscribe link in every email.
     unsubscribe: pick('unsubscribe') || NEWSLETTER_COPY_DEFAULTS.unsubscribe,
@@ -248,20 +227,6 @@ function header({ title, color, logo }: Context, date: Date) {
   return `<tr><td align="center" style="padding:28px 24px 18px;border-bottom:3px solid ${color};">${table(
     `<tr><td align="center">${mark}</td></tr><tr><td align="center" style="padding-top:10px;font-family:${SANS};font-size:12px;line-height:16px;letter-spacing:.04em;text-transform:uppercase;color:${MUTED_COLOR};">${escapeHtml(formatIssueDate(date))}</td></tr>`,
     'align="center"',
-  )}</td></tr>`
-}
-
-/** A banner with its label (when set), or nothing when the slot is empty or its link is not http(s). */
-function banner({ copy }: Context, slot: NewsletterEmailBanner, padding: string) {
-  const image = slot ? imageNatural(slot.image, CONTENT_WIDTH) : null
-  const href = slot ? httpUrl(slot.link) : null
-
-  if (!image || !href) {
-    return ''
-  }
-
-  return `<tr><td align="center" style="padding:${padding};">${table(
-    `${copy.advertisementLabel ? `<tr><td align="center" style="padding-bottom:6px;font-family:${SANS};font-size:10px;line-height:12px;letter-spacing:.12em;text-transform:uppercase;color:#8a959c;">${escapeHtml(copy.advertisementLabel)}</td></tr>` : ''}<tr><td align="center">${linked(href, img(image, { fluid: true }))}</td></tr>`,
   )}</td></tr>`
 }
 
@@ -350,17 +315,13 @@ export function renderNewsletterEmail(input: NewsletterEmailInput): string {
   }
   const domain = stegaClean(input.domain)?.trim() || BRANDS[brand].domain
   const [first, ...rest] = posts
-  const topBanner = banner(context, input.topBanner, '16px 24px 0')
-  const bottomBanner = banner(context, input.bottomBanner, '24px 24px 0')
 
   const rows = [
     header(context, input.date),
-    topBanner,
     first ? featured(context, first) : '',
     rest.length > 0
       ? `<tr><td style="padding:0 24px;">${table(rest.map((post) => listItem(context, post)).join(''))}</td></tr>`
       : '',
-    bottomBanner,
     `<tr><td style="height:32px;line-height:32px;font-size:0;">&nbsp;</td></tr>`,
     footer(context, domain),
   ]

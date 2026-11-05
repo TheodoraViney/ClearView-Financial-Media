@@ -1033,33 +1033,11 @@ export type NewsletterIssue = {
   _rev: string;
   brand?: string;
   subject?: string;
-  topBanner?: {
-    image?: {
-      asset?: SanityImageAssetReference;
-      media?: unknown;
-      hotspot?: SanityImageHotspot;
-      crop?: SanityImageCrop;
-      alt?: string;
-      _type: "image";
-    };
-    link?: string;
-  };
   posts?: Array<
     {
       _key: string;
     } & PostReference
   >;
-  bottomBanner?: {
-    image?: {
-      asset?: SanityImageAssetReference;
-      media?: unknown;
-      hotspot?: SanityImageHotspot;
-      crop?: SanityImageCrop;
-      alt?: string;
-      _type: "image";
-    };
-    link?: string;
-  };
   segment?: BrevoSegment;
   scheduledAt?: string;
   status?: "draft" | "scheduled" | "sent" | "cancelled";
@@ -2296,7 +2274,6 @@ export type Brand = {
       featuredLabel?: string;
       readFullStory?: string;
       readMore?: string;
-      advertisementLabel?: string;
       footerText?: string;
       unsubscribe?: string;
     };
@@ -13174,34 +13151,12 @@ export type POST_SLUGS_QUERY_RESULT = Array<{
 
 // Source: src/sanity/queries.ts
 // Variable: NEWSLETTER_ISSUE_VERSIONS_QUERY
-// Query: *[_type == "newsletterIssue" && _id in [$id, $draftId]]{    _id,    _rev,    brand,    subject,    topBanner{ image, link },    bottomBanner{ image, link },    segment{ id, name },    scheduledAt,    status,    brevoCampaignId,    sendingStartedAt,    sendRequestedAt,    "postIds": posts[]._ref  }
+// Query: *[_type == "newsletterIssue" && _id in [$id, $draftId]]{    _id,    _rev,    brand,    subject,    segment{ id, name },    scheduledAt,    status,    brevoCampaignId,    sendingStartedAt,    sendRequestedAt,    "postIds": posts[]._ref  }
 export type NEWSLETTER_ISSUE_VERSIONS_QUERY_RESULT = Array<{
   _id: string;
   _rev: string;
   brand: string | null;
   subject: string | null;
-  topBanner: {
-    image: {
-      asset?: SanityImageAssetReference;
-      media?: unknown;
-      hotspot?: SanityImageHotspot;
-      crop?: SanityImageCrop;
-      alt?: string;
-      _type: "image";
-    } | null;
-    link: string | null;
-  } | null;
-  bottomBanner: {
-    image: {
-      asset?: SanityImageAssetReference;
-      media?: unknown;
-      hotspot?: SanityImageHotspot;
-      crop?: SanityImageCrop;
-      alt?: string;
-      _type: "image";
-    } | null;
-    link: string | null;
-  } | null;
   segment: {
     id: number | null;
     name: string | null;
@@ -13216,7 +13171,7 @@ export type NEWSLETTER_ISSUE_VERSIONS_QUERY_RESULT = Array<{
 
 // Source: src/sanity/queries.ts
 // Variable: NEWSLETTER_EMAIL_QUERY
-// Query: {    "brand": *[_type == "brand" && _id == $brandId && key.current == $brand][0]{      title,      domain,      logo,      "senderId": newsletter.sender.id,      "copy": newsletter.copy{ featuredLabel, readFullStory, readMore, advertisementLabel, footerText, unsubscribe }    },    "posts": *[_type == "post" && _id in $postIds && $brand in brands]{      _id,      title,      excerpt,      "slug": slug.current,      publishedAt,      image    }  }
+// Query: {    "brand": *[_type == "brand" && _id == $brandId && key.current == $brand][0]{      title,      domain,      logo,      "senderId": newsletter.sender.id,      "copy": newsletter.copy{ featuredLabel, readFullStory, readMore, footerText, unsubscribe }    },    "posts": *[_type == "post" && _id in $postIds && $brand in brands]{      _id,      title,      excerpt,      "slug": slug.current,      publishedAt,      image    }  }
 export type NEWSLETTER_EMAIL_QUERY_RESULT = {
   brand: {
     title: string | null;
@@ -13233,7 +13188,6 @@ export type NEWSLETTER_EMAIL_QUERY_RESULT = {
       featuredLabel: string | null;
       readFullStory: string | null;
       readMore: string | null;
-      advertisementLabel: string | null;
       footerText: string | null;
       unsubscribe: string | null;
     } | null;
@@ -13344,8 +13298,8 @@ declare global {
     '\n  *[_type == "mostRead" && _id == $id][0]{\n    title,\n    "ids": coalesce(posts[]._ref, []),\n    "posts": *[\n      _type == "post"\n      && _id in coalesce(^.posts[]._ref, [])\n      && $brand in brands\n      && defined(slug.current)\n    ]{ \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  publishedAt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n  "topic": primaryTopic->{ title, "slug": slug.current }\n }\n  }\n': MOST_READ_QUERY_RESULT;
     '\n  *[\n    _type == "post"\n    && $brand in brands\n    && defined(slug.current)\n    && slug.current != $slug\n  ] | order(publishedAt desc)[0...$limit]{ \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  publishedAt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n  "topic": primaryTopic->{ title, "slug": slug.current }\n }\n': MOST_READ_LATEST_QUERY_RESULT;
     '\n  *[_type == "post" && defined(slug.current) && $brand in brands]{\n    "slug": slug.current\n  }\n': POST_SLUGS_QUERY_RESULT;
-    '\n  *[_type == "newsletterIssue" && _id in [$id, $draftId]]{\n    _id,\n    _rev,\n    brand,\n    subject,\n    topBanner{ image, link },\n    bottomBanner{ image, link },\n    segment{ id, name },\n    scheduledAt,\n    status,\n    brevoCampaignId,\n    sendingStartedAt,\n    sendRequestedAt,\n    "postIds": posts[]._ref\n  }\n': NEWSLETTER_ISSUE_VERSIONS_QUERY_RESULT;
-    '\n  {\n    "brand": *[_type == "brand" && _id == $brandId && key.current == $brand][0]{\n      title,\n      domain,\n      logo,\n      "senderId": newsletter.sender.id,\n      "copy": newsletter.copy{ featuredLabel, readFullStory, readMore, advertisementLabel, footerText, unsubscribe }\n    },\n    "posts": *[_type == "post" && _id in $postIds && $brand in brands]{\n      _id,\n      title,\n      excerpt,\n      "slug": slug.current,\n      publishedAt,\n      image\n    }\n  }\n': NEWSLETTER_EMAIL_QUERY_RESULT;
+    '\n  *[_type == "newsletterIssue" && _id in [$id, $draftId]]{\n    _id,\n    _rev,\n    brand,\n    subject,\n    segment{ id, name },\n    scheduledAt,\n    status,\n    brevoCampaignId,\n    sendingStartedAt,\n    sendRequestedAt,\n    "postIds": posts[]._ref\n  }\n': NEWSLETTER_ISSUE_VERSIONS_QUERY_RESULT;
+    '\n  {\n    "brand": *[_type == "brand" && _id == $brandId && key.current == $brand][0]{\n      title,\n      domain,\n      logo,\n      "senderId": newsletter.sender.id,\n      "copy": newsletter.copy{ featuredLabel, readFullStory, readMore, footerText, unsubscribe }\n    },\n    "posts": *[_type == "post" && _id in $postIds && $brand in brands]{\n      _id,\n      title,\n      excerpt,\n      "slug": slug.current,\n      publishedAt,\n      image\n    }\n  }\n': NEWSLETTER_EMAIL_QUERY_RESULT;
     '\n  *[_type == "newsletterIssue" && _id in [$id, $draftId] && sendingStartedAt == $lock]{ _id, _rev }\n': NEWSLETTER_ISSUE_LOCK_HOLDERS_QUERY_RESULT;
     '\n  *[_type == "newsletterIssue" && _id in [$id, $draftId]]._id\n': NEWSLETTER_ISSUE_EXISTING_IDS_QUERY_RESULT;
     '\n  *[_type == "brand" && _id == $brandId && key.current == $brand][0].newsletter.articlesPerIssue\n': NEWSLETTER_ARTICLES_PER_ISSUE_QUERY_RESULT;

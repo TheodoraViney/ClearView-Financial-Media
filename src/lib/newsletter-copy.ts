@@ -13,7 +13,6 @@ export const NEWSLETTER_COPY_DEFAULTS = {
   featuredLabel: 'Featured',
   readFullStory: 'Read the full story',
   readMore: 'Read more →',
-  advertisementLabel: 'Advertisement',
   footerText: `You are receiving this email because you subscribed to the ${NEWSLETTER_TITLE_PLACEHOLDER} daily briefing.`,
   unsubscribe: 'Unsubscribe',
 } as const
