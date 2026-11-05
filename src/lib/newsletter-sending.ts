@@ -311,8 +311,6 @@ async function buildCampaign(issueId: string, version: IssueVersion, action: 'te
       subject,
       date: issueDate(action, version.scheduledAt),
       posts: ordered,
-      topBanner: version.topBanner ?? null,
-      bottomBanner: version.bottomBanner ?? null,
     }),
     recipients: { segmentIds: [segment.id] },
   }

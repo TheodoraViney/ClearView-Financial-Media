@@ -131,7 +131,6 @@ export const brand = defineType({
               'Read more link',
               'Link under every other article. Leave empty to hide it; the headline still links to the article.',
             ),
-            emailCopy('advertisementLabel', 'Advertisement label', 'Shown above each banner. Leave empty to hide it.'),
             emailCopy(
               'footerText',
               'Footer text',

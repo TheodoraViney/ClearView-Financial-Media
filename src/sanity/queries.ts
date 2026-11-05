@@ -184,8 +184,6 @@ export const NEWSLETTER_ISSUE_VERSIONS_QUERY = defineQuery(`
     _rev,
     brand,
     subject,
-    topBanner{ image, link },
-    bottomBanner{ image, link },
     segment{ id, name },
     scheduledAt,
     status,
@@ -207,7 +205,7 @@ export const NEWSLETTER_EMAIL_QUERY = defineQuery(`
       domain,
       logo,
       "senderId": newsletter.sender.id,
-      "copy": newsletter.copy{ featuredLabel, readFullStory, readMore, advertisementLabel, footerText, unsubscribe }
+      "copy": newsletter.copy{ featuredLabel, readFullStory, readMore, footerText, unsubscribe }
     },
     "posts": *[_type == "post" && _id in $postIds && $brand in brands]{
       _id,
