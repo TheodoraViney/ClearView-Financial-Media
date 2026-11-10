@@ -1,8 +1,8 @@
-import { defineArrayMember, defineField } from 'sanity'
+import { defineArrayMember, defineField, type ConditionalProperty } from 'sanity'
 
 import { PageBlocksInput } from '@/sanity/components/page-blocks-input'
 
-import { adSlot } from './ad-slot'
+import { awardsWinners } from './awards-winners'
 import { cta } from './cta'
 import { exploreGrid } from './explore-grid'
 import { featuredStories } from './featured-stories'
@@ -18,9 +18,9 @@ import { topPicks } from './top-picks'
 import { topStories } from './top-stories'
 import { weeklyRoundup } from './weekly-roundup'
 
+// Every block type in the schema. Awards Winners goes in a Two columns sidebar only, so pages do not list it.
 export const blockTypes = [
   cta,
-  adSlot,
   splitLayout,
   topStories,
   publications,
@@ -35,7 +35,10 @@ export const blockTypes = [
   topPicks,
   exploreGrid,
   subscribeBanner,
+  awardsWinners,
 ]
+
+const pageBlockTypes = blockTypes.filter((blockType) => blockType !== awardsWinners)
 
 // The page's "Add item" menu, grouped; inside each group the blocks follow their usual order on a page.
 const INSERT_MENU_GROUPS = [
@@ -54,17 +57,23 @@ const INSERT_MENU_GROUPS = [
     ],
   },
   { name: 'records', title: 'Group records', of: [highlights.name, exploreGrid.name] },
-  { name: 'ads', title: 'Ads', of: [adSlot.name] },
   { name: 'signup', title: 'Signup', of: [subscribeBanner.name, newsletterSignup.name] },
   { name: 'other', title: 'Other', of: [publications.name, statsBar.name, cta.name] },
 ]
 
-export const blocksField = defineField({
-  name: 'blocks',
-  title: 'Blocks',
-  type: 'array',
-  of: blockTypes.map((blockType) => defineArrayMember({ type: blockType.name })),
-  options: { insertMenu: { groups: INSERT_MENU_GROUPS, views: [{ name: 'list' }] } },
-  // Leaves out the blocks the page brand cannot use (ClearView-only ones) from the insert menus.
-  components: { input: PageBlocksInput },
-})
+/** A list of page blocks. The page document has one, and the home page two more between its fixed banners. */
+export const pageBlocksField = (
+  name: string,
+  { title, description, hidden }: { title: string; description?: string; hidden?: ConditionalProperty },
+) =>
+  defineField({
+    name,
+    title,
+    description,
+    hidden,
+    type: 'array',
+    of: pageBlockTypes.map((blockType) => defineArrayMember({ type: blockType.name })),
+    options: { insertMenu: { groups: INSERT_MENU_GROUPS, views: [{ name: 'list' }] } },
+    // Leaves out the blocks the page brand cannot use (ClearView-only ones) from the insert menus.
+    components: { input: PageBlocksInput },
+  })

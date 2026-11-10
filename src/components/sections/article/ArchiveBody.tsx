@@ -1,19 +1,29 @@
 import { Figure } from '@/components/ui/Figure'
+import type { AdUnitView } from '@/lib/gam'
+
+import { ArticleBanner } from './ArticleBody'
 
 /**
  * An archived article's body in the article column: the record's Vimeo video first, as the legacy sites showed it
- * above the text, then the body HTML. The HTML went through the export allowlist; `.archive-prose` gives it the
- * typography of a post body.
+ * above the text, then the body HTML, then the article banner, as a post with no text after the banner. The HTML went
+ * through the export allowlist; `.archive-prose` gives it the typography of a post body.
  */
-export function ArchiveBody({ html, videoId, title }: { html: string; videoId: string | null; title: string }) {
+export function ArchiveBody({
+  html,
+  videoId,
+  title,
+  banner,
+}: {
+  html: string
+  videoId: string | null
+  title: string
+  banner: AdUnitView | null
+}) {
   const video = videoId && /^\d+$/.test(videoId) ? `https://player.vimeo.com/video/${videoId}` : null
 
-  if (!html && !video) {
-    return null
-  }
-
   return (
-    <div className="article-flow min-w-0">
+    // A container for the article banner, which hides where the column is narrower than 728.
+    <div className="article-flow @container min-w-0">
       {video && (
         <Figure>
           <iframe
@@ -26,6 +36,7 @@ export function ArchiveBody({ html, videoId, title }: { html: string; videoId: s
         </Figure>
       )}
       {html && <div className="archive-prose" dangerouslySetInnerHTML={{ __html: html }} />}
+      <ArticleBanner unit={banner} />
     </div>
   )
 }

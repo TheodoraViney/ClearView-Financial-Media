@@ -12,7 +12,8 @@ import {
 import { ArticleBody } from '@/components/sections/article/ArticleBody'
 import { ArticlePage } from '@/components/sections/article/ArticlePage'
 import { PEOPLE_MOVES_CATEGORY_ID } from '@/lib/article-taxonomy'
-import { fromPost, inContentAdUnit } from '@/sanity/article-view'
+import { fromPost } from '@/sanity/article-view'
+import { fetchAdUnits } from '@/sanity/brand-title'
 import {
   cachedSanity,
   getDynamicFetchOptions,
@@ -104,7 +105,7 @@ async function CachedPost({
   variant,
   stega,
 }: { brand: EditorialBrandKey; slug: string } & DynamicFetchOptions) {
-  const [{ data: post }, { data: mostRead }, mostReadFill, { data: copy }] = await Promise.all([
+  const [{ data: post }, { data: mostRead }, mostReadFill, { data: copy }, ads] = await Promise.all([
     cachedSanity({
       query: POST_QUERY,
       params: { brand, slug, peopleMoves: PEOPLE_MOVES_CATEGORY_ID },
@@ -127,6 +128,7 @@ async function CachedPost({
       variant,
       stega,
     }),
+    fetchAdUnits(brand, 'other', { perspective, variant, stega }),
   ])
 
   if (!post) {
@@ -138,8 +140,9 @@ async function CachedPost({
     mostRead,
     mostReadFill,
     copy,
+    ads,
     brand,
-    body: post.content ? <ArticleBody value={post.content} inContentAdUnit={inContentAdUnit(copy)} /> : null,
+    body: <ArticleBody value={post.content} after={post.contentAfter} banner={ads.article} />,
   })
 
   return <ArticlePage article={article} />

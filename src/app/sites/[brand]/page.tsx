@@ -4,7 +4,9 @@ import { Suspense } from 'react'
 
 import { isBrandKey, type BrandKey } from '@/brands'
 import { BlockRenderer } from '@/components/blocks/BlockRenderer'
-import { fetchBrandTitle } from '@/sanity/brand-title'
+import { PageAd } from '@/components/blocks/PageAd'
+import { PageBlocks } from '@/components/blocks/PageBlocks'
+import { fetchAdUnits, fetchBrandTitle } from '@/sanity/brand-title'
 import {
   cachedNow,
   cachedSanity,
@@ -57,7 +59,11 @@ async function CachedHome({
   variant,
   stega,
 }: { brand: BrandKey } & DynamicFetchOptions) {
-  const [today, now] = await Promise.all([cachedUkToday(), cachedNow()])
+  const [today, now, ads] = await Promise.all([
+    cachedUkToday(),
+    cachedNow(),
+    fetchAdUnits(brand, 'home', { perspective, variant, stega }),
+  ])
   const { data } = await cachedSanity({
     query: HOME_PAGE_QUERY,
     params: { brand, today },
@@ -78,9 +84,17 @@ async function CachedHome({
     )
   }
 
+  // The home template's banners: Top and Side with the first blocks, then Banner 3 and Banner 4 between the three
+  // block lists. Banner 4 follows the middle list, so it goes with it when that list is empty.
+  const hasMiddle = Boolean(data.blocksMiddle?.length)
+
   return (
     <main>
-      <BlockRenderer blocks={data.blocks} brand={brand} today={today} now={now} />
+      <PageBlocks blocks={data.blocks} brand={brand} today={today} now={now} ads={ads} />
+      <PageAd position="banner3" ads={ads} brand={brand} />
+      <BlockRenderer blocks={data.blocksMiddle} brand={brand} today={today} now={now} ads={ads} />
+      {hasMiddle && <PageAd position="banner4" ads={ads} brand={brand} />}
+      <BlockRenderer blocks={data.blocksBottom} brand={brand} today={today} now={now} ads={ads} />
     </main>
   )
 }

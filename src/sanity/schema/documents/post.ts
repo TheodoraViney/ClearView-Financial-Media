@@ -173,10 +173,19 @@ export const post = defineType({
         'Set only for sponsored content: the company that paid for this post. A post with a sponsor can appear in the "Sponsored content" block, which shows the company name, logo and a link to its profile.',
       options: { disableNew: true },
     }),
+    // The article banner sits between the two text fields, fixed by the template. `content` keeps its name from
+    // before the split, so stored bodies need no move.
     defineField({
       name: 'content',
-      title: 'Content',
+      title: 'Text before the banner',
       type: 'articleBody',
+      description: 'The article text above the advertising banner.',
+    }),
+    defineField({
+      name: 'contentAfter',
+      title: 'Text after the banner',
+      type: 'articleBody',
+      description: 'The article text below the advertising banner. Leave empty to show the banner after the text.',
     }),
     defineField({
       name: 'briefText',

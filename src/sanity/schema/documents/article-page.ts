@@ -6,8 +6,6 @@ import { BRANDS, isEditorialBrandKey } from '@/brands'
 import { ARTICLE_PAGE_COPY_DEFAULTS, type ArticlePageCopy } from '@/lib/article-copy'
 import { SHARE_LINK_DEFAULTS, SHARE_LINKS_MAX, shareTemplateError } from '@/lib/share-links'
 
-import { adUnitField } from '../fields'
-
 /*
  * The article template's labels, one document per editorial brand with the fixed id
  * `articlePageDocumentId(key)` from `src/brands.ts`, opened from each brand folder in the Studio.
@@ -88,25 +86,6 @@ export const articlePage = defineType({
           },
         }),
       ],
-    }),
-    // Every article of the brand shows these banners, archived ones included, so the units are set once here.
-    adUnitField({
-      name: 'topAdUnit',
-      title: 'Top banner ad unit',
-      description: 'The banner above the breadcrumb on every article. Only 728 × 90 units are listed.',
-      position: 'leaderboard',
-    }),
-    adUnitField({
-      name: 'sidebarAdUnit',
-      title: 'Sidebar banner ad unit',
-      description: 'The banner above Most read in the right column. Only 300 × 250 units are listed.',
-      position: 'mpu',
-    }),
-    adUnitField({
-      name: 'inContentAdUnit',
-      title: 'In-text banner ad unit',
-      description: 'The Advertisement blocks an editor places inside the article text. Only 728 × 90 units are listed.',
-      position: 'leaderboard',
     }),
   ],
   preview: {

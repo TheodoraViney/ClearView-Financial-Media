@@ -1,4 +1,3 @@
-import { adBreak } from './ad-break'
 import { agenda } from './agenda'
 import { articleBody } from './article-body'
 import { brevoAttribute, brevoList, brevoSegment, brevoSender, brevoTemplate } from './brevo'
@@ -23,7 +22,6 @@ export const objectTypes = [
   pullQuote,
   factBox,
   infographic,
-  adBreak,
   personGroup,
   companyGroup,
   winner,

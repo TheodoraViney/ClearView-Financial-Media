@@ -2,7 +2,7 @@ import { SplitVerticalIcon } from '@sanity/icons/SplitVertical'
 import { defineArrayMember, defineField, defineType } from 'sanity'
 
 import { adminLabelField } from '../fields'
-import { adSlot } from './ad-slot'
+import { awardsWinners } from './awards-winners'
 import { cta } from './cta'
 import { highlights } from './highlights'
 import { postBriefs, postCards } from './post-list'
@@ -13,14 +13,16 @@ import { weeklyRoundup } from './weekly-roundup'
 
 // Blocks allowed in the main column.
 // splitLayout itself is never listed, so the layout cannot nest.
-const mainBlockTypes = [adSlot, topStories, sponsoredContent, postCards, postBriefs, weeklyRoundup, publications, cta]
+const mainBlockTypes = [topStories, sponsoredContent, postCards, postBriefs, weeklyRoundup, publications, cta]
 
 // Blocks allowed in the sidebar.
-const asideBlockTypes = [highlights, adSlot]
+const asideBlockTypes = [highlights, awardsWinners]
 
 /**
  * A main column with a sidebar beside it from 1280px. Below that the sidebar
- * stacks after the main column.
+ * stacks after the main column. As a page's first block it also carries the
+ * page's Top banner (head of the main column) and Side banner (head of the
+ * sidebar), placed by the page template.
  */
 export const splitLayout = defineType({
   name: 'splitLayout',

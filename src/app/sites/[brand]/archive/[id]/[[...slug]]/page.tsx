@@ -17,7 +17,7 @@ import {
   type ArchiveRecord,
 } from '@/lib/archive'
 import { fromArchiveRecord } from '@/sanity/article-view'
-import { brandTitle, fetchBrandTitle, fetchShell } from '@/sanity/brand-title'
+import { brandTitle, fetchAdUnits, fetchBrandTitle, fetchShell } from '@/sanity/brand-title'
 import { cachedSanity, type DynamicFetchOptions } from '@/sanity/live'
 import { mostReadAutoFill } from '@/sanity/most-read'
 import { ARTICLE_PAGE_QUERY, MOST_READ_QUERY } from '@/sanity/queries'
@@ -117,12 +117,13 @@ export default async function ArchiveArticlePage({ params }: { params: Params })
     permanentRedirect(archiveArticlePath(record))
   }
 
-  const [{ data: shell }, { data: mostRead }, mostReadFill, { data: copy }] = await Promise.all([
+  const [{ data: shell }, { data: mostRead }, mostReadFill, { data: copy }, ads] = await Promise.all([
     fetchShell(brand, PUBLISHED),
     cachedSanity({ query: MOST_READ_QUERY, params: { brand, id: mostReadDocumentId(brand) }, ...PUBLISHED }),
     // No post is being read: an empty slug excludes none.
     mostReadAutoFill({ brand, slug: '', ...PUBLISHED }),
     cachedSanity({ query: ARTICLE_PAGE_QUERY, params: { id: articlePageDocumentId(brand) }, ...PUBLISHED }),
+    fetchAdUnits(brand, 'other', PUBLISHED),
   ])
 
   const article = fromArchiveRecord({
@@ -130,9 +131,12 @@ export default async function ArchiveArticlePage({ params }: { params: Params })
     mostRead,
     mostReadFill,
     copy,
+    ads,
     brand,
     logo: toLogo(shell.brand?.logo, brandTitle(brand, shell.brand?.title)),
-    body: <ArchiveBody html={record.bodyHtml ?? ''} videoId={record.media.videoId} title={record.title} />,
+    body: (
+      <ArchiveBody html={record.bodyHtml ?? ''} videoId={record.media.videoId} title={record.title} banner={ads.article} />
+    ),
   })
 
   return <ArticlePage article={article} />

@@ -19,6 +19,5 @@ export const articleBody = defineType({
     defineArrayMember({ type: 'pullQuote' }),
     defineArrayMember({ type: 'factBox' }),
     defineArrayMember({ type: 'infographic' }),
-    defineArrayMember({ type: 'adBreak' }),
   ],
 })

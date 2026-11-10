@@ -239,6 +239,25 @@ export type PromoLink = {
   external?: string;
 };
 
+export type AwardsWinners = {
+  _type: "awardsWinners";
+  adminLabel?: string;
+  heading?: Array<{
+    children?: Array<{
+      marks?: Array<string>;
+      text?: string;
+      _type: "span";
+      _key: string;
+    }>;
+    style?: "normal" | "h1" | "h2" | "h3" | "h4" | "h5" | "h6";
+    listItem?: never;
+    markDefs?: null;
+    level?: number;
+    _type: "block";
+    _key: string;
+  }>;
+};
+
 export type SubscribeBanner = {
   _type: "subscribeBanner";
   adminLabel?: string;
@@ -570,9 +589,6 @@ export type SplitLayout = {
   main?: Array<
     | ({
         _key: string;
-      } & AdSlot)
-    | ({
-        _key: string;
       } & TopStories)
     | ({
         _key: string;
@@ -599,25 +615,8 @@ export type SplitLayout = {
       } & Highlights)
     | ({
         _key: string;
-      } & AdSlot)
+      } & AwardsWinners)
   >;
-};
-
-export type AdUnitReference = {
-  _ref: string;
-  _type: "reference";
-  _weak?: boolean;
-  [internalGroqTypeReferenceTo]?: "adUnit";
-};
-
-export type AdSlot = {
-  _type: "adSlot";
-  adminLabel?: string;
-  size?: "leaderboard" | "billboard" | "mpu";
-  unit?: AdUnitReference;
-  label?: string;
-  spacing?:
-    "around" | "below" | "belowSection" | "aside" | "top" | "divided" | "none";
 };
 
 export type Cta = {
@@ -817,11 +816,6 @@ export type PersonGroup = {
   >;
 };
 
-export type AdBreak = {
-  _type: "adBreak";
-  adminLabel?: string;
-};
-
 export type Infographic = {
   _type: "infographic";
   eyebrow?: string;
@@ -911,9 +905,6 @@ export type ArticleBody = Array<
   | ({
       _key: string;
     } & Infographic)
-  | ({
-      _key: string;
-    } & AdBreak)
 >;
 
 export type RichText = Array<
@@ -1156,20 +1147,6 @@ export type ArticlePage = {
     _type: "shareLink";
     _key: string;
   }>;
-  topAdUnit?: AdUnitReference;
-  sidebarAdUnit?: AdUnitReference;
-  inContentAdUnit?: AdUnitReference;
-};
-
-export type AdUnit = {
-  _id: string;
-  _type: "adUnit";
-  _createdAt: string;
-  _updatedAt: string;
-  _rev: string;
-  title?: string;
-  code?: string;
-  size?: "728x90" | "300x250";
 };
 
 export type MostRead = {
@@ -1293,7 +1270,98 @@ export type Page = {
       } & Cta)
     | ({
         _key: string;
-      } & AdSlot)
+      } & SplitLayout)
+    | ({
+        _key: string;
+      } & TopStories)
+    | ({
+        _key: string;
+      } & Publications)
+    | ({
+        _key: string;
+      } & Highlights)
+    | ({
+        _key: string;
+      } & FeaturedStories)
+    | ({
+        _key: string;
+      } & StatsBar)
+    | ({
+        _key: string;
+      } & NewsletterSignup)
+    | ({
+        _key: string;
+      } & SponsoredContent)
+    | ({
+        _key: string;
+      } & PostCards)
+    | ({
+        _key: string;
+      } & PostBriefs)
+    | ({
+        _key: string;
+      } & WeeklyRoundup)
+    | ({
+        _key: string;
+      } & TopPicks)
+    | ({
+        _key: string;
+      } & ExploreGrid)
+    | ({
+        _key: string;
+      } & SubscribeBanner)
+  >;
+  blocksMiddle?: Array<
+    | ({
+        _key: string;
+      } & Cta)
+    | ({
+        _key: string;
+      } & SplitLayout)
+    | ({
+        _key: string;
+      } & TopStories)
+    | ({
+        _key: string;
+      } & Publications)
+    | ({
+        _key: string;
+      } & Highlights)
+    | ({
+        _key: string;
+      } & FeaturedStories)
+    | ({
+        _key: string;
+      } & StatsBar)
+    | ({
+        _key: string;
+      } & NewsletterSignup)
+    | ({
+        _key: string;
+      } & SponsoredContent)
+    | ({
+        _key: string;
+      } & PostCards)
+    | ({
+        _key: string;
+      } & PostBriefs)
+    | ({
+        _key: string;
+      } & WeeklyRoundup)
+    | ({
+        _key: string;
+      } & TopPicks)
+    | ({
+        _key: string;
+      } & ExploreGrid)
+    | ({
+        _key: string;
+      } & SubscribeBanner)
+  >;
+  blocksBottom?: Array<
+    | ({
+        _key: string;
+      } & Cta)
     | ({
         _key: string;
       } & SplitLayout)
@@ -2156,6 +2224,7 @@ export type Post = {
   };
   sponsor?: CompanyReference;
   content?: ArticleBody;
+  contentAfter?: ArticleBody;
   briefText?: string;
   recommended?: Array<
     {
@@ -2276,6 +2345,33 @@ export type Brand = {
       readMore?: string;
       footerText?: string;
       unsubscribe?: string;
+    };
+  };
+  advertising?: {
+    top?: {
+      home?: string;
+      other?: string;
+    };
+    side?: {
+      home?: string;
+      other?: string;
+    };
+    publications?: {
+      home?: string;
+      other?: string;
+    };
+    article?: {
+      other?: string;
+    };
+    banner3?: {
+      home?: string;
+    };
+    banner4?: {
+      home?: string;
+    };
+    awardsWinners?: {
+      home?: string;
+      other?: string;
     };
   };
 };
@@ -2427,6 +2523,7 @@ export type AllSanitySchemaTypes =
   | PublicationCardImage
   | PromoImage
   | PromoLink
+  | AwardsWinners
   | SubscribeBanner
   | ExploreGrid
   | TopPicks
@@ -2442,8 +2539,6 @@ export type AllSanitySchemaTypes =
   | Publications
   | TopStories
   | SplitLayout
-  | AdUnitReference
-  | AdSlot
   | Cta
   | BrevoAttribute
   | BrevoSender
@@ -2464,7 +2559,6 @@ export type AllSanitySchemaTypes =
   | CompanyGroup
   | PersonReference
   | PersonGroup
-  | AdBreak
   | Infographic
   | FactBox
   | PullQuote
@@ -2482,7 +2576,6 @@ export type AllSanitySchemaTypes =
   | BriefSettings
   | InfographicSettings
   | ArticlePage
-  | AdUnit
   | MostRead
   | PublicationFooter
   | ClearviewFooter
@@ -2520,7 +2613,7 @@ export type AllSanitySchemaTypes =
 
 // Source: src/sanity/queries.ts
 // Variable: SHELL_QUERY
-// Query: {    "header": *[_id == $headerId && _type in ["clearviewHeader", "publicationHeader"]][0]{      _type,      navigation[]{        _key,        _type,        label,        link{   kind,  external,  internal->{    _type,    "slug": slug.current,    brand,    brands  } },        links[]{ _key, _type, label, link{   kind,  external,  internal->{    _type,    "slug": slug.current,    brand,    brands  } } }      },      searchPlaceholder,      searchLabels,      subscribeLabel,      subscribe{   label,    kind,  external,  internal->{    _type,    "slug": slug.current,    brand,    brands  } }    },    "footer": *[_id == $footerId && _type in ["clearviewFooter", "publicationFooter"]][0]{      _type,      description,      publisherLine,      columns[]{        _key,        title,        links[]{ _key, label, link{   kind,  external,  internal->{    _type,    "slug": slug.current,    brand,    brands  } } }      },      socialHeading,      social[]{ _key, name, url, icon{ asset->{ url } } },      copyright    },    "brand": *[_type == "brand" && _id == $brandId && key.current == $brand][0]{      title,      logo{ "alt": asset->altText, asset->{ url, metadata{ dimensions{ width, height } } } },      footerLogo{ "alt": asset->altText, asset->{ url, metadata{ dimensions{ width, height } } } }    },    "subscribeModal": *[_id == $subscribeModalId && _type == "subscribeModal"][0]{   title,  description,  firstNameLabel,  lastNameLabel,  emailLabel,  emailPlaceholder,  companyLabel,  jobTitleLabel,  countryLabel,  countryPlaceholder,  industryLabel,  industryPlaceholder,  optionalMarker,  requiredMarker,  interestsLegend,  interests[]{ _key, label, locked, defaultChecked },  consentText,  privacyLinkLabel,  privacyLink{   kind,  external,  internal->{    _type,    "slug": slug.current,    brand,    brands  } },  submitLabel,  firstNameError,  lastNameError,  emailMissingError,  emailInvalidError,  consentError,  noPublicationError,  genericError,  successTitle,  successText,  closeLabel }  }
+// Query: {    "header": *[_id == $headerId && _type in ["clearviewHeader", "publicationHeader"]][0]{      _type,      navigation[]{        _key,        _type,        label,        link{   kind,  external,  internal->{    _type,    "slug": slug.current,    brand,    brands  } },        links[]{ _key, _type, label, link{   kind,  external,  internal->{    _type,    "slug": slug.current,    brand,    brands  } } }      },      searchPlaceholder,      searchLabels,      subscribeLabel,      subscribe{   label,    kind,  external,  internal->{    _type,    "slug": slug.current,    brand,    brands  } }    },    "footer": *[_id == $footerId && _type in ["clearviewFooter", "publicationFooter"]][0]{      _type,      description,      publisherLine,      columns[]{        _key,        title,        links[]{ _key, label, link{   kind,  external,  internal->{    _type,    "slug": slug.current,    brand,    brands  } } }      },      socialHeading,      social[]{ _key, name, url, icon{ asset->{ url } } },      copyright    },    "brand": *[_type == "brand" && _id == $brandId && key.current == $brand][0]{      title,      logo{ "alt": asset->altText, asset->{ url, metadata{ dimensions{ width, height } } } },      footerLogo{ "alt": asset->altText, asset->{ url, metadata{ dimensions{ width, height } } } },        advertising{    top{ home, other },    side{ home, other },    publications{ home, other },    article{ other },    banner3{ home },    banner4{ home },    awardsWinners{ home, other }  }    },    "subscribeModal": *[_id == $subscribeModalId && _type == "subscribeModal"][0]{   title,  description,  firstNameLabel,  lastNameLabel,  emailLabel,  emailPlaceholder,  companyLabel,  jobTitleLabel,  countryLabel,  countryPlaceholder,  industryLabel,  industryPlaceholder,  optionalMarker,  requiredMarker,  interestsLegend,  interests[]{ _key, label, locked, defaultChecked },  consentText,  privacyLinkLabel,  privacyLink{   kind,  external,  internal->{    _type,    "slug": slug.current,    brand,    brands  } },  submitLabel,  firstNameError,  lastNameError,  emailMissingError,  emailInvalidError,  consentError,  noPublicationError,  genericError,  successTitle,  successText,  closeLabel }  }
 export type SHELL_QUERY_RESULT = {
   header:
     | {
@@ -2887,6 +2980,33 @@ export type SHELL_QUERY_RESULT = {
         } | null;
       } | null;
     } | null;
+    advertising: {
+      top: {
+        home: string | null;
+        other: string | null;
+      } | null;
+      side: {
+        home: string | null;
+        other: string | null;
+      } | null;
+      publications: {
+        home: string | null;
+        other: string | null;
+      } | null;
+      article: {
+        other: string | null;
+      } | null;
+      banner3: {
+        home: string | null;
+      } | null;
+      banner4: {
+        home: string | null;
+      } | null;
+      awardsWinners: {
+        home: string | null;
+        other: string | null;
+      } | null;
+    } | null;
   } | null;
   subscribeModal: {
     title: string | null;
@@ -2969,30 +3089,11 @@ export type SHELL_QUERY_RESULT = {
 
 // Source: src/sanity/queries.ts
 // Variable: HOME_PAGE_QUERY
-// Query: *[_type == "page" && brand == $brand && slug.current == "home"][0]{    _id,    title,    blocks[]{ _key, _type,   _type == "adSlot" => {   size,  label,  spacing,  "unit": unit->{ code, size } },  _type == "topStories" => {   linkLabel,  label,  "slides": slides[$brand == "clearview" || $brand in @->brands]->{   _id,  title,  "slug": slug.current,  brands,    "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title },  publishedAt,  excerpt,  "image": image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },  "category": category->{ title, "slug": slug.current } },  "articles": articles[$brand == "clearview" || $brand in @->brands]->{   _id,  title,  "slug": slug.current,  brands,    "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title },  publishedAt,  excerpt,  "image": image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },  "category": category->{ title, "slug": slug.current } },  "latest": *[    _type == "post"    && defined(slug.current)    && ($brand == "clearview" || $brand in brands)    && !(_id in coalesce(^.slides[]._ref, []))    && !(_id in coalesce(^.articles[]._ref, []))  ] | order(publishedAt desc)[0...6]{   _id,  title,  "slug": slug.current,  brands,    "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title },  publishedAt,  excerpt,  "image": image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },  "category": category->{ title, "slug": slug.current } } },  _type == "publications" => {   heading[]{ _key, style, children[]{ _key, text } },  body,  cards[]{    _key,    brand,    "brandTitle": *[_type == "brand" && key.current == ^.brand][0].title,    description,    image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },    linkLabel  } },  _type == "cta" => {   heading,  text,  link{ label, href } },  _type == "highlights" => {   source,  count,  heading[]{ _key, style, children[]{ _key, text } },  deadlineLabel,  "items": items[]->{   _id,  _type,  "slug": slug.current,  title,  category,  nominationsClosingDate,  startDate,  endDate,  country,  publishedAt },  "fill": select(  source == "awards" => [    ...*[      _type == "awardsProgramme"      && nominationsClosingDate >= $today      && !(_id in coalesce(^.items[]._ref, []))    ] | order(nominationsClosingDate asc)[0...5]{   _id,  _type,  "slug": slug.current,  title,  category,  nominationsClosingDate,  startDate,  endDate,  country,  publishedAt },    ...*[      _type == "awardsProgramme"      && !(defined(nominationsClosingDate) && nominationsClosingDate >= $today)      && startDate >= $today      && !(_id in coalesce(^.items[]._ref, []))    ] | order(startDate asc)[0...5]{   _id,  _type,  "slug": slug.current,  title,  category,  nominationsClosingDate,  startDate,  endDate,  country,  publishedAt },    ...*[      _type == "awardsProgramme"      && !(defined(nominationsClosingDate) && nominationsClosingDate >= $today)      && startDate < $today      && !(_id in coalesce(^.items[]._ref, []))    ] | order(startDate desc)[0...5]{   _id,  _type,  "slug": slug.current,  title,  category,  nominationsClosingDate,  startDate,  endDate,  country,  publishedAt }  ],  source == "events" => [    ...*[      _type == "conferenceEvent"      && coalesce(endDate, startDate) >= $today      && !(_id in coalesce(^.items[]._ref, []))    ] | order(startDate asc)[0...4]{   _id,  _type,  "slug": slug.current,  title,  category,  nominationsClosingDate,  startDate,  endDate,  country,  publishedAt },    ...*[      _type == "conferenceEvent"      && coalesce(endDate, startDate) < $today      && !(_id in coalesce(^.items[]._ref, []))    ] | order(startDate desc)[0...4]{   _id,  _type,  "slug": slug.current,  title,  category,  nominationsClosingDate,  startDate,  endDate,  country,  publishedAt }  ],  source == "research" => *[    _type == "resource"    && category == "research"    && !(_id in coalesce(^.items[]._ref, []))    && _id != coalesce(^.promo.resource._ref, "")  ] | order(defined(publishedAt) desc, publishedAt desc, legacyWpId desc)[0...3]{   _id,  _type,  "slug": slug.current,  title,  category,  nominationsClosingDate,  startDate,  endDate,  country,  publishedAt }),  button{   label,    kind,  external,  internal->{    _type,    "slug": slug.current,    brand,    brands  } },  promo{    resource->{      title,      "downloadThumbnail": downloadThumbnail{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },      "downloadFileUrl": downloadFile.asset->url,      "downloadFileName": downloadFile.asset->originalFilename,      downloadUrl    },    title,    description,    "image": image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },    link{   kind,  external,  internal->{    _type,    "slug": slug.current,    brand,    brands  } }  } },  _type == "featuredStories" => {   heading[]{ _key, style, children[]{ _key, text } },  link{   label,    kind,  external,  internal->{    _type,    "slug": slug.current,    brand,    brands  } },  "posts": posts[]->{   _id,  title,  "slug": slug.current,  brands,    "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title },  publishedAt,  excerpt,  "image": image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },  "category": category->{ title, "slug": slug.current } } },  _type == "statsBar" => {   heading[]{ _key, style, children[]{ _key, text } },  items[]{ _key, icon, value, label } },  _type == "newsletterSignup" => {   heading[]{ _key, style, children[]{ _key, text } },  body,  preferencesLabel,  options[]{    _key,    label,    defaultChecked,    "interestKey": *[_type == "subscribeModal" && _id == "subscribe-modal-" + $brand][0].interests[attribute.name == ^.attribute.name][0]._key  },  emailPlaceholder,  buttonLabel,  invalidEmailMessage,  noOptionMessage,  image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) } },  _type == "sponsoredContent" => {   label,  link{   label,    kind,  external,  internal->{    _type,    "slug": slug.current,    brand,    brands  } },  profileLabel,  "post": *[    _type == "post"    && _id == ^.post._ref    && defined(slug.current)    && defined(sponsor)    && ($brand == "clearview" || $brand in brands)  ][0]{      _id,  title,  "slug": slug.current,  brands,    "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title },  publishedAt,  excerpt,  "image": image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },  "category": category->{ title, "slug": slug.current },    "sponsor": sponsor->{      title,      "slug": slug.current,      "logo": logo{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) }    }  } },  _type == "postCards" => {     heading[]{ _key, style, children[]{ _key, text } },  link{   label,    kind,  external,  internal->{    _type,    "slug": slug.current,    brand,    brands  } },  "category": category->{ title, "slug": slug.current },  "posts": posts[$brand in @->brands]->{   _id,  title,  "slug": slug.current,  brands,    "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title },  publishedAt,  excerpt,  "image": image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },  "category": category->{ title, "slug": slug.current } },  "latest":   *[    _type == "post"    && defined(slug.current)    && $brand in brands    && defined(^.category._ref) && category._ref == ^.category._ref    && !(_id in coalesce(^.posts[]._ref, []))  ] | order(publishedAt desc)[0...6]{   _id,  title,  "slug": slug.current,  brands,    "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title },  publishedAt,  excerpt,  "image": image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },  "category": category->{ title, "slug": slug.current } } },  _type == "postBriefs" => {     heading[]{ _key, style, children[]{ _key, text } },  link{   label,    kind,  external,  internal->{    _type,    "slug": slug.current,    brand,    brands  } },  count,  "posts": posts[$brand in @->brands]->{     _id,  title,  "slug": slug.current,  brands,    "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title },  publishedAt,  excerpt,  "image": image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },  "category": category->{ title, "slug": slug.current },  "topic": primaryTopic->{ title },  briefText },  "latest":   *[    _type == "post"    && defined(slug.current)    && $brand in brands    && true    && !(_id in coalesce(^.posts[]._ref, []))  ] | order(publishedAt desc)[0...6]{     _id,  title,  "slug": slug.current,  brands,    "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title },  publishedAt,  excerpt,  "image": image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },  "category": category->{ title, "slug": slug.current },  "topic": primaryTopic->{ title },  briefText } },  _type == "weeklyRoundup" => {   heading[]{ _key, style, children[]{ _key, text } },  label,  title,  summary,  button{   label,    kind,  external,  internal->{    _type,    "slug": slug.current,    brand,    brands  } },  listLabel,  "posts": posts[$brand in @->brands]->{   _id,  title,  "slug": slug.current,  brands,    "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title },  publishedAt,  excerpt,  "image": image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },  "category": category->{ title, "slug": slug.current } },  "latest":   *[    _type == "post"    && defined(slug.current)    && $brand in brands    && true    && !(_id in coalesce(^.posts[]._ref, []))  ] | order(publishedAt desc)[0...8]{   _id,  title,  "slug": slug.current,  brands,    "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title },  publishedAt,  excerpt,  "image": image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },  "category": category->{ title, "slug": slug.current } } },  _type == "topPicks" => {   heading[]{ _key, style, children[]{ _key, text } },  link{   label,    kind,  external,  internal->{    _type,    "slug": slug.current,    brand,    brands  } },  "posts": posts[$brand in @->brands]->{   _id,  title,  "slug": slug.current,  brands,    "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title },  publishedAt,  excerpt,  "image": image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },  "category": category->{ title, "slug": slug.current }, "sponsored": defined(sponsor) },  "fill": [    ...  *[    _type == "post"    && defined(slug.current)    && $brand in brands    && !defined(sponsor) && dateTime(publishedAt) >= dateTime($today + "T00:00:00Z") - 60*60*24*7    && !(_id in coalesce(^.posts[]._ref, []))  ] | order(publishedAt desc)[0...6]{   _id,  title,  "slug": slug.current,  brands,    "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title },  publishedAt,  excerpt,  "image": image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },  "category": category->{ title, "slug": slug.current } },    ...  *[    _type == "post"    && defined(slug.current)    && $brand in brands    && !defined(sponsor) && dateTime(publishedAt) < dateTime($today + "T00:00:00Z") - 60*60*24*7    && !(_id in coalesce(^.posts[]._ref, []))  ] | order(publishedAt desc)[0...6]{   _id,  title,  "slug": slug.current,  brands,    "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title },  publishedAt,  excerpt,  "image": image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },  "category": category->{ title, "slug": slug.current } }  ] },  _type == "exploreGrid" => {   cards[]{    _key,    heading[]{ _key, style, children[]{ _key, text } },    icon,    source,    count,    deadlineLabel,    button{   label,    kind,  external,  internal->{    _type,    "slug": slug.current,    brand,    brands  } },    "items": items[@->_type != "post" || $brand in @->brands]->{   _type == "post" => { _type,   _id,  title,  "slug": slug.current,  brands,    "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title },  publishedAt,  excerpt,  "image": image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },  "category": category->{ title, "slug": slug.current } },  _type != "post" => {   _id,  _type,  "slug": slug.current,  title,  category,  nominationsClosingDate,  startDate,  endDate,  country,  publishedAt } },    "fill": select(      source == "posts" =>   *[    _type == "post"    && defined(slug.current)    && $brand in brands    && defined(^.category._ref) && category._ref == ^.category._ref    && !(_id in coalesce(^.items[]._ref, []))  ] | order(publishedAt desc)[0...6]{ _type,   _id,  title,  "slug": slug.current,  brands,    "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title },  publishedAt,  excerpt,  "image": image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },  "category": category->{ title, "slug": slug.current } },        source == "awards" => [    ...*[      _type == "awardsProgramme"      && nominationsClosingDate >= $today      && !(_id in coalesce(^.items[]._ref, []))    ] | order(nominationsClosingDate asc)[0...5]{   _id,  _type,  "slug": slug.current,  title,  category,  nominationsClosingDate,  startDate,  endDate,  country,  publishedAt },    ...*[      _type == "awardsProgramme"      && !(defined(nominationsClosingDate) && nominationsClosingDate >= $today)      && startDate >= $today      && !(_id in coalesce(^.items[]._ref, []))    ] | order(startDate asc)[0...5]{   _id,  _type,  "slug": slug.current,  title,  category,  nominationsClosingDate,  startDate,  endDate,  country,  publishedAt },    ...*[      _type == "awardsProgramme"      && !(defined(nominationsClosingDate) && nominationsClosingDate >= $today)      && startDate < $today      && !(_id in coalesce(^.items[]._ref, []))    ] | order(startDate desc)[0...5]{   _id,  _type,  "slug": slug.current,  title,  category,  nominationsClosingDate,  startDate,  endDate,  country,  publishedAt }  ],  source == "events" => [    ...*[      _type == "conferenceEvent"      && coalesce(endDate, startDate) >= $today      && !(_id in coalesce(^.items[]._ref, []))    ] | order(startDate asc)[0...4]{   _id,  _type,  "slug": slug.current,  title,  category,  nominationsClosingDate,  startDate,  endDate,  country,  publishedAt },    ...*[      _type == "conferenceEvent"      && coalesce(endDate, startDate) < $today      && !(_id in coalesce(^.items[]._ref, []))    ] | order(startDate desc)[0...4]{   _id,  _type,  "slug": slug.current,  title,  category,  nominationsClosingDate,  startDate,  endDate,  country,  publishedAt }  ],  source == "research" => *[    _type == "resource"    && category == "research"    && !(_id in coalesce(^.items[]._ref, []))    && _id != coalesce(^.promo.resource._ref, "")  ] | order(defined(publishedAt) desc, publishedAt desc, legacyWpId desc)[0...3]{   _id,  _type,  "slug": slug.current,  title,  category,  nominationsClosingDate,  startDate,  endDate,  country,  publishedAt }    )  } },  _type == "subscribeBanner" => {   heading[]{ _key, style, children[]{ _key, text } },  description,  buttonLabel,  cta{   label,    kind,  external,  internal->{    _type,    "slug": slug.current,    brand,    brands  } } },  _type == "splitLayout" => {    "main": main[]{ _key, _type,   _type == "adSlot" => {   size,  label,  spacing,  "unit": unit->{ code, size } },  _type == "topStories" => {   linkLabel,  label,  "slides": slides[$brand == "clearview" || $brand in @->brands]->{   _id,  title,  "slug": slug.current,  brands,    "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title },  publishedAt,  excerpt,  "image": image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },  "category": category->{ title, "slug": slug.current } },  "articles": articles[$brand == "clearview" || $brand in @->brands]->{   _id,  title,  "slug": slug.current,  brands,    "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title },  publishedAt,  excerpt,  "image": image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },  "category": category->{ title, "slug": slug.current } },  "latest": *[    _type == "post"    && defined(slug.current)    && ($brand == "clearview" || $brand in brands)    && !(_id in coalesce(^.slides[]._ref, []))    && !(_id in coalesce(^.articles[]._ref, []))  ] | order(publishedAt desc)[0...6]{   _id,  title,  "slug": slug.current,  brands,    "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title },  publishedAt,  excerpt,  "image": image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },  "category": category->{ title, "slug": slug.current } } },  _type == "sponsoredContent" => {   label,  link{   label,    kind,  external,  internal->{    _type,    "slug": slug.current,    brand,    brands  } },  profileLabel,  "post": *[    _type == "post"    && _id == ^.post._ref    && defined(slug.current)    && defined(sponsor)    && ($brand == "clearview" || $brand in brands)  ][0]{      _id,  title,  "slug": slug.current,  brands,    "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title },  publishedAt,  excerpt,  "image": image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },  "category": category->{ title, "slug": slug.current },    "sponsor": sponsor->{      title,      "slug": slug.current,      "logo": logo{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) }    }  } },  _type == "postCards" => {     heading[]{ _key, style, children[]{ _key, text } },  link{   label,    kind,  external,  internal->{    _type,    "slug": slug.current,    brand,    brands  } },  "category": category->{ title, "slug": slug.current },  "posts": posts[$brand in @->brands]->{   _id,  title,  "slug": slug.current,  brands,    "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title },  publishedAt,  excerpt,  "image": image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },  "category": category->{ title, "slug": slug.current } },  "latest":   *[    _type == "post"    && defined(slug.current)    && $brand in brands    && defined(^.category._ref) && category._ref == ^.category._ref    && !(_id in coalesce(^.posts[]._ref, []))  ] | order(publishedAt desc)[0...6]{   _id,  title,  "slug": slug.current,  brands,    "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title },  publishedAt,  excerpt,  "image": image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },  "category": category->{ title, "slug": slug.current } } },  _type == "postBriefs" => {     heading[]{ _key, style, children[]{ _key, text } },  link{   label,    kind,  external,  internal->{    _type,    "slug": slug.current,    brand,    brands  } },  count,  "posts": posts[$brand in @->brands]->{     _id,  title,  "slug": slug.current,  brands,    "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title },  publishedAt,  excerpt,  "image": image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },  "category": category->{ title, "slug": slug.current },  "topic": primaryTopic->{ title },  briefText },  "latest":   *[    _type == "post"    && defined(slug.current)    && $brand in brands    && true    && !(_id in coalesce(^.posts[]._ref, []))  ] | order(publishedAt desc)[0...6]{     _id,  title,  "slug": slug.current,  brands,    "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title },  publishedAt,  excerpt,  "image": image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },  "category": category->{ title, "slug": slug.current },  "topic": primaryTopic->{ title },  briefText } },  _type == "weeklyRoundup" => {   heading[]{ _key, style, children[]{ _key, text } },  label,  title,  summary,  button{   label,    kind,  external,  internal->{    _type,    "slug": slug.current,    brand,    brands  } },  listLabel,  "posts": posts[$brand in @->brands]->{   _id,  title,  "slug": slug.current,  brands,    "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title },  publishedAt,  excerpt,  "image": image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },  "category": category->{ title, "slug": slug.current } },  "latest":   *[    _type == "post"    && defined(slug.current)    && $brand in brands    && true    && !(_id in coalesce(^.posts[]._ref, []))  ] | order(publishedAt desc)[0...8]{   _id,  title,  "slug": slug.current,  brands,    "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title },  publishedAt,  excerpt,  "image": image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },  "category": category->{ title, "slug": slug.current } } },  _type == "publications" => {   heading[]{ _key, style, children[]{ _key, text } },  body,  cards[]{    _key,    brand,    "brandTitle": *[_type == "brand" && key.current == ^.brand][0].title,    description,    image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },    linkLabel  } },  _type == "cta" => {   heading,  text,  link{ label, href } } },    "aside": aside[]{ _key, _type,   _type == "highlights" => {   source,  count,  heading[]{ _key, style, children[]{ _key, text } },  deadlineLabel,  "items": items[]->{   _id,  _type,  "slug": slug.current,  title,  category,  nominationsClosingDate,  startDate,  endDate,  country,  publishedAt },  "fill": select(  source == "awards" => [    ...*[      _type == "awardsProgramme"      && nominationsClosingDate >= $today      && !(_id in coalesce(^.items[]._ref, []))    ] | order(nominationsClosingDate asc)[0...5]{   _id,  _type,  "slug": slug.current,  title,  category,  nominationsClosingDate,  startDate,  endDate,  country,  publishedAt },    ...*[      _type == "awardsProgramme"      && !(defined(nominationsClosingDate) && nominationsClosingDate >= $today)      && startDate >= $today      && !(_id in coalesce(^.items[]._ref, []))    ] | order(startDate asc)[0...5]{   _id,  _type,  "slug": slug.current,  title,  category,  nominationsClosingDate,  startDate,  endDate,  country,  publishedAt },    ...*[      _type == "awardsProgramme"      && !(defined(nominationsClosingDate) && nominationsClosingDate >= $today)      && startDate < $today      && !(_id in coalesce(^.items[]._ref, []))    ] | order(startDate desc)[0...5]{   _id,  _type,  "slug": slug.current,  title,  category,  nominationsClosingDate,  startDate,  endDate,  country,  publishedAt }  ],  source == "events" => [    ...*[      _type == "conferenceEvent"      && coalesce(endDate, startDate) >= $today      && !(_id in coalesce(^.items[]._ref, []))    ] | order(startDate asc)[0...4]{   _id,  _type,  "slug": slug.current,  title,  category,  nominationsClosingDate,  startDate,  endDate,  country,  publishedAt },    ...*[      _type == "conferenceEvent"      && coalesce(endDate, startDate) < $today      && !(_id in coalesce(^.items[]._ref, []))    ] | order(startDate desc)[0...4]{   _id,  _type,  "slug": slug.current,  title,  category,  nominationsClosingDate,  startDate,  endDate,  country,  publishedAt }  ],  source == "research" => *[    _type == "resource"    && category == "research"    && !(_id in coalesce(^.items[]._ref, []))    && _id != coalesce(^.promo.resource._ref, "")  ] | order(defined(publishedAt) desc, publishedAt desc, legacyWpId desc)[0...3]{   _id,  _type,  "slug": slug.current,  title,  category,  nominationsClosingDate,  startDate,  endDate,  country,  publishedAt }),  button{   label,    kind,  external,  internal->{    _type,    "slug": slug.current,    brand,    brands  } },  promo{    resource->{      title,      "downloadThumbnail": downloadThumbnail{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },      "downloadFileUrl": downloadFile.asset->url,      "downloadFileName": downloadFile.asset->originalFilename,      downloadUrl    },    title,    description,    "image": image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },    link{   kind,  external,  internal->{    _type,    "slug": slug.current,    brand,    brands  } }  } },  _type == "adSlot" => {   size,  label,  spacing,  "unit": unit->{ code, size } } }  } }  }
+// Query: *[_type == "page" && brand == $brand && slug.current == "home"][0]{    _id,    title,    blocks[]{ _key, _type,   _type == "topStories" => {   linkLabel,  label,  "slides": slides[$brand == "clearview" || $brand in @->brands]->{   _id,  title,  "slug": slug.current,  brands,    "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title },  publishedAt,  excerpt,  "image": image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },  "category": category->{ title, "slug": slug.current } },  "articles": articles[$brand == "clearview" || $brand in @->brands]->{   _id,  title,  "slug": slug.current,  brands,    "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title },  publishedAt,  excerpt,  "image": image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },  "category": category->{ title, "slug": slug.current } },  "latest": *[    _type == "post"    && defined(slug.current)    && ($brand == "clearview" || $brand in brands)    && !(_id in coalesce(^.slides[]._ref, []))    && !(_id in coalesce(^.articles[]._ref, []))  ] | order(publishedAt desc)[0...6]{   _id,  title,  "slug": slug.current,  brands,    "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title },  publishedAt,  excerpt,  "image": image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },  "category": category->{ title, "slug": slug.current } } },  _type == "publications" => {   heading[]{ _key, style, children[]{ _key, text } },  body,  cards[]{    _key,    brand,    "brandTitle": *[_type == "brand" && key.current == ^.brand][0].title,    description,    image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },    linkLabel  } },  _type == "cta" => {   heading,  text,  link{ label, href } },  _type == "highlights" => {   source,  count,  heading[]{ _key, style, children[]{ _key, text } },  deadlineLabel,  "items": items[]->{   _id,  _type,  "slug": slug.current,  title,  category,  nominationsClosingDate,  startDate,  endDate,  country,  publishedAt },  "fill": select(  source == "awards" => [    ...*[      _type == "awardsProgramme"      && nominationsClosingDate >= $today      && !(_id in coalesce(^.items[]._ref, []))    ] | order(nominationsClosingDate asc)[0...5]{   _id,  _type,  "slug": slug.current,  title,  category,  nominationsClosingDate,  startDate,  endDate,  country,  publishedAt },    ...*[      _type == "awardsProgramme"      && !(defined(nominationsClosingDate) && nominationsClosingDate >= $today)      && startDate >= $today      && !(_id in coalesce(^.items[]._ref, []))    ] | order(startDate asc)[0...5]{   _id,  _type,  "slug": slug.current,  title,  category,  nominationsClosingDate,  startDate,  endDate,  country,  publishedAt },    ...*[      _type == "awardsProgramme"      && !(defined(nominationsClosingDate) && nominationsClosingDate >= $today)      && startDate < $today      && !(_id in coalesce(^.items[]._ref, []))    ] | order(startDate desc)[0...5]{   _id,  _type,  "slug": slug.current,  title,  category,  nominationsClosingDate,  startDate,  endDate,  country,  publishedAt }  ],  source == "events" => [    ...*[      _type == "conferenceEvent"      && coalesce(endDate, startDate) >= $today      && !(_id in coalesce(^.items[]._ref, []))    ] | order(startDate asc)[0...4]{   _id,  _type,  "slug": slug.current,  title,  category,  nominationsClosingDate,  startDate,  endDate,  country,  publishedAt },    ...*[      _type == "conferenceEvent"      && coalesce(endDate, startDate) < $today      && !(_id in coalesce(^.items[]._ref, []))    ] | order(startDate desc)[0...4]{   _id,  _type,  "slug": slug.current,  title,  category,  nominationsClosingDate,  startDate,  endDate,  country,  publishedAt }  ],  source == "research" => *[    _type == "resource"    && category == "research"    && !(_id in coalesce(^.items[]._ref, []))    && _id != coalesce(^.promo.resource._ref, "")  ] | order(defined(publishedAt) desc, publishedAt desc, legacyWpId desc)[0...3]{   _id,  _type,  "slug": slug.current,  title,  category,  nominationsClosingDate,  startDate,  endDate,  country,  publishedAt }),  button{   label,    kind,  external,  internal->{    _type,    "slug": slug.current,    brand,    brands  } },  promo{    resource->{      title,      "downloadThumbnail": downloadThumbnail{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },      "downloadFileUrl": downloadFile.asset->url,      "downloadFileName": downloadFile.asset->originalFilename,      downloadUrl    },    title,    description,    "image": image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },    link{   kind,  external,  internal->{    _type,    "slug": slug.current,    brand,    brands  } }  } },  _type == "featuredStories" => {   heading[]{ _key, style, children[]{ _key, text } },  link{   label,    kind,  external,  internal->{    _type,    "slug": slug.current,    brand,    brands  } },  "posts": posts[]->{   _id,  title,  "slug": slug.current,  brands,    "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title },  publishedAt,  excerpt,  "image": image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },  "category": category->{ title, "slug": slug.current } } },  _type == "statsBar" => {   heading[]{ _key, style, children[]{ _key, text } },  items[]{ _key, icon, value, label } },  _type == "newsletterSignup" => {   heading[]{ _key, style, children[]{ _key, text } },  body,  preferencesLabel,  options[]{    _key,    label,    defaultChecked,    "interestKey": *[_type == "subscribeModal" && _id == "subscribe-modal-" + $brand][0].interests[attribute.name == ^.attribute.name][0]._key  },  emailPlaceholder,  buttonLabel,  invalidEmailMessage,  noOptionMessage,  image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) } },  _type == "sponsoredContent" => {   label,  link{   label,    kind,  external,  internal->{    _type,    "slug": slug.current,    brand,    brands  } },  profileLabel,  "post": *[    _type == "post"    && _id == ^.post._ref    && defined(slug.current)    && defined(sponsor)    && ($brand == "clearview" || $brand in brands)  ][0]{      _id,  title,  "slug": slug.current,  brands,    "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title },  publishedAt,  excerpt,  "image": image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },  "category": category->{ title, "slug": slug.current },    "sponsor": sponsor->{      title,      "slug": slug.current,      "logo": logo{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) }    }  } },  _type == "postCards" => {     heading[]{ _key, style, children[]{ _key, text } },  link{   label,    kind,  external,  internal->{    _type,    "slug": slug.current,    brand,    brands  } },  "category": category->{ title, "slug": slug.current },  "posts": posts[$brand in @->brands]->{   _id,  title,  "slug": slug.current,  brands,    "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title },  publishedAt,  excerpt,  "image": image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },  "category": category->{ title, "slug": slug.current } },  "latest":   *[    _type == "post"    && defined(slug.current)    && $brand in brands    && defined(^.category._ref) && category._ref == ^.category._ref    && !(_id in coalesce(^.posts[]._ref, []))  ] | order(publishedAt desc)[0...6]{   _id,  title,  "slug": slug.current,  brands,    "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title },  publishedAt,  excerpt,  "image": image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },  "category": category->{ title, "slug": slug.current } } },  _type == "postBriefs" => {     heading[]{ _key, style, children[]{ _key, text } },  link{   label,    kind,  external,  internal->{    _type,    "slug": slug.current,    brand,    brands  } },  count,  "posts": posts[$brand in @->brands]->{     _id,  title,  "slug": slug.current,  brands,    "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title },  publishedAt,  excerpt,  "image": image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },  "category": category->{ title, "slug": slug.current },  "topic": primaryTopic->{ title },  briefText },  "latest":   *[    _type == "post"    && defined(slug.current)    && $brand in brands    && true    && !(_id in coalesce(^.posts[]._ref, []))  ] | order(publishedAt desc)[0...6]{     _id,  title,  "slug": slug.current,  brands,    "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title },  publishedAt,  excerpt,  "image": image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },  "category": category->{ title, "slug": slug.current },  "topic": primaryTopic->{ title },  briefText } },  _type == "weeklyRoundup" => {   heading[]{ _key, style, children[]{ _key, text } },  label,  title,  summary,  button{   label,    kind,  external,  internal->{    _type,    "slug": slug.current,    brand,    brands  } },  listLabel,  "posts": posts[$brand in @->brands]->{   _id,  title,  "slug": slug.current,  brands,    "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title },  publishedAt,  excerpt,  "image": image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },  "category": category->{ title, "slug": slug.current } },  "latest":   *[    _type == "post"    && defined(slug.current)    && $brand in brands    && true    && !(_id in coalesce(^.posts[]._ref, []))  ] | order(publishedAt desc)[0...8]{   _id,  title,  "slug": slug.current,  brands,    "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title },  publishedAt,  excerpt,  "image": image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },  "category": category->{ title, "slug": slug.current } } },  _type == "topPicks" => {   heading[]{ _key, style, children[]{ _key, text } },  link{   label,    kind,  external,  internal->{    _type,    "slug": slug.current,    brand,    brands  } },  "posts": posts[$brand in @->brands]->{   _id,  title,  "slug": slug.current,  brands,    "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title },  publishedAt,  excerpt,  "image": image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },  "category": category->{ title, "slug": slug.current }, "sponsored": defined(sponsor) },  "fill": [    ...  *[    _type == "post"    && defined(slug.current)    && $brand in brands    && !defined(sponsor) && dateTime(publishedAt) >= dateTime($today + "T00:00:00Z") - 60*60*24*7    && !(_id in coalesce(^.posts[]._ref, []))  ] | order(publishedAt desc)[0...6]{   _id,  title,  "slug": slug.current,  brands,    "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title },  publishedAt,  excerpt,  "image": image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },  "category": category->{ title, "slug": slug.current } },    ...  *[    _type == "post"    && defined(slug.current)    && $brand in brands    && !defined(sponsor) && dateTime(publishedAt) < dateTime($today + "T00:00:00Z") - 60*60*24*7    && !(_id in coalesce(^.posts[]._ref, []))  ] | order(publishedAt desc)[0...6]{   _id,  title,  "slug": slug.current,  brands,    "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title },  publishedAt,  excerpt,  "image": image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },  "category": category->{ title, "slug": slug.current } }  ] },  _type == "exploreGrid" => {   cards[]{    _key,    heading[]{ _key, style, children[]{ _key, text } },    icon,    source,    count,    deadlineLabel,    button{   label,    kind,  external,  internal->{    _type,    "slug": slug.current,    brand,    brands  } },    "items": items[@->_type != "post" || $brand in @->brands]->{   _type == "post" => { _type,   _id,  title,  "slug": slug.current,  brands,    "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title },  publishedAt,  excerpt,  "image": image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },  "category": category->{ title, "slug": slug.current } },  _type != "post" => {   _id,  _type,  "slug": slug.current,  title,  category,  nominationsClosingDate,  startDate,  endDate,  country,  publishedAt } },    "fill": select(      source == "posts" =>   *[    _type == "post"    && defined(slug.current)    && $brand in brands    && defined(^.category._ref) && category._ref == ^.category._ref    && !(_id in coalesce(^.items[]._ref, []))  ] | order(publishedAt desc)[0...6]{ _type,   _id,  title,  "slug": slug.current,  brands,    "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title },  publishedAt,  excerpt,  "image": image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },  "category": category->{ title, "slug": slug.current } },        source == "awards" => [    ...*[      _type == "awardsProgramme"      && nominationsClosingDate >= $today      && !(_id in coalesce(^.items[]._ref, []))    ] | order(nominationsClosingDate asc)[0...5]{   _id,  _type,  "slug": slug.current,  title,  category,  nominationsClosingDate,  startDate,  endDate,  country,  publishedAt },    ...*[      _type == "awardsProgramme"      && !(defined(nominationsClosingDate) && nominationsClosingDate >= $today)      && startDate >= $today      && !(_id in coalesce(^.items[]._ref, []))    ] | order(startDate asc)[0...5]{   _id,  _type,  "slug": slug.current,  title,  category,  nominationsClosingDate,  startDate,  endDate,  country,  publishedAt },    ...*[      _type == "awardsProgramme"      && !(defined(nominationsClosingDate) && nominationsClosingDate >= $today)      && startDate < $today      && !(_id in coalesce(^.items[]._ref, []))    ] | order(startDate desc)[0...5]{   _id,  _type,  "slug": slug.current,  title,  category,  nominationsClosingDate,  startDate,  endDate,  country,  publishedAt }  ],  source == "events" => [    ...*[      _type == "conferenceEvent"      && coalesce(endDate, startDate) >= $today      && !(_id in coalesce(^.items[]._ref, []))    ] | order(startDate asc)[0...4]{   _id,  _type,  "slug": slug.current,  title,  category,  nominationsClosingDate,  startDate,  endDate,  country,  publishedAt },    ...*[      _type == "conferenceEvent"      && coalesce(endDate, startDate) < $today      && !(_id in coalesce(^.items[]._ref, []))    ] | order(startDate desc)[0...4]{   _id,  _type,  "slug": slug.current,  title,  category,  nominationsClosingDate,  startDate,  endDate,  country,  publishedAt }  ],  source == "research" => *[    _type == "resource"    && category == "research"    && !(_id in coalesce(^.items[]._ref, []))    && _id != coalesce(^.promo.resource._ref, "")  ] | order(defined(publishedAt) desc, publishedAt desc, legacyWpId desc)[0...3]{   _id,  _type,  "slug": slug.current,  title,  category,  nominationsClosingDate,  startDate,  endDate,  country,  publishedAt }    )  } },  _type == "subscribeBanner" => {   heading[]{ _key, style, children[]{ _key, text } },  description,  buttonLabel,  cta{   label,    kind,  external,  internal->{    _type,    "slug": slug.current,    brand,    brands  } } },  _type == "splitLayout" => {    "main": main[]{ _key, _type,   _type == "topStories" => {   linkLabel,  label,  "slides": slides[$brand == "clearview" || $brand in @->brands]->{   _id,  title,  "slug": slug.current,  brands,    "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title },  publishedAt,  excerpt,  "image": image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },  "category": category->{ title, "slug": slug.current } },  "articles": articles[$brand == "clearview" || $brand in @->brands]->{   _id,  title,  "slug": slug.current,  brands,    "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title },  publishedAt,  excerpt,  "image": image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },  "category": category->{ title, "slug": slug.current } },  "latest": *[    _type == "post"    && defined(slug.current)    && ($brand == "clearview" || $brand in brands)    && !(_id in coalesce(^.slides[]._ref, []))    && !(_id in coalesce(^.articles[]._ref, []))  ] | order(publishedAt desc)[0...6]{   _id,  title,  "slug": slug.current,  brands,    "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title },  publishedAt,  excerpt,  "image": image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },  "category": category->{ title, "slug": slug.current } } },  _type == "sponsoredContent" => {   label,  link{   label,    kind,  external,  internal->{    _type,    "slug": slug.current,    brand,    brands  } },  profileLabel,  "post": *[    _type == "post"    && _id == ^.post._ref    && defined(slug.current)    && defined(sponsor)    && ($brand == "clearview" || $brand in brands)  ][0]{      _id,  title,  "slug": slug.current,  brands,    "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title },  publishedAt,  excerpt,  "image": image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },  "category": category->{ title, "slug": slug.current },    "sponsor": sponsor->{      title,      "slug": slug.current,      "logo": logo{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) }    }  } },  _type == "postCards" => {     heading[]{ _key, style, children[]{ _key, text } },  link{   label,    kind,  external,  internal->{    _type,    "slug": slug.current,    brand,    brands  } },  "category": category->{ title, "slug": slug.current },  "posts": posts[$brand in @->brands]->{   _id,  title,  "slug": slug.current,  brands,    "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title },  publishedAt,  excerpt,  "image": image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },  "category": category->{ title, "slug": slug.current } },  "latest":   *[    _type == "post"    && defined(slug.current)    && $brand in brands    && defined(^.category._ref) && category._ref == ^.category._ref    && !(_id in coalesce(^.posts[]._ref, []))  ] | order(publishedAt desc)[0...6]{   _id,  title,  "slug": slug.current,  brands,    "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title },  publishedAt,  excerpt,  "image": image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },  "category": category->{ title, "slug": slug.current } } },  _type == "postBriefs" => {     heading[]{ _key, style, children[]{ _key, text } },  link{   label,    kind,  external,  internal->{    _type,    "slug": slug.current,    brand,    brands  } },  count,  "posts": posts[$brand in @->brands]->{     _id,  title,  "slug": slug.current,  brands,    "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title },  publishedAt,  excerpt,  "image": image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },  "category": category->{ title, "slug": slug.current },  "topic": primaryTopic->{ title },  briefText },  "latest":   *[    _type == "post"    && defined(slug.current)    && $brand in brands    && true    && !(_id in coalesce(^.posts[]._ref, []))  ] | order(publishedAt desc)[0...6]{     _id,  title,  "slug": slug.current,  brands,    "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title },  publishedAt,  excerpt,  "image": image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },  "category": category->{ title, "slug": slug.current },  "topic": primaryTopic->{ title },  briefText } },  _type == "weeklyRoundup" => {   heading[]{ _key, style, children[]{ _key, text } },  label,  title,  summary,  button{   label,    kind,  external,  internal->{    _type,    "slug": slug.current,    brand,    brands  } },  listLabel,  "posts": posts[$brand in @->brands]->{   _id,  title,  "slug": slug.current,  brands,    "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title },  publishedAt,  excerpt,  "image": image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },  "category": category->{ title, "slug": slug.current } },  "latest":   *[    _type == "post"    && defined(slug.current)    && $brand in brands    && true    && !(_id in coalesce(^.posts[]._ref, []))  ] | order(publishedAt desc)[0...8]{   _id,  title,  "slug": slug.current,  brands,    "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title },  publishedAt,  excerpt,  "image": image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },  "category": category->{ title, "slug": slug.current } } },  _type == "publications" => {   heading[]{ _key, style, children[]{ _key, text } },  body,  cards[]{    _key,    brand,    "brandTitle": *[_type == "brand" && key.current == ^.brand][0].title,    description,    image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },    linkLabel  } },  _type == "cta" => {   heading,  text,  link{ label, href } } },    "aside": aside[]{ _key, _type,   _type == "highlights" => {   source,  count,  heading[]{ _key, style, children[]{ _key, text } },  deadlineLabel,  "items": items[]->{   _id,  _type,  "slug": slug.current,  title,  category,  nominationsClosingDate,  startDate,  endDate,  country,  publishedAt },  "fill": select(  source == "awards" => [    ...*[      _type == "awardsProgramme"      && nominationsClosingDate >= $today      && !(_id in coalesce(^.items[]._ref, []))    ] | order(nominationsClosingDate asc)[0...5]{   _id,  _type,  "slug": slug.current,  title,  category,  nominationsClosingDate,  startDate,  endDate,  country,  publishedAt },    ...*[      _type == "awardsProgramme"      && !(defined(nominationsClosingDate) && nominationsClosingDate >= $today)      && startDate >= $today      && !(_id in coalesce(^.items[]._ref, []))    ] | order(startDate asc)[0...5]{   _id,  _type,  "slug": slug.current,  title,  category,  nominationsClosingDate,  startDate,  endDate,  country,  publishedAt },    ...*[      _type == "awardsProgramme"      && !(defined(nominationsClosingDate) && nominationsClosingDate >= $today)      && startDate < $today      && !(_id in coalesce(^.items[]._ref, []))    ] | order(startDate desc)[0...5]{   _id,  _type,  "slug": slug.current,  title,  category,  nominationsClosingDate,  startDate,  endDate,  country,  publishedAt }  ],  source == "events" => [    ...*[      _type == "conferenceEvent"      && coalesce(endDate, startDate) >= $today      && !(_id in coalesce(^.items[]._ref, []))    ] | order(startDate asc)[0...4]{   _id,  _type,  "slug": slug.current,  title,  category,  nominationsClosingDate,  startDate,  endDate,  country,  publishedAt },    ...*[      _type == "conferenceEvent"      && coalesce(endDate, startDate) < $today      && !(_id in coalesce(^.items[]._ref, []))    ] | order(startDate desc)[0...4]{   _id,  _type,  "slug": slug.current,  title,  category,  nominationsClosingDate,  startDate,  endDate,  country,  publishedAt }  ],  source == "research" => *[    _type == "resource"    && category == "research"    && !(_id in coalesce(^.items[]._ref, []))    && _id != coalesce(^.promo.resource._ref, "")  ] | order(defined(publishedAt) desc, publishedAt desc, legacyWpId desc)[0...3]{   _id,  _type,  "slug": slug.current,  title,  category,  nominationsClosingDate,  startDate,  endDate,  country,  publishedAt }),  button{   label,    kind,  external,  internal->{    _type,    "slug": slug.current,    brand,    brands  } },  promo{    resource->{      title,      "downloadThumbnail": downloadThumbnail{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },      "downloadFileUrl": downloadFile.asset->url,      "downloadFileName": downloadFile.asset->originalFilename,      downloadUrl    },    title,    description,    "image": image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },    link{   kind,  external,  internal->{    _type,    "slug": slug.current,    brand,    brands  } }  } },  _type == "awardsWinners" => { heading[]{ _key, style, children[]{ _key, text } } } }  } },    blocksMiddle[]{ _key, _type,   _type == "topStories" => {   linkLabel,  label,  "slides": slides[$brand == "clearview" || $brand in @->brands]->{   _id,  title,  "slug": slug.current,  brands,    "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title },  publishedAt,  excerpt,  "image": image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },  "category": category->{ title, "slug": slug.current } },  "articles": articles[$brand == "clearview" || $brand in @->brands]->{   _id,  title,  "slug": slug.current,  brands,    "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title },  publishedAt,  excerpt,  "image": image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },  "category": category->{ title, "slug": slug.current } },  "latest": *[    _type == "post"    && defined(slug.current)    && ($brand == "clearview" || $brand in brands)    && !(_id in coalesce(^.slides[]._ref, []))    && !(_id in coalesce(^.articles[]._ref, []))  ] | order(publishedAt desc)[0...6]{   _id,  title,  "slug": slug.current,  brands,    "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title },  publishedAt,  excerpt,  "image": image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },  "category": category->{ title, "slug": slug.current } } },  _type == "publications" => {   heading[]{ _key, style, children[]{ _key, text } },  body,  cards[]{    _key,    brand,    "brandTitle": *[_type == "brand" && key.current == ^.brand][0].title,    description,    image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },    linkLabel  } },  _type == "cta" => {   heading,  text,  link{ label, href } },  _type == "highlights" => {   source,  count,  heading[]{ _key, style, children[]{ _key, text } },  deadlineLabel,  "items": items[]->{   _id,  _type,  "slug": slug.current,  title,  category,  nominationsClosingDate,  startDate,  endDate,  country,  publishedAt },  "fill": select(  source == "awards" => [    ...*[      _type == "awardsProgramme"      && nominationsClosingDate >= $today      && !(_id in coalesce(^.items[]._ref, []))    ] | order(nominationsClosingDate asc)[0...5]{   _id,  _type,  "slug": slug.current,  title,  category,  nominationsClosingDate,  startDate,  endDate,  country,  publishedAt },    ...*[      _type == "awardsProgramme"      && !(defined(nominationsClosingDate) && nominationsClosingDate >= $today)      && startDate >= $today      && !(_id in coalesce(^.items[]._ref, []))    ] | order(startDate asc)[0...5]{   _id,  _type,  "slug": slug.current,  title,  category,  nominationsClosingDate,  startDate,  endDate,  country,  publishedAt },    ...*[      _type == "awardsProgramme"      && !(defined(nominationsClosingDate) && nominationsClosingDate >= $today)      && startDate < $today      && !(_id in coalesce(^.items[]._ref, []))    ] | order(startDate desc)[0...5]{   _id,  _type,  "slug": slug.current,  title,  category,  nominationsClosingDate,  startDate,  endDate,  country,  publishedAt }  ],  source == "events" => [    ...*[      _type == "conferenceEvent"      && coalesce(endDate, startDate) >= $today      && !(_id in coalesce(^.items[]._ref, []))    ] | order(startDate asc)[0...4]{   _id,  _type,  "slug": slug.current,  title,  category,  nominationsClosingDate,  startDate,  endDate,  country,  publishedAt },    ...*[      _type == "conferenceEvent"      && coalesce(endDate, startDate) < $today      && !(_id in coalesce(^.items[]._ref, []))    ] | order(startDate desc)[0...4]{   _id,  _type,  "slug": slug.current,  title,  category,  nominationsClosingDate,  startDate,  endDate,  country,  publishedAt }  ],  source == "research" => *[    _type == "resource"    && category == "research"    && !(_id in coalesce(^.items[]._ref, []))    && _id != coalesce(^.promo.resource._ref, "")  ] | order(defined(publishedAt) desc, publishedAt desc, legacyWpId desc)[0...3]{   _id,  _type,  "slug": slug.current,  title,  category,  nominationsClosingDate,  startDate,  endDate,  country,  publishedAt }),  button{   label,    kind,  external,  internal->{    _type,    "slug": slug.current,    brand,    brands  } },  promo{    resource->{      title,      "downloadThumbnail": downloadThumbnail{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },      "downloadFileUrl": downloadFile.asset->url,      "downloadFileName": downloadFile.asset->originalFilename,      downloadUrl    },    title,    description,    "image": image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },    link{   kind,  external,  internal->{    _type,    "slug": slug.current,    brand,    brands  } }  } },  _type == "featuredStories" => {   heading[]{ _key, style, children[]{ _key, text } },  link{   label,    kind,  external,  internal->{    _type,    "slug": slug.current,    brand,    brands  } },  "posts": posts[]->{   _id,  title,  "slug": slug.current,  brands,    "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title },  publishedAt,  excerpt,  "image": image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },  "category": category->{ title, "slug": slug.current } } },  _type == "statsBar" => {   heading[]{ _key, style, children[]{ _key, text } },  items[]{ _key, icon, value, label } },  _type == "newsletterSignup" => {   heading[]{ _key, style, children[]{ _key, text } },  body,  preferencesLabel,  options[]{    _key,    label,    defaultChecked,    "interestKey": *[_type == "subscribeModal" && _id == "subscribe-modal-" + $brand][0].interests[attribute.name == ^.attribute.name][0]._key  },  emailPlaceholder,  buttonLabel,  invalidEmailMessage,  noOptionMessage,  image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) } },  _type == "sponsoredContent" => {   label,  link{   label,    kind,  external,  internal->{    _type,    "slug": slug.current,    brand,    brands  } },  profileLabel,  "post": *[    _type == "post"    && _id == ^.post._ref    && defined(slug.current)    && defined(sponsor)    && ($brand == "clearview" || $brand in brands)  ][0]{      _id,  title,  "slug": slug.current,  brands,    "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title },  publishedAt,  excerpt,  "image": image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },  "category": category->{ title, "slug": slug.current },    "sponsor": sponsor->{      title,      "slug": slug.current,      "logo": logo{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) }    }  } },  _type == "postCards" => {     heading[]{ _key, style, children[]{ _key, text } },  link{   label,    kind,  external,  internal->{    _type,    "slug": slug.current,    brand,    brands  } },  "category": category->{ title, "slug": slug.current },  "posts": posts[$brand in @->brands]->{   _id,  title,  "slug": slug.current,  brands,    "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title },  publishedAt,  excerpt,  "image": image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },  "category": category->{ title, "slug": slug.current } },  "latest":   *[    _type == "post"    && defined(slug.current)    && $brand in brands    && defined(^.category._ref) && category._ref == ^.category._ref    && !(_id in coalesce(^.posts[]._ref, []))  ] | order(publishedAt desc)[0...6]{   _id,  title,  "slug": slug.current,  brands,    "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title },  publishedAt,  excerpt,  "image": image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },  "category": category->{ title, "slug": slug.current } } },  _type == "postBriefs" => {     heading[]{ _key, style, children[]{ _key, text } },  link{   label,    kind,  external,  internal->{    _type,    "slug": slug.current,    brand,    brands  } },  count,  "posts": posts[$brand in @->brands]->{     _id,  title,  "slug": slug.current,  brands,    "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title },  publishedAt,  excerpt,  "image": image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },  "category": category->{ title, "slug": slug.current },  "topic": primaryTopic->{ title },  briefText },  "latest":   *[    _type == "post"    && defined(slug.current)    && $brand in brands    && true    && !(_id in coalesce(^.posts[]._ref, []))  ] | order(publishedAt desc)[0...6]{     _id,  title,  "slug": slug.current,  brands,    "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title },  publishedAt,  excerpt,  "image": image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },  "category": category->{ title, "slug": slug.current },  "topic": primaryTopic->{ title },  briefText } },  _type == "weeklyRoundup" => {   heading[]{ _key, style, children[]{ _key, text } },  label,  title,  summary,  button{   label,    kind,  external,  internal->{    _type,    "slug": slug.current,    brand,    brands  } },  listLabel,  "posts": posts[$brand in @->brands]->{   _id,  title,  "slug": slug.current,  brands,    "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title },  publishedAt,  excerpt,  "image": image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },  "category": category->{ title, "slug": slug.current } },  "latest":   *[    _type == "post"    && defined(slug.current)    && $brand in brands    && true    && !(_id in coalesce(^.posts[]._ref, []))  ] | order(publishedAt desc)[0...8]{   _id,  title,  "slug": slug.current,  brands,    "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title },  publishedAt,  excerpt,  "image": image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },  "category": category->{ title, "slug": slug.current } } },  _type == "topPicks" => {   heading[]{ _key, style, children[]{ _key, text } },  link{   label,    kind,  external,  internal->{    _type,    "slug": slug.current,    brand,    brands  } },  "posts": posts[$brand in @->brands]->{   _id,  title,  "slug": slug.current,  brands,    "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title },  publishedAt,  excerpt,  "image": image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },  "category": category->{ title, "slug": slug.current }, "sponsored": defined(sponsor) },  "fill": [    ...  *[    _type == "post"    && defined(slug.current)    && $brand in brands    && !defined(sponsor) && dateTime(publishedAt) >= dateTime($today + "T00:00:00Z") - 60*60*24*7    && !(_id in coalesce(^.posts[]._ref, []))  ] | order(publishedAt desc)[0...6]{   _id,  title,  "slug": slug.current,  brands,    "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title },  publishedAt,  excerpt,  "image": image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },  "category": category->{ title, "slug": slug.current } },    ...  *[    _type == "post"    && defined(slug.current)    && $brand in brands    && !defined(sponsor) && dateTime(publishedAt) < dateTime($today + "T00:00:00Z") - 60*60*24*7    && !(_id in coalesce(^.posts[]._ref, []))  ] | order(publishedAt desc)[0...6]{   _id,  title,  "slug": slug.current,  brands,    "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title },  publishedAt,  excerpt,  "image": image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },  "category": category->{ title, "slug": slug.current } }  ] },  _type == "exploreGrid" => {   cards[]{    _key,    heading[]{ _key, style, children[]{ _key, text } },    icon,    source,    count,    deadlineLabel,    button{   label,    kind,  external,  internal->{    _type,    "slug": slug.current,    brand,    brands  } },    "items": items[@->_type != "post" || $brand in @->brands]->{   _type == "post" => { _type,   _id,  title,  "slug": slug.current,  brands,    "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title },  publishedAt,  excerpt,  "image": image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },  "category": category->{ title, "slug": slug.current } },  _type != "post" => {   _id,  _type,  "slug": slug.current,  title,  category,  nominationsClosingDate,  startDate,  endDate,  country,  publishedAt } },    "fill": select(      source == "posts" =>   *[    _type == "post"    && defined(slug.current)    && $brand in brands    && defined(^.category._ref) && category._ref == ^.category._ref    && !(_id in coalesce(^.items[]._ref, []))  ] | order(publishedAt desc)[0...6]{ _type,   _id,  title,  "slug": slug.current,  brands,    "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title },  publishedAt,  excerpt,  "image": image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },  "category": category->{ title, "slug": slug.current } },        source == "awards" => [    ...*[      _type == "awardsProgramme"      && nominationsClosingDate >= $today      && !(_id in coalesce(^.items[]._ref, []))    ] | order(nominationsClosingDate asc)[0...5]{   _id,  _type,  "slug": slug.current,  title,  category,  nominationsClosingDate,  startDate,  endDate,  country,  publishedAt },    ...*[      _type == "awardsProgramme"      && !(defined(nominationsClosingDate) && nominationsClosingDate >= $today)      && startDate >= $today      && !(_id in coalesce(^.items[]._ref, []))    ] | order(startDate asc)[0...5]{   _id,  _type,  "slug": slug.current,  title,  category,  nominationsClosingDate,  startDate,  endDate,  country,  publishedAt },    ...*[      _type == "awardsProgramme"      && !(defined(nominationsClosingDate) && nominationsClosingDate >= $today)      && startDate < $today      && !(_id in coalesce(^.items[]._ref, []))    ] | order(startDate desc)[0...5]{   _id,  _type,  "slug": slug.current,  title,  category,  nominationsClosingDate,  startDate,  endDate,  country,  publishedAt }  ],  source == "events" => [    ...*[      _type == "conferenceEvent"      && coalesce(endDate, startDate) >= $today      && !(_id in coalesce(^.items[]._ref, []))    ] | order(startDate asc)[0...4]{   _id,  _type,  "slug": slug.current,  title,  category,  nominationsClosingDate,  startDate,  endDate,  country,  publishedAt },    ...*[      _type == "conferenceEvent"      && coalesce(endDate, startDate) < $today      && !(_id in coalesce(^.items[]._ref, []))    ] | order(startDate desc)[0...4]{   _id,  _type,  "slug": slug.current,  title,  category,  nominationsClosingDate,  startDate,  endDate,  country,  publishedAt }  ],  source == "research" => *[    _type == "resource"    && category == "research"    && !(_id in coalesce(^.items[]._ref, []))    && _id != coalesce(^.promo.resource._ref, "")  ] | order(defined(publishedAt) desc, publishedAt desc, legacyWpId desc)[0...3]{   _id,  _type,  "slug": slug.current,  title,  category,  nominationsClosingDate,  startDate,  endDate,  country,  publishedAt }    )  } },  _type == "subscribeBanner" => {   heading[]{ _key, style, children[]{ _key, text } },  description,  buttonLabel,  cta{   label,    kind,  external,  internal->{    _type,    "slug": slug.current,    brand,    brands  } } },  _type == "splitLayout" => {    "main": main[]{ _key, _type,   _type == "topStories" => {   linkLabel,  label,  "slides": slides[$brand == "clearview" || $brand in @->brands]->{   _id,  title,  "slug": slug.current,  brands,    "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title },  publishedAt,  excerpt,  "image": image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },  "category": category->{ title, "slug": slug.current } },  "articles": articles[$brand == "clearview" || $brand in @->brands]->{   _id,  title,  "slug": slug.current,  brands,    "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title },  publishedAt,  excerpt,  "image": image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },  "category": category->{ title, "slug": slug.current } },  "latest": *[    _type == "post"    && defined(slug.current)    && ($brand == "clearview" || $brand in brands)    && !(_id in coalesce(^.slides[]._ref, []))    && !(_id in coalesce(^.articles[]._ref, []))  ] | order(publishedAt desc)[0...6]{   _id,  title,  "slug": slug.current,  brands,    "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title },  publishedAt,  excerpt,  "image": image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },  "category": category->{ title, "slug": slug.current } } },  _type == "sponsoredContent" => {   label,  link{   label,    kind,  external,  internal->{    _type,    "slug": slug.current,    brand,    brands  } },  profileLabel,  "post": *[    _type == "post"    && _id == ^.post._ref    && defined(slug.current)    && defined(sponsor)    && ($brand == "clearview" || $brand in brands)  ][0]{      _id,  title,  "slug": slug.current,  brands,    "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title },  publishedAt,  excerpt,  "image": image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },  "category": category->{ title, "slug": slug.current },    "sponsor": sponsor->{      title,      "slug": slug.current,      "logo": logo{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) }    }  } },  _type == "postCards" => {     heading[]{ _key, style, children[]{ _key, text } },  link{   label,    kind,  external,  internal->{    _type,    "slug": slug.current,    brand,    brands  } },  "category": category->{ title, "slug": slug.current },  "posts": posts[$brand in @->brands]->{   _id,  title,  "slug": slug.current,  brands,    "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title },  publishedAt,  excerpt,  "image": image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },  "category": category->{ title, "slug": slug.current } },  "latest":   *[    _type == "post"    && defined(slug.current)    && $brand in brands    && defined(^.category._ref) && category._ref == ^.category._ref    && !(_id in coalesce(^.posts[]._ref, []))  ] | order(publishedAt desc)[0...6]{   _id,  title,  "slug": slug.current,  brands,    "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title },  publishedAt,  excerpt,  "image": image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },  "category": category->{ title, "slug": slug.current } } },  _type == "postBriefs" => {     heading[]{ _key, style, children[]{ _key, text } },  link{   label,    kind,  external,  internal->{    _type,    "slug": slug.current,    brand,    brands  } },  count,  "posts": posts[$brand in @->brands]->{     _id,  title,  "slug": slug.current,  brands,    "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title },  publishedAt,  excerpt,  "image": image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },  "category": category->{ title, "slug": slug.current },  "topic": primaryTopic->{ title },  briefText },  "latest":   *[    _type == "post"    && defined(slug.current)    && $brand in brands    && true    && !(_id in coalesce(^.posts[]._ref, []))  ] | order(publishedAt desc)[0...6]{     _id,  title,  "slug": slug.current,  brands,    "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title },  publishedAt,  excerpt,  "image": image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },  "category": category->{ title, "slug": slug.current },  "topic": primaryTopic->{ title },  briefText } },  _type == "weeklyRoundup" => {   heading[]{ _key, style, children[]{ _key, text } },  label,  title,  summary,  button{   label,    kind,  external,  internal->{    _type,    "slug": slug.current,    brand,    brands  } },  listLabel,  "posts": posts[$brand in @->brands]->{   _id,  title,  "slug": slug.current,  brands,    "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title },  publishedAt,  excerpt,  "image": image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },  "category": category->{ title, "slug": slug.current } },  "latest":   *[    _type == "post"    && defined(slug.current)    && $brand in brands    && true    && !(_id in coalesce(^.posts[]._ref, []))  ] | order(publishedAt desc)[0...8]{   _id,  title,  "slug": slug.current,  brands,    "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title },  publishedAt,  excerpt,  "image": image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },  "category": category->{ title, "slug": slug.current } } },  _type == "publications" => {   heading[]{ _key, style, children[]{ _key, text } },  body,  cards[]{    _key,    brand,    "brandTitle": *[_type == "brand" && key.current == ^.brand][0].title,    description,    image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },    linkLabel  } },  _type == "cta" => {   heading,  text,  link{ label, href } } },    "aside": aside[]{ _key, _type,   _type == "highlights" => {   source,  count,  heading[]{ _key, style, children[]{ _key, text } },  deadlineLabel,  "items": items[]->{   _id,  _type,  "slug": slug.current,  title,  category,  nominationsClosingDate,  startDate,  endDate,  country,  publishedAt },  "fill": select(  source == "awards" => [    ...*[      _type == "awardsProgramme"      && nominationsClosingDate >= $today      && !(_id in coalesce(^.items[]._ref, []))    ] | order(nominationsClosingDate asc)[0...5]{   _id,  _type,  "slug": slug.current,  title,  category,  nominationsClosingDate,  startDate,  endDate,  country,  publishedAt },    ...*[      _type == "awardsProgramme"      && !(defined(nominationsClosingDate) && nominationsClosingDate >= $today)      && startDate >= $today      && !(_id in coalesce(^.items[]._ref, []))    ] | order(startDate asc)[0...5]{   _id,  _type,  "slug": slug.current,  title,  category,  nominationsClosingDate,  startDate,  endDate,  country,  publishedAt },    ...*[      _type == "awardsProgramme"      && !(defined(nominationsClosingDate) && nominationsClosingDate >= $today)      && startDate < $today      && !(_id in coalesce(^.items[]._ref, []))    ] | order(startDate desc)[0...5]{   _id,  _type,  "slug": slug.current,  title,  category,  nominationsClosingDate,  startDate,  endDate,  country,  publishedAt }  ],  source == "events" => [    ...*[      _type == "conferenceEvent"      && coalesce(endDate, startDate) >= $today      && !(_id in coalesce(^.items[]._ref, []))    ] | order(startDate asc)[0...4]{   _id,  _type,  "slug": slug.current,  title,  category,  nominationsClosingDate,  startDate,  endDate,  country,  publishedAt },    ...*[      _type == "conferenceEvent"      && coalesce(endDate, startDate) < $today      && !(_id in coalesce(^.items[]._ref, []))    ] | order(startDate desc)[0...4]{   _id,  _type,  "slug": slug.current,  title,  category,  nominationsClosingDate,  startDate,  endDate,  country,  publishedAt }  ],  source == "research" => *[    _type == "resource"    && category == "research"    && !(_id in coalesce(^.items[]._ref, []))    && _id != coalesce(^.promo.resource._ref, "")  ] | order(defined(publishedAt) desc, publishedAt desc, legacyWpId desc)[0...3]{   _id,  _type,  "slug": slug.current,  title,  category,  nominationsClosingDate,  startDate,  endDate,  country,  publishedAt }),  button{   label,    kind,  external,  internal->{    _type,    "slug": slug.current,    brand,    brands  } },  promo{    resource->{      title,      "downloadThumbnail": downloadThumbnail{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },      "downloadFileUrl": downloadFile.asset->url,      "downloadFileName": downloadFile.asset->originalFilename,      downloadUrl    },    title,    description,    "image": image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },    link{   kind,  external,  internal->{    _type,    "slug": slug.current,    brand,    brands  } }  } },  _type == "awardsWinners" => { heading[]{ _key, style, children[]{ _key, text } } } }  } },    blocksBottom[]{ _key, _type,   _type == "topStories" => {   linkLabel,  label,  "slides": slides[$brand == "clearview" || $brand in @->brands]->{   _id,  title,  "slug": slug.current,  brands,    "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title },  publishedAt,  excerpt,  "image": image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },  "category": category->{ title, "slug": slug.current } },  "articles": articles[$brand == "clearview" || $brand in @->brands]->{   _id,  title,  "slug": slug.current,  brands,    "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title },  publishedAt,  excerpt,  "image": image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },  "category": category->{ title, "slug": slug.current } },  "latest": *[    _type == "post"    && defined(slug.current)    && ($brand == "clearview" || $brand in brands)    && !(_id in coalesce(^.slides[]._ref, []))    && !(_id in coalesce(^.articles[]._ref, []))  ] | order(publishedAt desc)[0...6]{   _id,  title,  "slug": slug.current,  brands,    "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title },  publishedAt,  excerpt,  "image": image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },  "category": category->{ title, "slug": slug.current } } },  _type == "publications" => {   heading[]{ _key, style, children[]{ _key, text } },  body,  cards[]{    _key,    brand,    "brandTitle": *[_type == "brand" && key.current == ^.brand][0].title,    description,    image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },    linkLabel  } },  _type == "cta" => {   heading,  text,  link{ label, href } },  _type == "highlights" => {   source,  count,  heading[]{ _key, style, children[]{ _key, text } },  deadlineLabel,  "items": items[]->{   _id,  _type,  "slug": slug.current,  title,  category,  nominationsClosingDate,  startDate,  endDate,  country,  publishedAt },  "fill": select(  source == "awards" => [    ...*[      _type == "awardsProgramme"      && nominationsClosingDate >= $today      && !(_id in coalesce(^.items[]._ref, []))    ] | order(nominationsClosingDate asc)[0...5]{   _id,  _type,  "slug": slug.current,  title,  category,  nominationsClosingDate,  startDate,  endDate,  country,  publishedAt },    ...*[      _type == "awardsProgramme"      && !(defined(nominationsClosingDate) && nominationsClosingDate >= $today)      && startDate >= $today      && !(_id in coalesce(^.items[]._ref, []))    ] | order(startDate asc)[0...5]{   _id,  _type,  "slug": slug.current,  title,  category,  nominationsClosingDate,  startDate,  endDate,  country,  publishedAt },    ...*[      _type == "awardsProgramme"      && !(defined(nominationsClosingDate) && nominationsClosingDate >= $today)      && startDate < $today      && !(_id in coalesce(^.items[]._ref, []))    ] | order(startDate desc)[0...5]{   _id,  _type,  "slug": slug.current,  title,  category,  nominationsClosingDate,  startDate,  endDate,  country,  publishedAt }  ],  source == "events" => [    ...*[      _type == "conferenceEvent"      && coalesce(endDate, startDate) >= $today      && !(_id in coalesce(^.items[]._ref, []))    ] | order(startDate asc)[0...4]{   _id,  _type,  "slug": slug.current,  title,  category,  nominationsClosingDate,  startDate,  endDate,  country,  publishedAt },    ...*[      _type == "conferenceEvent"      && coalesce(endDate, startDate) < $today      && !(_id in coalesce(^.items[]._ref, []))    ] | order(startDate desc)[0...4]{   _id,  _type,  "slug": slug.current,  title,  category,  nominationsClosingDate,  startDate,  endDate,  country,  publishedAt }  ],  source == "research" => *[    _type == "resource"    && category == "research"    && !(_id in coalesce(^.items[]._ref, []))    && _id != coalesce(^.promo.resource._ref, "")  ] | order(defined(publishedAt) desc, publishedAt desc, legacyWpId desc)[0...3]{   _id,  _type,  "slug": slug.current,  title,  category,  nominationsClosingDate,  startDate,  endDate,  country,  publishedAt }),  button{   label,    kind,  external,  internal->{    _type,    "slug": slug.current,    brand,    brands  } },  promo{    resource->{      title,      "downloadThumbnail": downloadThumbnail{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },      "downloadFileUrl": downloadFile.asset->url,      "downloadFileName": downloadFile.asset->originalFilename,      downloadUrl    },    title,    description,    "image": image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },    link{   kind,  external,  internal->{    _type,    "slug": slug.current,    brand,    brands  } }  } },  _type == "featuredStories" => {   heading[]{ _key, style, children[]{ _key, text } },  link{   label,    kind,  external,  internal->{    _type,    "slug": slug.current,    brand,    brands  } },  "posts": posts[]->{   _id,  title,  "slug": slug.current,  brands,    "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title },  publishedAt,  excerpt,  "image": image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },  "category": category->{ title, "slug": slug.current } } },  _type == "statsBar" => {   heading[]{ _key, style, children[]{ _key, text } },  items[]{ _key, icon, value, label } },  _type == "newsletterSignup" => {   heading[]{ _key, style, children[]{ _key, text } },  body,  preferencesLabel,  options[]{    _key,    label,    defaultChecked,    "interestKey": *[_type == "subscribeModal" && _id == "subscribe-modal-" + $brand][0].interests[attribute.name == ^.attribute.name][0]._key  },  emailPlaceholder,  buttonLabel,  invalidEmailMessage,  noOptionMessage,  image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) } },  _type == "sponsoredContent" => {   label,  link{   label,    kind,  external,  internal->{    _type,    "slug": slug.current,    brand,    brands  } },  profileLabel,  "post": *[    _type == "post"    && _id == ^.post._ref    && defined(slug.current)    && defined(sponsor)    && ($brand == "clearview" || $brand in brands)  ][0]{      _id,  title,  "slug": slug.current,  brands,    "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title },  publishedAt,  excerpt,  "image": image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },  "category": category->{ title, "slug": slug.current },    "sponsor": sponsor->{      title,      "slug": slug.current,      "logo": logo{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) }    }  } },  _type == "postCards" => {     heading[]{ _key, style, children[]{ _key, text } },  link{   label,    kind,  external,  internal->{    _type,    "slug": slug.current,    brand,    brands  } },  "category": category->{ title, "slug": slug.current },  "posts": posts[$brand in @->brands]->{   _id,  title,  "slug": slug.current,  brands,    "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title },  publishedAt,  excerpt,  "image": image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },  "category": category->{ title, "slug": slug.current } },  "latest":   *[    _type == "post"    && defined(slug.current)    && $brand in brands    && defined(^.category._ref) && category._ref == ^.category._ref    && !(_id in coalesce(^.posts[]._ref, []))  ] | order(publishedAt desc)[0...6]{   _id,  title,  "slug": slug.current,  brands,    "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title },  publishedAt,  excerpt,  "image": image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },  "category": category->{ title, "slug": slug.current } } },  _type == "postBriefs" => {     heading[]{ _key, style, children[]{ _key, text } },  link{   label,    kind,  external,  internal->{    _type,    "slug": slug.current,    brand,    brands  } },  count,  "posts": posts[$brand in @->brands]->{     _id,  title,  "slug": slug.current,  brands,    "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title },  publishedAt,  excerpt,  "image": image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },  "category": category->{ title, "slug": slug.current },  "topic": primaryTopic->{ title },  briefText },  "latest":   *[    _type == "post"    && defined(slug.current)    && $brand in brands    && true    && !(_id in coalesce(^.posts[]._ref, []))  ] | order(publishedAt desc)[0...6]{     _id,  title,  "slug": slug.current,  brands,    "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title },  publishedAt,  excerpt,  "image": image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },  "category": category->{ title, "slug": slug.current },  "topic": primaryTopic->{ title },  briefText } },  _type == "weeklyRoundup" => {   heading[]{ _key, style, children[]{ _key, text } },  label,  title,  summary,  button{   label,    kind,  external,  internal->{    _type,    "slug": slug.current,    brand,    brands  } },  listLabel,  "posts": posts[$brand in @->brands]->{   _id,  title,  "slug": slug.current,  brands,    "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title },  publishedAt,  excerpt,  "image": image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },  "category": category->{ title, "slug": slug.current } },  "latest":   *[    _type == "post"    && defined(slug.current)    && $brand in brands    && true    && !(_id in coalesce(^.posts[]._ref, []))  ] | order(publishedAt desc)[0...8]{   _id,  title,  "slug": slug.current,  brands,    "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title },  publishedAt,  excerpt,  "image": image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },  "category": category->{ title, "slug": slug.current } } },  _type == "topPicks" => {   heading[]{ _key, style, children[]{ _key, text } },  link{   label,    kind,  external,  internal->{    _type,    "slug": slug.current,    brand,    brands  } },  "posts": posts[$brand in @->brands]->{   _id,  title,  "slug": slug.current,  brands,    "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title },  publishedAt,  excerpt,  "image": image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },  "category": category->{ title, "slug": slug.current }, "sponsored": defined(sponsor) },  "fill": [    ...  *[    _type == "post"    && defined(slug.current)    && $brand in brands    && !defined(sponsor) && dateTime(publishedAt) >= dateTime($today + "T00:00:00Z") - 60*60*24*7    && !(_id in coalesce(^.posts[]._ref, []))  ] | order(publishedAt desc)[0...6]{   _id,  title,  "slug": slug.current,  brands,    "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title },  publishedAt,  excerpt,  "image": image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },  "category": category->{ title, "slug": slug.current } },    ...  *[    _type == "post"    && defined(slug.current)    && $brand in brands    && !defined(sponsor) && dateTime(publishedAt) < dateTime($today + "T00:00:00Z") - 60*60*24*7    && !(_id in coalesce(^.posts[]._ref, []))  ] | order(publishedAt desc)[0...6]{   _id,  title,  "slug": slug.current,  brands,    "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title },  publishedAt,  excerpt,  "image": image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },  "category": category->{ title, "slug": slug.current } }  ] },  _type == "exploreGrid" => {   cards[]{    _key,    heading[]{ _key, style, children[]{ _key, text } },    icon,    source,    count,    deadlineLabel,    button{   label,    kind,  external,  internal->{    _type,    "slug": slug.current,    brand,    brands  } },    "items": items[@->_type != "post" || $brand in @->brands]->{   _type == "post" => { _type,   _id,  title,  "slug": slug.current,  brands,    "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title },  publishedAt,  excerpt,  "image": image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },  "category": category->{ title, "slug": slug.current } },  _type != "post" => {   _id,  _type,  "slug": slug.current,  title,  category,  nominationsClosingDate,  startDate,  endDate,  country,  publishedAt } },    "fill": select(      source == "posts" =>   *[    _type == "post"    && defined(slug.current)    && $brand in brands    && defined(^.category._ref) && category._ref == ^.category._ref    && !(_id in coalesce(^.items[]._ref, []))  ] | order(publishedAt desc)[0...6]{ _type,   _id,  title,  "slug": slug.current,  brands,    "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title },  publishedAt,  excerpt,  "image": image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },  "category": category->{ title, "slug": slug.current } },        source == "awards" => [    ...*[      _type == "awardsProgramme"      && nominationsClosingDate >= $today      && !(_id in coalesce(^.items[]._ref, []))    ] | order(nominationsClosingDate asc)[0...5]{   _id,  _type,  "slug": slug.current,  title,  category,  nominationsClosingDate,  startDate,  endDate,  country,  publishedAt },    ...*[      _type == "awardsProgramme"      && !(defined(nominationsClosingDate) && nominationsClosingDate >= $today)      && startDate >= $today      && !(_id in coalesce(^.items[]._ref, []))    ] | order(startDate asc)[0...5]{   _id,  _type,  "slug": slug.current,  title,  category,  nominationsClosingDate,  startDate,  endDate,  country,  publishedAt },    ...*[      _type == "awardsProgramme"      && !(defined(nominationsClosingDate) && nominationsClosingDate >= $today)      && startDate < $today      && !(_id in coalesce(^.items[]._ref, []))    ] | order(startDate desc)[0...5]{   _id,  _type,  "slug": slug.current,  title,  category,  nominationsClosingDate,  startDate,  endDate,  country,  publishedAt }  ],  source == "events" => [    ...*[      _type == "conferenceEvent"      && coalesce(endDate, startDate) >= $today      && !(_id in coalesce(^.items[]._ref, []))    ] | order(startDate asc)[0...4]{   _id,  _type,  "slug": slug.current,  title,  category,  nominationsClosingDate,  startDate,  endDate,  country,  publishedAt },    ...*[      _type == "conferenceEvent"      && coalesce(endDate, startDate) < $today      && !(_id in coalesce(^.items[]._ref, []))    ] | order(startDate desc)[0...4]{   _id,  _type,  "slug": slug.current,  title,  category,  nominationsClosingDate,  startDate,  endDate,  country,  publishedAt }  ],  source == "research" => *[    _type == "resource"    && category == "research"    && !(_id in coalesce(^.items[]._ref, []))    && _id != coalesce(^.promo.resource._ref, "")  ] | order(defined(publishedAt) desc, publishedAt desc, legacyWpId desc)[0...3]{   _id,  _type,  "slug": slug.current,  title,  category,  nominationsClosingDate,  startDate,  endDate,  country,  publishedAt }    )  } },  _type == "subscribeBanner" => {   heading[]{ _key, style, children[]{ _key, text } },  description,  buttonLabel,  cta{   label,    kind,  external,  internal->{    _type,    "slug": slug.current,    brand,    brands  } } },  _type == "splitLayout" => {    "main": main[]{ _key, _type,   _type == "topStories" => {   linkLabel,  label,  "slides": slides[$brand == "clearview" || $brand in @->brands]->{   _id,  title,  "slug": slug.current,  brands,    "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title },  publishedAt,  excerpt,  "image": image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },  "category": category->{ title, "slug": slug.current } },  "articles": articles[$brand == "clearview" || $brand in @->brands]->{   _id,  title,  "slug": slug.current,  brands,    "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title },  publishedAt,  excerpt,  "image": image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },  "category": category->{ title, "slug": slug.current } },  "latest": *[    _type == "post"    && defined(slug.current)    && ($brand == "clearview" || $brand in brands)    && !(_id in coalesce(^.slides[]._ref, []))    && !(_id in coalesce(^.articles[]._ref, []))  ] | order(publishedAt desc)[0...6]{   _id,  title,  "slug": slug.current,  brands,    "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title },  publishedAt,  excerpt,  "image": image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },  "category": category->{ title, "slug": slug.current } } },  _type == "sponsoredContent" => {   label,  link{   label,    kind,  external,  internal->{    _type,    "slug": slug.current,    brand,    brands  } },  profileLabel,  "post": *[    _type == "post"    && _id == ^.post._ref    && defined(slug.current)    && defined(sponsor)    && ($brand == "clearview" || $brand in brands)  ][0]{      _id,  title,  "slug": slug.current,  brands,    "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title },  publishedAt,  excerpt,  "image": image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },  "category": category->{ title, "slug": slug.current },    "sponsor": sponsor->{      title,      "slug": slug.current,      "logo": logo{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) }    }  } },  _type == "postCards" => {     heading[]{ _key, style, children[]{ _key, text } },  link{   label,    kind,  external,  internal->{    _type,    "slug": slug.current,    brand,    brands  } },  "category": category->{ title, "slug": slug.current },  "posts": posts[$brand in @->brands]->{   _id,  title,  "slug": slug.current,  brands,    "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title },  publishedAt,  excerpt,  "image": image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },  "category": category->{ title, "slug": slug.current } },  "latest":   *[    _type == "post"    && defined(slug.current)    && $brand in brands    && defined(^.category._ref) && category._ref == ^.category._ref    && !(_id in coalesce(^.posts[]._ref, []))  ] | order(publishedAt desc)[0...6]{   _id,  title,  "slug": slug.current,  brands,    "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title },  publishedAt,  excerpt,  "image": image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },  "category": category->{ title, "slug": slug.current } } },  _type == "postBriefs" => {     heading[]{ _key, style, children[]{ _key, text } },  link{   label,    kind,  external,  internal->{    _type,    "slug": slug.current,    brand,    brands  } },  count,  "posts": posts[$brand in @->brands]->{     _id,  title,  "slug": slug.current,  brands,    "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title },  publishedAt,  excerpt,  "image": image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },  "category": category->{ title, "slug": slug.current },  "topic": primaryTopic->{ title },  briefText },  "latest":   *[    _type == "post"    && defined(slug.current)    && $brand in brands    && true    && !(_id in coalesce(^.posts[]._ref, []))  ] | order(publishedAt desc)[0...6]{     _id,  title,  "slug": slug.current,  brands,    "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title },  publishedAt,  excerpt,  "image": image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },  "category": category->{ title, "slug": slug.current },  "topic": primaryTopic->{ title },  briefText } },  _type == "weeklyRoundup" => {   heading[]{ _key, style, children[]{ _key, text } },  label,  title,  summary,  button{   label,    kind,  external,  internal->{    _type,    "slug": slug.current,    brand,    brands  } },  listLabel,  "posts": posts[$brand in @->brands]->{   _id,  title,  "slug": slug.current,  brands,    "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title },  publishedAt,  excerpt,  "image": image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },  "category": category->{ title, "slug": slug.current } },  "latest":   *[    _type == "post"    && defined(slug.current)    && $brand in brands    && true    && !(_id in coalesce(^.posts[]._ref, []))  ] | order(publishedAt desc)[0...8]{   _id,  title,  "slug": slug.current,  brands,    "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title },  publishedAt,  excerpt,  "image": image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },  "category": category->{ title, "slug": slug.current } } },  _type == "publications" => {   heading[]{ _key, style, children[]{ _key, text } },  body,  cards[]{    _key,    brand,    "brandTitle": *[_type == "brand" && key.current == ^.brand][0].title,    description,    image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },    linkLabel  } },  _type == "cta" => {   heading,  text,  link{ label, href } } },    "aside": aside[]{ _key, _type,   _type == "highlights" => {   source,  count,  heading[]{ _key, style, children[]{ _key, text } },  deadlineLabel,  "items": items[]->{   _id,  _type,  "slug": slug.current,  title,  category,  nominationsClosingDate,  startDate,  endDate,  country,  publishedAt },  "fill": select(  source == "awards" => [    ...*[      _type == "awardsProgramme"      && nominationsClosingDate >= $today      && !(_id in coalesce(^.items[]._ref, []))    ] | order(nominationsClosingDate asc)[0...5]{   _id,  _type,  "slug": slug.current,  title,  category,  nominationsClosingDate,  startDate,  endDate,  country,  publishedAt },    ...*[      _type == "awardsProgramme"      && !(defined(nominationsClosingDate) && nominationsClosingDate >= $today)      && startDate >= $today      && !(_id in coalesce(^.items[]._ref, []))    ] | order(startDate asc)[0...5]{   _id,  _type,  "slug": slug.current,  title,  category,  nominationsClosingDate,  startDate,  endDate,  country,  publishedAt },    ...*[      _type == "awardsProgramme"      && !(defined(nominationsClosingDate) && nominationsClosingDate >= $today)      && startDate < $today      && !(_id in coalesce(^.items[]._ref, []))    ] | order(startDate desc)[0...5]{   _id,  _type,  "slug": slug.current,  title,  category,  nominationsClosingDate,  startDate,  endDate,  country,  publishedAt }  ],  source == "events" => [    ...*[      _type == "conferenceEvent"      && coalesce(endDate, startDate) >= $today      && !(_id in coalesce(^.items[]._ref, []))    ] | order(startDate asc)[0...4]{   _id,  _type,  "slug": slug.current,  title,  category,  nominationsClosingDate,  startDate,  endDate,  country,  publishedAt },    ...*[      _type == "conferenceEvent"      && coalesce(endDate, startDate) < $today      && !(_id in coalesce(^.items[]._ref, []))    ] | order(startDate desc)[0...4]{   _id,  _type,  "slug": slug.current,  title,  category,  nominationsClosingDate,  startDate,  endDate,  country,  publishedAt }  ],  source == "research" => *[    _type == "resource"    && category == "research"    && !(_id in coalesce(^.items[]._ref, []))    && _id != coalesce(^.promo.resource._ref, "")  ] | order(defined(publishedAt) desc, publishedAt desc, legacyWpId desc)[0...3]{   _id,  _type,  "slug": slug.current,  title,  category,  nominationsClosingDate,  startDate,  endDate,  country,  publishedAt }),  button{   label,    kind,  external,  internal->{    _type,    "slug": slug.current,    brand,    brands  } },  promo{    resource->{      title,      "downloadThumbnail": downloadThumbnail{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },      "downloadFileUrl": downloadFile.asset->url,      "downloadFileName": downloadFile.asset->originalFilename,      downloadUrl    },    title,    description,    "image": image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },    link{   kind,  external,  internal->{    _type,    "slug": slug.current,    brand,    brands  } }  } },  _type == "awardsWinners" => { heading[]{ _key, style, children[]{ _key, text } } } }  } }  }
 export type HOME_PAGE_QUERY_RESULT = {
   _id: string;
   title: string | null;
   blocks: Array<
-    | {
-        _key: string;
-        _type: "adSlot";
-        size: "billboard" | "leaderboard" | "mpu" | null;
-        label: string | null;
-        spacing:
-          | "around"
-          | "aside"
-          | "below"
-          | "belowSection"
-          | "divided"
-          | "none"
-          | "top"
-          | null;
-        unit: {
-          code: string | null;
-          size: "300x250" | "728x90" | null;
-        } | null;
-      }
     | {
         _key: string;
         _type: "cta";
@@ -5738,23 +5839,4903 @@ export type HOME_PAGE_QUERY_RESULT = {
         main: Array<
           | {
               _key: string;
-              _type: "adSlot";
-              size: "billboard" | "leaderboard" | "mpu" | null;
-              label: string | null;
-              spacing:
-                | "around"
-                | "aside"
-                | "below"
-                | "belowSection"
-                | "divided"
-                | "none"
-                | "top"
-                | null;
-              unit: {
-                code: string | null;
-                size: "300x250" | "728x90" | null;
+              _type: "cta";
+              heading: string | null;
+              text: string | null;
+              link: {
+                label: string | null;
+                href: string | null;
               } | null;
             }
+          | {
+              _key: string;
+              _type: "postBriefs";
+              heading: Array<{
+                _key: string;
+                style:
+                  "h1" | "h2" | "h3" | "h4" | "h5" | "h6" | "normal" | null;
+                children: Array<{
+                  _key: string;
+                  text: string | null;
+                }> | null;
+              }> | null;
+              link: {
+                label: string | null;
+                kind: "external" | "internal" | null;
+                external: string | null;
+                internal:
+                  | {
+                      _type: "awardsProgramme";
+                      slug: string | null;
+                      brand: null;
+                      brands: null;
+                    }
+                  | {
+                      _type: "conferenceEvent";
+                      slug: string | null;
+                      brand: null;
+                      brands: null;
+                    }
+                  | {
+                      _type: "page";
+                      slug: string | null;
+                      brand:
+                        | "clearview"
+                        | "familywealthreport"
+                        | "wealthbriefing"
+                        | "wealthbriefingasia"
+                        | null;
+                      brands: null;
+                    }
+                  | {
+                      _type: "post";
+                      slug: string | null;
+                      brand: null;
+                      brands: Array<string> | null;
+                    }
+                  | {
+                      _type: "resource";
+                      slug: string | null;
+                      brand: null;
+                      brands: null;
+                    }
+                  | null;
+              } | null;
+              count: number | null;
+              posts: Array<{
+                _id: string;
+                title: string | null;
+                slug: string | null;
+                brands: Array<string> | null;
+                brandTitles: Array<{
+                  key: string | null;
+                  title: string | null;
+                }>;
+                publishedAt: string | null;
+                excerpt: string | null;
+                image: {
+                  asset: SanityImageAssetReference | null;
+                  hotspot: SanityImageHotspot | null;
+                  crop: SanityImageCrop | null;
+                  alt: string | null;
+                } | null;
+                category: {
+                  title: string | null;
+                  slug: string | null;
+                } | null;
+                topic: {
+                  title: string | null;
+                } | null;
+                briefText: string | null;
+              }> | null;
+              latest: Array<{
+                _id: string;
+                title: string | null;
+                slug: string | null;
+                brands: Array<string> | null;
+                brandTitles: Array<{
+                  key: string | null;
+                  title: string | null;
+                }>;
+                publishedAt: string | null;
+                excerpt: string | null;
+                image: {
+                  asset: SanityImageAssetReference | null;
+                  hotspot: SanityImageHotspot | null;
+                  crop: SanityImageCrop | null;
+                  alt: string | null;
+                } | null;
+                category: {
+                  title: string | null;
+                  slug: string | null;
+                } | null;
+                topic: {
+                  title: string | null;
+                } | null;
+                briefText: string | null;
+              }>;
+            }
+          | {
+              _key: string;
+              _type: "postCards";
+              heading: Array<{
+                _key: string;
+                style:
+                  "h1" | "h2" | "h3" | "h4" | "h5" | "h6" | "normal" | null;
+                children: Array<{
+                  _key: string;
+                  text: string | null;
+                }> | null;
+              }> | null;
+              link: {
+                label: string | null;
+                kind: "external" | "internal" | null;
+                external: string | null;
+                internal:
+                  | {
+                      _type: "awardsProgramme";
+                      slug: string | null;
+                      brand: null;
+                      brands: null;
+                    }
+                  | {
+                      _type: "conferenceEvent";
+                      slug: string | null;
+                      brand: null;
+                      brands: null;
+                    }
+                  | {
+                      _type: "page";
+                      slug: string | null;
+                      brand:
+                        | "clearview"
+                        | "familywealthreport"
+                        | "wealthbriefing"
+                        | "wealthbriefingasia"
+                        | null;
+                      brands: null;
+                    }
+                  | {
+                      _type: "post";
+                      slug: string | null;
+                      brand: null;
+                      brands: Array<string> | null;
+                    }
+                  | {
+                      _type: "resource";
+                      slug: string | null;
+                      brand: null;
+                      brands: null;
+                    }
+                  | null;
+              } | null;
+              category: {
+                title: string | null;
+                slug: string | null;
+              } | null;
+              posts: Array<{
+                _id: string;
+                title: string | null;
+                slug: string | null;
+                brands: Array<string> | null;
+                brandTitles: Array<{
+                  key: string | null;
+                  title: string | null;
+                }>;
+                publishedAt: string | null;
+                excerpt: string | null;
+                image: {
+                  asset: SanityImageAssetReference | null;
+                  hotspot: SanityImageHotspot | null;
+                  crop: SanityImageCrop | null;
+                  alt: string | null;
+                } | null;
+                category: {
+                  title: string | null;
+                  slug: string | null;
+                } | null;
+              }> | null;
+              latest: Array<{
+                _id: string;
+                title: string | null;
+                slug: string | null;
+                brands: Array<string> | null;
+                brandTitles: Array<{
+                  key: string | null;
+                  title: string | null;
+                }>;
+                publishedAt: string | null;
+                excerpt: string | null;
+                image: {
+                  asset: SanityImageAssetReference | null;
+                  hotspot: SanityImageHotspot | null;
+                  crop: SanityImageCrop | null;
+                  alt: string | null;
+                } | null;
+                category: {
+                  title: string | null;
+                  slug: string | null;
+                } | null;
+              }>;
+            }
+          | {
+              _key: string;
+              _type: "publications";
+              heading: Array<{
+                _key: string;
+                style:
+                  "h1" | "h2" | "h3" | "h4" | "h5" | "h6" | "normal" | null;
+                children: Array<{
+                  _key: string;
+                  text: string | null;
+                }> | null;
+              }> | null;
+              body: string | null;
+              cards: Array<{
+                _key: string;
+                brand:
+                  | "familywealthreport"
+                  | "wealthbriefing"
+                  | "wealthbriefingasia"
+                  | null;
+                brandTitle: string | null;
+                description: string | null;
+                image: {
+                  asset: SanityImageAssetReference | null;
+                  hotspot: SanityImageHotspot | null;
+                  crop: SanityImageCrop | null;
+                  alt: string | null;
+                } | null;
+                linkLabel: string | null;
+              }> | null;
+            }
+          | {
+              _key: string;
+              _type: "sponsoredContent";
+              label: string | null;
+              link: {
+                label: string | null;
+                kind: "external" | "internal" | null;
+                external: string | null;
+                internal:
+                  | {
+                      _type: "awardsProgramme";
+                      slug: string | null;
+                      brand: null;
+                      brands: null;
+                    }
+                  | {
+                      _type: "conferenceEvent";
+                      slug: string | null;
+                      brand: null;
+                      brands: null;
+                    }
+                  | {
+                      _type: "page";
+                      slug: string | null;
+                      brand:
+                        | "clearview"
+                        | "familywealthreport"
+                        | "wealthbriefing"
+                        | "wealthbriefingasia"
+                        | null;
+                      brands: null;
+                    }
+                  | {
+                      _type: "post";
+                      slug: string | null;
+                      brand: null;
+                      brands: Array<string> | null;
+                    }
+                  | {
+                      _type: "resource";
+                      slug: string | null;
+                      brand: null;
+                      brands: null;
+                    }
+                  | null;
+              } | null;
+              profileLabel: string | null;
+              post: {
+                _id: string;
+                title: string | null;
+                slug: string | null;
+                brands: Array<string> | null;
+                brandTitles: Array<{
+                  key: string | null;
+                  title: string | null;
+                }>;
+                publishedAt: string | null;
+                excerpt: string | null;
+                image: {
+                  asset: SanityImageAssetReference | null;
+                  hotspot: SanityImageHotspot | null;
+                  crop: SanityImageCrop | null;
+                  alt: string | null;
+                } | null;
+                category: {
+                  title: string | null;
+                  slug: string | null;
+                } | null;
+                sponsor: {
+                  title: string | null;
+                  slug: string | null;
+                  logo: {
+                    asset: SanityImageAssetReference | null;
+                    hotspot: SanityImageHotspot | null;
+                    crop: SanityImageCrop | null;
+                    alt: string | null;
+                  } | null;
+                } | null;
+              } | null;
+            }
+          | {
+              _key: string;
+              _type: "topStories";
+              linkLabel: string | null;
+              label: string | null;
+              slides: Array<{
+                _id: string;
+                title: string | null;
+                slug: string | null;
+                brands: Array<string> | null;
+                brandTitles: Array<{
+                  key: string | null;
+                  title: string | null;
+                }>;
+                publishedAt: string | null;
+                excerpt: string | null;
+                image: {
+                  asset: SanityImageAssetReference | null;
+                  hotspot: SanityImageHotspot | null;
+                  crop: SanityImageCrop | null;
+                  alt: string | null;
+                } | null;
+                category: {
+                  title: string | null;
+                  slug: string | null;
+                } | null;
+              }> | null;
+              articles: Array<{
+                _id: string;
+                title: string | null;
+                slug: string | null;
+                brands: Array<string> | null;
+                brandTitles: Array<{
+                  key: string | null;
+                  title: string | null;
+                }>;
+                publishedAt: string | null;
+                excerpt: string | null;
+                image: {
+                  asset: SanityImageAssetReference | null;
+                  hotspot: SanityImageHotspot | null;
+                  crop: SanityImageCrop | null;
+                  alt: string | null;
+                } | null;
+                category: {
+                  title: string | null;
+                  slug: string | null;
+                } | null;
+              }> | null;
+              latest: Array<{
+                _id: string;
+                title: string | null;
+                slug: string | null;
+                brands: Array<string> | null;
+                brandTitles: Array<{
+                  key: string | null;
+                  title: string | null;
+                }>;
+                publishedAt: string | null;
+                excerpt: string | null;
+                image: {
+                  asset: SanityImageAssetReference | null;
+                  hotspot: SanityImageHotspot | null;
+                  crop: SanityImageCrop | null;
+                  alt: string | null;
+                } | null;
+                category: {
+                  title: string | null;
+                  slug: string | null;
+                } | null;
+              }>;
+            }
+          | {
+              _key: string;
+              _type: "weeklyRoundup";
+              heading: Array<{
+                _key: string;
+                style:
+                  "h1" | "h2" | "h3" | "h4" | "h5" | "h6" | "normal" | null;
+                children: Array<{
+                  _key: string;
+                  text: string | null;
+                }> | null;
+              }> | null;
+              label: string | null;
+              title: string | null;
+              summary: string | null;
+              button: {
+                label: string | null;
+                kind: "external" | "internal" | null;
+                external: string | null;
+                internal:
+                  | {
+                      _type: "awardsProgramme";
+                      slug: string | null;
+                      brand: null;
+                      brands: null;
+                    }
+                  | {
+                      _type: "conferenceEvent";
+                      slug: string | null;
+                      brand: null;
+                      brands: null;
+                    }
+                  | {
+                      _type: "page";
+                      slug: string | null;
+                      brand:
+                        | "clearview"
+                        | "familywealthreport"
+                        | "wealthbriefing"
+                        | "wealthbriefingasia"
+                        | null;
+                      brands: null;
+                    }
+                  | {
+                      _type: "post";
+                      slug: string | null;
+                      brand: null;
+                      brands: Array<string> | null;
+                    }
+                  | {
+                      _type: "resource";
+                      slug: string | null;
+                      brand: null;
+                      brands: null;
+                    }
+                  | null;
+              } | null;
+              listLabel: string | null;
+              posts: Array<{
+                _id: string;
+                title: string | null;
+                slug: string | null;
+                brands: Array<string> | null;
+                brandTitles: Array<{
+                  key: string | null;
+                  title: string | null;
+                }>;
+                publishedAt: string | null;
+                excerpt: string | null;
+                image: {
+                  asset: SanityImageAssetReference | null;
+                  hotspot: SanityImageHotspot | null;
+                  crop: SanityImageCrop | null;
+                  alt: string | null;
+                } | null;
+                category: {
+                  title: string | null;
+                  slug: string | null;
+                } | null;
+              }> | null;
+              latest: Array<{
+                _id: string;
+                title: string | null;
+                slug: string | null;
+                brands: Array<string> | null;
+                brandTitles: Array<{
+                  key: string | null;
+                  title: string | null;
+                }>;
+                publishedAt: string | null;
+                excerpt: string | null;
+                image: {
+                  asset: SanityImageAssetReference | null;
+                  hotspot: SanityImageHotspot | null;
+                  crop: SanityImageCrop | null;
+                  alt: string | null;
+                } | null;
+                category: {
+                  title: string | null;
+                  slug: string | null;
+                } | null;
+              }>;
+            }
+        > | null;
+        aside: Array<
+          | {
+              _key: string;
+              _type: "awardsWinners";
+              heading: Array<{
+                _key: string;
+                style:
+                  "h1" | "h2" | "h3" | "h4" | "h5" | "h6" | "normal" | null;
+                children: Array<{
+                  _key: string;
+                  text: string | null;
+                }> | null;
+              }> | null;
+            }
+          | {
+              _key: string;
+              _type: "highlights";
+              source: "awards" | "events" | "research" | null;
+              count: number | null;
+              heading: Array<{
+                _key: string;
+                style:
+                  "h1" | "h2" | "h3" | "h4" | "h5" | "h6" | "normal" | null;
+                children: Array<{
+                  _key: string;
+                  text: string | null;
+                }> | null;
+              }> | null;
+              deadlineLabel: string | null;
+              items: Array<
+                | {
+                    _id: string;
+                    _type: "awardsProgramme";
+                    slug: string | null;
+                    title: string | null;
+                    category: null;
+                    nominationsClosingDate: string | null;
+                    startDate: string | null;
+                    endDate: string | null;
+                    country:
+                      | "AD"
+                      | "AE"
+                      | "AF"
+                      | "AG"
+                      | "AI"
+                      | "AL"
+                      | "AM"
+                      | "AO"
+                      | "AQ"
+                      | "AR"
+                      | "AS"
+                      | "AT"
+                      | "AU"
+                      | "AW"
+                      | "AX"
+                      | "AZ"
+                      | "BA"
+                      | "BB"
+                      | "BD"
+                      | "BE"
+                      | "BF"
+                      | "BG"
+                      | "BH"
+                      | "BI"
+                      | "BJ"
+                      | "BL"
+                      | "BM"
+                      | "BN"
+                      | "BO"
+                      | "BQ"
+                      | "BR"
+                      | "BS"
+                      | "BT"
+                      | "BV"
+                      | "BW"
+                      | "BY"
+                      | "BZ"
+                      | "CA"
+                      | "CC"
+                      | "CD"
+                      | "CF"
+                      | "CG"
+                      | "CH"
+                      | "CI"
+                      | "CK"
+                      | "CL"
+                      | "CM"
+                      | "CN"
+                      | "CO"
+                      | "CR"
+                      | "CU"
+                      | "CV"
+                      | "CW"
+                      | "CX"
+                      | "CY"
+                      | "CZ"
+                      | "DE"
+                      | "DJ"
+                      | "DK"
+                      | "DM"
+                      | "DO"
+                      | "DZ"
+                      | "EC"
+                      | "EE"
+                      | "EG"
+                      | "EH"
+                      | "ER"
+                      | "ES"
+                      | "ET"
+                      | "FI"
+                      | "FJ"
+                      | "FK"
+                      | "FM"
+                      | "FO"
+                      | "FR"
+                      | "GA"
+                      | "GB"
+                      | "GD"
+                      | "GE"
+                      | "GF"
+                      | "GG"
+                      | "GH"
+                      | "GI"
+                      | "GL"
+                      | "GM"
+                      | "GN"
+                      | "GP"
+                      | "GQ"
+                      | "GR"
+                      | "GS"
+                      | "GT"
+                      | "GU"
+                      | "GW"
+                      | "GY"
+                      | "HK"
+                      | "HM"
+                      | "HN"
+                      | "HR"
+                      | "HT"
+                      | "HU"
+                      | "ID"
+                      | "IE"
+                      | "IL"
+                      | "IM"
+                      | "IN"
+                      | "IO"
+                      | "IQ"
+                      | "IR"
+                      | "IS"
+                      | "IT"
+                      | "JE"
+                      | "JM"
+                      | "JO"
+                      | "JP"
+                      | "KE"
+                      | "KG"
+                      | "KH"
+                      | "KI"
+                      | "KM"
+                      | "KN"
+                      | "KP"
+                      | "KR"
+                      | "KW"
+                      | "KY"
+                      | "KZ"
+                      | "LA"
+                      | "LB"
+                      | "LC"
+                      | "LI"
+                      | "LK"
+                      | "LR"
+                      | "LS"
+                      | "LT"
+                      | "LU"
+                      | "LV"
+                      | "LY"
+                      | "MA"
+                      | "MC"
+                      | "MD"
+                      | "ME"
+                      | "MF"
+                      | "MG"
+                      | "MH"
+                      | "MK"
+                      | "ML"
+                      | "MM"
+                      | "MN"
+                      | "MO"
+                      | "MP"
+                      | "MQ"
+                      | "MR"
+                      | "MS"
+                      | "MT"
+                      | "MU"
+                      | "MV"
+                      | "MW"
+                      | "MX"
+                      | "MY"
+                      | "MZ"
+                      | "NA"
+                      | "NC"
+                      | "NE"
+                      | "NF"
+                      | "NG"
+                      | "NI"
+                      | "NL"
+                      | "NO"
+                      | "NP"
+                      | "NR"
+                      | "NU"
+                      | "NZ"
+                      | "OM"
+                      | "PA"
+                      | "PE"
+                      | "PF"
+                      | "PG"
+                      | "PH"
+                      | "PK"
+                      | "PL"
+                      | "PM"
+                      | "PN"
+                      | "PR"
+                      | "PS"
+                      | "PT"
+                      | "PW"
+                      | "PY"
+                      | "QA"
+                      | "RE"
+                      | "RO"
+                      | "RS"
+                      | "RU"
+                      | "RW"
+                      | "SA"
+                      | "SB"
+                      | "SC"
+                      | "SD"
+                      | "SE"
+                      | "SG"
+                      | "SH"
+                      | "SI"
+                      | "SJ"
+                      | "SK"
+                      | "SL"
+                      | "SM"
+                      | "SN"
+                      | "SO"
+                      | "SR"
+                      | "SS"
+                      | "ST"
+                      | "SV"
+                      | "SX"
+                      | "SY"
+                      | "SZ"
+                      | "TC"
+                      | "TD"
+                      | "TF"
+                      | "TG"
+                      | "TH"
+                      | "TJ"
+                      | "TK"
+                      | "TL"
+                      | "TM"
+                      | "TN"
+                      | "TO"
+                      | "TR"
+                      | "TT"
+                      | "TV"
+                      | "TW"
+                      | "TZ"
+                      | "UA"
+                      | "UG"
+                      | "UM"
+                      | "US"
+                      | "UY"
+                      | "UZ"
+                      | "VA"
+                      | "VC"
+                      | "VE"
+                      | "VG"
+                      | "VI"
+                      | "VN"
+                      | "VU"
+                      | "WF"
+                      | "WS"
+                      | "YE"
+                      | "YT"
+                      | "ZA"
+                      | "ZM"
+                      | "ZW"
+                      | null;
+                    publishedAt: null;
+                  }
+                | {
+                    _id: string;
+                    _type: "conferenceEvent";
+                    slug: string | null;
+                    title: string | null;
+                    category: null;
+                    nominationsClosingDate: null;
+                    startDate: string | null;
+                    endDate: string | null;
+                    country:
+                      | "AD"
+                      | "AE"
+                      | "AF"
+                      | "AG"
+                      | "AI"
+                      | "AL"
+                      | "AM"
+                      | "AO"
+                      | "AQ"
+                      | "AR"
+                      | "AS"
+                      | "AT"
+                      | "AU"
+                      | "AW"
+                      | "AX"
+                      | "AZ"
+                      | "BA"
+                      | "BB"
+                      | "BD"
+                      | "BE"
+                      | "BF"
+                      | "BG"
+                      | "BH"
+                      | "BI"
+                      | "BJ"
+                      | "BL"
+                      | "BM"
+                      | "BN"
+                      | "BO"
+                      | "BQ"
+                      | "BR"
+                      | "BS"
+                      | "BT"
+                      | "BV"
+                      | "BW"
+                      | "BY"
+                      | "BZ"
+                      | "CA"
+                      | "CC"
+                      | "CD"
+                      | "CF"
+                      | "CG"
+                      | "CH"
+                      | "CI"
+                      | "CK"
+                      | "CL"
+                      | "CM"
+                      | "CN"
+                      | "CO"
+                      | "CR"
+                      | "CU"
+                      | "CV"
+                      | "CW"
+                      | "CX"
+                      | "CY"
+                      | "CZ"
+                      | "DE"
+                      | "DJ"
+                      | "DK"
+                      | "DM"
+                      | "DO"
+                      | "DZ"
+                      | "EC"
+                      | "EE"
+                      | "EG"
+                      | "EH"
+                      | "ER"
+                      | "ES"
+                      | "ET"
+                      | "FI"
+                      | "FJ"
+                      | "FK"
+                      | "FM"
+                      | "FO"
+                      | "FR"
+                      | "GA"
+                      | "GB"
+                      | "GD"
+                      | "GE"
+                      | "GF"
+                      | "GG"
+                      | "GH"
+                      | "GI"
+                      | "GL"
+                      | "GM"
+                      | "GN"
+                      | "GP"
+                      | "GQ"
+                      | "GR"
+                      | "GS"
+                      | "GT"
+                      | "GU"
+                      | "GW"
+                      | "GY"
+                      | "HK"
+                      | "HM"
+                      | "HN"
+                      | "HR"
+                      | "HT"
+                      | "HU"
+                      | "ID"
+                      | "IE"
+                      | "IL"
+                      | "IM"
+                      | "IN"
+                      | "IO"
+                      | "IQ"
+                      | "IR"
+                      | "IS"
+                      | "IT"
+                      | "JE"
+                      | "JM"
+                      | "JO"
+                      | "JP"
+                      | "KE"
+                      | "KG"
+                      | "KH"
+                      | "KI"
+                      | "KM"
+                      | "KN"
+                      | "KP"
+                      | "KR"
+                      | "KW"
+                      | "KY"
+                      | "KZ"
+                      | "LA"
+                      | "LB"
+                      | "LC"
+                      | "LI"
+                      | "LK"
+                      | "LR"
+                      | "LS"
+                      | "LT"
+                      | "LU"
+                      | "LV"
+                      | "LY"
+                      | "MA"
+                      | "MC"
+                      | "MD"
+                      | "ME"
+                      | "MF"
+                      | "MG"
+                      | "MH"
+                      | "MK"
+                      | "ML"
+                      | "MM"
+                      | "MN"
+                      | "MO"
+                      | "MP"
+                      | "MQ"
+                      | "MR"
+                      | "MS"
+                      | "MT"
+                      | "MU"
+                      | "MV"
+                      | "MW"
+                      | "MX"
+                      | "MY"
+                      | "MZ"
+                      | "NA"
+                      | "NC"
+                      | "NE"
+                      | "NF"
+                      | "NG"
+                      | "NI"
+                      | "NL"
+                      | "NO"
+                      | "NP"
+                      | "NR"
+                      | "NU"
+                      | "NZ"
+                      | "OM"
+                      | "PA"
+                      | "PE"
+                      | "PF"
+                      | "PG"
+                      | "PH"
+                      | "PK"
+                      | "PL"
+                      | "PM"
+                      | "PN"
+                      | "PR"
+                      | "PS"
+                      | "PT"
+                      | "PW"
+                      | "PY"
+                      | "QA"
+                      | "RE"
+                      | "RO"
+                      | "RS"
+                      | "RU"
+                      | "RW"
+                      | "SA"
+                      | "SB"
+                      | "SC"
+                      | "SD"
+                      | "SE"
+                      | "SG"
+                      | "SH"
+                      | "SI"
+                      | "SJ"
+                      | "SK"
+                      | "SL"
+                      | "SM"
+                      | "SN"
+                      | "SO"
+                      | "SR"
+                      | "SS"
+                      | "ST"
+                      | "SV"
+                      | "SX"
+                      | "SY"
+                      | "SZ"
+                      | "TC"
+                      | "TD"
+                      | "TF"
+                      | "TG"
+                      | "TH"
+                      | "TJ"
+                      | "TK"
+                      | "TL"
+                      | "TM"
+                      | "TN"
+                      | "TO"
+                      | "TR"
+                      | "TT"
+                      | "TV"
+                      | "TW"
+                      | "TZ"
+                      | "UA"
+                      | "UG"
+                      | "UM"
+                      | "US"
+                      | "UY"
+                      | "UZ"
+                      | "VA"
+                      | "VC"
+                      | "VE"
+                      | "VG"
+                      | "VI"
+                      | "VN"
+                      | "VU"
+                      | "WF"
+                      | "WS"
+                      | "YE"
+                      | "YT"
+                      | "ZA"
+                      | "ZM"
+                      | "ZW"
+                      | null;
+                    publishedAt: null;
+                  }
+                | {
+                    _id: string;
+                    _type: "resource";
+                    slug: string | null;
+                    title: string | null;
+                    category: "research" | null;
+                    nominationsClosingDate: null;
+                    startDate: null;
+                    endDate: null;
+                    country: null;
+                    publishedAt: string | null;
+                  }
+              > | null;
+              fill:
+                | Array<{
+                    _id: string;
+                    _type: "resource";
+                    slug: string | null;
+                    title: string | null;
+                    category: "research" | null;
+                    nominationsClosingDate: null;
+                    startDate: null;
+                    endDate: null;
+                    country: null;
+                    publishedAt: string | null;
+                  }>
+                | Array<{
+                    _id: string;
+                    _type: "awardsProgramme";
+                    slug: string | null;
+                    title: string | null;
+                    category: null;
+                    nominationsClosingDate: string | null;
+                    startDate: string | null;
+                    endDate: string | null;
+                    country:
+                      | "AD"
+                      | "AE"
+                      | "AF"
+                      | "AG"
+                      | "AI"
+                      | "AL"
+                      | "AM"
+                      | "AO"
+                      | "AQ"
+                      | "AR"
+                      | "AS"
+                      | "AT"
+                      | "AU"
+                      | "AW"
+                      | "AX"
+                      | "AZ"
+                      | "BA"
+                      | "BB"
+                      | "BD"
+                      | "BE"
+                      | "BF"
+                      | "BG"
+                      | "BH"
+                      | "BI"
+                      | "BJ"
+                      | "BL"
+                      | "BM"
+                      | "BN"
+                      | "BO"
+                      | "BQ"
+                      | "BR"
+                      | "BS"
+                      | "BT"
+                      | "BV"
+                      | "BW"
+                      | "BY"
+                      | "BZ"
+                      | "CA"
+                      | "CC"
+                      | "CD"
+                      | "CF"
+                      | "CG"
+                      | "CH"
+                      | "CI"
+                      | "CK"
+                      | "CL"
+                      | "CM"
+                      | "CN"
+                      | "CO"
+                      | "CR"
+                      | "CU"
+                      | "CV"
+                      | "CW"
+                      | "CX"
+                      | "CY"
+                      | "CZ"
+                      | "DE"
+                      | "DJ"
+                      | "DK"
+                      | "DM"
+                      | "DO"
+                      | "DZ"
+                      | "EC"
+                      | "EE"
+                      | "EG"
+                      | "EH"
+                      | "ER"
+                      | "ES"
+                      | "ET"
+                      | "FI"
+                      | "FJ"
+                      | "FK"
+                      | "FM"
+                      | "FO"
+                      | "FR"
+                      | "GA"
+                      | "GB"
+                      | "GD"
+                      | "GE"
+                      | "GF"
+                      | "GG"
+                      | "GH"
+                      | "GI"
+                      | "GL"
+                      | "GM"
+                      | "GN"
+                      | "GP"
+                      | "GQ"
+                      | "GR"
+                      | "GS"
+                      | "GT"
+                      | "GU"
+                      | "GW"
+                      | "GY"
+                      | "HK"
+                      | "HM"
+                      | "HN"
+                      | "HR"
+                      | "HT"
+                      | "HU"
+                      | "ID"
+                      | "IE"
+                      | "IL"
+                      | "IM"
+                      | "IN"
+                      | "IO"
+                      | "IQ"
+                      | "IR"
+                      | "IS"
+                      | "IT"
+                      | "JE"
+                      | "JM"
+                      | "JO"
+                      | "JP"
+                      | "KE"
+                      | "KG"
+                      | "KH"
+                      | "KI"
+                      | "KM"
+                      | "KN"
+                      | "KP"
+                      | "KR"
+                      | "KW"
+                      | "KY"
+                      | "KZ"
+                      | "LA"
+                      | "LB"
+                      | "LC"
+                      | "LI"
+                      | "LK"
+                      | "LR"
+                      | "LS"
+                      | "LT"
+                      | "LU"
+                      | "LV"
+                      | "LY"
+                      | "MA"
+                      | "MC"
+                      | "MD"
+                      | "ME"
+                      | "MF"
+                      | "MG"
+                      | "MH"
+                      | "MK"
+                      | "ML"
+                      | "MM"
+                      | "MN"
+                      | "MO"
+                      | "MP"
+                      | "MQ"
+                      | "MR"
+                      | "MS"
+                      | "MT"
+                      | "MU"
+                      | "MV"
+                      | "MW"
+                      | "MX"
+                      | "MY"
+                      | "MZ"
+                      | "NA"
+                      | "NC"
+                      | "NE"
+                      | "NF"
+                      | "NG"
+                      | "NI"
+                      | "NL"
+                      | "NO"
+                      | "NP"
+                      | "NR"
+                      | "NU"
+                      | "NZ"
+                      | "OM"
+                      | "PA"
+                      | "PE"
+                      | "PF"
+                      | "PG"
+                      | "PH"
+                      | "PK"
+                      | "PL"
+                      | "PM"
+                      | "PN"
+                      | "PR"
+                      | "PS"
+                      | "PT"
+                      | "PW"
+                      | "PY"
+                      | "QA"
+                      | "RE"
+                      | "RO"
+                      | "RS"
+                      | "RU"
+                      | "RW"
+                      | "SA"
+                      | "SB"
+                      | "SC"
+                      | "SD"
+                      | "SE"
+                      | "SG"
+                      | "SH"
+                      | "SI"
+                      | "SJ"
+                      | "SK"
+                      | "SL"
+                      | "SM"
+                      | "SN"
+                      | "SO"
+                      | "SR"
+                      | "SS"
+                      | "ST"
+                      | "SV"
+                      | "SX"
+                      | "SY"
+                      | "SZ"
+                      | "TC"
+                      | "TD"
+                      | "TF"
+                      | "TG"
+                      | "TH"
+                      | "TJ"
+                      | "TK"
+                      | "TL"
+                      | "TM"
+                      | "TN"
+                      | "TO"
+                      | "TR"
+                      | "TT"
+                      | "TV"
+                      | "TW"
+                      | "TZ"
+                      | "UA"
+                      | "UG"
+                      | "UM"
+                      | "US"
+                      | "UY"
+                      | "UZ"
+                      | "VA"
+                      | "VC"
+                      | "VE"
+                      | "VG"
+                      | "VI"
+                      | "VN"
+                      | "VU"
+                      | "WF"
+                      | "WS"
+                      | "YE"
+                      | "YT"
+                      | "ZA"
+                      | "ZM"
+                      | "ZW"
+                      | null;
+                    publishedAt: null;
+                  }>
+                | Array<{
+                    _id: string;
+                    _type: "conferenceEvent";
+                    slug: string | null;
+                    title: string | null;
+                    category: null;
+                    nominationsClosingDate: null;
+                    startDate: string | null;
+                    endDate: string | null;
+                    country:
+                      | "AD"
+                      | "AE"
+                      | "AF"
+                      | "AG"
+                      | "AI"
+                      | "AL"
+                      | "AM"
+                      | "AO"
+                      | "AQ"
+                      | "AR"
+                      | "AS"
+                      | "AT"
+                      | "AU"
+                      | "AW"
+                      | "AX"
+                      | "AZ"
+                      | "BA"
+                      | "BB"
+                      | "BD"
+                      | "BE"
+                      | "BF"
+                      | "BG"
+                      | "BH"
+                      | "BI"
+                      | "BJ"
+                      | "BL"
+                      | "BM"
+                      | "BN"
+                      | "BO"
+                      | "BQ"
+                      | "BR"
+                      | "BS"
+                      | "BT"
+                      | "BV"
+                      | "BW"
+                      | "BY"
+                      | "BZ"
+                      | "CA"
+                      | "CC"
+                      | "CD"
+                      | "CF"
+                      | "CG"
+                      | "CH"
+                      | "CI"
+                      | "CK"
+                      | "CL"
+                      | "CM"
+                      | "CN"
+                      | "CO"
+                      | "CR"
+                      | "CU"
+                      | "CV"
+                      | "CW"
+                      | "CX"
+                      | "CY"
+                      | "CZ"
+                      | "DE"
+                      | "DJ"
+                      | "DK"
+                      | "DM"
+                      | "DO"
+                      | "DZ"
+                      | "EC"
+                      | "EE"
+                      | "EG"
+                      | "EH"
+                      | "ER"
+                      | "ES"
+                      | "ET"
+                      | "FI"
+                      | "FJ"
+                      | "FK"
+                      | "FM"
+                      | "FO"
+                      | "FR"
+                      | "GA"
+                      | "GB"
+                      | "GD"
+                      | "GE"
+                      | "GF"
+                      | "GG"
+                      | "GH"
+                      | "GI"
+                      | "GL"
+                      | "GM"
+                      | "GN"
+                      | "GP"
+                      | "GQ"
+                      | "GR"
+                      | "GS"
+                      | "GT"
+                      | "GU"
+                      | "GW"
+                      | "GY"
+                      | "HK"
+                      | "HM"
+                      | "HN"
+                      | "HR"
+                      | "HT"
+                      | "HU"
+                      | "ID"
+                      | "IE"
+                      | "IL"
+                      | "IM"
+                      | "IN"
+                      | "IO"
+                      | "IQ"
+                      | "IR"
+                      | "IS"
+                      | "IT"
+                      | "JE"
+                      | "JM"
+                      | "JO"
+                      | "JP"
+                      | "KE"
+                      | "KG"
+                      | "KH"
+                      | "KI"
+                      | "KM"
+                      | "KN"
+                      | "KP"
+                      | "KR"
+                      | "KW"
+                      | "KY"
+                      | "KZ"
+                      | "LA"
+                      | "LB"
+                      | "LC"
+                      | "LI"
+                      | "LK"
+                      | "LR"
+                      | "LS"
+                      | "LT"
+                      | "LU"
+                      | "LV"
+                      | "LY"
+                      | "MA"
+                      | "MC"
+                      | "MD"
+                      | "ME"
+                      | "MF"
+                      | "MG"
+                      | "MH"
+                      | "MK"
+                      | "ML"
+                      | "MM"
+                      | "MN"
+                      | "MO"
+                      | "MP"
+                      | "MQ"
+                      | "MR"
+                      | "MS"
+                      | "MT"
+                      | "MU"
+                      | "MV"
+                      | "MW"
+                      | "MX"
+                      | "MY"
+                      | "MZ"
+                      | "NA"
+                      | "NC"
+                      | "NE"
+                      | "NF"
+                      | "NG"
+                      | "NI"
+                      | "NL"
+                      | "NO"
+                      | "NP"
+                      | "NR"
+                      | "NU"
+                      | "NZ"
+                      | "OM"
+                      | "PA"
+                      | "PE"
+                      | "PF"
+                      | "PG"
+                      | "PH"
+                      | "PK"
+                      | "PL"
+                      | "PM"
+                      | "PN"
+                      | "PR"
+                      | "PS"
+                      | "PT"
+                      | "PW"
+                      | "PY"
+                      | "QA"
+                      | "RE"
+                      | "RO"
+                      | "RS"
+                      | "RU"
+                      | "RW"
+                      | "SA"
+                      | "SB"
+                      | "SC"
+                      | "SD"
+                      | "SE"
+                      | "SG"
+                      | "SH"
+                      | "SI"
+                      | "SJ"
+                      | "SK"
+                      | "SL"
+                      | "SM"
+                      | "SN"
+                      | "SO"
+                      | "SR"
+                      | "SS"
+                      | "ST"
+                      | "SV"
+                      | "SX"
+                      | "SY"
+                      | "SZ"
+                      | "TC"
+                      | "TD"
+                      | "TF"
+                      | "TG"
+                      | "TH"
+                      | "TJ"
+                      | "TK"
+                      | "TL"
+                      | "TM"
+                      | "TN"
+                      | "TO"
+                      | "TR"
+                      | "TT"
+                      | "TV"
+                      | "TW"
+                      | "TZ"
+                      | "UA"
+                      | "UG"
+                      | "UM"
+                      | "US"
+                      | "UY"
+                      | "UZ"
+                      | "VA"
+                      | "VC"
+                      | "VE"
+                      | "VG"
+                      | "VI"
+                      | "VN"
+                      | "VU"
+                      | "WF"
+                      | "WS"
+                      | "YE"
+                      | "YT"
+                      | "ZA"
+                      | "ZM"
+                      | "ZW"
+                      | null;
+                    publishedAt: null;
+                  }>;
+              button: {
+                label: string | null;
+                kind: "external" | "internal" | null;
+                external: string | null;
+                internal:
+                  | {
+                      _type: "awardsProgramme";
+                      slug: string | null;
+                      brand: null;
+                      brands: null;
+                    }
+                  | {
+                      _type: "conferenceEvent";
+                      slug: string | null;
+                      brand: null;
+                      brands: null;
+                    }
+                  | {
+                      _type: "page";
+                      slug: string | null;
+                      brand:
+                        | "clearview"
+                        | "familywealthreport"
+                        | "wealthbriefing"
+                        | "wealthbriefingasia"
+                        | null;
+                      brands: null;
+                    }
+                  | {
+                      _type: "post";
+                      slug: string | null;
+                      brand: null;
+                      brands: Array<string> | null;
+                    }
+                  | {
+                      _type: "resource";
+                      slug: string | null;
+                      brand: null;
+                      brands: null;
+                    }
+                  | null;
+              } | null;
+              promo: {
+                resource: {
+                  title: string | null;
+                  downloadThumbnail: {
+                    asset: SanityImageAssetReference | null;
+                    hotspot: SanityImageHotspot | null;
+                    crop: SanityImageCrop | null;
+                    alt: string | null;
+                  } | null;
+                  downloadFileUrl: string | null;
+                  downloadFileName: string | null;
+                  downloadUrl: string | null;
+                } | null;
+                title: string | null;
+                description: string | null;
+                image: {
+                  asset: SanityImageAssetReference | null;
+                  hotspot: SanityImageHotspot | null;
+                  crop: SanityImageCrop | null;
+                  alt: string | null;
+                } | null;
+                link: {
+                  kind: "external" | "internal" | null;
+                  external: string | null;
+                  internal:
+                    | {
+                        _type: "awardsProgramme";
+                        slug: string | null;
+                        brand: null;
+                        brands: null;
+                      }
+                    | {
+                        _type: "conferenceEvent";
+                        slug: string | null;
+                        brand: null;
+                        brands: null;
+                      }
+                    | {
+                        _type: "page";
+                        slug: string | null;
+                        brand:
+                          | "clearview"
+                          | "familywealthreport"
+                          | "wealthbriefing"
+                          | "wealthbriefingasia"
+                          | null;
+                        brands: null;
+                      }
+                    | {
+                        _type: "post";
+                        slug: string | null;
+                        brand: null;
+                        brands: Array<string> | null;
+                      }
+                    | {
+                        _type: "resource";
+                        slug: string | null;
+                        brand: null;
+                        brands: null;
+                      }
+                    | null;
+                } | null;
+              } | null;
+            }
+        > | null;
+      }
+    | {
+        _key: string;
+        _type: "sponsoredContent";
+        label: string | null;
+        link: {
+          label: string | null;
+          kind: "external" | "internal" | null;
+          external: string | null;
+          internal:
+            | {
+                _type: "awardsProgramme";
+                slug: string | null;
+                brand: null;
+                brands: null;
+              }
+            | {
+                _type: "conferenceEvent";
+                slug: string | null;
+                brand: null;
+                brands: null;
+              }
+            | {
+                _type: "page";
+                slug: string | null;
+                brand:
+                  | "clearview"
+                  | "familywealthreport"
+                  | "wealthbriefing"
+                  | "wealthbriefingasia"
+                  | null;
+                brands: null;
+              }
+            | {
+                _type: "post";
+                slug: string | null;
+                brand: null;
+                brands: Array<string> | null;
+              }
+            | {
+                _type: "resource";
+                slug: string | null;
+                brand: null;
+                brands: null;
+              }
+            | null;
+        } | null;
+        profileLabel: string | null;
+        post: {
+          _id: string;
+          title: string | null;
+          slug: string | null;
+          brands: Array<string> | null;
+          brandTitles: Array<{
+            key: string | null;
+            title: string | null;
+          }>;
+          publishedAt: string | null;
+          excerpt: string | null;
+          image: {
+            asset: SanityImageAssetReference | null;
+            hotspot: SanityImageHotspot | null;
+            crop: SanityImageCrop | null;
+            alt: string | null;
+          } | null;
+          category: {
+            title: string | null;
+            slug: string | null;
+          } | null;
+          sponsor: {
+            title: string | null;
+            slug: string | null;
+            logo: {
+              asset: SanityImageAssetReference | null;
+              hotspot: SanityImageHotspot | null;
+              crop: SanityImageCrop | null;
+              alt: string | null;
+            } | null;
+          } | null;
+        } | null;
+      }
+    | {
+        _key: string;
+        _type: "statsBar";
+        heading: Array<{
+          _key: string;
+          style: "h1" | "h2" | "h3" | "h4" | "h5" | "h6" | "normal" | null;
+          children: Array<{
+            _key: string;
+            text: string | null;
+          }> | null;
+        }> | null;
+        items: Array<{
+          _key: string;
+          icon:
+            | "stat-article"
+            | "stat-globe"
+            | "stat-public"
+            | "stat-search"
+            | "stat-star"
+            | "stat-user"
+            | null;
+          value: string | null;
+          label: string | null;
+        }> | null;
+      }
+    | {
+        _key: string;
+        _type: "subscribeBanner";
+        heading: Array<{
+          _key: string;
+          style: "h1" | "h2" | "h3" | "h4" | "h5" | "h6" | "normal" | null;
+          children: Array<{
+            _key: string;
+            text: string | null;
+          }> | null;
+        }> | null;
+        description: string | null;
+        buttonLabel: string | null;
+        cta: {
+          label: string | null;
+          kind: "external" | "internal" | null;
+          external: string | null;
+          internal:
+            | {
+                _type: "awardsProgramme";
+                slug: string | null;
+                brand: null;
+                brands: null;
+              }
+            | {
+                _type: "conferenceEvent";
+                slug: string | null;
+                brand: null;
+                brands: null;
+              }
+            | {
+                _type: "page";
+                slug: string | null;
+                brand:
+                  | "clearview"
+                  | "familywealthreport"
+                  | "wealthbriefing"
+                  | "wealthbriefingasia"
+                  | null;
+                brands: null;
+              }
+            | {
+                _type: "post";
+                slug: string | null;
+                brand: null;
+                brands: Array<string> | null;
+              }
+            | {
+                _type: "resource";
+                slug: string | null;
+                brand: null;
+                brands: null;
+              }
+            | null;
+        } | null;
+      }
+    | {
+        _key: string;
+        _type: "topPicks";
+        heading: Array<{
+          _key: string;
+          style: "h1" | "h2" | "h3" | "h4" | "h5" | "h6" | "normal" | null;
+          children: Array<{
+            _key: string;
+            text: string | null;
+          }> | null;
+        }> | null;
+        link: {
+          label: string | null;
+          kind: "external" | "internal" | null;
+          external: string | null;
+          internal:
+            | {
+                _type: "awardsProgramme";
+                slug: string | null;
+                brand: null;
+                brands: null;
+              }
+            | {
+                _type: "conferenceEvent";
+                slug: string | null;
+                brand: null;
+                brands: null;
+              }
+            | {
+                _type: "page";
+                slug: string | null;
+                brand:
+                  | "clearview"
+                  | "familywealthreport"
+                  | "wealthbriefing"
+                  | "wealthbriefingasia"
+                  | null;
+                brands: null;
+              }
+            | {
+                _type: "post";
+                slug: string | null;
+                brand: null;
+                brands: Array<string> | null;
+              }
+            | {
+                _type: "resource";
+                slug: string | null;
+                brand: null;
+                brands: null;
+              }
+            | null;
+        } | null;
+        posts: Array<{
+          _id: string;
+          title: string | null;
+          slug: string | null;
+          brands: Array<string> | null;
+          brandTitles: Array<{
+            key: string | null;
+            title: string | null;
+          }>;
+          publishedAt: string | null;
+          excerpt: string | null;
+          image: {
+            asset: SanityImageAssetReference | null;
+            hotspot: SanityImageHotspot | null;
+            crop: SanityImageCrop | null;
+            alt: string | null;
+          } | null;
+          category: {
+            title: string | null;
+            slug: string | null;
+          } | null;
+          sponsored: false | true;
+        }> | null;
+        fill: Array<{
+          _id: string;
+          title: string | null;
+          slug: string | null;
+          brands: Array<string> | null;
+          brandTitles: Array<{
+            key: string | null;
+            title: string | null;
+          }>;
+          publishedAt: string | null;
+          excerpt: string | null;
+          image: {
+            asset: SanityImageAssetReference | null;
+            hotspot: SanityImageHotspot | null;
+            crop: SanityImageCrop | null;
+            alt: string | null;
+          } | null;
+          category: {
+            title: string | null;
+            slug: string | null;
+          } | null;
+        }>;
+      }
+    | {
+        _key: string;
+        _type: "topStories";
+        linkLabel: string | null;
+        label: string | null;
+        slides: Array<{
+          _id: string;
+          title: string | null;
+          slug: string | null;
+          brands: Array<string> | null;
+          brandTitles: Array<{
+            key: string | null;
+            title: string | null;
+          }>;
+          publishedAt: string | null;
+          excerpt: string | null;
+          image: {
+            asset: SanityImageAssetReference | null;
+            hotspot: SanityImageHotspot | null;
+            crop: SanityImageCrop | null;
+            alt: string | null;
+          } | null;
+          category: {
+            title: string | null;
+            slug: string | null;
+          } | null;
+        }> | null;
+        articles: Array<{
+          _id: string;
+          title: string | null;
+          slug: string | null;
+          brands: Array<string> | null;
+          brandTitles: Array<{
+            key: string | null;
+            title: string | null;
+          }>;
+          publishedAt: string | null;
+          excerpt: string | null;
+          image: {
+            asset: SanityImageAssetReference | null;
+            hotspot: SanityImageHotspot | null;
+            crop: SanityImageCrop | null;
+            alt: string | null;
+          } | null;
+          category: {
+            title: string | null;
+            slug: string | null;
+          } | null;
+        }> | null;
+        latest: Array<{
+          _id: string;
+          title: string | null;
+          slug: string | null;
+          brands: Array<string> | null;
+          brandTitles: Array<{
+            key: string | null;
+            title: string | null;
+          }>;
+          publishedAt: string | null;
+          excerpt: string | null;
+          image: {
+            asset: SanityImageAssetReference | null;
+            hotspot: SanityImageHotspot | null;
+            crop: SanityImageCrop | null;
+            alt: string | null;
+          } | null;
+          category: {
+            title: string | null;
+            slug: string | null;
+          } | null;
+        }>;
+      }
+    | {
+        _key: string;
+        _type: "weeklyRoundup";
+        heading: Array<{
+          _key: string;
+          style: "h1" | "h2" | "h3" | "h4" | "h5" | "h6" | "normal" | null;
+          children: Array<{
+            _key: string;
+            text: string | null;
+          }> | null;
+        }> | null;
+        label: string | null;
+        title: string | null;
+        summary: string | null;
+        button: {
+          label: string | null;
+          kind: "external" | "internal" | null;
+          external: string | null;
+          internal:
+            | {
+                _type: "awardsProgramme";
+                slug: string | null;
+                brand: null;
+                brands: null;
+              }
+            | {
+                _type: "conferenceEvent";
+                slug: string | null;
+                brand: null;
+                brands: null;
+              }
+            | {
+                _type: "page";
+                slug: string | null;
+                brand:
+                  | "clearview"
+                  | "familywealthreport"
+                  | "wealthbriefing"
+                  | "wealthbriefingasia"
+                  | null;
+                brands: null;
+              }
+            | {
+                _type: "post";
+                slug: string | null;
+                brand: null;
+                brands: Array<string> | null;
+              }
+            | {
+                _type: "resource";
+                slug: string | null;
+                brand: null;
+                brands: null;
+              }
+            | null;
+        } | null;
+        listLabel: string | null;
+        posts: Array<{
+          _id: string;
+          title: string | null;
+          slug: string | null;
+          brands: Array<string> | null;
+          brandTitles: Array<{
+            key: string | null;
+            title: string | null;
+          }>;
+          publishedAt: string | null;
+          excerpt: string | null;
+          image: {
+            asset: SanityImageAssetReference | null;
+            hotspot: SanityImageHotspot | null;
+            crop: SanityImageCrop | null;
+            alt: string | null;
+          } | null;
+          category: {
+            title: string | null;
+            slug: string | null;
+          } | null;
+        }> | null;
+        latest: Array<{
+          _id: string;
+          title: string | null;
+          slug: string | null;
+          brands: Array<string> | null;
+          brandTitles: Array<{
+            key: string | null;
+            title: string | null;
+          }>;
+          publishedAt: string | null;
+          excerpt: string | null;
+          image: {
+            asset: SanityImageAssetReference | null;
+            hotspot: SanityImageHotspot | null;
+            crop: SanityImageCrop | null;
+            alt: string | null;
+          } | null;
+          category: {
+            title: string | null;
+            slug: string | null;
+          } | null;
+        }>;
+      }
+  > | null;
+  blocksMiddle: Array<
+    | {
+        _key: string;
+        _type: "cta";
+        heading: string | null;
+        text: string | null;
+        link: {
+          label: string | null;
+          href: string | null;
+        } | null;
+      }
+    | {
+        _key: string;
+        _type: "exploreGrid";
+        cards: Array<{
+          _key: string;
+          heading: Array<{
+            _key: string;
+            style: "h1" | "h2" | "h3" | "h4" | "h5" | "h6" | "normal" | null;
+            children: Array<{
+              _key: string;
+              text: string | null;
+            }> | null;
+          }> | null;
+          icon:
+            | "comment"
+            | "document"
+            | "glasses"
+            | "people-moves"
+            | "public"
+            | "star"
+            | null;
+          source: "awards" | "events" | "posts" | "research" | null;
+          count: number | null;
+          deadlineLabel: string | null;
+          button: {
+            label: string | null;
+            kind: "external" | "internal" | null;
+            external: string | null;
+            internal:
+              | {
+                  _type: "awardsProgramme";
+                  slug: string | null;
+                  brand: null;
+                  brands: null;
+                }
+              | {
+                  _type: "conferenceEvent";
+                  slug: string | null;
+                  brand: null;
+                  brands: null;
+                }
+              | {
+                  _type: "page";
+                  slug: string | null;
+                  brand:
+                    | "clearview"
+                    | "familywealthreport"
+                    | "wealthbriefing"
+                    | "wealthbriefingasia"
+                    | null;
+                  brands: null;
+                }
+              | {
+                  _type: "post";
+                  slug: string | null;
+                  brand: null;
+                  brands: Array<string> | null;
+                }
+              | {
+                  _type: "resource";
+                  slug: string | null;
+                  brand: null;
+                  brands: null;
+                }
+              | null;
+          } | null;
+          items: Array<
+            | {
+                _id: string;
+                _type: "awardsProgramme";
+                slug: string | null;
+                title: string | null;
+                category: null;
+                nominationsClosingDate: string | null;
+                startDate: string | null;
+                endDate: string | null;
+                country:
+                  | "AD"
+                  | "AE"
+                  | "AF"
+                  | "AG"
+                  | "AI"
+                  | "AL"
+                  | "AM"
+                  | "AO"
+                  | "AQ"
+                  | "AR"
+                  | "AS"
+                  | "AT"
+                  | "AU"
+                  | "AW"
+                  | "AX"
+                  | "AZ"
+                  | "BA"
+                  | "BB"
+                  | "BD"
+                  | "BE"
+                  | "BF"
+                  | "BG"
+                  | "BH"
+                  | "BI"
+                  | "BJ"
+                  | "BL"
+                  | "BM"
+                  | "BN"
+                  | "BO"
+                  | "BQ"
+                  | "BR"
+                  | "BS"
+                  | "BT"
+                  | "BV"
+                  | "BW"
+                  | "BY"
+                  | "BZ"
+                  | "CA"
+                  | "CC"
+                  | "CD"
+                  | "CF"
+                  | "CG"
+                  | "CH"
+                  | "CI"
+                  | "CK"
+                  | "CL"
+                  | "CM"
+                  | "CN"
+                  | "CO"
+                  | "CR"
+                  | "CU"
+                  | "CV"
+                  | "CW"
+                  | "CX"
+                  | "CY"
+                  | "CZ"
+                  | "DE"
+                  | "DJ"
+                  | "DK"
+                  | "DM"
+                  | "DO"
+                  | "DZ"
+                  | "EC"
+                  | "EE"
+                  | "EG"
+                  | "EH"
+                  | "ER"
+                  | "ES"
+                  | "ET"
+                  | "FI"
+                  | "FJ"
+                  | "FK"
+                  | "FM"
+                  | "FO"
+                  | "FR"
+                  | "GA"
+                  | "GB"
+                  | "GD"
+                  | "GE"
+                  | "GF"
+                  | "GG"
+                  | "GH"
+                  | "GI"
+                  | "GL"
+                  | "GM"
+                  | "GN"
+                  | "GP"
+                  | "GQ"
+                  | "GR"
+                  | "GS"
+                  | "GT"
+                  | "GU"
+                  | "GW"
+                  | "GY"
+                  | "HK"
+                  | "HM"
+                  | "HN"
+                  | "HR"
+                  | "HT"
+                  | "HU"
+                  | "ID"
+                  | "IE"
+                  | "IL"
+                  | "IM"
+                  | "IN"
+                  | "IO"
+                  | "IQ"
+                  | "IR"
+                  | "IS"
+                  | "IT"
+                  | "JE"
+                  | "JM"
+                  | "JO"
+                  | "JP"
+                  | "KE"
+                  | "KG"
+                  | "KH"
+                  | "KI"
+                  | "KM"
+                  | "KN"
+                  | "KP"
+                  | "KR"
+                  | "KW"
+                  | "KY"
+                  | "KZ"
+                  | "LA"
+                  | "LB"
+                  | "LC"
+                  | "LI"
+                  | "LK"
+                  | "LR"
+                  | "LS"
+                  | "LT"
+                  | "LU"
+                  | "LV"
+                  | "LY"
+                  | "MA"
+                  | "MC"
+                  | "MD"
+                  | "ME"
+                  | "MF"
+                  | "MG"
+                  | "MH"
+                  | "MK"
+                  | "ML"
+                  | "MM"
+                  | "MN"
+                  | "MO"
+                  | "MP"
+                  | "MQ"
+                  | "MR"
+                  | "MS"
+                  | "MT"
+                  | "MU"
+                  | "MV"
+                  | "MW"
+                  | "MX"
+                  | "MY"
+                  | "MZ"
+                  | "NA"
+                  | "NC"
+                  | "NE"
+                  | "NF"
+                  | "NG"
+                  | "NI"
+                  | "NL"
+                  | "NO"
+                  | "NP"
+                  | "NR"
+                  | "NU"
+                  | "NZ"
+                  | "OM"
+                  | "PA"
+                  | "PE"
+                  | "PF"
+                  | "PG"
+                  | "PH"
+                  | "PK"
+                  | "PL"
+                  | "PM"
+                  | "PN"
+                  | "PR"
+                  | "PS"
+                  | "PT"
+                  | "PW"
+                  | "PY"
+                  | "QA"
+                  | "RE"
+                  | "RO"
+                  | "RS"
+                  | "RU"
+                  | "RW"
+                  | "SA"
+                  | "SB"
+                  | "SC"
+                  | "SD"
+                  | "SE"
+                  | "SG"
+                  | "SH"
+                  | "SI"
+                  | "SJ"
+                  | "SK"
+                  | "SL"
+                  | "SM"
+                  | "SN"
+                  | "SO"
+                  | "SR"
+                  | "SS"
+                  | "ST"
+                  | "SV"
+                  | "SX"
+                  | "SY"
+                  | "SZ"
+                  | "TC"
+                  | "TD"
+                  | "TF"
+                  | "TG"
+                  | "TH"
+                  | "TJ"
+                  | "TK"
+                  | "TL"
+                  | "TM"
+                  | "TN"
+                  | "TO"
+                  | "TR"
+                  | "TT"
+                  | "TV"
+                  | "TW"
+                  | "TZ"
+                  | "UA"
+                  | "UG"
+                  | "UM"
+                  | "US"
+                  | "UY"
+                  | "UZ"
+                  | "VA"
+                  | "VC"
+                  | "VE"
+                  | "VG"
+                  | "VI"
+                  | "VN"
+                  | "VU"
+                  | "WF"
+                  | "WS"
+                  | "YE"
+                  | "YT"
+                  | "ZA"
+                  | "ZM"
+                  | "ZW"
+                  | null;
+                publishedAt: null;
+              }
+            | {
+                _id: string;
+                _type: "conferenceEvent";
+                slug: string | null;
+                title: string | null;
+                category: null;
+                nominationsClosingDate: null;
+                startDate: string | null;
+                endDate: string | null;
+                country:
+                  | "AD"
+                  | "AE"
+                  | "AF"
+                  | "AG"
+                  | "AI"
+                  | "AL"
+                  | "AM"
+                  | "AO"
+                  | "AQ"
+                  | "AR"
+                  | "AS"
+                  | "AT"
+                  | "AU"
+                  | "AW"
+                  | "AX"
+                  | "AZ"
+                  | "BA"
+                  | "BB"
+                  | "BD"
+                  | "BE"
+                  | "BF"
+                  | "BG"
+                  | "BH"
+                  | "BI"
+                  | "BJ"
+                  | "BL"
+                  | "BM"
+                  | "BN"
+                  | "BO"
+                  | "BQ"
+                  | "BR"
+                  | "BS"
+                  | "BT"
+                  | "BV"
+                  | "BW"
+                  | "BY"
+                  | "BZ"
+                  | "CA"
+                  | "CC"
+                  | "CD"
+                  | "CF"
+                  | "CG"
+                  | "CH"
+                  | "CI"
+                  | "CK"
+                  | "CL"
+                  | "CM"
+                  | "CN"
+                  | "CO"
+                  | "CR"
+                  | "CU"
+                  | "CV"
+                  | "CW"
+                  | "CX"
+                  | "CY"
+                  | "CZ"
+                  | "DE"
+                  | "DJ"
+                  | "DK"
+                  | "DM"
+                  | "DO"
+                  | "DZ"
+                  | "EC"
+                  | "EE"
+                  | "EG"
+                  | "EH"
+                  | "ER"
+                  | "ES"
+                  | "ET"
+                  | "FI"
+                  | "FJ"
+                  | "FK"
+                  | "FM"
+                  | "FO"
+                  | "FR"
+                  | "GA"
+                  | "GB"
+                  | "GD"
+                  | "GE"
+                  | "GF"
+                  | "GG"
+                  | "GH"
+                  | "GI"
+                  | "GL"
+                  | "GM"
+                  | "GN"
+                  | "GP"
+                  | "GQ"
+                  | "GR"
+                  | "GS"
+                  | "GT"
+                  | "GU"
+                  | "GW"
+                  | "GY"
+                  | "HK"
+                  | "HM"
+                  | "HN"
+                  | "HR"
+                  | "HT"
+                  | "HU"
+                  | "ID"
+                  | "IE"
+                  | "IL"
+                  | "IM"
+                  | "IN"
+                  | "IO"
+                  | "IQ"
+                  | "IR"
+                  | "IS"
+                  | "IT"
+                  | "JE"
+                  | "JM"
+                  | "JO"
+                  | "JP"
+                  | "KE"
+                  | "KG"
+                  | "KH"
+                  | "KI"
+                  | "KM"
+                  | "KN"
+                  | "KP"
+                  | "KR"
+                  | "KW"
+                  | "KY"
+                  | "KZ"
+                  | "LA"
+                  | "LB"
+                  | "LC"
+                  | "LI"
+                  | "LK"
+                  | "LR"
+                  | "LS"
+                  | "LT"
+                  | "LU"
+                  | "LV"
+                  | "LY"
+                  | "MA"
+                  | "MC"
+                  | "MD"
+                  | "ME"
+                  | "MF"
+                  | "MG"
+                  | "MH"
+                  | "MK"
+                  | "ML"
+                  | "MM"
+                  | "MN"
+                  | "MO"
+                  | "MP"
+                  | "MQ"
+                  | "MR"
+                  | "MS"
+                  | "MT"
+                  | "MU"
+                  | "MV"
+                  | "MW"
+                  | "MX"
+                  | "MY"
+                  | "MZ"
+                  | "NA"
+                  | "NC"
+                  | "NE"
+                  | "NF"
+                  | "NG"
+                  | "NI"
+                  | "NL"
+                  | "NO"
+                  | "NP"
+                  | "NR"
+                  | "NU"
+                  | "NZ"
+                  | "OM"
+                  | "PA"
+                  | "PE"
+                  | "PF"
+                  | "PG"
+                  | "PH"
+                  | "PK"
+                  | "PL"
+                  | "PM"
+                  | "PN"
+                  | "PR"
+                  | "PS"
+                  | "PT"
+                  | "PW"
+                  | "PY"
+                  | "QA"
+                  | "RE"
+                  | "RO"
+                  | "RS"
+                  | "RU"
+                  | "RW"
+                  | "SA"
+                  | "SB"
+                  | "SC"
+                  | "SD"
+                  | "SE"
+                  | "SG"
+                  | "SH"
+                  | "SI"
+                  | "SJ"
+                  | "SK"
+                  | "SL"
+                  | "SM"
+                  | "SN"
+                  | "SO"
+                  | "SR"
+                  | "SS"
+                  | "ST"
+                  | "SV"
+                  | "SX"
+                  | "SY"
+                  | "SZ"
+                  | "TC"
+                  | "TD"
+                  | "TF"
+                  | "TG"
+                  | "TH"
+                  | "TJ"
+                  | "TK"
+                  | "TL"
+                  | "TM"
+                  | "TN"
+                  | "TO"
+                  | "TR"
+                  | "TT"
+                  | "TV"
+                  | "TW"
+                  | "TZ"
+                  | "UA"
+                  | "UG"
+                  | "UM"
+                  | "US"
+                  | "UY"
+                  | "UZ"
+                  | "VA"
+                  | "VC"
+                  | "VE"
+                  | "VG"
+                  | "VI"
+                  | "VN"
+                  | "VU"
+                  | "WF"
+                  | "WS"
+                  | "YE"
+                  | "YT"
+                  | "ZA"
+                  | "ZM"
+                  | "ZW"
+                  | null;
+                publishedAt: null;
+              }
+            | {
+                _type: "post";
+                _id: string;
+                title: string | null;
+                slug: string | null;
+                brands: Array<string> | null;
+                brandTitles: Array<{
+                  key: string | null;
+                  title: string | null;
+                }>;
+                publishedAt: string | null;
+                excerpt: string | null;
+                image: {
+                  asset: SanityImageAssetReference | null;
+                  hotspot: SanityImageHotspot | null;
+                  crop: SanityImageCrop | null;
+                  alt: string | null;
+                } | null;
+                category: {
+                  title: string | null;
+                  slug: string | null;
+                } | null;
+              }
+            | {
+                _id: string;
+                _type: "resource";
+                slug: string | null;
+                title: string | null;
+                category: "research" | null;
+                nominationsClosingDate: null;
+                startDate: null;
+                endDate: null;
+                country: null;
+                publishedAt: string | null;
+              }
+          > | null;
+          fill:
+            | Array<{
+                _type: "post";
+                _id: string;
+                title: string | null;
+                slug: string | null;
+                brands: Array<string> | null;
+                brandTitles: Array<{
+                  key: string | null;
+                  title: string | null;
+                }>;
+                publishedAt: string | null;
+                excerpt: string | null;
+                image: {
+                  asset: SanityImageAssetReference | null;
+                  hotspot: SanityImageHotspot | null;
+                  crop: SanityImageCrop | null;
+                  alt: string | null;
+                } | null;
+                category: {
+                  title: string | null;
+                  slug: string | null;
+                } | null;
+              }>
+            | Array<{
+                _id: string;
+                _type: "resource";
+                slug: string | null;
+                title: string | null;
+                category: "research" | null;
+                nominationsClosingDate: null;
+                startDate: null;
+                endDate: null;
+                country: null;
+                publishedAt: string | null;
+              }>
+            | Array<{
+                _id: string;
+                _type: "awardsProgramme";
+                slug: string | null;
+                title: string | null;
+                category: null;
+                nominationsClosingDate: string | null;
+                startDate: string | null;
+                endDate: string | null;
+                country:
+                  | "AD"
+                  | "AE"
+                  | "AF"
+                  | "AG"
+                  | "AI"
+                  | "AL"
+                  | "AM"
+                  | "AO"
+                  | "AQ"
+                  | "AR"
+                  | "AS"
+                  | "AT"
+                  | "AU"
+                  | "AW"
+                  | "AX"
+                  | "AZ"
+                  | "BA"
+                  | "BB"
+                  | "BD"
+                  | "BE"
+                  | "BF"
+                  | "BG"
+                  | "BH"
+                  | "BI"
+                  | "BJ"
+                  | "BL"
+                  | "BM"
+                  | "BN"
+                  | "BO"
+                  | "BQ"
+                  | "BR"
+                  | "BS"
+                  | "BT"
+                  | "BV"
+                  | "BW"
+                  | "BY"
+                  | "BZ"
+                  | "CA"
+                  | "CC"
+                  | "CD"
+                  | "CF"
+                  | "CG"
+                  | "CH"
+                  | "CI"
+                  | "CK"
+                  | "CL"
+                  | "CM"
+                  | "CN"
+                  | "CO"
+                  | "CR"
+                  | "CU"
+                  | "CV"
+                  | "CW"
+                  | "CX"
+                  | "CY"
+                  | "CZ"
+                  | "DE"
+                  | "DJ"
+                  | "DK"
+                  | "DM"
+                  | "DO"
+                  | "DZ"
+                  | "EC"
+                  | "EE"
+                  | "EG"
+                  | "EH"
+                  | "ER"
+                  | "ES"
+                  | "ET"
+                  | "FI"
+                  | "FJ"
+                  | "FK"
+                  | "FM"
+                  | "FO"
+                  | "FR"
+                  | "GA"
+                  | "GB"
+                  | "GD"
+                  | "GE"
+                  | "GF"
+                  | "GG"
+                  | "GH"
+                  | "GI"
+                  | "GL"
+                  | "GM"
+                  | "GN"
+                  | "GP"
+                  | "GQ"
+                  | "GR"
+                  | "GS"
+                  | "GT"
+                  | "GU"
+                  | "GW"
+                  | "GY"
+                  | "HK"
+                  | "HM"
+                  | "HN"
+                  | "HR"
+                  | "HT"
+                  | "HU"
+                  | "ID"
+                  | "IE"
+                  | "IL"
+                  | "IM"
+                  | "IN"
+                  | "IO"
+                  | "IQ"
+                  | "IR"
+                  | "IS"
+                  | "IT"
+                  | "JE"
+                  | "JM"
+                  | "JO"
+                  | "JP"
+                  | "KE"
+                  | "KG"
+                  | "KH"
+                  | "KI"
+                  | "KM"
+                  | "KN"
+                  | "KP"
+                  | "KR"
+                  | "KW"
+                  | "KY"
+                  | "KZ"
+                  | "LA"
+                  | "LB"
+                  | "LC"
+                  | "LI"
+                  | "LK"
+                  | "LR"
+                  | "LS"
+                  | "LT"
+                  | "LU"
+                  | "LV"
+                  | "LY"
+                  | "MA"
+                  | "MC"
+                  | "MD"
+                  | "ME"
+                  | "MF"
+                  | "MG"
+                  | "MH"
+                  | "MK"
+                  | "ML"
+                  | "MM"
+                  | "MN"
+                  | "MO"
+                  | "MP"
+                  | "MQ"
+                  | "MR"
+                  | "MS"
+                  | "MT"
+                  | "MU"
+                  | "MV"
+                  | "MW"
+                  | "MX"
+                  | "MY"
+                  | "MZ"
+                  | "NA"
+                  | "NC"
+                  | "NE"
+                  | "NF"
+                  | "NG"
+                  | "NI"
+                  | "NL"
+                  | "NO"
+                  | "NP"
+                  | "NR"
+                  | "NU"
+                  | "NZ"
+                  | "OM"
+                  | "PA"
+                  | "PE"
+                  | "PF"
+                  | "PG"
+                  | "PH"
+                  | "PK"
+                  | "PL"
+                  | "PM"
+                  | "PN"
+                  | "PR"
+                  | "PS"
+                  | "PT"
+                  | "PW"
+                  | "PY"
+                  | "QA"
+                  | "RE"
+                  | "RO"
+                  | "RS"
+                  | "RU"
+                  | "RW"
+                  | "SA"
+                  | "SB"
+                  | "SC"
+                  | "SD"
+                  | "SE"
+                  | "SG"
+                  | "SH"
+                  | "SI"
+                  | "SJ"
+                  | "SK"
+                  | "SL"
+                  | "SM"
+                  | "SN"
+                  | "SO"
+                  | "SR"
+                  | "SS"
+                  | "ST"
+                  | "SV"
+                  | "SX"
+                  | "SY"
+                  | "SZ"
+                  | "TC"
+                  | "TD"
+                  | "TF"
+                  | "TG"
+                  | "TH"
+                  | "TJ"
+                  | "TK"
+                  | "TL"
+                  | "TM"
+                  | "TN"
+                  | "TO"
+                  | "TR"
+                  | "TT"
+                  | "TV"
+                  | "TW"
+                  | "TZ"
+                  | "UA"
+                  | "UG"
+                  | "UM"
+                  | "US"
+                  | "UY"
+                  | "UZ"
+                  | "VA"
+                  | "VC"
+                  | "VE"
+                  | "VG"
+                  | "VI"
+                  | "VN"
+                  | "VU"
+                  | "WF"
+                  | "WS"
+                  | "YE"
+                  | "YT"
+                  | "ZA"
+                  | "ZM"
+                  | "ZW"
+                  | null;
+                publishedAt: null;
+              }>
+            | Array<{
+                _id: string;
+                _type: "conferenceEvent";
+                slug: string | null;
+                title: string | null;
+                category: null;
+                nominationsClosingDate: null;
+                startDate: string | null;
+                endDate: string | null;
+                country:
+                  | "AD"
+                  | "AE"
+                  | "AF"
+                  | "AG"
+                  | "AI"
+                  | "AL"
+                  | "AM"
+                  | "AO"
+                  | "AQ"
+                  | "AR"
+                  | "AS"
+                  | "AT"
+                  | "AU"
+                  | "AW"
+                  | "AX"
+                  | "AZ"
+                  | "BA"
+                  | "BB"
+                  | "BD"
+                  | "BE"
+                  | "BF"
+                  | "BG"
+                  | "BH"
+                  | "BI"
+                  | "BJ"
+                  | "BL"
+                  | "BM"
+                  | "BN"
+                  | "BO"
+                  | "BQ"
+                  | "BR"
+                  | "BS"
+                  | "BT"
+                  | "BV"
+                  | "BW"
+                  | "BY"
+                  | "BZ"
+                  | "CA"
+                  | "CC"
+                  | "CD"
+                  | "CF"
+                  | "CG"
+                  | "CH"
+                  | "CI"
+                  | "CK"
+                  | "CL"
+                  | "CM"
+                  | "CN"
+                  | "CO"
+                  | "CR"
+                  | "CU"
+                  | "CV"
+                  | "CW"
+                  | "CX"
+                  | "CY"
+                  | "CZ"
+                  | "DE"
+                  | "DJ"
+                  | "DK"
+                  | "DM"
+                  | "DO"
+                  | "DZ"
+                  | "EC"
+                  | "EE"
+                  | "EG"
+                  | "EH"
+                  | "ER"
+                  | "ES"
+                  | "ET"
+                  | "FI"
+                  | "FJ"
+                  | "FK"
+                  | "FM"
+                  | "FO"
+                  | "FR"
+                  | "GA"
+                  | "GB"
+                  | "GD"
+                  | "GE"
+                  | "GF"
+                  | "GG"
+                  | "GH"
+                  | "GI"
+                  | "GL"
+                  | "GM"
+                  | "GN"
+                  | "GP"
+                  | "GQ"
+                  | "GR"
+                  | "GS"
+                  | "GT"
+                  | "GU"
+                  | "GW"
+                  | "GY"
+                  | "HK"
+                  | "HM"
+                  | "HN"
+                  | "HR"
+                  | "HT"
+                  | "HU"
+                  | "ID"
+                  | "IE"
+                  | "IL"
+                  | "IM"
+                  | "IN"
+                  | "IO"
+                  | "IQ"
+                  | "IR"
+                  | "IS"
+                  | "IT"
+                  | "JE"
+                  | "JM"
+                  | "JO"
+                  | "JP"
+                  | "KE"
+                  | "KG"
+                  | "KH"
+                  | "KI"
+                  | "KM"
+                  | "KN"
+                  | "KP"
+                  | "KR"
+                  | "KW"
+                  | "KY"
+                  | "KZ"
+                  | "LA"
+                  | "LB"
+                  | "LC"
+                  | "LI"
+                  | "LK"
+                  | "LR"
+                  | "LS"
+                  | "LT"
+                  | "LU"
+                  | "LV"
+                  | "LY"
+                  | "MA"
+                  | "MC"
+                  | "MD"
+                  | "ME"
+                  | "MF"
+                  | "MG"
+                  | "MH"
+                  | "MK"
+                  | "ML"
+                  | "MM"
+                  | "MN"
+                  | "MO"
+                  | "MP"
+                  | "MQ"
+                  | "MR"
+                  | "MS"
+                  | "MT"
+                  | "MU"
+                  | "MV"
+                  | "MW"
+                  | "MX"
+                  | "MY"
+                  | "MZ"
+                  | "NA"
+                  | "NC"
+                  | "NE"
+                  | "NF"
+                  | "NG"
+                  | "NI"
+                  | "NL"
+                  | "NO"
+                  | "NP"
+                  | "NR"
+                  | "NU"
+                  | "NZ"
+                  | "OM"
+                  | "PA"
+                  | "PE"
+                  | "PF"
+                  | "PG"
+                  | "PH"
+                  | "PK"
+                  | "PL"
+                  | "PM"
+                  | "PN"
+                  | "PR"
+                  | "PS"
+                  | "PT"
+                  | "PW"
+                  | "PY"
+                  | "QA"
+                  | "RE"
+                  | "RO"
+                  | "RS"
+                  | "RU"
+                  | "RW"
+                  | "SA"
+                  | "SB"
+                  | "SC"
+                  | "SD"
+                  | "SE"
+                  | "SG"
+                  | "SH"
+                  | "SI"
+                  | "SJ"
+                  | "SK"
+                  | "SL"
+                  | "SM"
+                  | "SN"
+                  | "SO"
+                  | "SR"
+                  | "SS"
+                  | "ST"
+                  | "SV"
+                  | "SX"
+                  | "SY"
+                  | "SZ"
+                  | "TC"
+                  | "TD"
+                  | "TF"
+                  | "TG"
+                  | "TH"
+                  | "TJ"
+                  | "TK"
+                  | "TL"
+                  | "TM"
+                  | "TN"
+                  | "TO"
+                  | "TR"
+                  | "TT"
+                  | "TV"
+                  | "TW"
+                  | "TZ"
+                  | "UA"
+                  | "UG"
+                  | "UM"
+                  | "US"
+                  | "UY"
+                  | "UZ"
+                  | "VA"
+                  | "VC"
+                  | "VE"
+                  | "VG"
+                  | "VI"
+                  | "VN"
+                  | "VU"
+                  | "WF"
+                  | "WS"
+                  | "YE"
+                  | "YT"
+                  | "ZA"
+                  | "ZM"
+                  | "ZW"
+                  | null;
+                publishedAt: null;
+              }>;
+        }> | null;
+      }
+    | {
+        _key: string;
+        _type: "featuredStories";
+        heading: Array<{
+          _key: string;
+          style: "h1" | "h2" | "h3" | "h4" | "h5" | "h6" | "normal" | null;
+          children: Array<{
+            _key: string;
+            text: string | null;
+          }> | null;
+        }> | null;
+        link: {
+          label: string | null;
+          kind: "external" | "internal" | null;
+          external: string | null;
+          internal:
+            | {
+                _type: "awardsProgramme";
+                slug: string | null;
+                brand: null;
+                brands: null;
+              }
+            | {
+                _type: "conferenceEvent";
+                slug: string | null;
+                brand: null;
+                brands: null;
+              }
+            | {
+                _type: "page";
+                slug: string | null;
+                brand:
+                  | "clearview"
+                  | "familywealthreport"
+                  | "wealthbriefing"
+                  | "wealthbriefingasia"
+                  | null;
+                brands: null;
+              }
+            | {
+                _type: "post";
+                slug: string | null;
+                brand: null;
+                brands: Array<string> | null;
+              }
+            | {
+                _type: "resource";
+                slug: string | null;
+                brand: null;
+                brands: null;
+              }
+            | null;
+        } | null;
+        posts: Array<{
+          _id: string;
+          title: string | null;
+          slug: string | null;
+          brands: Array<string> | null;
+          brandTitles: Array<{
+            key: string | null;
+            title: string | null;
+          }>;
+          publishedAt: string | null;
+          excerpt: string | null;
+          image: {
+            asset: SanityImageAssetReference | null;
+            hotspot: SanityImageHotspot | null;
+            crop: SanityImageCrop | null;
+            alt: string | null;
+          } | null;
+          category: {
+            title: string | null;
+            slug: string | null;
+          } | null;
+        }> | null;
+      }
+    | {
+        _key: string;
+        _type: "highlights";
+        source: "awards" | "events" | "research" | null;
+        count: number | null;
+        heading: Array<{
+          _key: string;
+          style: "h1" | "h2" | "h3" | "h4" | "h5" | "h6" | "normal" | null;
+          children: Array<{
+            _key: string;
+            text: string | null;
+          }> | null;
+        }> | null;
+        deadlineLabel: string | null;
+        items: Array<
+          | {
+              _id: string;
+              _type: "awardsProgramme";
+              slug: string | null;
+              title: string | null;
+              category: null;
+              nominationsClosingDate: string | null;
+              startDate: string | null;
+              endDate: string | null;
+              country:
+                | "AD"
+                | "AE"
+                | "AF"
+                | "AG"
+                | "AI"
+                | "AL"
+                | "AM"
+                | "AO"
+                | "AQ"
+                | "AR"
+                | "AS"
+                | "AT"
+                | "AU"
+                | "AW"
+                | "AX"
+                | "AZ"
+                | "BA"
+                | "BB"
+                | "BD"
+                | "BE"
+                | "BF"
+                | "BG"
+                | "BH"
+                | "BI"
+                | "BJ"
+                | "BL"
+                | "BM"
+                | "BN"
+                | "BO"
+                | "BQ"
+                | "BR"
+                | "BS"
+                | "BT"
+                | "BV"
+                | "BW"
+                | "BY"
+                | "BZ"
+                | "CA"
+                | "CC"
+                | "CD"
+                | "CF"
+                | "CG"
+                | "CH"
+                | "CI"
+                | "CK"
+                | "CL"
+                | "CM"
+                | "CN"
+                | "CO"
+                | "CR"
+                | "CU"
+                | "CV"
+                | "CW"
+                | "CX"
+                | "CY"
+                | "CZ"
+                | "DE"
+                | "DJ"
+                | "DK"
+                | "DM"
+                | "DO"
+                | "DZ"
+                | "EC"
+                | "EE"
+                | "EG"
+                | "EH"
+                | "ER"
+                | "ES"
+                | "ET"
+                | "FI"
+                | "FJ"
+                | "FK"
+                | "FM"
+                | "FO"
+                | "FR"
+                | "GA"
+                | "GB"
+                | "GD"
+                | "GE"
+                | "GF"
+                | "GG"
+                | "GH"
+                | "GI"
+                | "GL"
+                | "GM"
+                | "GN"
+                | "GP"
+                | "GQ"
+                | "GR"
+                | "GS"
+                | "GT"
+                | "GU"
+                | "GW"
+                | "GY"
+                | "HK"
+                | "HM"
+                | "HN"
+                | "HR"
+                | "HT"
+                | "HU"
+                | "ID"
+                | "IE"
+                | "IL"
+                | "IM"
+                | "IN"
+                | "IO"
+                | "IQ"
+                | "IR"
+                | "IS"
+                | "IT"
+                | "JE"
+                | "JM"
+                | "JO"
+                | "JP"
+                | "KE"
+                | "KG"
+                | "KH"
+                | "KI"
+                | "KM"
+                | "KN"
+                | "KP"
+                | "KR"
+                | "KW"
+                | "KY"
+                | "KZ"
+                | "LA"
+                | "LB"
+                | "LC"
+                | "LI"
+                | "LK"
+                | "LR"
+                | "LS"
+                | "LT"
+                | "LU"
+                | "LV"
+                | "LY"
+                | "MA"
+                | "MC"
+                | "MD"
+                | "ME"
+                | "MF"
+                | "MG"
+                | "MH"
+                | "MK"
+                | "ML"
+                | "MM"
+                | "MN"
+                | "MO"
+                | "MP"
+                | "MQ"
+                | "MR"
+                | "MS"
+                | "MT"
+                | "MU"
+                | "MV"
+                | "MW"
+                | "MX"
+                | "MY"
+                | "MZ"
+                | "NA"
+                | "NC"
+                | "NE"
+                | "NF"
+                | "NG"
+                | "NI"
+                | "NL"
+                | "NO"
+                | "NP"
+                | "NR"
+                | "NU"
+                | "NZ"
+                | "OM"
+                | "PA"
+                | "PE"
+                | "PF"
+                | "PG"
+                | "PH"
+                | "PK"
+                | "PL"
+                | "PM"
+                | "PN"
+                | "PR"
+                | "PS"
+                | "PT"
+                | "PW"
+                | "PY"
+                | "QA"
+                | "RE"
+                | "RO"
+                | "RS"
+                | "RU"
+                | "RW"
+                | "SA"
+                | "SB"
+                | "SC"
+                | "SD"
+                | "SE"
+                | "SG"
+                | "SH"
+                | "SI"
+                | "SJ"
+                | "SK"
+                | "SL"
+                | "SM"
+                | "SN"
+                | "SO"
+                | "SR"
+                | "SS"
+                | "ST"
+                | "SV"
+                | "SX"
+                | "SY"
+                | "SZ"
+                | "TC"
+                | "TD"
+                | "TF"
+                | "TG"
+                | "TH"
+                | "TJ"
+                | "TK"
+                | "TL"
+                | "TM"
+                | "TN"
+                | "TO"
+                | "TR"
+                | "TT"
+                | "TV"
+                | "TW"
+                | "TZ"
+                | "UA"
+                | "UG"
+                | "UM"
+                | "US"
+                | "UY"
+                | "UZ"
+                | "VA"
+                | "VC"
+                | "VE"
+                | "VG"
+                | "VI"
+                | "VN"
+                | "VU"
+                | "WF"
+                | "WS"
+                | "YE"
+                | "YT"
+                | "ZA"
+                | "ZM"
+                | "ZW"
+                | null;
+              publishedAt: null;
+            }
+          | {
+              _id: string;
+              _type: "conferenceEvent";
+              slug: string | null;
+              title: string | null;
+              category: null;
+              nominationsClosingDate: null;
+              startDate: string | null;
+              endDate: string | null;
+              country:
+                | "AD"
+                | "AE"
+                | "AF"
+                | "AG"
+                | "AI"
+                | "AL"
+                | "AM"
+                | "AO"
+                | "AQ"
+                | "AR"
+                | "AS"
+                | "AT"
+                | "AU"
+                | "AW"
+                | "AX"
+                | "AZ"
+                | "BA"
+                | "BB"
+                | "BD"
+                | "BE"
+                | "BF"
+                | "BG"
+                | "BH"
+                | "BI"
+                | "BJ"
+                | "BL"
+                | "BM"
+                | "BN"
+                | "BO"
+                | "BQ"
+                | "BR"
+                | "BS"
+                | "BT"
+                | "BV"
+                | "BW"
+                | "BY"
+                | "BZ"
+                | "CA"
+                | "CC"
+                | "CD"
+                | "CF"
+                | "CG"
+                | "CH"
+                | "CI"
+                | "CK"
+                | "CL"
+                | "CM"
+                | "CN"
+                | "CO"
+                | "CR"
+                | "CU"
+                | "CV"
+                | "CW"
+                | "CX"
+                | "CY"
+                | "CZ"
+                | "DE"
+                | "DJ"
+                | "DK"
+                | "DM"
+                | "DO"
+                | "DZ"
+                | "EC"
+                | "EE"
+                | "EG"
+                | "EH"
+                | "ER"
+                | "ES"
+                | "ET"
+                | "FI"
+                | "FJ"
+                | "FK"
+                | "FM"
+                | "FO"
+                | "FR"
+                | "GA"
+                | "GB"
+                | "GD"
+                | "GE"
+                | "GF"
+                | "GG"
+                | "GH"
+                | "GI"
+                | "GL"
+                | "GM"
+                | "GN"
+                | "GP"
+                | "GQ"
+                | "GR"
+                | "GS"
+                | "GT"
+                | "GU"
+                | "GW"
+                | "GY"
+                | "HK"
+                | "HM"
+                | "HN"
+                | "HR"
+                | "HT"
+                | "HU"
+                | "ID"
+                | "IE"
+                | "IL"
+                | "IM"
+                | "IN"
+                | "IO"
+                | "IQ"
+                | "IR"
+                | "IS"
+                | "IT"
+                | "JE"
+                | "JM"
+                | "JO"
+                | "JP"
+                | "KE"
+                | "KG"
+                | "KH"
+                | "KI"
+                | "KM"
+                | "KN"
+                | "KP"
+                | "KR"
+                | "KW"
+                | "KY"
+                | "KZ"
+                | "LA"
+                | "LB"
+                | "LC"
+                | "LI"
+                | "LK"
+                | "LR"
+                | "LS"
+                | "LT"
+                | "LU"
+                | "LV"
+                | "LY"
+                | "MA"
+                | "MC"
+                | "MD"
+                | "ME"
+                | "MF"
+                | "MG"
+                | "MH"
+                | "MK"
+                | "ML"
+                | "MM"
+                | "MN"
+                | "MO"
+                | "MP"
+                | "MQ"
+                | "MR"
+                | "MS"
+                | "MT"
+                | "MU"
+                | "MV"
+                | "MW"
+                | "MX"
+                | "MY"
+                | "MZ"
+                | "NA"
+                | "NC"
+                | "NE"
+                | "NF"
+                | "NG"
+                | "NI"
+                | "NL"
+                | "NO"
+                | "NP"
+                | "NR"
+                | "NU"
+                | "NZ"
+                | "OM"
+                | "PA"
+                | "PE"
+                | "PF"
+                | "PG"
+                | "PH"
+                | "PK"
+                | "PL"
+                | "PM"
+                | "PN"
+                | "PR"
+                | "PS"
+                | "PT"
+                | "PW"
+                | "PY"
+                | "QA"
+                | "RE"
+                | "RO"
+                | "RS"
+                | "RU"
+                | "RW"
+                | "SA"
+                | "SB"
+                | "SC"
+                | "SD"
+                | "SE"
+                | "SG"
+                | "SH"
+                | "SI"
+                | "SJ"
+                | "SK"
+                | "SL"
+                | "SM"
+                | "SN"
+                | "SO"
+                | "SR"
+                | "SS"
+                | "ST"
+                | "SV"
+                | "SX"
+                | "SY"
+                | "SZ"
+                | "TC"
+                | "TD"
+                | "TF"
+                | "TG"
+                | "TH"
+                | "TJ"
+                | "TK"
+                | "TL"
+                | "TM"
+                | "TN"
+                | "TO"
+                | "TR"
+                | "TT"
+                | "TV"
+                | "TW"
+                | "TZ"
+                | "UA"
+                | "UG"
+                | "UM"
+                | "US"
+                | "UY"
+                | "UZ"
+                | "VA"
+                | "VC"
+                | "VE"
+                | "VG"
+                | "VI"
+                | "VN"
+                | "VU"
+                | "WF"
+                | "WS"
+                | "YE"
+                | "YT"
+                | "ZA"
+                | "ZM"
+                | "ZW"
+                | null;
+              publishedAt: null;
+            }
+          | {
+              _id: string;
+              _type: "resource";
+              slug: string | null;
+              title: string | null;
+              category: "research" | null;
+              nominationsClosingDate: null;
+              startDate: null;
+              endDate: null;
+              country: null;
+              publishedAt: string | null;
+            }
+        > | null;
+        fill:
+          | Array<{
+              _id: string;
+              _type: "resource";
+              slug: string | null;
+              title: string | null;
+              category: "research" | null;
+              nominationsClosingDate: null;
+              startDate: null;
+              endDate: null;
+              country: null;
+              publishedAt: string | null;
+            }>
+          | Array<{
+              _id: string;
+              _type: "awardsProgramme";
+              slug: string | null;
+              title: string | null;
+              category: null;
+              nominationsClosingDate: string | null;
+              startDate: string | null;
+              endDate: string | null;
+              country:
+                | "AD"
+                | "AE"
+                | "AF"
+                | "AG"
+                | "AI"
+                | "AL"
+                | "AM"
+                | "AO"
+                | "AQ"
+                | "AR"
+                | "AS"
+                | "AT"
+                | "AU"
+                | "AW"
+                | "AX"
+                | "AZ"
+                | "BA"
+                | "BB"
+                | "BD"
+                | "BE"
+                | "BF"
+                | "BG"
+                | "BH"
+                | "BI"
+                | "BJ"
+                | "BL"
+                | "BM"
+                | "BN"
+                | "BO"
+                | "BQ"
+                | "BR"
+                | "BS"
+                | "BT"
+                | "BV"
+                | "BW"
+                | "BY"
+                | "BZ"
+                | "CA"
+                | "CC"
+                | "CD"
+                | "CF"
+                | "CG"
+                | "CH"
+                | "CI"
+                | "CK"
+                | "CL"
+                | "CM"
+                | "CN"
+                | "CO"
+                | "CR"
+                | "CU"
+                | "CV"
+                | "CW"
+                | "CX"
+                | "CY"
+                | "CZ"
+                | "DE"
+                | "DJ"
+                | "DK"
+                | "DM"
+                | "DO"
+                | "DZ"
+                | "EC"
+                | "EE"
+                | "EG"
+                | "EH"
+                | "ER"
+                | "ES"
+                | "ET"
+                | "FI"
+                | "FJ"
+                | "FK"
+                | "FM"
+                | "FO"
+                | "FR"
+                | "GA"
+                | "GB"
+                | "GD"
+                | "GE"
+                | "GF"
+                | "GG"
+                | "GH"
+                | "GI"
+                | "GL"
+                | "GM"
+                | "GN"
+                | "GP"
+                | "GQ"
+                | "GR"
+                | "GS"
+                | "GT"
+                | "GU"
+                | "GW"
+                | "GY"
+                | "HK"
+                | "HM"
+                | "HN"
+                | "HR"
+                | "HT"
+                | "HU"
+                | "ID"
+                | "IE"
+                | "IL"
+                | "IM"
+                | "IN"
+                | "IO"
+                | "IQ"
+                | "IR"
+                | "IS"
+                | "IT"
+                | "JE"
+                | "JM"
+                | "JO"
+                | "JP"
+                | "KE"
+                | "KG"
+                | "KH"
+                | "KI"
+                | "KM"
+                | "KN"
+                | "KP"
+                | "KR"
+                | "KW"
+                | "KY"
+                | "KZ"
+                | "LA"
+                | "LB"
+                | "LC"
+                | "LI"
+                | "LK"
+                | "LR"
+                | "LS"
+                | "LT"
+                | "LU"
+                | "LV"
+                | "LY"
+                | "MA"
+                | "MC"
+                | "MD"
+                | "ME"
+                | "MF"
+                | "MG"
+                | "MH"
+                | "MK"
+                | "ML"
+                | "MM"
+                | "MN"
+                | "MO"
+                | "MP"
+                | "MQ"
+                | "MR"
+                | "MS"
+                | "MT"
+                | "MU"
+                | "MV"
+                | "MW"
+                | "MX"
+                | "MY"
+                | "MZ"
+                | "NA"
+                | "NC"
+                | "NE"
+                | "NF"
+                | "NG"
+                | "NI"
+                | "NL"
+                | "NO"
+                | "NP"
+                | "NR"
+                | "NU"
+                | "NZ"
+                | "OM"
+                | "PA"
+                | "PE"
+                | "PF"
+                | "PG"
+                | "PH"
+                | "PK"
+                | "PL"
+                | "PM"
+                | "PN"
+                | "PR"
+                | "PS"
+                | "PT"
+                | "PW"
+                | "PY"
+                | "QA"
+                | "RE"
+                | "RO"
+                | "RS"
+                | "RU"
+                | "RW"
+                | "SA"
+                | "SB"
+                | "SC"
+                | "SD"
+                | "SE"
+                | "SG"
+                | "SH"
+                | "SI"
+                | "SJ"
+                | "SK"
+                | "SL"
+                | "SM"
+                | "SN"
+                | "SO"
+                | "SR"
+                | "SS"
+                | "ST"
+                | "SV"
+                | "SX"
+                | "SY"
+                | "SZ"
+                | "TC"
+                | "TD"
+                | "TF"
+                | "TG"
+                | "TH"
+                | "TJ"
+                | "TK"
+                | "TL"
+                | "TM"
+                | "TN"
+                | "TO"
+                | "TR"
+                | "TT"
+                | "TV"
+                | "TW"
+                | "TZ"
+                | "UA"
+                | "UG"
+                | "UM"
+                | "US"
+                | "UY"
+                | "UZ"
+                | "VA"
+                | "VC"
+                | "VE"
+                | "VG"
+                | "VI"
+                | "VN"
+                | "VU"
+                | "WF"
+                | "WS"
+                | "YE"
+                | "YT"
+                | "ZA"
+                | "ZM"
+                | "ZW"
+                | null;
+              publishedAt: null;
+            }>
+          | Array<{
+              _id: string;
+              _type: "conferenceEvent";
+              slug: string | null;
+              title: string | null;
+              category: null;
+              nominationsClosingDate: null;
+              startDate: string | null;
+              endDate: string | null;
+              country:
+                | "AD"
+                | "AE"
+                | "AF"
+                | "AG"
+                | "AI"
+                | "AL"
+                | "AM"
+                | "AO"
+                | "AQ"
+                | "AR"
+                | "AS"
+                | "AT"
+                | "AU"
+                | "AW"
+                | "AX"
+                | "AZ"
+                | "BA"
+                | "BB"
+                | "BD"
+                | "BE"
+                | "BF"
+                | "BG"
+                | "BH"
+                | "BI"
+                | "BJ"
+                | "BL"
+                | "BM"
+                | "BN"
+                | "BO"
+                | "BQ"
+                | "BR"
+                | "BS"
+                | "BT"
+                | "BV"
+                | "BW"
+                | "BY"
+                | "BZ"
+                | "CA"
+                | "CC"
+                | "CD"
+                | "CF"
+                | "CG"
+                | "CH"
+                | "CI"
+                | "CK"
+                | "CL"
+                | "CM"
+                | "CN"
+                | "CO"
+                | "CR"
+                | "CU"
+                | "CV"
+                | "CW"
+                | "CX"
+                | "CY"
+                | "CZ"
+                | "DE"
+                | "DJ"
+                | "DK"
+                | "DM"
+                | "DO"
+                | "DZ"
+                | "EC"
+                | "EE"
+                | "EG"
+                | "EH"
+                | "ER"
+                | "ES"
+                | "ET"
+                | "FI"
+                | "FJ"
+                | "FK"
+                | "FM"
+                | "FO"
+                | "FR"
+                | "GA"
+                | "GB"
+                | "GD"
+                | "GE"
+                | "GF"
+                | "GG"
+                | "GH"
+                | "GI"
+                | "GL"
+                | "GM"
+                | "GN"
+                | "GP"
+                | "GQ"
+                | "GR"
+                | "GS"
+                | "GT"
+                | "GU"
+                | "GW"
+                | "GY"
+                | "HK"
+                | "HM"
+                | "HN"
+                | "HR"
+                | "HT"
+                | "HU"
+                | "ID"
+                | "IE"
+                | "IL"
+                | "IM"
+                | "IN"
+                | "IO"
+                | "IQ"
+                | "IR"
+                | "IS"
+                | "IT"
+                | "JE"
+                | "JM"
+                | "JO"
+                | "JP"
+                | "KE"
+                | "KG"
+                | "KH"
+                | "KI"
+                | "KM"
+                | "KN"
+                | "KP"
+                | "KR"
+                | "KW"
+                | "KY"
+                | "KZ"
+                | "LA"
+                | "LB"
+                | "LC"
+                | "LI"
+                | "LK"
+                | "LR"
+                | "LS"
+                | "LT"
+                | "LU"
+                | "LV"
+                | "LY"
+                | "MA"
+                | "MC"
+                | "MD"
+                | "ME"
+                | "MF"
+                | "MG"
+                | "MH"
+                | "MK"
+                | "ML"
+                | "MM"
+                | "MN"
+                | "MO"
+                | "MP"
+                | "MQ"
+                | "MR"
+                | "MS"
+                | "MT"
+                | "MU"
+                | "MV"
+                | "MW"
+                | "MX"
+                | "MY"
+                | "MZ"
+                | "NA"
+                | "NC"
+                | "NE"
+                | "NF"
+                | "NG"
+                | "NI"
+                | "NL"
+                | "NO"
+                | "NP"
+                | "NR"
+                | "NU"
+                | "NZ"
+                | "OM"
+                | "PA"
+                | "PE"
+                | "PF"
+                | "PG"
+                | "PH"
+                | "PK"
+                | "PL"
+                | "PM"
+                | "PN"
+                | "PR"
+                | "PS"
+                | "PT"
+                | "PW"
+                | "PY"
+                | "QA"
+                | "RE"
+                | "RO"
+                | "RS"
+                | "RU"
+                | "RW"
+                | "SA"
+                | "SB"
+                | "SC"
+                | "SD"
+                | "SE"
+                | "SG"
+                | "SH"
+                | "SI"
+                | "SJ"
+                | "SK"
+                | "SL"
+                | "SM"
+                | "SN"
+                | "SO"
+                | "SR"
+                | "SS"
+                | "ST"
+                | "SV"
+                | "SX"
+                | "SY"
+                | "SZ"
+                | "TC"
+                | "TD"
+                | "TF"
+                | "TG"
+                | "TH"
+                | "TJ"
+                | "TK"
+                | "TL"
+                | "TM"
+                | "TN"
+                | "TO"
+                | "TR"
+                | "TT"
+                | "TV"
+                | "TW"
+                | "TZ"
+                | "UA"
+                | "UG"
+                | "UM"
+                | "US"
+                | "UY"
+                | "UZ"
+                | "VA"
+                | "VC"
+                | "VE"
+                | "VG"
+                | "VI"
+                | "VN"
+                | "VU"
+                | "WF"
+                | "WS"
+                | "YE"
+                | "YT"
+                | "ZA"
+                | "ZM"
+                | "ZW"
+                | null;
+              publishedAt: null;
+            }>;
+        button: {
+          label: string | null;
+          kind: "external" | "internal" | null;
+          external: string | null;
+          internal:
+            | {
+                _type: "awardsProgramme";
+                slug: string | null;
+                brand: null;
+                brands: null;
+              }
+            | {
+                _type: "conferenceEvent";
+                slug: string | null;
+                brand: null;
+                brands: null;
+              }
+            | {
+                _type: "page";
+                slug: string | null;
+                brand:
+                  | "clearview"
+                  | "familywealthreport"
+                  | "wealthbriefing"
+                  | "wealthbriefingasia"
+                  | null;
+                brands: null;
+              }
+            | {
+                _type: "post";
+                slug: string | null;
+                brand: null;
+                brands: Array<string> | null;
+              }
+            | {
+                _type: "resource";
+                slug: string | null;
+                brand: null;
+                brands: null;
+              }
+            | null;
+        } | null;
+        promo: {
+          resource: {
+            title: string | null;
+            downloadThumbnail: {
+              asset: SanityImageAssetReference | null;
+              hotspot: SanityImageHotspot | null;
+              crop: SanityImageCrop | null;
+              alt: string | null;
+            } | null;
+            downloadFileUrl: string | null;
+            downloadFileName: string | null;
+            downloadUrl: string | null;
+          } | null;
+          title: string | null;
+          description: string | null;
+          image: {
+            asset: SanityImageAssetReference | null;
+            hotspot: SanityImageHotspot | null;
+            crop: SanityImageCrop | null;
+            alt: string | null;
+          } | null;
+          link: {
+            kind: "external" | "internal" | null;
+            external: string | null;
+            internal:
+              | {
+                  _type: "awardsProgramme";
+                  slug: string | null;
+                  brand: null;
+                  brands: null;
+                }
+              | {
+                  _type: "conferenceEvent";
+                  slug: string | null;
+                  brand: null;
+                  brands: null;
+                }
+              | {
+                  _type: "page";
+                  slug: string | null;
+                  brand:
+                    | "clearview"
+                    | "familywealthreport"
+                    | "wealthbriefing"
+                    | "wealthbriefingasia"
+                    | null;
+                  brands: null;
+                }
+              | {
+                  _type: "post";
+                  slug: string | null;
+                  brand: null;
+                  brands: Array<string> | null;
+                }
+              | {
+                  _type: "resource";
+                  slug: string | null;
+                  brand: null;
+                  brands: null;
+                }
+              | null;
+          } | null;
+        } | null;
+      }
+    | {
+        _key: string;
+        _type: "newsletterSignup";
+        heading: Array<{
+          _key: string;
+          style: "h1" | "h2" | "h3" | "h4" | "h5" | "h6" | "normal" | null;
+          children: Array<{
+            _key: string;
+            text: string | null;
+          }> | null;
+        }> | null;
+        body: string | null;
+        preferencesLabel: string | null;
+        options: Array<{
+          _key: string;
+          label: string | null;
+          defaultChecked: boolean | null;
+          interestKey: string | null;
+        }> | null;
+        emailPlaceholder: string | null;
+        buttonLabel: string | null;
+        invalidEmailMessage: string | null;
+        noOptionMessage: string | null;
+        image: {
+          asset: SanityImageAssetReference | null;
+          hotspot: SanityImageHotspot | null;
+          crop: SanityImageCrop | null;
+          alt: string | null;
+        } | null;
+      }
+    | {
+        _key: string;
+        _type: "postBriefs";
+        heading: Array<{
+          _key: string;
+          style: "h1" | "h2" | "h3" | "h4" | "h5" | "h6" | "normal" | null;
+          children: Array<{
+            _key: string;
+            text: string | null;
+          }> | null;
+        }> | null;
+        link: {
+          label: string | null;
+          kind: "external" | "internal" | null;
+          external: string | null;
+          internal:
+            | {
+                _type: "awardsProgramme";
+                slug: string | null;
+                brand: null;
+                brands: null;
+              }
+            | {
+                _type: "conferenceEvent";
+                slug: string | null;
+                brand: null;
+                brands: null;
+              }
+            | {
+                _type: "page";
+                slug: string | null;
+                brand:
+                  | "clearview"
+                  | "familywealthreport"
+                  | "wealthbriefing"
+                  | "wealthbriefingasia"
+                  | null;
+                brands: null;
+              }
+            | {
+                _type: "post";
+                slug: string | null;
+                brand: null;
+                brands: Array<string> | null;
+              }
+            | {
+                _type: "resource";
+                slug: string | null;
+                brand: null;
+                brands: null;
+              }
+            | null;
+        } | null;
+        count: number | null;
+        posts: Array<{
+          _id: string;
+          title: string | null;
+          slug: string | null;
+          brands: Array<string> | null;
+          brandTitles: Array<{
+            key: string | null;
+            title: string | null;
+          }>;
+          publishedAt: string | null;
+          excerpt: string | null;
+          image: {
+            asset: SanityImageAssetReference | null;
+            hotspot: SanityImageHotspot | null;
+            crop: SanityImageCrop | null;
+            alt: string | null;
+          } | null;
+          category: {
+            title: string | null;
+            slug: string | null;
+          } | null;
+          topic: {
+            title: string | null;
+          } | null;
+          briefText: string | null;
+        }> | null;
+        latest: Array<{
+          _id: string;
+          title: string | null;
+          slug: string | null;
+          brands: Array<string> | null;
+          brandTitles: Array<{
+            key: string | null;
+            title: string | null;
+          }>;
+          publishedAt: string | null;
+          excerpt: string | null;
+          image: {
+            asset: SanityImageAssetReference | null;
+            hotspot: SanityImageHotspot | null;
+            crop: SanityImageCrop | null;
+            alt: string | null;
+          } | null;
+          category: {
+            title: string | null;
+            slug: string | null;
+          } | null;
+          topic: {
+            title: string | null;
+          } | null;
+          briefText: string | null;
+        }>;
+      }
+    | {
+        _key: string;
+        _type: "postCards";
+        heading: Array<{
+          _key: string;
+          style: "h1" | "h2" | "h3" | "h4" | "h5" | "h6" | "normal" | null;
+          children: Array<{
+            _key: string;
+            text: string | null;
+          }> | null;
+        }> | null;
+        link: {
+          label: string | null;
+          kind: "external" | "internal" | null;
+          external: string | null;
+          internal:
+            | {
+                _type: "awardsProgramme";
+                slug: string | null;
+                brand: null;
+                brands: null;
+              }
+            | {
+                _type: "conferenceEvent";
+                slug: string | null;
+                brand: null;
+                brands: null;
+              }
+            | {
+                _type: "page";
+                slug: string | null;
+                brand:
+                  | "clearview"
+                  | "familywealthreport"
+                  | "wealthbriefing"
+                  | "wealthbriefingasia"
+                  | null;
+                brands: null;
+              }
+            | {
+                _type: "post";
+                slug: string | null;
+                brand: null;
+                brands: Array<string> | null;
+              }
+            | {
+                _type: "resource";
+                slug: string | null;
+                brand: null;
+                brands: null;
+              }
+            | null;
+        } | null;
+        category: {
+          title: string | null;
+          slug: string | null;
+        } | null;
+        posts: Array<{
+          _id: string;
+          title: string | null;
+          slug: string | null;
+          brands: Array<string> | null;
+          brandTitles: Array<{
+            key: string | null;
+            title: string | null;
+          }>;
+          publishedAt: string | null;
+          excerpt: string | null;
+          image: {
+            asset: SanityImageAssetReference | null;
+            hotspot: SanityImageHotspot | null;
+            crop: SanityImageCrop | null;
+            alt: string | null;
+          } | null;
+          category: {
+            title: string | null;
+            slug: string | null;
+          } | null;
+        }> | null;
+        latest: Array<{
+          _id: string;
+          title: string | null;
+          slug: string | null;
+          brands: Array<string> | null;
+          brandTitles: Array<{
+            key: string | null;
+            title: string | null;
+          }>;
+          publishedAt: string | null;
+          excerpt: string | null;
+          image: {
+            asset: SanityImageAssetReference | null;
+            hotspot: SanityImageHotspot | null;
+            crop: SanityImageCrop | null;
+            alt: string | null;
+          } | null;
+          category: {
+            title: string | null;
+            slug: string | null;
+          } | null;
+        }>;
+      }
+    | {
+        _key: string;
+        _type: "publications";
+        heading: Array<{
+          _key: string;
+          style: "h1" | "h2" | "h3" | "h4" | "h5" | "h6" | "normal" | null;
+          children: Array<{
+            _key: string;
+            text: string | null;
+          }> | null;
+        }> | null;
+        body: string | null;
+        cards: Array<{
+          _key: string;
+          brand:
+            | "familywealthreport"
+            | "wealthbriefing"
+            | "wealthbriefingasia"
+            | null;
+          brandTitle: string | null;
+          description: string | null;
+          image: {
+            asset: SanityImageAssetReference | null;
+            hotspot: SanityImageHotspot | null;
+            crop: SanityImageCrop | null;
+            alt: string | null;
+          } | null;
+          linkLabel: string | null;
+        }> | null;
+      }
+    | {
+        _key: string;
+        _type: "splitLayout";
+        main: Array<
           | {
               _key: string;
               _type: "cta";
@@ -6266,22 +11247,4915 @@ export type HOME_PAGE_QUERY_RESULT = {
         aside: Array<
           | {
               _key: string;
-              _type: "adSlot";
-              size: "billboard" | "leaderboard" | "mpu" | null;
-              label: string | null;
-              spacing:
-                | "around"
-                | "aside"
-                | "below"
-                | "belowSection"
-                | "divided"
-                | "none"
-                | "top"
-                | null;
-              unit: {
-                code: string | null;
-                size: "300x250" | "728x90" | null;
+              _type: "awardsWinners";
+              heading: Array<{
+                _key: string;
+                style:
+                  "h1" | "h2" | "h3" | "h4" | "h5" | "h6" | "normal" | null;
+                children: Array<{
+                  _key: string;
+                  text: string | null;
+                }> | null;
+              }> | null;
+            }
+          | {
+              _key: string;
+              _type: "highlights";
+              source: "awards" | "events" | "research" | null;
+              count: number | null;
+              heading: Array<{
+                _key: string;
+                style:
+                  "h1" | "h2" | "h3" | "h4" | "h5" | "h6" | "normal" | null;
+                children: Array<{
+                  _key: string;
+                  text: string | null;
+                }> | null;
+              }> | null;
+              deadlineLabel: string | null;
+              items: Array<
+                | {
+                    _id: string;
+                    _type: "awardsProgramme";
+                    slug: string | null;
+                    title: string | null;
+                    category: null;
+                    nominationsClosingDate: string | null;
+                    startDate: string | null;
+                    endDate: string | null;
+                    country:
+                      | "AD"
+                      | "AE"
+                      | "AF"
+                      | "AG"
+                      | "AI"
+                      | "AL"
+                      | "AM"
+                      | "AO"
+                      | "AQ"
+                      | "AR"
+                      | "AS"
+                      | "AT"
+                      | "AU"
+                      | "AW"
+                      | "AX"
+                      | "AZ"
+                      | "BA"
+                      | "BB"
+                      | "BD"
+                      | "BE"
+                      | "BF"
+                      | "BG"
+                      | "BH"
+                      | "BI"
+                      | "BJ"
+                      | "BL"
+                      | "BM"
+                      | "BN"
+                      | "BO"
+                      | "BQ"
+                      | "BR"
+                      | "BS"
+                      | "BT"
+                      | "BV"
+                      | "BW"
+                      | "BY"
+                      | "BZ"
+                      | "CA"
+                      | "CC"
+                      | "CD"
+                      | "CF"
+                      | "CG"
+                      | "CH"
+                      | "CI"
+                      | "CK"
+                      | "CL"
+                      | "CM"
+                      | "CN"
+                      | "CO"
+                      | "CR"
+                      | "CU"
+                      | "CV"
+                      | "CW"
+                      | "CX"
+                      | "CY"
+                      | "CZ"
+                      | "DE"
+                      | "DJ"
+                      | "DK"
+                      | "DM"
+                      | "DO"
+                      | "DZ"
+                      | "EC"
+                      | "EE"
+                      | "EG"
+                      | "EH"
+                      | "ER"
+                      | "ES"
+                      | "ET"
+                      | "FI"
+                      | "FJ"
+                      | "FK"
+                      | "FM"
+                      | "FO"
+                      | "FR"
+                      | "GA"
+                      | "GB"
+                      | "GD"
+                      | "GE"
+                      | "GF"
+                      | "GG"
+                      | "GH"
+                      | "GI"
+                      | "GL"
+                      | "GM"
+                      | "GN"
+                      | "GP"
+                      | "GQ"
+                      | "GR"
+                      | "GS"
+                      | "GT"
+                      | "GU"
+                      | "GW"
+                      | "GY"
+                      | "HK"
+                      | "HM"
+                      | "HN"
+                      | "HR"
+                      | "HT"
+                      | "HU"
+                      | "ID"
+                      | "IE"
+                      | "IL"
+                      | "IM"
+                      | "IN"
+                      | "IO"
+                      | "IQ"
+                      | "IR"
+                      | "IS"
+                      | "IT"
+                      | "JE"
+                      | "JM"
+                      | "JO"
+                      | "JP"
+                      | "KE"
+                      | "KG"
+                      | "KH"
+                      | "KI"
+                      | "KM"
+                      | "KN"
+                      | "KP"
+                      | "KR"
+                      | "KW"
+                      | "KY"
+                      | "KZ"
+                      | "LA"
+                      | "LB"
+                      | "LC"
+                      | "LI"
+                      | "LK"
+                      | "LR"
+                      | "LS"
+                      | "LT"
+                      | "LU"
+                      | "LV"
+                      | "LY"
+                      | "MA"
+                      | "MC"
+                      | "MD"
+                      | "ME"
+                      | "MF"
+                      | "MG"
+                      | "MH"
+                      | "MK"
+                      | "ML"
+                      | "MM"
+                      | "MN"
+                      | "MO"
+                      | "MP"
+                      | "MQ"
+                      | "MR"
+                      | "MS"
+                      | "MT"
+                      | "MU"
+                      | "MV"
+                      | "MW"
+                      | "MX"
+                      | "MY"
+                      | "MZ"
+                      | "NA"
+                      | "NC"
+                      | "NE"
+                      | "NF"
+                      | "NG"
+                      | "NI"
+                      | "NL"
+                      | "NO"
+                      | "NP"
+                      | "NR"
+                      | "NU"
+                      | "NZ"
+                      | "OM"
+                      | "PA"
+                      | "PE"
+                      | "PF"
+                      | "PG"
+                      | "PH"
+                      | "PK"
+                      | "PL"
+                      | "PM"
+                      | "PN"
+                      | "PR"
+                      | "PS"
+                      | "PT"
+                      | "PW"
+                      | "PY"
+                      | "QA"
+                      | "RE"
+                      | "RO"
+                      | "RS"
+                      | "RU"
+                      | "RW"
+                      | "SA"
+                      | "SB"
+                      | "SC"
+                      | "SD"
+                      | "SE"
+                      | "SG"
+                      | "SH"
+                      | "SI"
+                      | "SJ"
+                      | "SK"
+                      | "SL"
+                      | "SM"
+                      | "SN"
+                      | "SO"
+                      | "SR"
+                      | "SS"
+                      | "ST"
+                      | "SV"
+                      | "SX"
+                      | "SY"
+                      | "SZ"
+                      | "TC"
+                      | "TD"
+                      | "TF"
+                      | "TG"
+                      | "TH"
+                      | "TJ"
+                      | "TK"
+                      | "TL"
+                      | "TM"
+                      | "TN"
+                      | "TO"
+                      | "TR"
+                      | "TT"
+                      | "TV"
+                      | "TW"
+                      | "TZ"
+                      | "UA"
+                      | "UG"
+                      | "UM"
+                      | "US"
+                      | "UY"
+                      | "UZ"
+                      | "VA"
+                      | "VC"
+                      | "VE"
+                      | "VG"
+                      | "VI"
+                      | "VN"
+                      | "VU"
+                      | "WF"
+                      | "WS"
+                      | "YE"
+                      | "YT"
+                      | "ZA"
+                      | "ZM"
+                      | "ZW"
+                      | null;
+                    publishedAt: null;
+                  }
+                | {
+                    _id: string;
+                    _type: "conferenceEvent";
+                    slug: string | null;
+                    title: string | null;
+                    category: null;
+                    nominationsClosingDate: null;
+                    startDate: string | null;
+                    endDate: string | null;
+                    country:
+                      | "AD"
+                      | "AE"
+                      | "AF"
+                      | "AG"
+                      | "AI"
+                      | "AL"
+                      | "AM"
+                      | "AO"
+                      | "AQ"
+                      | "AR"
+                      | "AS"
+                      | "AT"
+                      | "AU"
+                      | "AW"
+                      | "AX"
+                      | "AZ"
+                      | "BA"
+                      | "BB"
+                      | "BD"
+                      | "BE"
+                      | "BF"
+                      | "BG"
+                      | "BH"
+                      | "BI"
+                      | "BJ"
+                      | "BL"
+                      | "BM"
+                      | "BN"
+                      | "BO"
+                      | "BQ"
+                      | "BR"
+                      | "BS"
+                      | "BT"
+                      | "BV"
+                      | "BW"
+                      | "BY"
+                      | "BZ"
+                      | "CA"
+                      | "CC"
+                      | "CD"
+                      | "CF"
+                      | "CG"
+                      | "CH"
+                      | "CI"
+                      | "CK"
+                      | "CL"
+                      | "CM"
+                      | "CN"
+                      | "CO"
+                      | "CR"
+                      | "CU"
+                      | "CV"
+                      | "CW"
+                      | "CX"
+                      | "CY"
+                      | "CZ"
+                      | "DE"
+                      | "DJ"
+                      | "DK"
+                      | "DM"
+                      | "DO"
+                      | "DZ"
+                      | "EC"
+                      | "EE"
+                      | "EG"
+                      | "EH"
+                      | "ER"
+                      | "ES"
+                      | "ET"
+                      | "FI"
+                      | "FJ"
+                      | "FK"
+                      | "FM"
+                      | "FO"
+                      | "FR"
+                      | "GA"
+                      | "GB"
+                      | "GD"
+                      | "GE"
+                      | "GF"
+                      | "GG"
+                      | "GH"
+                      | "GI"
+                      | "GL"
+                      | "GM"
+                      | "GN"
+                      | "GP"
+                      | "GQ"
+                      | "GR"
+                      | "GS"
+                      | "GT"
+                      | "GU"
+                      | "GW"
+                      | "GY"
+                      | "HK"
+                      | "HM"
+                      | "HN"
+                      | "HR"
+                      | "HT"
+                      | "HU"
+                      | "ID"
+                      | "IE"
+                      | "IL"
+                      | "IM"
+                      | "IN"
+                      | "IO"
+                      | "IQ"
+                      | "IR"
+                      | "IS"
+                      | "IT"
+                      | "JE"
+                      | "JM"
+                      | "JO"
+                      | "JP"
+                      | "KE"
+                      | "KG"
+                      | "KH"
+                      | "KI"
+                      | "KM"
+                      | "KN"
+                      | "KP"
+                      | "KR"
+                      | "KW"
+                      | "KY"
+                      | "KZ"
+                      | "LA"
+                      | "LB"
+                      | "LC"
+                      | "LI"
+                      | "LK"
+                      | "LR"
+                      | "LS"
+                      | "LT"
+                      | "LU"
+                      | "LV"
+                      | "LY"
+                      | "MA"
+                      | "MC"
+                      | "MD"
+                      | "ME"
+                      | "MF"
+                      | "MG"
+                      | "MH"
+                      | "MK"
+                      | "ML"
+                      | "MM"
+                      | "MN"
+                      | "MO"
+                      | "MP"
+                      | "MQ"
+                      | "MR"
+                      | "MS"
+                      | "MT"
+                      | "MU"
+                      | "MV"
+                      | "MW"
+                      | "MX"
+                      | "MY"
+                      | "MZ"
+                      | "NA"
+                      | "NC"
+                      | "NE"
+                      | "NF"
+                      | "NG"
+                      | "NI"
+                      | "NL"
+                      | "NO"
+                      | "NP"
+                      | "NR"
+                      | "NU"
+                      | "NZ"
+                      | "OM"
+                      | "PA"
+                      | "PE"
+                      | "PF"
+                      | "PG"
+                      | "PH"
+                      | "PK"
+                      | "PL"
+                      | "PM"
+                      | "PN"
+                      | "PR"
+                      | "PS"
+                      | "PT"
+                      | "PW"
+                      | "PY"
+                      | "QA"
+                      | "RE"
+                      | "RO"
+                      | "RS"
+                      | "RU"
+                      | "RW"
+                      | "SA"
+                      | "SB"
+                      | "SC"
+                      | "SD"
+                      | "SE"
+                      | "SG"
+                      | "SH"
+                      | "SI"
+                      | "SJ"
+                      | "SK"
+                      | "SL"
+                      | "SM"
+                      | "SN"
+                      | "SO"
+                      | "SR"
+                      | "SS"
+                      | "ST"
+                      | "SV"
+                      | "SX"
+                      | "SY"
+                      | "SZ"
+                      | "TC"
+                      | "TD"
+                      | "TF"
+                      | "TG"
+                      | "TH"
+                      | "TJ"
+                      | "TK"
+                      | "TL"
+                      | "TM"
+                      | "TN"
+                      | "TO"
+                      | "TR"
+                      | "TT"
+                      | "TV"
+                      | "TW"
+                      | "TZ"
+                      | "UA"
+                      | "UG"
+                      | "UM"
+                      | "US"
+                      | "UY"
+                      | "UZ"
+                      | "VA"
+                      | "VC"
+                      | "VE"
+                      | "VG"
+                      | "VI"
+                      | "VN"
+                      | "VU"
+                      | "WF"
+                      | "WS"
+                      | "YE"
+                      | "YT"
+                      | "ZA"
+                      | "ZM"
+                      | "ZW"
+                      | null;
+                    publishedAt: null;
+                  }
+                | {
+                    _id: string;
+                    _type: "resource";
+                    slug: string | null;
+                    title: string | null;
+                    category: "research" | null;
+                    nominationsClosingDate: null;
+                    startDate: null;
+                    endDate: null;
+                    country: null;
+                    publishedAt: string | null;
+                  }
+              > | null;
+              fill:
+                | Array<{
+                    _id: string;
+                    _type: "resource";
+                    slug: string | null;
+                    title: string | null;
+                    category: "research" | null;
+                    nominationsClosingDate: null;
+                    startDate: null;
+                    endDate: null;
+                    country: null;
+                    publishedAt: string | null;
+                  }>
+                | Array<{
+                    _id: string;
+                    _type: "awardsProgramme";
+                    slug: string | null;
+                    title: string | null;
+                    category: null;
+                    nominationsClosingDate: string | null;
+                    startDate: string | null;
+                    endDate: string | null;
+                    country:
+                      | "AD"
+                      | "AE"
+                      | "AF"
+                      | "AG"
+                      | "AI"
+                      | "AL"
+                      | "AM"
+                      | "AO"
+                      | "AQ"
+                      | "AR"
+                      | "AS"
+                      | "AT"
+                      | "AU"
+                      | "AW"
+                      | "AX"
+                      | "AZ"
+                      | "BA"
+                      | "BB"
+                      | "BD"
+                      | "BE"
+                      | "BF"
+                      | "BG"
+                      | "BH"
+                      | "BI"
+                      | "BJ"
+                      | "BL"
+                      | "BM"
+                      | "BN"
+                      | "BO"
+                      | "BQ"
+                      | "BR"
+                      | "BS"
+                      | "BT"
+                      | "BV"
+                      | "BW"
+                      | "BY"
+                      | "BZ"
+                      | "CA"
+                      | "CC"
+                      | "CD"
+                      | "CF"
+                      | "CG"
+                      | "CH"
+                      | "CI"
+                      | "CK"
+                      | "CL"
+                      | "CM"
+                      | "CN"
+                      | "CO"
+                      | "CR"
+                      | "CU"
+                      | "CV"
+                      | "CW"
+                      | "CX"
+                      | "CY"
+                      | "CZ"
+                      | "DE"
+                      | "DJ"
+                      | "DK"
+                      | "DM"
+                      | "DO"
+                      | "DZ"
+                      | "EC"
+                      | "EE"
+                      | "EG"
+                      | "EH"
+                      | "ER"
+                      | "ES"
+                      | "ET"
+                      | "FI"
+                      | "FJ"
+                      | "FK"
+                      | "FM"
+                      | "FO"
+                      | "FR"
+                      | "GA"
+                      | "GB"
+                      | "GD"
+                      | "GE"
+                      | "GF"
+                      | "GG"
+                      | "GH"
+                      | "GI"
+                      | "GL"
+                      | "GM"
+                      | "GN"
+                      | "GP"
+                      | "GQ"
+                      | "GR"
+                      | "GS"
+                      | "GT"
+                      | "GU"
+                      | "GW"
+                      | "GY"
+                      | "HK"
+                      | "HM"
+                      | "HN"
+                      | "HR"
+                      | "HT"
+                      | "HU"
+                      | "ID"
+                      | "IE"
+                      | "IL"
+                      | "IM"
+                      | "IN"
+                      | "IO"
+                      | "IQ"
+                      | "IR"
+                      | "IS"
+                      | "IT"
+                      | "JE"
+                      | "JM"
+                      | "JO"
+                      | "JP"
+                      | "KE"
+                      | "KG"
+                      | "KH"
+                      | "KI"
+                      | "KM"
+                      | "KN"
+                      | "KP"
+                      | "KR"
+                      | "KW"
+                      | "KY"
+                      | "KZ"
+                      | "LA"
+                      | "LB"
+                      | "LC"
+                      | "LI"
+                      | "LK"
+                      | "LR"
+                      | "LS"
+                      | "LT"
+                      | "LU"
+                      | "LV"
+                      | "LY"
+                      | "MA"
+                      | "MC"
+                      | "MD"
+                      | "ME"
+                      | "MF"
+                      | "MG"
+                      | "MH"
+                      | "MK"
+                      | "ML"
+                      | "MM"
+                      | "MN"
+                      | "MO"
+                      | "MP"
+                      | "MQ"
+                      | "MR"
+                      | "MS"
+                      | "MT"
+                      | "MU"
+                      | "MV"
+                      | "MW"
+                      | "MX"
+                      | "MY"
+                      | "MZ"
+                      | "NA"
+                      | "NC"
+                      | "NE"
+                      | "NF"
+                      | "NG"
+                      | "NI"
+                      | "NL"
+                      | "NO"
+                      | "NP"
+                      | "NR"
+                      | "NU"
+                      | "NZ"
+                      | "OM"
+                      | "PA"
+                      | "PE"
+                      | "PF"
+                      | "PG"
+                      | "PH"
+                      | "PK"
+                      | "PL"
+                      | "PM"
+                      | "PN"
+                      | "PR"
+                      | "PS"
+                      | "PT"
+                      | "PW"
+                      | "PY"
+                      | "QA"
+                      | "RE"
+                      | "RO"
+                      | "RS"
+                      | "RU"
+                      | "RW"
+                      | "SA"
+                      | "SB"
+                      | "SC"
+                      | "SD"
+                      | "SE"
+                      | "SG"
+                      | "SH"
+                      | "SI"
+                      | "SJ"
+                      | "SK"
+                      | "SL"
+                      | "SM"
+                      | "SN"
+                      | "SO"
+                      | "SR"
+                      | "SS"
+                      | "ST"
+                      | "SV"
+                      | "SX"
+                      | "SY"
+                      | "SZ"
+                      | "TC"
+                      | "TD"
+                      | "TF"
+                      | "TG"
+                      | "TH"
+                      | "TJ"
+                      | "TK"
+                      | "TL"
+                      | "TM"
+                      | "TN"
+                      | "TO"
+                      | "TR"
+                      | "TT"
+                      | "TV"
+                      | "TW"
+                      | "TZ"
+                      | "UA"
+                      | "UG"
+                      | "UM"
+                      | "US"
+                      | "UY"
+                      | "UZ"
+                      | "VA"
+                      | "VC"
+                      | "VE"
+                      | "VG"
+                      | "VI"
+                      | "VN"
+                      | "VU"
+                      | "WF"
+                      | "WS"
+                      | "YE"
+                      | "YT"
+                      | "ZA"
+                      | "ZM"
+                      | "ZW"
+                      | null;
+                    publishedAt: null;
+                  }>
+                | Array<{
+                    _id: string;
+                    _type: "conferenceEvent";
+                    slug: string | null;
+                    title: string | null;
+                    category: null;
+                    nominationsClosingDate: null;
+                    startDate: string | null;
+                    endDate: string | null;
+                    country:
+                      | "AD"
+                      | "AE"
+                      | "AF"
+                      | "AG"
+                      | "AI"
+                      | "AL"
+                      | "AM"
+                      | "AO"
+                      | "AQ"
+                      | "AR"
+                      | "AS"
+                      | "AT"
+                      | "AU"
+                      | "AW"
+                      | "AX"
+                      | "AZ"
+                      | "BA"
+                      | "BB"
+                      | "BD"
+                      | "BE"
+                      | "BF"
+                      | "BG"
+                      | "BH"
+                      | "BI"
+                      | "BJ"
+                      | "BL"
+                      | "BM"
+                      | "BN"
+                      | "BO"
+                      | "BQ"
+                      | "BR"
+                      | "BS"
+                      | "BT"
+                      | "BV"
+                      | "BW"
+                      | "BY"
+                      | "BZ"
+                      | "CA"
+                      | "CC"
+                      | "CD"
+                      | "CF"
+                      | "CG"
+                      | "CH"
+                      | "CI"
+                      | "CK"
+                      | "CL"
+                      | "CM"
+                      | "CN"
+                      | "CO"
+                      | "CR"
+                      | "CU"
+                      | "CV"
+                      | "CW"
+                      | "CX"
+                      | "CY"
+                      | "CZ"
+                      | "DE"
+                      | "DJ"
+                      | "DK"
+                      | "DM"
+                      | "DO"
+                      | "DZ"
+                      | "EC"
+                      | "EE"
+                      | "EG"
+                      | "EH"
+                      | "ER"
+                      | "ES"
+                      | "ET"
+                      | "FI"
+                      | "FJ"
+                      | "FK"
+                      | "FM"
+                      | "FO"
+                      | "FR"
+                      | "GA"
+                      | "GB"
+                      | "GD"
+                      | "GE"
+                      | "GF"
+                      | "GG"
+                      | "GH"
+                      | "GI"
+                      | "GL"
+                      | "GM"
+                      | "GN"
+                      | "GP"
+                      | "GQ"
+                      | "GR"
+                      | "GS"
+                      | "GT"
+                      | "GU"
+                      | "GW"
+                      | "GY"
+                      | "HK"
+                      | "HM"
+                      | "HN"
+                      | "HR"
+                      | "HT"
+                      | "HU"
+                      | "ID"
+                      | "IE"
+                      | "IL"
+                      | "IM"
+                      | "IN"
+                      | "IO"
+                      | "IQ"
+                      | "IR"
+                      | "IS"
+                      | "IT"
+                      | "JE"
+                      | "JM"
+                      | "JO"
+                      | "JP"
+                      | "KE"
+                      | "KG"
+                      | "KH"
+                      | "KI"
+                      | "KM"
+                      | "KN"
+                      | "KP"
+                      | "KR"
+                      | "KW"
+                      | "KY"
+                      | "KZ"
+                      | "LA"
+                      | "LB"
+                      | "LC"
+                      | "LI"
+                      | "LK"
+                      | "LR"
+                      | "LS"
+                      | "LT"
+                      | "LU"
+                      | "LV"
+                      | "LY"
+                      | "MA"
+                      | "MC"
+                      | "MD"
+                      | "ME"
+                      | "MF"
+                      | "MG"
+                      | "MH"
+                      | "MK"
+                      | "ML"
+                      | "MM"
+                      | "MN"
+                      | "MO"
+                      | "MP"
+                      | "MQ"
+                      | "MR"
+                      | "MS"
+                      | "MT"
+                      | "MU"
+                      | "MV"
+                      | "MW"
+                      | "MX"
+                      | "MY"
+                      | "MZ"
+                      | "NA"
+                      | "NC"
+                      | "NE"
+                      | "NF"
+                      | "NG"
+                      | "NI"
+                      | "NL"
+                      | "NO"
+                      | "NP"
+                      | "NR"
+                      | "NU"
+                      | "NZ"
+                      | "OM"
+                      | "PA"
+                      | "PE"
+                      | "PF"
+                      | "PG"
+                      | "PH"
+                      | "PK"
+                      | "PL"
+                      | "PM"
+                      | "PN"
+                      | "PR"
+                      | "PS"
+                      | "PT"
+                      | "PW"
+                      | "PY"
+                      | "QA"
+                      | "RE"
+                      | "RO"
+                      | "RS"
+                      | "RU"
+                      | "RW"
+                      | "SA"
+                      | "SB"
+                      | "SC"
+                      | "SD"
+                      | "SE"
+                      | "SG"
+                      | "SH"
+                      | "SI"
+                      | "SJ"
+                      | "SK"
+                      | "SL"
+                      | "SM"
+                      | "SN"
+                      | "SO"
+                      | "SR"
+                      | "SS"
+                      | "ST"
+                      | "SV"
+                      | "SX"
+                      | "SY"
+                      | "SZ"
+                      | "TC"
+                      | "TD"
+                      | "TF"
+                      | "TG"
+                      | "TH"
+                      | "TJ"
+                      | "TK"
+                      | "TL"
+                      | "TM"
+                      | "TN"
+                      | "TO"
+                      | "TR"
+                      | "TT"
+                      | "TV"
+                      | "TW"
+                      | "TZ"
+                      | "UA"
+                      | "UG"
+                      | "UM"
+                      | "US"
+                      | "UY"
+                      | "UZ"
+                      | "VA"
+                      | "VC"
+                      | "VE"
+                      | "VG"
+                      | "VI"
+                      | "VN"
+                      | "VU"
+                      | "WF"
+                      | "WS"
+                      | "YE"
+                      | "YT"
+                      | "ZA"
+                      | "ZM"
+                      | "ZW"
+                      | null;
+                    publishedAt: null;
+                  }>;
+              button: {
+                label: string | null;
+                kind: "external" | "internal" | null;
+                external: string | null;
+                internal:
+                  | {
+                      _type: "awardsProgramme";
+                      slug: string | null;
+                      brand: null;
+                      brands: null;
+                    }
+                  | {
+                      _type: "conferenceEvent";
+                      slug: string | null;
+                      brand: null;
+                      brands: null;
+                    }
+                  | {
+                      _type: "page";
+                      slug: string | null;
+                      brand:
+                        | "clearview"
+                        | "familywealthreport"
+                        | "wealthbriefing"
+                        | "wealthbriefingasia"
+                        | null;
+                      brands: null;
+                    }
+                  | {
+                      _type: "post";
+                      slug: string | null;
+                      brand: null;
+                      brands: Array<string> | null;
+                    }
+                  | {
+                      _type: "resource";
+                      slug: string | null;
+                      brand: null;
+                      brands: null;
+                    }
+                  | null;
               } | null;
+              promo: {
+                resource: {
+                  title: string | null;
+                  downloadThumbnail: {
+                    asset: SanityImageAssetReference | null;
+                    hotspot: SanityImageHotspot | null;
+                    crop: SanityImageCrop | null;
+                    alt: string | null;
+                  } | null;
+                  downloadFileUrl: string | null;
+                  downloadFileName: string | null;
+                  downloadUrl: string | null;
+                } | null;
+                title: string | null;
+                description: string | null;
+                image: {
+                  asset: SanityImageAssetReference | null;
+                  hotspot: SanityImageHotspot | null;
+                  crop: SanityImageCrop | null;
+                  alt: string | null;
+                } | null;
+                link: {
+                  kind: "external" | "internal" | null;
+                  external: string | null;
+                  internal:
+                    | {
+                        _type: "awardsProgramme";
+                        slug: string | null;
+                        brand: null;
+                        brands: null;
+                      }
+                    | {
+                        _type: "conferenceEvent";
+                        slug: string | null;
+                        brand: null;
+                        brands: null;
+                      }
+                    | {
+                        _type: "page";
+                        slug: string | null;
+                        brand:
+                          | "clearview"
+                          | "familywealthreport"
+                          | "wealthbriefing"
+                          | "wealthbriefingasia"
+                          | null;
+                        brands: null;
+                      }
+                    | {
+                        _type: "post";
+                        slug: string | null;
+                        brand: null;
+                        brands: Array<string> | null;
+                      }
+                    | {
+                        _type: "resource";
+                        slug: string | null;
+                        brand: null;
+                        brands: null;
+                      }
+                    | null;
+                } | null;
+              } | null;
+            }
+        > | null;
+      }
+    | {
+        _key: string;
+        _type: "sponsoredContent";
+        label: string | null;
+        link: {
+          label: string | null;
+          kind: "external" | "internal" | null;
+          external: string | null;
+          internal:
+            | {
+                _type: "awardsProgramme";
+                slug: string | null;
+                brand: null;
+                brands: null;
+              }
+            | {
+                _type: "conferenceEvent";
+                slug: string | null;
+                brand: null;
+                brands: null;
+              }
+            | {
+                _type: "page";
+                slug: string | null;
+                brand:
+                  | "clearview"
+                  | "familywealthreport"
+                  | "wealthbriefing"
+                  | "wealthbriefingasia"
+                  | null;
+                brands: null;
+              }
+            | {
+                _type: "post";
+                slug: string | null;
+                brand: null;
+                brands: Array<string> | null;
+              }
+            | {
+                _type: "resource";
+                slug: string | null;
+                brand: null;
+                brands: null;
+              }
+            | null;
+        } | null;
+        profileLabel: string | null;
+        post: {
+          _id: string;
+          title: string | null;
+          slug: string | null;
+          brands: Array<string> | null;
+          brandTitles: Array<{
+            key: string | null;
+            title: string | null;
+          }>;
+          publishedAt: string | null;
+          excerpt: string | null;
+          image: {
+            asset: SanityImageAssetReference | null;
+            hotspot: SanityImageHotspot | null;
+            crop: SanityImageCrop | null;
+            alt: string | null;
+          } | null;
+          category: {
+            title: string | null;
+            slug: string | null;
+          } | null;
+          sponsor: {
+            title: string | null;
+            slug: string | null;
+            logo: {
+              asset: SanityImageAssetReference | null;
+              hotspot: SanityImageHotspot | null;
+              crop: SanityImageCrop | null;
+              alt: string | null;
+            } | null;
+          } | null;
+        } | null;
+      }
+    | {
+        _key: string;
+        _type: "statsBar";
+        heading: Array<{
+          _key: string;
+          style: "h1" | "h2" | "h3" | "h4" | "h5" | "h6" | "normal" | null;
+          children: Array<{
+            _key: string;
+            text: string | null;
+          }> | null;
+        }> | null;
+        items: Array<{
+          _key: string;
+          icon:
+            | "stat-article"
+            | "stat-globe"
+            | "stat-public"
+            | "stat-search"
+            | "stat-star"
+            | "stat-user"
+            | null;
+          value: string | null;
+          label: string | null;
+        }> | null;
+      }
+    | {
+        _key: string;
+        _type: "subscribeBanner";
+        heading: Array<{
+          _key: string;
+          style: "h1" | "h2" | "h3" | "h4" | "h5" | "h6" | "normal" | null;
+          children: Array<{
+            _key: string;
+            text: string | null;
+          }> | null;
+        }> | null;
+        description: string | null;
+        buttonLabel: string | null;
+        cta: {
+          label: string | null;
+          kind: "external" | "internal" | null;
+          external: string | null;
+          internal:
+            | {
+                _type: "awardsProgramme";
+                slug: string | null;
+                brand: null;
+                brands: null;
+              }
+            | {
+                _type: "conferenceEvent";
+                slug: string | null;
+                brand: null;
+                brands: null;
+              }
+            | {
+                _type: "page";
+                slug: string | null;
+                brand:
+                  | "clearview"
+                  | "familywealthreport"
+                  | "wealthbriefing"
+                  | "wealthbriefingasia"
+                  | null;
+                brands: null;
+              }
+            | {
+                _type: "post";
+                slug: string | null;
+                brand: null;
+                brands: Array<string> | null;
+              }
+            | {
+                _type: "resource";
+                slug: string | null;
+                brand: null;
+                brands: null;
+              }
+            | null;
+        } | null;
+      }
+    | {
+        _key: string;
+        _type: "topPicks";
+        heading: Array<{
+          _key: string;
+          style: "h1" | "h2" | "h3" | "h4" | "h5" | "h6" | "normal" | null;
+          children: Array<{
+            _key: string;
+            text: string | null;
+          }> | null;
+        }> | null;
+        link: {
+          label: string | null;
+          kind: "external" | "internal" | null;
+          external: string | null;
+          internal:
+            | {
+                _type: "awardsProgramme";
+                slug: string | null;
+                brand: null;
+                brands: null;
+              }
+            | {
+                _type: "conferenceEvent";
+                slug: string | null;
+                brand: null;
+                brands: null;
+              }
+            | {
+                _type: "page";
+                slug: string | null;
+                brand:
+                  | "clearview"
+                  | "familywealthreport"
+                  | "wealthbriefing"
+                  | "wealthbriefingasia"
+                  | null;
+                brands: null;
+              }
+            | {
+                _type: "post";
+                slug: string | null;
+                brand: null;
+                brands: Array<string> | null;
+              }
+            | {
+                _type: "resource";
+                slug: string | null;
+                brand: null;
+                brands: null;
+              }
+            | null;
+        } | null;
+        posts: Array<{
+          _id: string;
+          title: string | null;
+          slug: string | null;
+          brands: Array<string> | null;
+          brandTitles: Array<{
+            key: string | null;
+            title: string | null;
+          }>;
+          publishedAt: string | null;
+          excerpt: string | null;
+          image: {
+            asset: SanityImageAssetReference | null;
+            hotspot: SanityImageHotspot | null;
+            crop: SanityImageCrop | null;
+            alt: string | null;
+          } | null;
+          category: {
+            title: string | null;
+            slug: string | null;
+          } | null;
+          sponsored: false | true;
+        }> | null;
+        fill: Array<{
+          _id: string;
+          title: string | null;
+          slug: string | null;
+          brands: Array<string> | null;
+          brandTitles: Array<{
+            key: string | null;
+            title: string | null;
+          }>;
+          publishedAt: string | null;
+          excerpt: string | null;
+          image: {
+            asset: SanityImageAssetReference | null;
+            hotspot: SanityImageHotspot | null;
+            crop: SanityImageCrop | null;
+            alt: string | null;
+          } | null;
+          category: {
+            title: string | null;
+            slug: string | null;
+          } | null;
+        }>;
+      }
+    | {
+        _key: string;
+        _type: "topStories";
+        linkLabel: string | null;
+        label: string | null;
+        slides: Array<{
+          _id: string;
+          title: string | null;
+          slug: string | null;
+          brands: Array<string> | null;
+          brandTitles: Array<{
+            key: string | null;
+            title: string | null;
+          }>;
+          publishedAt: string | null;
+          excerpt: string | null;
+          image: {
+            asset: SanityImageAssetReference | null;
+            hotspot: SanityImageHotspot | null;
+            crop: SanityImageCrop | null;
+            alt: string | null;
+          } | null;
+          category: {
+            title: string | null;
+            slug: string | null;
+          } | null;
+        }> | null;
+        articles: Array<{
+          _id: string;
+          title: string | null;
+          slug: string | null;
+          brands: Array<string> | null;
+          brandTitles: Array<{
+            key: string | null;
+            title: string | null;
+          }>;
+          publishedAt: string | null;
+          excerpt: string | null;
+          image: {
+            asset: SanityImageAssetReference | null;
+            hotspot: SanityImageHotspot | null;
+            crop: SanityImageCrop | null;
+            alt: string | null;
+          } | null;
+          category: {
+            title: string | null;
+            slug: string | null;
+          } | null;
+        }> | null;
+        latest: Array<{
+          _id: string;
+          title: string | null;
+          slug: string | null;
+          brands: Array<string> | null;
+          brandTitles: Array<{
+            key: string | null;
+            title: string | null;
+          }>;
+          publishedAt: string | null;
+          excerpt: string | null;
+          image: {
+            asset: SanityImageAssetReference | null;
+            hotspot: SanityImageHotspot | null;
+            crop: SanityImageCrop | null;
+            alt: string | null;
+          } | null;
+          category: {
+            title: string | null;
+            slug: string | null;
+          } | null;
+        }>;
+      }
+    | {
+        _key: string;
+        _type: "weeklyRoundup";
+        heading: Array<{
+          _key: string;
+          style: "h1" | "h2" | "h3" | "h4" | "h5" | "h6" | "normal" | null;
+          children: Array<{
+            _key: string;
+            text: string | null;
+          }> | null;
+        }> | null;
+        label: string | null;
+        title: string | null;
+        summary: string | null;
+        button: {
+          label: string | null;
+          kind: "external" | "internal" | null;
+          external: string | null;
+          internal:
+            | {
+                _type: "awardsProgramme";
+                slug: string | null;
+                brand: null;
+                brands: null;
+              }
+            | {
+                _type: "conferenceEvent";
+                slug: string | null;
+                brand: null;
+                brands: null;
+              }
+            | {
+                _type: "page";
+                slug: string | null;
+                brand:
+                  | "clearview"
+                  | "familywealthreport"
+                  | "wealthbriefing"
+                  | "wealthbriefingasia"
+                  | null;
+                brands: null;
+              }
+            | {
+                _type: "post";
+                slug: string | null;
+                brand: null;
+                brands: Array<string> | null;
+              }
+            | {
+                _type: "resource";
+                slug: string | null;
+                brand: null;
+                brands: null;
+              }
+            | null;
+        } | null;
+        listLabel: string | null;
+        posts: Array<{
+          _id: string;
+          title: string | null;
+          slug: string | null;
+          brands: Array<string> | null;
+          brandTitles: Array<{
+            key: string | null;
+            title: string | null;
+          }>;
+          publishedAt: string | null;
+          excerpt: string | null;
+          image: {
+            asset: SanityImageAssetReference | null;
+            hotspot: SanityImageHotspot | null;
+            crop: SanityImageCrop | null;
+            alt: string | null;
+          } | null;
+          category: {
+            title: string | null;
+            slug: string | null;
+          } | null;
+        }> | null;
+        latest: Array<{
+          _id: string;
+          title: string | null;
+          slug: string | null;
+          brands: Array<string> | null;
+          brandTitles: Array<{
+            key: string | null;
+            title: string | null;
+          }>;
+          publishedAt: string | null;
+          excerpt: string | null;
+          image: {
+            asset: SanityImageAssetReference | null;
+            hotspot: SanityImageHotspot | null;
+            crop: SanityImageCrop | null;
+            alt: string | null;
+          } | null;
+          category: {
+            title: string | null;
+            slug: string | null;
+          } | null;
+        }>;
+      }
+  > | null;
+  blocksBottom: Array<
+    | {
+        _key: string;
+        _type: "cta";
+        heading: string | null;
+        text: string | null;
+        link: {
+          label: string | null;
+          href: string | null;
+        } | null;
+      }
+    | {
+        _key: string;
+        _type: "exploreGrid";
+        cards: Array<{
+          _key: string;
+          heading: Array<{
+            _key: string;
+            style: "h1" | "h2" | "h3" | "h4" | "h5" | "h6" | "normal" | null;
+            children: Array<{
+              _key: string;
+              text: string | null;
+            }> | null;
+          }> | null;
+          icon:
+            | "comment"
+            | "document"
+            | "glasses"
+            | "people-moves"
+            | "public"
+            | "star"
+            | null;
+          source: "awards" | "events" | "posts" | "research" | null;
+          count: number | null;
+          deadlineLabel: string | null;
+          button: {
+            label: string | null;
+            kind: "external" | "internal" | null;
+            external: string | null;
+            internal:
+              | {
+                  _type: "awardsProgramme";
+                  slug: string | null;
+                  brand: null;
+                  brands: null;
+                }
+              | {
+                  _type: "conferenceEvent";
+                  slug: string | null;
+                  brand: null;
+                  brands: null;
+                }
+              | {
+                  _type: "page";
+                  slug: string | null;
+                  brand:
+                    | "clearview"
+                    | "familywealthreport"
+                    | "wealthbriefing"
+                    | "wealthbriefingasia"
+                    | null;
+                  brands: null;
+                }
+              | {
+                  _type: "post";
+                  slug: string | null;
+                  brand: null;
+                  brands: Array<string> | null;
+                }
+              | {
+                  _type: "resource";
+                  slug: string | null;
+                  brand: null;
+                  brands: null;
+                }
+              | null;
+          } | null;
+          items: Array<
+            | {
+                _id: string;
+                _type: "awardsProgramme";
+                slug: string | null;
+                title: string | null;
+                category: null;
+                nominationsClosingDate: string | null;
+                startDate: string | null;
+                endDate: string | null;
+                country:
+                  | "AD"
+                  | "AE"
+                  | "AF"
+                  | "AG"
+                  | "AI"
+                  | "AL"
+                  | "AM"
+                  | "AO"
+                  | "AQ"
+                  | "AR"
+                  | "AS"
+                  | "AT"
+                  | "AU"
+                  | "AW"
+                  | "AX"
+                  | "AZ"
+                  | "BA"
+                  | "BB"
+                  | "BD"
+                  | "BE"
+                  | "BF"
+                  | "BG"
+                  | "BH"
+                  | "BI"
+                  | "BJ"
+                  | "BL"
+                  | "BM"
+                  | "BN"
+                  | "BO"
+                  | "BQ"
+                  | "BR"
+                  | "BS"
+                  | "BT"
+                  | "BV"
+                  | "BW"
+                  | "BY"
+                  | "BZ"
+                  | "CA"
+                  | "CC"
+                  | "CD"
+                  | "CF"
+                  | "CG"
+                  | "CH"
+                  | "CI"
+                  | "CK"
+                  | "CL"
+                  | "CM"
+                  | "CN"
+                  | "CO"
+                  | "CR"
+                  | "CU"
+                  | "CV"
+                  | "CW"
+                  | "CX"
+                  | "CY"
+                  | "CZ"
+                  | "DE"
+                  | "DJ"
+                  | "DK"
+                  | "DM"
+                  | "DO"
+                  | "DZ"
+                  | "EC"
+                  | "EE"
+                  | "EG"
+                  | "EH"
+                  | "ER"
+                  | "ES"
+                  | "ET"
+                  | "FI"
+                  | "FJ"
+                  | "FK"
+                  | "FM"
+                  | "FO"
+                  | "FR"
+                  | "GA"
+                  | "GB"
+                  | "GD"
+                  | "GE"
+                  | "GF"
+                  | "GG"
+                  | "GH"
+                  | "GI"
+                  | "GL"
+                  | "GM"
+                  | "GN"
+                  | "GP"
+                  | "GQ"
+                  | "GR"
+                  | "GS"
+                  | "GT"
+                  | "GU"
+                  | "GW"
+                  | "GY"
+                  | "HK"
+                  | "HM"
+                  | "HN"
+                  | "HR"
+                  | "HT"
+                  | "HU"
+                  | "ID"
+                  | "IE"
+                  | "IL"
+                  | "IM"
+                  | "IN"
+                  | "IO"
+                  | "IQ"
+                  | "IR"
+                  | "IS"
+                  | "IT"
+                  | "JE"
+                  | "JM"
+                  | "JO"
+                  | "JP"
+                  | "KE"
+                  | "KG"
+                  | "KH"
+                  | "KI"
+                  | "KM"
+                  | "KN"
+                  | "KP"
+                  | "KR"
+                  | "KW"
+                  | "KY"
+                  | "KZ"
+                  | "LA"
+                  | "LB"
+                  | "LC"
+                  | "LI"
+                  | "LK"
+                  | "LR"
+                  | "LS"
+                  | "LT"
+                  | "LU"
+                  | "LV"
+                  | "LY"
+                  | "MA"
+                  | "MC"
+                  | "MD"
+                  | "ME"
+                  | "MF"
+                  | "MG"
+                  | "MH"
+                  | "MK"
+                  | "ML"
+                  | "MM"
+                  | "MN"
+                  | "MO"
+                  | "MP"
+                  | "MQ"
+                  | "MR"
+                  | "MS"
+                  | "MT"
+                  | "MU"
+                  | "MV"
+                  | "MW"
+                  | "MX"
+                  | "MY"
+                  | "MZ"
+                  | "NA"
+                  | "NC"
+                  | "NE"
+                  | "NF"
+                  | "NG"
+                  | "NI"
+                  | "NL"
+                  | "NO"
+                  | "NP"
+                  | "NR"
+                  | "NU"
+                  | "NZ"
+                  | "OM"
+                  | "PA"
+                  | "PE"
+                  | "PF"
+                  | "PG"
+                  | "PH"
+                  | "PK"
+                  | "PL"
+                  | "PM"
+                  | "PN"
+                  | "PR"
+                  | "PS"
+                  | "PT"
+                  | "PW"
+                  | "PY"
+                  | "QA"
+                  | "RE"
+                  | "RO"
+                  | "RS"
+                  | "RU"
+                  | "RW"
+                  | "SA"
+                  | "SB"
+                  | "SC"
+                  | "SD"
+                  | "SE"
+                  | "SG"
+                  | "SH"
+                  | "SI"
+                  | "SJ"
+                  | "SK"
+                  | "SL"
+                  | "SM"
+                  | "SN"
+                  | "SO"
+                  | "SR"
+                  | "SS"
+                  | "ST"
+                  | "SV"
+                  | "SX"
+                  | "SY"
+                  | "SZ"
+                  | "TC"
+                  | "TD"
+                  | "TF"
+                  | "TG"
+                  | "TH"
+                  | "TJ"
+                  | "TK"
+                  | "TL"
+                  | "TM"
+                  | "TN"
+                  | "TO"
+                  | "TR"
+                  | "TT"
+                  | "TV"
+                  | "TW"
+                  | "TZ"
+                  | "UA"
+                  | "UG"
+                  | "UM"
+                  | "US"
+                  | "UY"
+                  | "UZ"
+                  | "VA"
+                  | "VC"
+                  | "VE"
+                  | "VG"
+                  | "VI"
+                  | "VN"
+                  | "VU"
+                  | "WF"
+                  | "WS"
+                  | "YE"
+                  | "YT"
+                  | "ZA"
+                  | "ZM"
+                  | "ZW"
+                  | null;
+                publishedAt: null;
+              }
+            | {
+                _id: string;
+                _type: "conferenceEvent";
+                slug: string | null;
+                title: string | null;
+                category: null;
+                nominationsClosingDate: null;
+                startDate: string | null;
+                endDate: string | null;
+                country:
+                  | "AD"
+                  | "AE"
+                  | "AF"
+                  | "AG"
+                  | "AI"
+                  | "AL"
+                  | "AM"
+                  | "AO"
+                  | "AQ"
+                  | "AR"
+                  | "AS"
+                  | "AT"
+                  | "AU"
+                  | "AW"
+                  | "AX"
+                  | "AZ"
+                  | "BA"
+                  | "BB"
+                  | "BD"
+                  | "BE"
+                  | "BF"
+                  | "BG"
+                  | "BH"
+                  | "BI"
+                  | "BJ"
+                  | "BL"
+                  | "BM"
+                  | "BN"
+                  | "BO"
+                  | "BQ"
+                  | "BR"
+                  | "BS"
+                  | "BT"
+                  | "BV"
+                  | "BW"
+                  | "BY"
+                  | "BZ"
+                  | "CA"
+                  | "CC"
+                  | "CD"
+                  | "CF"
+                  | "CG"
+                  | "CH"
+                  | "CI"
+                  | "CK"
+                  | "CL"
+                  | "CM"
+                  | "CN"
+                  | "CO"
+                  | "CR"
+                  | "CU"
+                  | "CV"
+                  | "CW"
+                  | "CX"
+                  | "CY"
+                  | "CZ"
+                  | "DE"
+                  | "DJ"
+                  | "DK"
+                  | "DM"
+                  | "DO"
+                  | "DZ"
+                  | "EC"
+                  | "EE"
+                  | "EG"
+                  | "EH"
+                  | "ER"
+                  | "ES"
+                  | "ET"
+                  | "FI"
+                  | "FJ"
+                  | "FK"
+                  | "FM"
+                  | "FO"
+                  | "FR"
+                  | "GA"
+                  | "GB"
+                  | "GD"
+                  | "GE"
+                  | "GF"
+                  | "GG"
+                  | "GH"
+                  | "GI"
+                  | "GL"
+                  | "GM"
+                  | "GN"
+                  | "GP"
+                  | "GQ"
+                  | "GR"
+                  | "GS"
+                  | "GT"
+                  | "GU"
+                  | "GW"
+                  | "GY"
+                  | "HK"
+                  | "HM"
+                  | "HN"
+                  | "HR"
+                  | "HT"
+                  | "HU"
+                  | "ID"
+                  | "IE"
+                  | "IL"
+                  | "IM"
+                  | "IN"
+                  | "IO"
+                  | "IQ"
+                  | "IR"
+                  | "IS"
+                  | "IT"
+                  | "JE"
+                  | "JM"
+                  | "JO"
+                  | "JP"
+                  | "KE"
+                  | "KG"
+                  | "KH"
+                  | "KI"
+                  | "KM"
+                  | "KN"
+                  | "KP"
+                  | "KR"
+                  | "KW"
+                  | "KY"
+                  | "KZ"
+                  | "LA"
+                  | "LB"
+                  | "LC"
+                  | "LI"
+                  | "LK"
+                  | "LR"
+                  | "LS"
+                  | "LT"
+                  | "LU"
+                  | "LV"
+                  | "LY"
+                  | "MA"
+                  | "MC"
+                  | "MD"
+                  | "ME"
+                  | "MF"
+                  | "MG"
+                  | "MH"
+                  | "MK"
+                  | "ML"
+                  | "MM"
+                  | "MN"
+                  | "MO"
+                  | "MP"
+                  | "MQ"
+                  | "MR"
+                  | "MS"
+                  | "MT"
+                  | "MU"
+                  | "MV"
+                  | "MW"
+                  | "MX"
+                  | "MY"
+                  | "MZ"
+                  | "NA"
+                  | "NC"
+                  | "NE"
+                  | "NF"
+                  | "NG"
+                  | "NI"
+                  | "NL"
+                  | "NO"
+                  | "NP"
+                  | "NR"
+                  | "NU"
+                  | "NZ"
+                  | "OM"
+                  | "PA"
+                  | "PE"
+                  | "PF"
+                  | "PG"
+                  | "PH"
+                  | "PK"
+                  | "PL"
+                  | "PM"
+                  | "PN"
+                  | "PR"
+                  | "PS"
+                  | "PT"
+                  | "PW"
+                  | "PY"
+                  | "QA"
+                  | "RE"
+                  | "RO"
+                  | "RS"
+                  | "RU"
+                  | "RW"
+                  | "SA"
+                  | "SB"
+                  | "SC"
+                  | "SD"
+                  | "SE"
+                  | "SG"
+                  | "SH"
+                  | "SI"
+                  | "SJ"
+                  | "SK"
+                  | "SL"
+                  | "SM"
+                  | "SN"
+                  | "SO"
+                  | "SR"
+                  | "SS"
+                  | "ST"
+                  | "SV"
+                  | "SX"
+                  | "SY"
+                  | "SZ"
+                  | "TC"
+                  | "TD"
+                  | "TF"
+                  | "TG"
+                  | "TH"
+                  | "TJ"
+                  | "TK"
+                  | "TL"
+                  | "TM"
+                  | "TN"
+                  | "TO"
+                  | "TR"
+                  | "TT"
+                  | "TV"
+                  | "TW"
+                  | "TZ"
+                  | "UA"
+                  | "UG"
+                  | "UM"
+                  | "US"
+                  | "UY"
+                  | "UZ"
+                  | "VA"
+                  | "VC"
+                  | "VE"
+                  | "VG"
+                  | "VI"
+                  | "VN"
+                  | "VU"
+                  | "WF"
+                  | "WS"
+                  | "YE"
+                  | "YT"
+                  | "ZA"
+                  | "ZM"
+                  | "ZW"
+                  | null;
+                publishedAt: null;
+              }
+            | {
+                _type: "post";
+                _id: string;
+                title: string | null;
+                slug: string | null;
+                brands: Array<string> | null;
+                brandTitles: Array<{
+                  key: string | null;
+                  title: string | null;
+                }>;
+                publishedAt: string | null;
+                excerpt: string | null;
+                image: {
+                  asset: SanityImageAssetReference | null;
+                  hotspot: SanityImageHotspot | null;
+                  crop: SanityImageCrop | null;
+                  alt: string | null;
+                } | null;
+                category: {
+                  title: string | null;
+                  slug: string | null;
+                } | null;
+              }
+            | {
+                _id: string;
+                _type: "resource";
+                slug: string | null;
+                title: string | null;
+                category: "research" | null;
+                nominationsClosingDate: null;
+                startDate: null;
+                endDate: null;
+                country: null;
+                publishedAt: string | null;
+              }
+          > | null;
+          fill:
+            | Array<{
+                _type: "post";
+                _id: string;
+                title: string | null;
+                slug: string | null;
+                brands: Array<string> | null;
+                brandTitles: Array<{
+                  key: string | null;
+                  title: string | null;
+                }>;
+                publishedAt: string | null;
+                excerpt: string | null;
+                image: {
+                  asset: SanityImageAssetReference | null;
+                  hotspot: SanityImageHotspot | null;
+                  crop: SanityImageCrop | null;
+                  alt: string | null;
+                } | null;
+                category: {
+                  title: string | null;
+                  slug: string | null;
+                } | null;
+              }>
+            | Array<{
+                _id: string;
+                _type: "resource";
+                slug: string | null;
+                title: string | null;
+                category: "research" | null;
+                nominationsClosingDate: null;
+                startDate: null;
+                endDate: null;
+                country: null;
+                publishedAt: string | null;
+              }>
+            | Array<{
+                _id: string;
+                _type: "awardsProgramme";
+                slug: string | null;
+                title: string | null;
+                category: null;
+                nominationsClosingDate: string | null;
+                startDate: string | null;
+                endDate: string | null;
+                country:
+                  | "AD"
+                  | "AE"
+                  | "AF"
+                  | "AG"
+                  | "AI"
+                  | "AL"
+                  | "AM"
+                  | "AO"
+                  | "AQ"
+                  | "AR"
+                  | "AS"
+                  | "AT"
+                  | "AU"
+                  | "AW"
+                  | "AX"
+                  | "AZ"
+                  | "BA"
+                  | "BB"
+                  | "BD"
+                  | "BE"
+                  | "BF"
+                  | "BG"
+                  | "BH"
+                  | "BI"
+                  | "BJ"
+                  | "BL"
+                  | "BM"
+                  | "BN"
+                  | "BO"
+                  | "BQ"
+                  | "BR"
+                  | "BS"
+                  | "BT"
+                  | "BV"
+                  | "BW"
+                  | "BY"
+                  | "BZ"
+                  | "CA"
+                  | "CC"
+                  | "CD"
+                  | "CF"
+                  | "CG"
+                  | "CH"
+                  | "CI"
+                  | "CK"
+                  | "CL"
+                  | "CM"
+                  | "CN"
+                  | "CO"
+                  | "CR"
+                  | "CU"
+                  | "CV"
+                  | "CW"
+                  | "CX"
+                  | "CY"
+                  | "CZ"
+                  | "DE"
+                  | "DJ"
+                  | "DK"
+                  | "DM"
+                  | "DO"
+                  | "DZ"
+                  | "EC"
+                  | "EE"
+                  | "EG"
+                  | "EH"
+                  | "ER"
+                  | "ES"
+                  | "ET"
+                  | "FI"
+                  | "FJ"
+                  | "FK"
+                  | "FM"
+                  | "FO"
+                  | "FR"
+                  | "GA"
+                  | "GB"
+                  | "GD"
+                  | "GE"
+                  | "GF"
+                  | "GG"
+                  | "GH"
+                  | "GI"
+                  | "GL"
+                  | "GM"
+                  | "GN"
+                  | "GP"
+                  | "GQ"
+                  | "GR"
+                  | "GS"
+                  | "GT"
+                  | "GU"
+                  | "GW"
+                  | "GY"
+                  | "HK"
+                  | "HM"
+                  | "HN"
+                  | "HR"
+                  | "HT"
+                  | "HU"
+                  | "ID"
+                  | "IE"
+                  | "IL"
+                  | "IM"
+                  | "IN"
+                  | "IO"
+                  | "IQ"
+                  | "IR"
+                  | "IS"
+                  | "IT"
+                  | "JE"
+                  | "JM"
+                  | "JO"
+                  | "JP"
+                  | "KE"
+                  | "KG"
+                  | "KH"
+                  | "KI"
+                  | "KM"
+                  | "KN"
+                  | "KP"
+                  | "KR"
+                  | "KW"
+                  | "KY"
+                  | "KZ"
+                  | "LA"
+                  | "LB"
+                  | "LC"
+                  | "LI"
+                  | "LK"
+                  | "LR"
+                  | "LS"
+                  | "LT"
+                  | "LU"
+                  | "LV"
+                  | "LY"
+                  | "MA"
+                  | "MC"
+                  | "MD"
+                  | "ME"
+                  | "MF"
+                  | "MG"
+                  | "MH"
+                  | "MK"
+                  | "ML"
+                  | "MM"
+                  | "MN"
+                  | "MO"
+                  | "MP"
+                  | "MQ"
+                  | "MR"
+                  | "MS"
+                  | "MT"
+                  | "MU"
+                  | "MV"
+                  | "MW"
+                  | "MX"
+                  | "MY"
+                  | "MZ"
+                  | "NA"
+                  | "NC"
+                  | "NE"
+                  | "NF"
+                  | "NG"
+                  | "NI"
+                  | "NL"
+                  | "NO"
+                  | "NP"
+                  | "NR"
+                  | "NU"
+                  | "NZ"
+                  | "OM"
+                  | "PA"
+                  | "PE"
+                  | "PF"
+                  | "PG"
+                  | "PH"
+                  | "PK"
+                  | "PL"
+                  | "PM"
+                  | "PN"
+                  | "PR"
+                  | "PS"
+                  | "PT"
+                  | "PW"
+                  | "PY"
+                  | "QA"
+                  | "RE"
+                  | "RO"
+                  | "RS"
+                  | "RU"
+                  | "RW"
+                  | "SA"
+                  | "SB"
+                  | "SC"
+                  | "SD"
+                  | "SE"
+                  | "SG"
+                  | "SH"
+                  | "SI"
+                  | "SJ"
+                  | "SK"
+                  | "SL"
+                  | "SM"
+                  | "SN"
+                  | "SO"
+                  | "SR"
+                  | "SS"
+                  | "ST"
+                  | "SV"
+                  | "SX"
+                  | "SY"
+                  | "SZ"
+                  | "TC"
+                  | "TD"
+                  | "TF"
+                  | "TG"
+                  | "TH"
+                  | "TJ"
+                  | "TK"
+                  | "TL"
+                  | "TM"
+                  | "TN"
+                  | "TO"
+                  | "TR"
+                  | "TT"
+                  | "TV"
+                  | "TW"
+                  | "TZ"
+                  | "UA"
+                  | "UG"
+                  | "UM"
+                  | "US"
+                  | "UY"
+                  | "UZ"
+                  | "VA"
+                  | "VC"
+                  | "VE"
+                  | "VG"
+                  | "VI"
+                  | "VN"
+                  | "VU"
+                  | "WF"
+                  | "WS"
+                  | "YE"
+                  | "YT"
+                  | "ZA"
+                  | "ZM"
+                  | "ZW"
+                  | null;
+                publishedAt: null;
+              }>
+            | Array<{
+                _id: string;
+                _type: "conferenceEvent";
+                slug: string | null;
+                title: string | null;
+                category: null;
+                nominationsClosingDate: null;
+                startDate: string | null;
+                endDate: string | null;
+                country:
+                  | "AD"
+                  | "AE"
+                  | "AF"
+                  | "AG"
+                  | "AI"
+                  | "AL"
+                  | "AM"
+                  | "AO"
+                  | "AQ"
+                  | "AR"
+                  | "AS"
+                  | "AT"
+                  | "AU"
+                  | "AW"
+                  | "AX"
+                  | "AZ"
+                  | "BA"
+                  | "BB"
+                  | "BD"
+                  | "BE"
+                  | "BF"
+                  | "BG"
+                  | "BH"
+                  | "BI"
+                  | "BJ"
+                  | "BL"
+                  | "BM"
+                  | "BN"
+                  | "BO"
+                  | "BQ"
+                  | "BR"
+                  | "BS"
+                  | "BT"
+                  | "BV"
+                  | "BW"
+                  | "BY"
+                  | "BZ"
+                  | "CA"
+                  | "CC"
+                  | "CD"
+                  | "CF"
+                  | "CG"
+                  | "CH"
+                  | "CI"
+                  | "CK"
+                  | "CL"
+                  | "CM"
+                  | "CN"
+                  | "CO"
+                  | "CR"
+                  | "CU"
+                  | "CV"
+                  | "CW"
+                  | "CX"
+                  | "CY"
+                  | "CZ"
+                  | "DE"
+                  | "DJ"
+                  | "DK"
+                  | "DM"
+                  | "DO"
+                  | "DZ"
+                  | "EC"
+                  | "EE"
+                  | "EG"
+                  | "EH"
+                  | "ER"
+                  | "ES"
+                  | "ET"
+                  | "FI"
+                  | "FJ"
+                  | "FK"
+                  | "FM"
+                  | "FO"
+                  | "FR"
+                  | "GA"
+                  | "GB"
+                  | "GD"
+                  | "GE"
+                  | "GF"
+                  | "GG"
+                  | "GH"
+                  | "GI"
+                  | "GL"
+                  | "GM"
+                  | "GN"
+                  | "GP"
+                  | "GQ"
+                  | "GR"
+                  | "GS"
+                  | "GT"
+                  | "GU"
+                  | "GW"
+                  | "GY"
+                  | "HK"
+                  | "HM"
+                  | "HN"
+                  | "HR"
+                  | "HT"
+                  | "HU"
+                  | "ID"
+                  | "IE"
+                  | "IL"
+                  | "IM"
+                  | "IN"
+                  | "IO"
+                  | "IQ"
+                  | "IR"
+                  | "IS"
+                  | "IT"
+                  | "JE"
+                  | "JM"
+                  | "JO"
+                  | "JP"
+                  | "KE"
+                  | "KG"
+                  | "KH"
+                  | "KI"
+                  | "KM"
+                  | "KN"
+                  | "KP"
+                  | "KR"
+                  | "KW"
+                  | "KY"
+                  | "KZ"
+                  | "LA"
+                  | "LB"
+                  | "LC"
+                  | "LI"
+                  | "LK"
+                  | "LR"
+                  | "LS"
+                  | "LT"
+                  | "LU"
+                  | "LV"
+                  | "LY"
+                  | "MA"
+                  | "MC"
+                  | "MD"
+                  | "ME"
+                  | "MF"
+                  | "MG"
+                  | "MH"
+                  | "MK"
+                  | "ML"
+                  | "MM"
+                  | "MN"
+                  | "MO"
+                  | "MP"
+                  | "MQ"
+                  | "MR"
+                  | "MS"
+                  | "MT"
+                  | "MU"
+                  | "MV"
+                  | "MW"
+                  | "MX"
+                  | "MY"
+                  | "MZ"
+                  | "NA"
+                  | "NC"
+                  | "NE"
+                  | "NF"
+                  | "NG"
+                  | "NI"
+                  | "NL"
+                  | "NO"
+                  | "NP"
+                  | "NR"
+                  | "NU"
+                  | "NZ"
+                  | "OM"
+                  | "PA"
+                  | "PE"
+                  | "PF"
+                  | "PG"
+                  | "PH"
+                  | "PK"
+                  | "PL"
+                  | "PM"
+                  | "PN"
+                  | "PR"
+                  | "PS"
+                  | "PT"
+                  | "PW"
+                  | "PY"
+                  | "QA"
+                  | "RE"
+                  | "RO"
+                  | "RS"
+                  | "RU"
+                  | "RW"
+                  | "SA"
+                  | "SB"
+                  | "SC"
+                  | "SD"
+                  | "SE"
+                  | "SG"
+                  | "SH"
+                  | "SI"
+                  | "SJ"
+                  | "SK"
+                  | "SL"
+                  | "SM"
+                  | "SN"
+                  | "SO"
+                  | "SR"
+                  | "SS"
+                  | "ST"
+                  | "SV"
+                  | "SX"
+                  | "SY"
+                  | "SZ"
+                  | "TC"
+                  | "TD"
+                  | "TF"
+                  | "TG"
+                  | "TH"
+                  | "TJ"
+                  | "TK"
+                  | "TL"
+                  | "TM"
+                  | "TN"
+                  | "TO"
+                  | "TR"
+                  | "TT"
+                  | "TV"
+                  | "TW"
+                  | "TZ"
+                  | "UA"
+                  | "UG"
+                  | "UM"
+                  | "US"
+                  | "UY"
+                  | "UZ"
+                  | "VA"
+                  | "VC"
+                  | "VE"
+                  | "VG"
+                  | "VI"
+                  | "VN"
+                  | "VU"
+                  | "WF"
+                  | "WS"
+                  | "YE"
+                  | "YT"
+                  | "ZA"
+                  | "ZM"
+                  | "ZW"
+                  | null;
+                publishedAt: null;
+              }>;
+        }> | null;
+      }
+    | {
+        _key: string;
+        _type: "featuredStories";
+        heading: Array<{
+          _key: string;
+          style: "h1" | "h2" | "h3" | "h4" | "h5" | "h6" | "normal" | null;
+          children: Array<{
+            _key: string;
+            text: string | null;
+          }> | null;
+        }> | null;
+        link: {
+          label: string | null;
+          kind: "external" | "internal" | null;
+          external: string | null;
+          internal:
+            | {
+                _type: "awardsProgramme";
+                slug: string | null;
+                brand: null;
+                brands: null;
+              }
+            | {
+                _type: "conferenceEvent";
+                slug: string | null;
+                brand: null;
+                brands: null;
+              }
+            | {
+                _type: "page";
+                slug: string | null;
+                brand:
+                  | "clearview"
+                  | "familywealthreport"
+                  | "wealthbriefing"
+                  | "wealthbriefingasia"
+                  | null;
+                brands: null;
+              }
+            | {
+                _type: "post";
+                slug: string | null;
+                brand: null;
+                brands: Array<string> | null;
+              }
+            | {
+                _type: "resource";
+                slug: string | null;
+                brand: null;
+                brands: null;
+              }
+            | null;
+        } | null;
+        posts: Array<{
+          _id: string;
+          title: string | null;
+          slug: string | null;
+          brands: Array<string> | null;
+          brandTitles: Array<{
+            key: string | null;
+            title: string | null;
+          }>;
+          publishedAt: string | null;
+          excerpt: string | null;
+          image: {
+            asset: SanityImageAssetReference | null;
+            hotspot: SanityImageHotspot | null;
+            crop: SanityImageCrop | null;
+            alt: string | null;
+          } | null;
+          category: {
+            title: string | null;
+            slug: string | null;
+          } | null;
+        }> | null;
+      }
+    | {
+        _key: string;
+        _type: "highlights";
+        source: "awards" | "events" | "research" | null;
+        count: number | null;
+        heading: Array<{
+          _key: string;
+          style: "h1" | "h2" | "h3" | "h4" | "h5" | "h6" | "normal" | null;
+          children: Array<{
+            _key: string;
+            text: string | null;
+          }> | null;
+        }> | null;
+        deadlineLabel: string | null;
+        items: Array<
+          | {
+              _id: string;
+              _type: "awardsProgramme";
+              slug: string | null;
+              title: string | null;
+              category: null;
+              nominationsClosingDate: string | null;
+              startDate: string | null;
+              endDate: string | null;
+              country:
+                | "AD"
+                | "AE"
+                | "AF"
+                | "AG"
+                | "AI"
+                | "AL"
+                | "AM"
+                | "AO"
+                | "AQ"
+                | "AR"
+                | "AS"
+                | "AT"
+                | "AU"
+                | "AW"
+                | "AX"
+                | "AZ"
+                | "BA"
+                | "BB"
+                | "BD"
+                | "BE"
+                | "BF"
+                | "BG"
+                | "BH"
+                | "BI"
+                | "BJ"
+                | "BL"
+                | "BM"
+                | "BN"
+                | "BO"
+                | "BQ"
+                | "BR"
+                | "BS"
+                | "BT"
+                | "BV"
+                | "BW"
+                | "BY"
+                | "BZ"
+                | "CA"
+                | "CC"
+                | "CD"
+                | "CF"
+                | "CG"
+                | "CH"
+                | "CI"
+                | "CK"
+                | "CL"
+                | "CM"
+                | "CN"
+                | "CO"
+                | "CR"
+                | "CU"
+                | "CV"
+                | "CW"
+                | "CX"
+                | "CY"
+                | "CZ"
+                | "DE"
+                | "DJ"
+                | "DK"
+                | "DM"
+                | "DO"
+                | "DZ"
+                | "EC"
+                | "EE"
+                | "EG"
+                | "EH"
+                | "ER"
+                | "ES"
+                | "ET"
+                | "FI"
+                | "FJ"
+                | "FK"
+                | "FM"
+                | "FO"
+                | "FR"
+                | "GA"
+                | "GB"
+                | "GD"
+                | "GE"
+                | "GF"
+                | "GG"
+                | "GH"
+                | "GI"
+                | "GL"
+                | "GM"
+                | "GN"
+                | "GP"
+                | "GQ"
+                | "GR"
+                | "GS"
+                | "GT"
+                | "GU"
+                | "GW"
+                | "GY"
+                | "HK"
+                | "HM"
+                | "HN"
+                | "HR"
+                | "HT"
+                | "HU"
+                | "ID"
+                | "IE"
+                | "IL"
+                | "IM"
+                | "IN"
+                | "IO"
+                | "IQ"
+                | "IR"
+                | "IS"
+                | "IT"
+                | "JE"
+                | "JM"
+                | "JO"
+                | "JP"
+                | "KE"
+                | "KG"
+                | "KH"
+                | "KI"
+                | "KM"
+                | "KN"
+                | "KP"
+                | "KR"
+                | "KW"
+                | "KY"
+                | "KZ"
+                | "LA"
+                | "LB"
+                | "LC"
+                | "LI"
+                | "LK"
+                | "LR"
+                | "LS"
+                | "LT"
+                | "LU"
+                | "LV"
+                | "LY"
+                | "MA"
+                | "MC"
+                | "MD"
+                | "ME"
+                | "MF"
+                | "MG"
+                | "MH"
+                | "MK"
+                | "ML"
+                | "MM"
+                | "MN"
+                | "MO"
+                | "MP"
+                | "MQ"
+                | "MR"
+                | "MS"
+                | "MT"
+                | "MU"
+                | "MV"
+                | "MW"
+                | "MX"
+                | "MY"
+                | "MZ"
+                | "NA"
+                | "NC"
+                | "NE"
+                | "NF"
+                | "NG"
+                | "NI"
+                | "NL"
+                | "NO"
+                | "NP"
+                | "NR"
+                | "NU"
+                | "NZ"
+                | "OM"
+                | "PA"
+                | "PE"
+                | "PF"
+                | "PG"
+                | "PH"
+                | "PK"
+                | "PL"
+                | "PM"
+                | "PN"
+                | "PR"
+                | "PS"
+                | "PT"
+                | "PW"
+                | "PY"
+                | "QA"
+                | "RE"
+                | "RO"
+                | "RS"
+                | "RU"
+                | "RW"
+                | "SA"
+                | "SB"
+                | "SC"
+                | "SD"
+                | "SE"
+                | "SG"
+                | "SH"
+                | "SI"
+                | "SJ"
+                | "SK"
+                | "SL"
+                | "SM"
+                | "SN"
+                | "SO"
+                | "SR"
+                | "SS"
+                | "ST"
+                | "SV"
+                | "SX"
+                | "SY"
+                | "SZ"
+                | "TC"
+                | "TD"
+                | "TF"
+                | "TG"
+                | "TH"
+                | "TJ"
+                | "TK"
+                | "TL"
+                | "TM"
+                | "TN"
+                | "TO"
+                | "TR"
+                | "TT"
+                | "TV"
+                | "TW"
+                | "TZ"
+                | "UA"
+                | "UG"
+                | "UM"
+                | "US"
+                | "UY"
+                | "UZ"
+                | "VA"
+                | "VC"
+                | "VE"
+                | "VG"
+                | "VI"
+                | "VN"
+                | "VU"
+                | "WF"
+                | "WS"
+                | "YE"
+                | "YT"
+                | "ZA"
+                | "ZM"
+                | "ZW"
+                | null;
+              publishedAt: null;
+            }
+          | {
+              _id: string;
+              _type: "conferenceEvent";
+              slug: string | null;
+              title: string | null;
+              category: null;
+              nominationsClosingDate: null;
+              startDate: string | null;
+              endDate: string | null;
+              country:
+                | "AD"
+                | "AE"
+                | "AF"
+                | "AG"
+                | "AI"
+                | "AL"
+                | "AM"
+                | "AO"
+                | "AQ"
+                | "AR"
+                | "AS"
+                | "AT"
+                | "AU"
+                | "AW"
+                | "AX"
+                | "AZ"
+                | "BA"
+                | "BB"
+                | "BD"
+                | "BE"
+                | "BF"
+                | "BG"
+                | "BH"
+                | "BI"
+                | "BJ"
+                | "BL"
+                | "BM"
+                | "BN"
+                | "BO"
+                | "BQ"
+                | "BR"
+                | "BS"
+                | "BT"
+                | "BV"
+                | "BW"
+                | "BY"
+                | "BZ"
+                | "CA"
+                | "CC"
+                | "CD"
+                | "CF"
+                | "CG"
+                | "CH"
+                | "CI"
+                | "CK"
+                | "CL"
+                | "CM"
+                | "CN"
+                | "CO"
+                | "CR"
+                | "CU"
+                | "CV"
+                | "CW"
+                | "CX"
+                | "CY"
+                | "CZ"
+                | "DE"
+                | "DJ"
+                | "DK"
+                | "DM"
+                | "DO"
+                | "DZ"
+                | "EC"
+                | "EE"
+                | "EG"
+                | "EH"
+                | "ER"
+                | "ES"
+                | "ET"
+                | "FI"
+                | "FJ"
+                | "FK"
+                | "FM"
+                | "FO"
+                | "FR"
+                | "GA"
+                | "GB"
+                | "GD"
+                | "GE"
+                | "GF"
+                | "GG"
+                | "GH"
+                | "GI"
+                | "GL"
+                | "GM"
+                | "GN"
+                | "GP"
+                | "GQ"
+                | "GR"
+                | "GS"
+                | "GT"
+                | "GU"
+                | "GW"
+                | "GY"
+                | "HK"
+                | "HM"
+                | "HN"
+                | "HR"
+                | "HT"
+                | "HU"
+                | "ID"
+                | "IE"
+                | "IL"
+                | "IM"
+                | "IN"
+                | "IO"
+                | "IQ"
+                | "IR"
+                | "IS"
+                | "IT"
+                | "JE"
+                | "JM"
+                | "JO"
+                | "JP"
+                | "KE"
+                | "KG"
+                | "KH"
+                | "KI"
+                | "KM"
+                | "KN"
+                | "KP"
+                | "KR"
+                | "KW"
+                | "KY"
+                | "KZ"
+                | "LA"
+                | "LB"
+                | "LC"
+                | "LI"
+                | "LK"
+                | "LR"
+                | "LS"
+                | "LT"
+                | "LU"
+                | "LV"
+                | "LY"
+                | "MA"
+                | "MC"
+                | "MD"
+                | "ME"
+                | "MF"
+                | "MG"
+                | "MH"
+                | "MK"
+                | "ML"
+                | "MM"
+                | "MN"
+                | "MO"
+                | "MP"
+                | "MQ"
+                | "MR"
+                | "MS"
+                | "MT"
+                | "MU"
+                | "MV"
+                | "MW"
+                | "MX"
+                | "MY"
+                | "MZ"
+                | "NA"
+                | "NC"
+                | "NE"
+                | "NF"
+                | "NG"
+                | "NI"
+                | "NL"
+                | "NO"
+                | "NP"
+                | "NR"
+                | "NU"
+                | "NZ"
+                | "OM"
+                | "PA"
+                | "PE"
+                | "PF"
+                | "PG"
+                | "PH"
+                | "PK"
+                | "PL"
+                | "PM"
+                | "PN"
+                | "PR"
+                | "PS"
+                | "PT"
+                | "PW"
+                | "PY"
+                | "QA"
+                | "RE"
+                | "RO"
+                | "RS"
+                | "RU"
+                | "RW"
+                | "SA"
+                | "SB"
+                | "SC"
+                | "SD"
+                | "SE"
+                | "SG"
+                | "SH"
+                | "SI"
+                | "SJ"
+                | "SK"
+                | "SL"
+                | "SM"
+                | "SN"
+                | "SO"
+                | "SR"
+                | "SS"
+                | "ST"
+                | "SV"
+                | "SX"
+                | "SY"
+                | "SZ"
+                | "TC"
+                | "TD"
+                | "TF"
+                | "TG"
+                | "TH"
+                | "TJ"
+                | "TK"
+                | "TL"
+                | "TM"
+                | "TN"
+                | "TO"
+                | "TR"
+                | "TT"
+                | "TV"
+                | "TW"
+                | "TZ"
+                | "UA"
+                | "UG"
+                | "UM"
+                | "US"
+                | "UY"
+                | "UZ"
+                | "VA"
+                | "VC"
+                | "VE"
+                | "VG"
+                | "VI"
+                | "VN"
+                | "VU"
+                | "WF"
+                | "WS"
+                | "YE"
+                | "YT"
+                | "ZA"
+                | "ZM"
+                | "ZW"
+                | null;
+              publishedAt: null;
+            }
+          | {
+              _id: string;
+              _type: "resource";
+              slug: string | null;
+              title: string | null;
+              category: "research" | null;
+              nominationsClosingDate: null;
+              startDate: null;
+              endDate: null;
+              country: null;
+              publishedAt: string | null;
+            }
+        > | null;
+        fill:
+          | Array<{
+              _id: string;
+              _type: "resource";
+              slug: string | null;
+              title: string | null;
+              category: "research" | null;
+              nominationsClosingDate: null;
+              startDate: null;
+              endDate: null;
+              country: null;
+              publishedAt: string | null;
+            }>
+          | Array<{
+              _id: string;
+              _type: "awardsProgramme";
+              slug: string | null;
+              title: string | null;
+              category: null;
+              nominationsClosingDate: string | null;
+              startDate: string | null;
+              endDate: string | null;
+              country:
+                | "AD"
+                | "AE"
+                | "AF"
+                | "AG"
+                | "AI"
+                | "AL"
+                | "AM"
+                | "AO"
+                | "AQ"
+                | "AR"
+                | "AS"
+                | "AT"
+                | "AU"
+                | "AW"
+                | "AX"
+                | "AZ"
+                | "BA"
+                | "BB"
+                | "BD"
+                | "BE"
+                | "BF"
+                | "BG"
+                | "BH"
+                | "BI"
+                | "BJ"
+                | "BL"
+                | "BM"
+                | "BN"
+                | "BO"
+                | "BQ"
+                | "BR"
+                | "BS"
+                | "BT"
+                | "BV"
+                | "BW"
+                | "BY"
+                | "BZ"
+                | "CA"
+                | "CC"
+                | "CD"
+                | "CF"
+                | "CG"
+                | "CH"
+                | "CI"
+                | "CK"
+                | "CL"
+                | "CM"
+                | "CN"
+                | "CO"
+                | "CR"
+                | "CU"
+                | "CV"
+                | "CW"
+                | "CX"
+                | "CY"
+                | "CZ"
+                | "DE"
+                | "DJ"
+                | "DK"
+                | "DM"
+                | "DO"
+                | "DZ"
+                | "EC"
+                | "EE"
+                | "EG"
+                | "EH"
+                | "ER"
+                | "ES"
+                | "ET"
+                | "FI"
+                | "FJ"
+                | "FK"
+                | "FM"
+                | "FO"
+                | "FR"
+                | "GA"
+                | "GB"
+                | "GD"
+                | "GE"
+                | "GF"
+                | "GG"
+                | "GH"
+                | "GI"
+                | "GL"
+                | "GM"
+                | "GN"
+                | "GP"
+                | "GQ"
+                | "GR"
+                | "GS"
+                | "GT"
+                | "GU"
+                | "GW"
+                | "GY"
+                | "HK"
+                | "HM"
+                | "HN"
+                | "HR"
+                | "HT"
+                | "HU"
+                | "ID"
+                | "IE"
+                | "IL"
+                | "IM"
+                | "IN"
+                | "IO"
+                | "IQ"
+                | "IR"
+                | "IS"
+                | "IT"
+                | "JE"
+                | "JM"
+                | "JO"
+                | "JP"
+                | "KE"
+                | "KG"
+                | "KH"
+                | "KI"
+                | "KM"
+                | "KN"
+                | "KP"
+                | "KR"
+                | "KW"
+                | "KY"
+                | "KZ"
+                | "LA"
+                | "LB"
+                | "LC"
+                | "LI"
+                | "LK"
+                | "LR"
+                | "LS"
+                | "LT"
+                | "LU"
+                | "LV"
+                | "LY"
+                | "MA"
+                | "MC"
+                | "MD"
+                | "ME"
+                | "MF"
+                | "MG"
+                | "MH"
+                | "MK"
+                | "ML"
+                | "MM"
+                | "MN"
+                | "MO"
+                | "MP"
+                | "MQ"
+                | "MR"
+                | "MS"
+                | "MT"
+                | "MU"
+                | "MV"
+                | "MW"
+                | "MX"
+                | "MY"
+                | "MZ"
+                | "NA"
+                | "NC"
+                | "NE"
+                | "NF"
+                | "NG"
+                | "NI"
+                | "NL"
+                | "NO"
+                | "NP"
+                | "NR"
+                | "NU"
+                | "NZ"
+                | "OM"
+                | "PA"
+                | "PE"
+                | "PF"
+                | "PG"
+                | "PH"
+                | "PK"
+                | "PL"
+                | "PM"
+                | "PN"
+                | "PR"
+                | "PS"
+                | "PT"
+                | "PW"
+                | "PY"
+                | "QA"
+                | "RE"
+                | "RO"
+                | "RS"
+                | "RU"
+                | "RW"
+                | "SA"
+                | "SB"
+                | "SC"
+                | "SD"
+                | "SE"
+                | "SG"
+                | "SH"
+                | "SI"
+                | "SJ"
+                | "SK"
+                | "SL"
+                | "SM"
+                | "SN"
+                | "SO"
+                | "SR"
+                | "SS"
+                | "ST"
+                | "SV"
+                | "SX"
+                | "SY"
+                | "SZ"
+                | "TC"
+                | "TD"
+                | "TF"
+                | "TG"
+                | "TH"
+                | "TJ"
+                | "TK"
+                | "TL"
+                | "TM"
+                | "TN"
+                | "TO"
+                | "TR"
+                | "TT"
+                | "TV"
+                | "TW"
+                | "TZ"
+                | "UA"
+                | "UG"
+                | "UM"
+                | "US"
+                | "UY"
+                | "UZ"
+                | "VA"
+                | "VC"
+                | "VE"
+                | "VG"
+                | "VI"
+                | "VN"
+                | "VU"
+                | "WF"
+                | "WS"
+                | "YE"
+                | "YT"
+                | "ZA"
+                | "ZM"
+                | "ZW"
+                | null;
+              publishedAt: null;
+            }>
+          | Array<{
+              _id: string;
+              _type: "conferenceEvent";
+              slug: string | null;
+              title: string | null;
+              category: null;
+              nominationsClosingDate: null;
+              startDate: string | null;
+              endDate: string | null;
+              country:
+                | "AD"
+                | "AE"
+                | "AF"
+                | "AG"
+                | "AI"
+                | "AL"
+                | "AM"
+                | "AO"
+                | "AQ"
+                | "AR"
+                | "AS"
+                | "AT"
+                | "AU"
+                | "AW"
+                | "AX"
+                | "AZ"
+                | "BA"
+                | "BB"
+                | "BD"
+                | "BE"
+                | "BF"
+                | "BG"
+                | "BH"
+                | "BI"
+                | "BJ"
+                | "BL"
+                | "BM"
+                | "BN"
+                | "BO"
+                | "BQ"
+                | "BR"
+                | "BS"
+                | "BT"
+                | "BV"
+                | "BW"
+                | "BY"
+                | "BZ"
+                | "CA"
+                | "CC"
+                | "CD"
+                | "CF"
+                | "CG"
+                | "CH"
+                | "CI"
+                | "CK"
+                | "CL"
+                | "CM"
+                | "CN"
+                | "CO"
+                | "CR"
+                | "CU"
+                | "CV"
+                | "CW"
+                | "CX"
+                | "CY"
+                | "CZ"
+                | "DE"
+                | "DJ"
+                | "DK"
+                | "DM"
+                | "DO"
+                | "DZ"
+                | "EC"
+                | "EE"
+                | "EG"
+                | "EH"
+                | "ER"
+                | "ES"
+                | "ET"
+                | "FI"
+                | "FJ"
+                | "FK"
+                | "FM"
+                | "FO"
+                | "FR"
+                | "GA"
+                | "GB"
+                | "GD"
+                | "GE"
+                | "GF"
+                | "GG"
+                | "GH"
+                | "GI"
+                | "GL"
+                | "GM"
+                | "GN"
+                | "GP"
+                | "GQ"
+                | "GR"
+                | "GS"
+                | "GT"
+                | "GU"
+                | "GW"
+                | "GY"
+                | "HK"
+                | "HM"
+                | "HN"
+                | "HR"
+                | "HT"
+                | "HU"
+                | "ID"
+                | "IE"
+                | "IL"
+                | "IM"
+                | "IN"
+                | "IO"
+                | "IQ"
+                | "IR"
+                | "IS"
+                | "IT"
+                | "JE"
+                | "JM"
+                | "JO"
+                | "JP"
+                | "KE"
+                | "KG"
+                | "KH"
+                | "KI"
+                | "KM"
+                | "KN"
+                | "KP"
+                | "KR"
+                | "KW"
+                | "KY"
+                | "KZ"
+                | "LA"
+                | "LB"
+                | "LC"
+                | "LI"
+                | "LK"
+                | "LR"
+                | "LS"
+                | "LT"
+                | "LU"
+                | "LV"
+                | "LY"
+                | "MA"
+                | "MC"
+                | "MD"
+                | "ME"
+                | "MF"
+                | "MG"
+                | "MH"
+                | "MK"
+                | "ML"
+                | "MM"
+                | "MN"
+                | "MO"
+                | "MP"
+                | "MQ"
+                | "MR"
+                | "MS"
+                | "MT"
+                | "MU"
+                | "MV"
+                | "MW"
+                | "MX"
+                | "MY"
+                | "MZ"
+                | "NA"
+                | "NC"
+                | "NE"
+                | "NF"
+                | "NG"
+                | "NI"
+                | "NL"
+                | "NO"
+                | "NP"
+                | "NR"
+                | "NU"
+                | "NZ"
+                | "OM"
+                | "PA"
+                | "PE"
+                | "PF"
+                | "PG"
+                | "PH"
+                | "PK"
+                | "PL"
+                | "PM"
+                | "PN"
+                | "PR"
+                | "PS"
+                | "PT"
+                | "PW"
+                | "PY"
+                | "QA"
+                | "RE"
+                | "RO"
+                | "RS"
+                | "RU"
+                | "RW"
+                | "SA"
+                | "SB"
+                | "SC"
+                | "SD"
+                | "SE"
+                | "SG"
+                | "SH"
+                | "SI"
+                | "SJ"
+                | "SK"
+                | "SL"
+                | "SM"
+                | "SN"
+                | "SO"
+                | "SR"
+                | "SS"
+                | "ST"
+                | "SV"
+                | "SX"
+                | "SY"
+                | "SZ"
+                | "TC"
+                | "TD"
+                | "TF"
+                | "TG"
+                | "TH"
+                | "TJ"
+                | "TK"
+                | "TL"
+                | "TM"
+                | "TN"
+                | "TO"
+                | "TR"
+                | "TT"
+                | "TV"
+                | "TW"
+                | "TZ"
+                | "UA"
+                | "UG"
+                | "UM"
+                | "US"
+                | "UY"
+                | "UZ"
+                | "VA"
+                | "VC"
+                | "VE"
+                | "VG"
+                | "VI"
+                | "VN"
+                | "VU"
+                | "WF"
+                | "WS"
+                | "YE"
+                | "YT"
+                | "ZA"
+                | "ZM"
+                | "ZW"
+                | null;
+              publishedAt: null;
+            }>;
+        button: {
+          label: string | null;
+          kind: "external" | "internal" | null;
+          external: string | null;
+          internal:
+            | {
+                _type: "awardsProgramme";
+                slug: string | null;
+                brand: null;
+                brands: null;
+              }
+            | {
+                _type: "conferenceEvent";
+                slug: string | null;
+                brand: null;
+                brands: null;
+              }
+            | {
+                _type: "page";
+                slug: string | null;
+                brand:
+                  | "clearview"
+                  | "familywealthreport"
+                  | "wealthbriefing"
+                  | "wealthbriefingasia"
+                  | null;
+                brands: null;
+              }
+            | {
+                _type: "post";
+                slug: string | null;
+                brand: null;
+                brands: Array<string> | null;
+              }
+            | {
+                _type: "resource";
+                slug: string | null;
+                brand: null;
+                brands: null;
+              }
+            | null;
+        } | null;
+        promo: {
+          resource: {
+            title: string | null;
+            downloadThumbnail: {
+              asset: SanityImageAssetReference | null;
+              hotspot: SanityImageHotspot | null;
+              crop: SanityImageCrop | null;
+              alt: string | null;
+            } | null;
+            downloadFileUrl: string | null;
+            downloadFileName: string | null;
+            downloadUrl: string | null;
+          } | null;
+          title: string | null;
+          description: string | null;
+          image: {
+            asset: SanityImageAssetReference | null;
+            hotspot: SanityImageHotspot | null;
+            crop: SanityImageCrop | null;
+            alt: string | null;
+          } | null;
+          link: {
+            kind: "external" | "internal" | null;
+            external: string | null;
+            internal:
+              | {
+                  _type: "awardsProgramme";
+                  slug: string | null;
+                  brand: null;
+                  brands: null;
+                }
+              | {
+                  _type: "conferenceEvent";
+                  slug: string | null;
+                  brand: null;
+                  brands: null;
+                }
+              | {
+                  _type: "page";
+                  slug: string | null;
+                  brand:
+                    | "clearview"
+                    | "familywealthreport"
+                    | "wealthbriefing"
+                    | "wealthbriefingasia"
+                    | null;
+                  brands: null;
+                }
+              | {
+                  _type: "post";
+                  slug: string | null;
+                  brand: null;
+                  brands: Array<string> | null;
+                }
+              | {
+                  _type: "resource";
+                  slug: string | null;
+                  brand: null;
+                  brands: null;
+                }
+              | null;
+          } | null;
+        } | null;
+      }
+    | {
+        _key: string;
+        _type: "newsletterSignup";
+        heading: Array<{
+          _key: string;
+          style: "h1" | "h2" | "h3" | "h4" | "h5" | "h6" | "normal" | null;
+          children: Array<{
+            _key: string;
+            text: string | null;
+          }> | null;
+        }> | null;
+        body: string | null;
+        preferencesLabel: string | null;
+        options: Array<{
+          _key: string;
+          label: string | null;
+          defaultChecked: boolean | null;
+          interestKey: string | null;
+        }> | null;
+        emailPlaceholder: string | null;
+        buttonLabel: string | null;
+        invalidEmailMessage: string | null;
+        noOptionMessage: string | null;
+        image: {
+          asset: SanityImageAssetReference | null;
+          hotspot: SanityImageHotspot | null;
+          crop: SanityImageCrop | null;
+          alt: string | null;
+        } | null;
+      }
+    | {
+        _key: string;
+        _type: "postBriefs";
+        heading: Array<{
+          _key: string;
+          style: "h1" | "h2" | "h3" | "h4" | "h5" | "h6" | "normal" | null;
+          children: Array<{
+            _key: string;
+            text: string | null;
+          }> | null;
+        }> | null;
+        link: {
+          label: string | null;
+          kind: "external" | "internal" | null;
+          external: string | null;
+          internal:
+            | {
+                _type: "awardsProgramme";
+                slug: string | null;
+                brand: null;
+                brands: null;
+              }
+            | {
+                _type: "conferenceEvent";
+                slug: string | null;
+                brand: null;
+                brands: null;
+              }
+            | {
+                _type: "page";
+                slug: string | null;
+                brand:
+                  | "clearview"
+                  | "familywealthreport"
+                  | "wealthbriefing"
+                  | "wealthbriefingasia"
+                  | null;
+                brands: null;
+              }
+            | {
+                _type: "post";
+                slug: string | null;
+                brand: null;
+                brands: Array<string> | null;
+              }
+            | {
+                _type: "resource";
+                slug: string | null;
+                brand: null;
+                brands: null;
+              }
+            | null;
+        } | null;
+        count: number | null;
+        posts: Array<{
+          _id: string;
+          title: string | null;
+          slug: string | null;
+          brands: Array<string> | null;
+          brandTitles: Array<{
+            key: string | null;
+            title: string | null;
+          }>;
+          publishedAt: string | null;
+          excerpt: string | null;
+          image: {
+            asset: SanityImageAssetReference | null;
+            hotspot: SanityImageHotspot | null;
+            crop: SanityImageCrop | null;
+            alt: string | null;
+          } | null;
+          category: {
+            title: string | null;
+            slug: string | null;
+          } | null;
+          topic: {
+            title: string | null;
+          } | null;
+          briefText: string | null;
+        }> | null;
+        latest: Array<{
+          _id: string;
+          title: string | null;
+          slug: string | null;
+          brands: Array<string> | null;
+          brandTitles: Array<{
+            key: string | null;
+            title: string | null;
+          }>;
+          publishedAt: string | null;
+          excerpt: string | null;
+          image: {
+            asset: SanityImageAssetReference | null;
+            hotspot: SanityImageHotspot | null;
+            crop: SanityImageCrop | null;
+            alt: string | null;
+          } | null;
+          category: {
+            title: string | null;
+            slug: string | null;
+          } | null;
+          topic: {
+            title: string | null;
+          } | null;
+          briefText: string | null;
+        }>;
+      }
+    | {
+        _key: string;
+        _type: "postCards";
+        heading: Array<{
+          _key: string;
+          style: "h1" | "h2" | "h3" | "h4" | "h5" | "h6" | "normal" | null;
+          children: Array<{
+            _key: string;
+            text: string | null;
+          }> | null;
+        }> | null;
+        link: {
+          label: string | null;
+          kind: "external" | "internal" | null;
+          external: string | null;
+          internal:
+            | {
+                _type: "awardsProgramme";
+                slug: string | null;
+                brand: null;
+                brands: null;
+              }
+            | {
+                _type: "conferenceEvent";
+                slug: string | null;
+                brand: null;
+                brands: null;
+              }
+            | {
+                _type: "page";
+                slug: string | null;
+                brand:
+                  | "clearview"
+                  | "familywealthreport"
+                  | "wealthbriefing"
+                  | "wealthbriefingasia"
+                  | null;
+                brands: null;
+              }
+            | {
+                _type: "post";
+                slug: string | null;
+                brand: null;
+                brands: Array<string> | null;
+              }
+            | {
+                _type: "resource";
+                slug: string | null;
+                brand: null;
+                brands: null;
+              }
+            | null;
+        } | null;
+        category: {
+          title: string | null;
+          slug: string | null;
+        } | null;
+        posts: Array<{
+          _id: string;
+          title: string | null;
+          slug: string | null;
+          brands: Array<string> | null;
+          brandTitles: Array<{
+            key: string | null;
+            title: string | null;
+          }>;
+          publishedAt: string | null;
+          excerpt: string | null;
+          image: {
+            asset: SanityImageAssetReference | null;
+            hotspot: SanityImageHotspot | null;
+            crop: SanityImageCrop | null;
+            alt: string | null;
+          } | null;
+          category: {
+            title: string | null;
+            slug: string | null;
+          } | null;
+        }> | null;
+        latest: Array<{
+          _id: string;
+          title: string | null;
+          slug: string | null;
+          brands: Array<string> | null;
+          brandTitles: Array<{
+            key: string | null;
+            title: string | null;
+          }>;
+          publishedAt: string | null;
+          excerpt: string | null;
+          image: {
+            asset: SanityImageAssetReference | null;
+            hotspot: SanityImageHotspot | null;
+            crop: SanityImageCrop | null;
+            alt: string | null;
+          } | null;
+          category: {
+            title: string | null;
+            slug: string | null;
+          } | null;
+        }>;
+      }
+    | {
+        _key: string;
+        _type: "publications";
+        heading: Array<{
+          _key: string;
+          style: "h1" | "h2" | "h3" | "h4" | "h5" | "h6" | "normal" | null;
+          children: Array<{
+            _key: string;
+            text: string | null;
+          }> | null;
+        }> | null;
+        body: string | null;
+        cards: Array<{
+          _key: string;
+          brand:
+            | "familywealthreport"
+            | "wealthbriefing"
+            | "wealthbriefingasia"
+            | null;
+          brandTitle: string | null;
+          description: string | null;
+          image: {
+            asset: SanityImageAssetReference | null;
+            hotspot: SanityImageHotspot | null;
+            crop: SanityImageCrop | null;
+            alt: string | null;
+          } | null;
+          linkLabel: string | null;
+        }> | null;
+      }
+    | {
+        _key: string;
+        _type: "splitLayout";
+        main: Array<
+          | {
+              _key: string;
+              _type: "cta";
+              heading: string | null;
+              text: string | null;
+              link: {
+                label: string | null;
+                href: string | null;
+              } | null;
+            }
+          | {
+              _key: string;
+              _type: "postBriefs";
+              heading: Array<{
+                _key: string;
+                style:
+                  "h1" | "h2" | "h3" | "h4" | "h5" | "h6" | "normal" | null;
+                children: Array<{
+                  _key: string;
+                  text: string | null;
+                }> | null;
+              }> | null;
+              link: {
+                label: string | null;
+                kind: "external" | "internal" | null;
+                external: string | null;
+                internal:
+                  | {
+                      _type: "awardsProgramme";
+                      slug: string | null;
+                      brand: null;
+                      brands: null;
+                    }
+                  | {
+                      _type: "conferenceEvent";
+                      slug: string | null;
+                      brand: null;
+                      brands: null;
+                    }
+                  | {
+                      _type: "page";
+                      slug: string | null;
+                      brand:
+                        | "clearview"
+                        | "familywealthreport"
+                        | "wealthbriefing"
+                        | "wealthbriefingasia"
+                        | null;
+                      brands: null;
+                    }
+                  | {
+                      _type: "post";
+                      slug: string | null;
+                      brand: null;
+                      brands: Array<string> | null;
+                    }
+                  | {
+                      _type: "resource";
+                      slug: string | null;
+                      brand: null;
+                      brands: null;
+                    }
+                  | null;
+              } | null;
+              count: number | null;
+              posts: Array<{
+                _id: string;
+                title: string | null;
+                slug: string | null;
+                brands: Array<string> | null;
+                brandTitles: Array<{
+                  key: string | null;
+                  title: string | null;
+                }>;
+                publishedAt: string | null;
+                excerpt: string | null;
+                image: {
+                  asset: SanityImageAssetReference | null;
+                  hotspot: SanityImageHotspot | null;
+                  crop: SanityImageCrop | null;
+                  alt: string | null;
+                } | null;
+                category: {
+                  title: string | null;
+                  slug: string | null;
+                } | null;
+                topic: {
+                  title: string | null;
+                } | null;
+                briefText: string | null;
+              }> | null;
+              latest: Array<{
+                _id: string;
+                title: string | null;
+                slug: string | null;
+                brands: Array<string> | null;
+                brandTitles: Array<{
+                  key: string | null;
+                  title: string | null;
+                }>;
+                publishedAt: string | null;
+                excerpt: string | null;
+                image: {
+                  asset: SanityImageAssetReference | null;
+                  hotspot: SanityImageHotspot | null;
+                  crop: SanityImageCrop | null;
+                  alt: string | null;
+                } | null;
+                category: {
+                  title: string | null;
+                  slug: string | null;
+                } | null;
+                topic: {
+                  title: string | null;
+                } | null;
+                briefText: string | null;
+              }>;
+            }
+          | {
+              _key: string;
+              _type: "postCards";
+              heading: Array<{
+                _key: string;
+                style:
+                  "h1" | "h2" | "h3" | "h4" | "h5" | "h6" | "normal" | null;
+                children: Array<{
+                  _key: string;
+                  text: string | null;
+                }> | null;
+              }> | null;
+              link: {
+                label: string | null;
+                kind: "external" | "internal" | null;
+                external: string | null;
+                internal:
+                  | {
+                      _type: "awardsProgramme";
+                      slug: string | null;
+                      brand: null;
+                      brands: null;
+                    }
+                  | {
+                      _type: "conferenceEvent";
+                      slug: string | null;
+                      brand: null;
+                      brands: null;
+                    }
+                  | {
+                      _type: "page";
+                      slug: string | null;
+                      brand:
+                        | "clearview"
+                        | "familywealthreport"
+                        | "wealthbriefing"
+                        | "wealthbriefingasia"
+                        | null;
+                      brands: null;
+                    }
+                  | {
+                      _type: "post";
+                      slug: string | null;
+                      brand: null;
+                      brands: Array<string> | null;
+                    }
+                  | {
+                      _type: "resource";
+                      slug: string | null;
+                      brand: null;
+                      brands: null;
+                    }
+                  | null;
+              } | null;
+              category: {
+                title: string | null;
+                slug: string | null;
+              } | null;
+              posts: Array<{
+                _id: string;
+                title: string | null;
+                slug: string | null;
+                brands: Array<string> | null;
+                brandTitles: Array<{
+                  key: string | null;
+                  title: string | null;
+                }>;
+                publishedAt: string | null;
+                excerpt: string | null;
+                image: {
+                  asset: SanityImageAssetReference | null;
+                  hotspot: SanityImageHotspot | null;
+                  crop: SanityImageCrop | null;
+                  alt: string | null;
+                } | null;
+                category: {
+                  title: string | null;
+                  slug: string | null;
+                } | null;
+              }> | null;
+              latest: Array<{
+                _id: string;
+                title: string | null;
+                slug: string | null;
+                brands: Array<string> | null;
+                brandTitles: Array<{
+                  key: string | null;
+                  title: string | null;
+                }>;
+                publishedAt: string | null;
+                excerpt: string | null;
+                image: {
+                  asset: SanityImageAssetReference | null;
+                  hotspot: SanityImageHotspot | null;
+                  crop: SanityImageCrop | null;
+                  alt: string | null;
+                } | null;
+                category: {
+                  title: string | null;
+                  slug: string | null;
+                } | null;
+              }>;
+            }
+          | {
+              _key: string;
+              _type: "publications";
+              heading: Array<{
+                _key: string;
+                style:
+                  "h1" | "h2" | "h3" | "h4" | "h5" | "h6" | "normal" | null;
+                children: Array<{
+                  _key: string;
+                  text: string | null;
+                }> | null;
+              }> | null;
+              body: string | null;
+              cards: Array<{
+                _key: string;
+                brand:
+                  | "familywealthreport"
+                  | "wealthbriefing"
+                  | "wealthbriefingasia"
+                  | null;
+                brandTitle: string | null;
+                description: string | null;
+                image: {
+                  asset: SanityImageAssetReference | null;
+                  hotspot: SanityImageHotspot | null;
+                  crop: SanityImageCrop | null;
+                  alt: string | null;
+                } | null;
+                linkLabel: string | null;
+              }> | null;
+            }
+          | {
+              _key: string;
+              _type: "sponsoredContent";
+              label: string | null;
+              link: {
+                label: string | null;
+                kind: "external" | "internal" | null;
+                external: string | null;
+                internal:
+                  | {
+                      _type: "awardsProgramme";
+                      slug: string | null;
+                      brand: null;
+                      brands: null;
+                    }
+                  | {
+                      _type: "conferenceEvent";
+                      slug: string | null;
+                      brand: null;
+                      brands: null;
+                    }
+                  | {
+                      _type: "page";
+                      slug: string | null;
+                      brand:
+                        | "clearview"
+                        | "familywealthreport"
+                        | "wealthbriefing"
+                        | "wealthbriefingasia"
+                        | null;
+                      brands: null;
+                    }
+                  | {
+                      _type: "post";
+                      slug: string | null;
+                      brand: null;
+                      brands: Array<string> | null;
+                    }
+                  | {
+                      _type: "resource";
+                      slug: string | null;
+                      brand: null;
+                      brands: null;
+                    }
+                  | null;
+              } | null;
+              profileLabel: string | null;
+              post: {
+                _id: string;
+                title: string | null;
+                slug: string | null;
+                brands: Array<string> | null;
+                brandTitles: Array<{
+                  key: string | null;
+                  title: string | null;
+                }>;
+                publishedAt: string | null;
+                excerpt: string | null;
+                image: {
+                  asset: SanityImageAssetReference | null;
+                  hotspot: SanityImageHotspot | null;
+                  crop: SanityImageCrop | null;
+                  alt: string | null;
+                } | null;
+                category: {
+                  title: string | null;
+                  slug: string | null;
+                } | null;
+                sponsor: {
+                  title: string | null;
+                  slug: string | null;
+                  logo: {
+                    asset: SanityImageAssetReference | null;
+                    hotspot: SanityImageHotspot | null;
+                    crop: SanityImageCrop | null;
+                    alt: string | null;
+                  } | null;
+                } | null;
+              } | null;
+            }
+          | {
+              _key: string;
+              _type: "topStories";
+              linkLabel: string | null;
+              label: string | null;
+              slides: Array<{
+                _id: string;
+                title: string | null;
+                slug: string | null;
+                brands: Array<string> | null;
+                brandTitles: Array<{
+                  key: string | null;
+                  title: string | null;
+                }>;
+                publishedAt: string | null;
+                excerpt: string | null;
+                image: {
+                  asset: SanityImageAssetReference | null;
+                  hotspot: SanityImageHotspot | null;
+                  crop: SanityImageCrop | null;
+                  alt: string | null;
+                } | null;
+                category: {
+                  title: string | null;
+                  slug: string | null;
+                } | null;
+              }> | null;
+              articles: Array<{
+                _id: string;
+                title: string | null;
+                slug: string | null;
+                brands: Array<string> | null;
+                brandTitles: Array<{
+                  key: string | null;
+                  title: string | null;
+                }>;
+                publishedAt: string | null;
+                excerpt: string | null;
+                image: {
+                  asset: SanityImageAssetReference | null;
+                  hotspot: SanityImageHotspot | null;
+                  crop: SanityImageCrop | null;
+                  alt: string | null;
+                } | null;
+                category: {
+                  title: string | null;
+                  slug: string | null;
+                } | null;
+              }> | null;
+              latest: Array<{
+                _id: string;
+                title: string | null;
+                slug: string | null;
+                brands: Array<string> | null;
+                brandTitles: Array<{
+                  key: string | null;
+                  title: string | null;
+                }>;
+                publishedAt: string | null;
+                excerpt: string | null;
+                image: {
+                  asset: SanityImageAssetReference | null;
+                  hotspot: SanityImageHotspot | null;
+                  crop: SanityImageCrop | null;
+                  alt: string | null;
+                } | null;
+                category: {
+                  title: string | null;
+                  slug: string | null;
+                } | null;
+              }>;
+            }
+          | {
+              _key: string;
+              _type: "weeklyRoundup";
+              heading: Array<{
+                _key: string;
+                style:
+                  "h1" | "h2" | "h3" | "h4" | "h5" | "h6" | "normal" | null;
+                children: Array<{
+                  _key: string;
+                  text: string | null;
+                }> | null;
+              }> | null;
+              label: string | null;
+              title: string | null;
+              summary: string | null;
+              button: {
+                label: string | null;
+                kind: "external" | "internal" | null;
+                external: string | null;
+                internal:
+                  | {
+                      _type: "awardsProgramme";
+                      slug: string | null;
+                      brand: null;
+                      brands: null;
+                    }
+                  | {
+                      _type: "conferenceEvent";
+                      slug: string | null;
+                      brand: null;
+                      brands: null;
+                    }
+                  | {
+                      _type: "page";
+                      slug: string | null;
+                      brand:
+                        | "clearview"
+                        | "familywealthreport"
+                        | "wealthbriefing"
+                        | "wealthbriefingasia"
+                        | null;
+                      brands: null;
+                    }
+                  | {
+                      _type: "post";
+                      slug: string | null;
+                      brand: null;
+                      brands: Array<string> | null;
+                    }
+                  | {
+                      _type: "resource";
+                      slug: string | null;
+                      brand: null;
+                      brands: null;
+                    }
+                  | null;
+              } | null;
+              listLabel: string | null;
+              posts: Array<{
+                _id: string;
+                title: string | null;
+                slug: string | null;
+                brands: Array<string> | null;
+                brandTitles: Array<{
+                  key: string | null;
+                  title: string | null;
+                }>;
+                publishedAt: string | null;
+                excerpt: string | null;
+                image: {
+                  asset: SanityImageAssetReference | null;
+                  hotspot: SanityImageHotspot | null;
+                  crop: SanityImageCrop | null;
+                  alt: string | null;
+                } | null;
+                category: {
+                  title: string | null;
+                  slug: string | null;
+                } | null;
+              }> | null;
+              latest: Array<{
+                _id: string;
+                title: string | null;
+                slug: string | null;
+                brands: Array<string> | null;
+                brandTitles: Array<{
+                  key: string | null;
+                  title: string | null;
+                }>;
+                publishedAt: string | null;
+                excerpt: string | null;
+                image: {
+                  asset: SanityImageAssetReference | null;
+                  hotspot: SanityImageHotspot | null;
+                  crop: SanityImageCrop | null;
+                  alt: string | null;
+                } | null;
+                category: {
+                  title: string | null;
+                  slug: string | null;
+                } | null;
+              }>;
+            }
+        > | null;
+        aside: Array<
+          | {
+              _key: string;
+              _type: "awardsWinners";
+              heading: Array<{
+                _key: string;
+                style:
+                  "h1" | "h2" | "h3" | "h4" | "h5" | "h6" | "normal" | null;
+                children: Array<{
+                  _key: string;
+                  text: string | null;
+                }> | null;
+              }> | null;
             }
           | {
               _key: string;
@@ -7920,30 +17794,11 @@ export type HOME_PAGE_QUERY_RESULT = {
 
 // Source: src/sanity/queries.ts
 // Variable: PAGE_QUERY
-// Query: *[_type == "page" && slug.current == $slug && brand == $brand][0]{    _id,    title,    blocks[]{ _key, _type,   _type == "adSlot" => {   size,  label,  spacing,  "unit": unit->{ code, size } },  _type == "topStories" => {   linkLabel,  label,  "slides": slides[$brand == "clearview" || $brand in @->brands]->{   _id,  title,  "slug": slug.current,  brands,    "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title },  publishedAt,  excerpt,  "image": image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },  "category": category->{ title, "slug": slug.current } },  "articles": articles[$brand == "clearview" || $brand in @->brands]->{   _id,  title,  "slug": slug.current,  brands,    "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title },  publishedAt,  excerpt,  "image": image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },  "category": category->{ title, "slug": slug.current } },  "latest": *[    _type == "post"    && defined(slug.current)    && ($brand == "clearview" || $brand in brands)    && !(_id in coalesce(^.slides[]._ref, []))    && !(_id in coalesce(^.articles[]._ref, []))  ] | order(publishedAt desc)[0...6]{   _id,  title,  "slug": slug.current,  brands,    "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title },  publishedAt,  excerpt,  "image": image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },  "category": category->{ title, "slug": slug.current } } },  _type == "publications" => {   heading[]{ _key, style, children[]{ _key, text } },  body,  cards[]{    _key,    brand,    "brandTitle": *[_type == "brand" && key.current == ^.brand][0].title,    description,    image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },    linkLabel  } },  _type == "cta" => {   heading,  text,  link{ label, href } },  _type == "highlights" => {   source,  count,  heading[]{ _key, style, children[]{ _key, text } },  deadlineLabel,  "items": items[]->{   _id,  _type,  "slug": slug.current,  title,  category,  nominationsClosingDate,  startDate,  endDate,  country,  publishedAt },  "fill": select(  source == "awards" => [    ...*[      _type == "awardsProgramme"      && nominationsClosingDate >= $today      && !(_id in coalesce(^.items[]._ref, []))    ] | order(nominationsClosingDate asc)[0...5]{   _id,  _type,  "slug": slug.current,  title,  category,  nominationsClosingDate,  startDate,  endDate,  country,  publishedAt },    ...*[      _type == "awardsProgramme"      && !(defined(nominationsClosingDate) && nominationsClosingDate >= $today)      && startDate >= $today      && !(_id in coalesce(^.items[]._ref, []))    ] | order(startDate asc)[0...5]{   _id,  _type,  "slug": slug.current,  title,  category,  nominationsClosingDate,  startDate,  endDate,  country,  publishedAt },    ...*[      _type == "awardsProgramme"      && !(defined(nominationsClosingDate) && nominationsClosingDate >= $today)      && startDate < $today      && !(_id in coalesce(^.items[]._ref, []))    ] | order(startDate desc)[0...5]{   _id,  _type,  "slug": slug.current,  title,  category,  nominationsClosingDate,  startDate,  endDate,  country,  publishedAt }  ],  source == "events" => [    ...*[      _type == "conferenceEvent"      && coalesce(endDate, startDate) >= $today      && !(_id in coalesce(^.items[]._ref, []))    ] | order(startDate asc)[0...4]{   _id,  _type,  "slug": slug.current,  title,  category,  nominationsClosingDate,  startDate,  endDate,  country,  publishedAt },    ...*[      _type == "conferenceEvent"      && coalesce(endDate, startDate) < $today      && !(_id in coalesce(^.items[]._ref, []))    ] | order(startDate desc)[0...4]{   _id,  _type,  "slug": slug.current,  title,  category,  nominationsClosingDate,  startDate,  endDate,  country,  publishedAt }  ],  source == "research" => *[    _type == "resource"    && category == "research"    && !(_id in coalesce(^.items[]._ref, []))    && _id != coalesce(^.promo.resource._ref, "")  ] | order(defined(publishedAt) desc, publishedAt desc, legacyWpId desc)[0...3]{   _id,  _type,  "slug": slug.current,  title,  category,  nominationsClosingDate,  startDate,  endDate,  country,  publishedAt }),  button{   label,    kind,  external,  internal->{    _type,    "slug": slug.current,    brand,    brands  } },  promo{    resource->{      title,      "downloadThumbnail": downloadThumbnail{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },      "downloadFileUrl": downloadFile.asset->url,      "downloadFileName": downloadFile.asset->originalFilename,      downloadUrl    },    title,    description,    "image": image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },    link{   kind,  external,  internal->{    _type,    "slug": slug.current,    brand,    brands  } }  } },  _type == "featuredStories" => {   heading[]{ _key, style, children[]{ _key, text } },  link{   label,    kind,  external,  internal->{    _type,    "slug": slug.current,    brand,    brands  } },  "posts": posts[]->{   _id,  title,  "slug": slug.current,  brands,    "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title },  publishedAt,  excerpt,  "image": image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },  "category": category->{ title, "slug": slug.current } } },  _type == "statsBar" => {   heading[]{ _key, style, children[]{ _key, text } },  items[]{ _key, icon, value, label } },  _type == "newsletterSignup" => {   heading[]{ _key, style, children[]{ _key, text } },  body,  preferencesLabel,  options[]{    _key,    label,    defaultChecked,    "interestKey": *[_type == "subscribeModal" && _id == "subscribe-modal-" + $brand][0].interests[attribute.name == ^.attribute.name][0]._key  },  emailPlaceholder,  buttonLabel,  invalidEmailMessage,  noOptionMessage,  image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) } },  _type == "sponsoredContent" => {   label,  link{   label,    kind,  external,  internal->{    _type,    "slug": slug.current,    brand,    brands  } },  profileLabel,  "post": *[    _type == "post"    && _id == ^.post._ref    && defined(slug.current)    && defined(sponsor)    && ($brand == "clearview" || $brand in brands)  ][0]{      _id,  title,  "slug": slug.current,  brands,    "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title },  publishedAt,  excerpt,  "image": image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },  "category": category->{ title, "slug": slug.current },    "sponsor": sponsor->{      title,      "slug": slug.current,      "logo": logo{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) }    }  } },  _type == "postCards" => {     heading[]{ _key, style, children[]{ _key, text } },  link{   label,    kind,  external,  internal->{    _type,    "slug": slug.current,    brand,    brands  } },  "category": category->{ title, "slug": slug.current },  "posts": posts[$brand in @->brands]->{   _id,  title,  "slug": slug.current,  brands,    "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title },  publishedAt,  excerpt,  "image": image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },  "category": category->{ title, "slug": slug.current } },  "latest":   *[    _type == "post"    && defined(slug.current)    && $brand in brands    && defined(^.category._ref) && category._ref == ^.category._ref    && !(_id in coalesce(^.posts[]._ref, []))  ] | order(publishedAt desc)[0...6]{   _id,  title,  "slug": slug.current,  brands,    "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title },  publishedAt,  excerpt,  "image": image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },  "category": category->{ title, "slug": slug.current } } },  _type == "postBriefs" => {     heading[]{ _key, style, children[]{ _key, text } },  link{   label,    kind,  external,  internal->{    _type,    "slug": slug.current,    brand,    brands  } },  count,  "posts": posts[$brand in @->brands]->{     _id,  title,  "slug": slug.current,  brands,    "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title },  publishedAt,  excerpt,  "image": image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },  "category": category->{ title, "slug": slug.current },  "topic": primaryTopic->{ title },  briefText },  "latest":   *[    _type == "post"    && defined(slug.current)    && $brand in brands    && true    && !(_id in coalesce(^.posts[]._ref, []))  ] | order(publishedAt desc)[0...6]{     _id,  title,  "slug": slug.current,  brands,    "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title },  publishedAt,  excerpt,  "image": image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },  "category": category->{ title, "slug": slug.current },  "topic": primaryTopic->{ title },  briefText } },  _type == "weeklyRoundup" => {   heading[]{ _key, style, children[]{ _key, text } },  label,  title,  summary,  button{   label,    kind,  external,  internal->{    _type,    "slug": slug.current,    brand,    brands  } },  listLabel,  "posts": posts[$brand in @->brands]->{   _id,  title,  "slug": slug.current,  brands,    "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title },  publishedAt,  excerpt,  "image": image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },  "category": category->{ title, "slug": slug.current } },  "latest":   *[    _type == "post"    && defined(slug.current)    && $brand in brands    && true    && !(_id in coalesce(^.posts[]._ref, []))  ] | order(publishedAt desc)[0...8]{   _id,  title,  "slug": slug.current,  brands,    "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title },  publishedAt,  excerpt,  "image": image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },  "category": category->{ title, "slug": slug.current } } },  _type == "topPicks" => {   heading[]{ _key, style, children[]{ _key, text } },  link{   label,    kind,  external,  internal->{    _type,    "slug": slug.current,    brand,    brands  } },  "posts": posts[$brand in @->brands]->{   _id,  title,  "slug": slug.current,  brands,    "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title },  publishedAt,  excerpt,  "image": image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },  "category": category->{ title, "slug": slug.current }, "sponsored": defined(sponsor) },  "fill": [    ...  *[    _type == "post"    && defined(slug.current)    && $brand in brands    && !defined(sponsor) && dateTime(publishedAt) >= dateTime($today + "T00:00:00Z") - 60*60*24*7    && !(_id in coalesce(^.posts[]._ref, []))  ] | order(publishedAt desc)[0...6]{   _id,  title,  "slug": slug.current,  brands,    "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title },  publishedAt,  excerpt,  "image": image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },  "category": category->{ title, "slug": slug.current } },    ...  *[    _type == "post"    && defined(slug.current)    && $brand in brands    && !defined(sponsor) && dateTime(publishedAt) < dateTime($today + "T00:00:00Z") - 60*60*24*7    && !(_id in coalesce(^.posts[]._ref, []))  ] | order(publishedAt desc)[0...6]{   _id,  title,  "slug": slug.current,  brands,    "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title },  publishedAt,  excerpt,  "image": image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },  "category": category->{ title, "slug": slug.current } }  ] },  _type == "exploreGrid" => {   cards[]{    _key,    heading[]{ _key, style, children[]{ _key, text } },    icon,    source,    count,    deadlineLabel,    button{   label,    kind,  external,  internal->{    _type,    "slug": slug.current,    brand,    brands  } },    "items": items[@->_type != "post" || $brand in @->brands]->{   _type == "post" => { _type,   _id,  title,  "slug": slug.current,  brands,    "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title },  publishedAt,  excerpt,  "image": image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },  "category": category->{ title, "slug": slug.current } },  _type != "post" => {   _id,  _type,  "slug": slug.current,  title,  category,  nominationsClosingDate,  startDate,  endDate,  country,  publishedAt } },    "fill": select(      source == "posts" =>   *[    _type == "post"    && defined(slug.current)    && $brand in brands    && defined(^.category._ref) && category._ref == ^.category._ref    && !(_id in coalesce(^.items[]._ref, []))  ] | order(publishedAt desc)[0...6]{ _type,   _id,  title,  "slug": slug.current,  brands,    "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title },  publishedAt,  excerpt,  "image": image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },  "category": category->{ title, "slug": slug.current } },        source == "awards" => [    ...*[      _type == "awardsProgramme"      && nominationsClosingDate >= $today      && !(_id in coalesce(^.items[]._ref, []))    ] | order(nominationsClosingDate asc)[0...5]{   _id,  _type,  "slug": slug.current,  title,  category,  nominationsClosingDate,  startDate,  endDate,  country,  publishedAt },    ...*[      _type == "awardsProgramme"      && !(defined(nominationsClosingDate) && nominationsClosingDate >= $today)      && startDate >= $today      && !(_id in coalesce(^.items[]._ref, []))    ] | order(startDate asc)[0...5]{   _id,  _type,  "slug": slug.current,  title,  category,  nominationsClosingDate,  startDate,  endDate,  country,  publishedAt },    ...*[      _type == "awardsProgramme"      && !(defined(nominationsClosingDate) && nominationsClosingDate >= $today)      && startDate < $today      && !(_id in coalesce(^.items[]._ref, []))    ] | order(startDate desc)[0...5]{   _id,  _type,  "slug": slug.current,  title,  category,  nominationsClosingDate,  startDate,  endDate,  country,  publishedAt }  ],  source == "events" => [    ...*[      _type == "conferenceEvent"      && coalesce(endDate, startDate) >= $today      && !(_id in coalesce(^.items[]._ref, []))    ] | order(startDate asc)[0...4]{   _id,  _type,  "slug": slug.current,  title,  category,  nominationsClosingDate,  startDate,  endDate,  country,  publishedAt },    ...*[      _type == "conferenceEvent"      && coalesce(endDate, startDate) < $today      && !(_id in coalesce(^.items[]._ref, []))    ] | order(startDate desc)[0...4]{   _id,  _type,  "slug": slug.current,  title,  category,  nominationsClosingDate,  startDate,  endDate,  country,  publishedAt }  ],  source == "research" => *[    _type == "resource"    && category == "research"    && !(_id in coalesce(^.items[]._ref, []))    && _id != coalesce(^.promo.resource._ref, "")  ] | order(defined(publishedAt) desc, publishedAt desc, legacyWpId desc)[0...3]{   _id,  _type,  "slug": slug.current,  title,  category,  nominationsClosingDate,  startDate,  endDate,  country,  publishedAt }    )  } },  _type == "subscribeBanner" => {   heading[]{ _key, style, children[]{ _key, text } },  description,  buttonLabel,  cta{   label,    kind,  external,  internal->{    _type,    "slug": slug.current,    brand,    brands  } } },  _type == "splitLayout" => {    "main": main[]{ _key, _type,   _type == "adSlot" => {   size,  label,  spacing,  "unit": unit->{ code, size } },  _type == "topStories" => {   linkLabel,  label,  "slides": slides[$brand == "clearview" || $brand in @->brands]->{   _id,  title,  "slug": slug.current,  brands,    "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title },  publishedAt,  excerpt,  "image": image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },  "category": category->{ title, "slug": slug.current } },  "articles": articles[$brand == "clearview" || $brand in @->brands]->{   _id,  title,  "slug": slug.current,  brands,    "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title },  publishedAt,  excerpt,  "image": image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },  "category": category->{ title, "slug": slug.current } },  "latest": *[    _type == "post"    && defined(slug.current)    && ($brand == "clearview" || $brand in brands)    && !(_id in coalesce(^.slides[]._ref, []))    && !(_id in coalesce(^.articles[]._ref, []))  ] | order(publishedAt desc)[0...6]{   _id,  title,  "slug": slug.current,  brands,    "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title },  publishedAt,  excerpt,  "image": image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },  "category": category->{ title, "slug": slug.current } } },  _type == "sponsoredContent" => {   label,  link{   label,    kind,  external,  internal->{    _type,    "slug": slug.current,    brand,    brands  } },  profileLabel,  "post": *[    _type == "post"    && _id == ^.post._ref    && defined(slug.current)    && defined(sponsor)    && ($brand == "clearview" || $brand in brands)  ][0]{      _id,  title,  "slug": slug.current,  brands,    "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title },  publishedAt,  excerpt,  "image": image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },  "category": category->{ title, "slug": slug.current },    "sponsor": sponsor->{      title,      "slug": slug.current,      "logo": logo{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) }    }  } },  _type == "postCards" => {     heading[]{ _key, style, children[]{ _key, text } },  link{   label,    kind,  external,  internal->{    _type,    "slug": slug.current,    brand,    brands  } },  "category": category->{ title, "slug": slug.current },  "posts": posts[$brand in @->brands]->{   _id,  title,  "slug": slug.current,  brands,    "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title },  publishedAt,  excerpt,  "image": image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },  "category": category->{ title, "slug": slug.current } },  "latest":   *[    _type == "post"    && defined(slug.current)    && $brand in brands    && defined(^.category._ref) && category._ref == ^.category._ref    && !(_id in coalesce(^.posts[]._ref, []))  ] | order(publishedAt desc)[0...6]{   _id,  title,  "slug": slug.current,  brands,    "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title },  publishedAt,  excerpt,  "image": image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },  "category": category->{ title, "slug": slug.current } } },  _type == "postBriefs" => {     heading[]{ _key, style, children[]{ _key, text } },  link{   label,    kind,  external,  internal->{    _type,    "slug": slug.current,    brand,    brands  } },  count,  "posts": posts[$brand in @->brands]->{     _id,  title,  "slug": slug.current,  brands,    "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title },  publishedAt,  excerpt,  "image": image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },  "category": category->{ title, "slug": slug.current },  "topic": primaryTopic->{ title },  briefText },  "latest":   *[    _type == "post"    && defined(slug.current)    && $brand in brands    && true    && !(_id in coalesce(^.posts[]._ref, []))  ] | order(publishedAt desc)[0...6]{     _id,  title,  "slug": slug.current,  brands,    "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title },  publishedAt,  excerpt,  "image": image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },  "category": category->{ title, "slug": slug.current },  "topic": primaryTopic->{ title },  briefText } },  _type == "weeklyRoundup" => {   heading[]{ _key, style, children[]{ _key, text } },  label,  title,  summary,  button{   label,    kind,  external,  internal->{    _type,    "slug": slug.current,    brand,    brands  } },  listLabel,  "posts": posts[$brand in @->brands]->{   _id,  title,  "slug": slug.current,  brands,    "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title },  publishedAt,  excerpt,  "image": image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },  "category": category->{ title, "slug": slug.current } },  "latest":   *[    _type == "post"    && defined(slug.current)    && $brand in brands    && true    && !(_id in coalesce(^.posts[]._ref, []))  ] | order(publishedAt desc)[0...8]{   _id,  title,  "slug": slug.current,  brands,    "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title },  publishedAt,  excerpt,  "image": image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },  "category": category->{ title, "slug": slug.current } } },  _type == "publications" => {   heading[]{ _key, style, children[]{ _key, text } },  body,  cards[]{    _key,    brand,    "brandTitle": *[_type == "brand" && key.current == ^.brand][0].title,    description,    image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },    linkLabel  } },  _type == "cta" => {   heading,  text,  link{ label, href } } },    "aside": aside[]{ _key, _type,   _type == "highlights" => {   source,  count,  heading[]{ _key, style, children[]{ _key, text } },  deadlineLabel,  "items": items[]->{   _id,  _type,  "slug": slug.current,  title,  category,  nominationsClosingDate,  startDate,  endDate,  country,  publishedAt },  "fill": select(  source == "awards" => [    ...*[      _type == "awardsProgramme"      && nominationsClosingDate >= $today      && !(_id in coalesce(^.items[]._ref, []))    ] | order(nominationsClosingDate asc)[0...5]{   _id,  _type,  "slug": slug.current,  title,  category,  nominationsClosingDate,  startDate,  endDate,  country,  publishedAt },    ...*[      _type == "awardsProgramme"      && !(defined(nominationsClosingDate) && nominationsClosingDate >= $today)      && startDate >= $today      && !(_id in coalesce(^.items[]._ref, []))    ] | order(startDate asc)[0...5]{   _id,  _type,  "slug": slug.current,  title,  category,  nominationsClosingDate,  startDate,  endDate,  country,  publishedAt },    ...*[      _type == "awardsProgramme"      && !(defined(nominationsClosingDate) && nominationsClosingDate >= $today)      && startDate < $today      && !(_id in coalesce(^.items[]._ref, []))    ] | order(startDate desc)[0...5]{   _id,  _type,  "slug": slug.current,  title,  category,  nominationsClosingDate,  startDate,  endDate,  country,  publishedAt }  ],  source == "events" => [    ...*[      _type == "conferenceEvent"      && coalesce(endDate, startDate) >= $today      && !(_id in coalesce(^.items[]._ref, []))    ] | order(startDate asc)[0...4]{   _id,  _type,  "slug": slug.current,  title,  category,  nominationsClosingDate,  startDate,  endDate,  country,  publishedAt },    ...*[      _type == "conferenceEvent"      && coalesce(endDate, startDate) < $today      && !(_id in coalesce(^.items[]._ref, []))    ] | order(startDate desc)[0...4]{   _id,  _type,  "slug": slug.current,  title,  category,  nominationsClosingDate,  startDate,  endDate,  country,  publishedAt }  ],  source == "research" => *[    _type == "resource"    && category == "research"    && !(_id in coalesce(^.items[]._ref, []))    && _id != coalesce(^.promo.resource._ref, "")  ] | order(defined(publishedAt) desc, publishedAt desc, legacyWpId desc)[0...3]{   _id,  _type,  "slug": slug.current,  title,  category,  nominationsClosingDate,  startDate,  endDate,  country,  publishedAt }),  button{   label,    kind,  external,  internal->{    _type,    "slug": slug.current,    brand,    brands  } },  promo{    resource->{      title,      "downloadThumbnail": downloadThumbnail{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },      "downloadFileUrl": downloadFile.asset->url,      "downloadFileName": downloadFile.asset->originalFilename,      downloadUrl    },    title,    description,    "image": image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },    link{   kind,  external,  internal->{    _type,    "slug": slug.current,    brand,    brands  } }  } },  _type == "adSlot" => {   size,  label,  spacing,  "unit": unit->{ code, size } } }  } }  }
+// Query: *[_type == "page" && slug.current == $slug && brand == $brand][0]{    _id,    title,    blocks[]{ _key, _type,   _type == "topStories" => {   linkLabel,  label,  "slides": slides[$brand == "clearview" || $brand in @->brands]->{   _id,  title,  "slug": slug.current,  brands,    "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title },  publishedAt,  excerpt,  "image": image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },  "category": category->{ title, "slug": slug.current } },  "articles": articles[$brand == "clearview" || $brand in @->brands]->{   _id,  title,  "slug": slug.current,  brands,    "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title },  publishedAt,  excerpt,  "image": image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },  "category": category->{ title, "slug": slug.current } },  "latest": *[    _type == "post"    && defined(slug.current)    && ($brand == "clearview" || $brand in brands)    && !(_id in coalesce(^.slides[]._ref, []))    && !(_id in coalesce(^.articles[]._ref, []))  ] | order(publishedAt desc)[0...6]{   _id,  title,  "slug": slug.current,  brands,    "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title },  publishedAt,  excerpt,  "image": image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },  "category": category->{ title, "slug": slug.current } } },  _type == "publications" => {   heading[]{ _key, style, children[]{ _key, text } },  body,  cards[]{    _key,    brand,    "brandTitle": *[_type == "brand" && key.current == ^.brand][0].title,    description,    image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },    linkLabel  } },  _type == "cta" => {   heading,  text,  link{ label, href } },  _type == "highlights" => {   source,  count,  heading[]{ _key, style, children[]{ _key, text } },  deadlineLabel,  "items": items[]->{   _id,  _type,  "slug": slug.current,  title,  category,  nominationsClosingDate,  startDate,  endDate,  country,  publishedAt },  "fill": select(  source == "awards" => [    ...*[      _type == "awardsProgramme"      && nominationsClosingDate >= $today      && !(_id in coalesce(^.items[]._ref, []))    ] | order(nominationsClosingDate asc)[0...5]{   _id,  _type,  "slug": slug.current,  title,  category,  nominationsClosingDate,  startDate,  endDate,  country,  publishedAt },    ...*[      _type == "awardsProgramme"      && !(defined(nominationsClosingDate) && nominationsClosingDate >= $today)      && startDate >= $today      && !(_id in coalesce(^.items[]._ref, []))    ] | order(startDate asc)[0...5]{   _id,  _type,  "slug": slug.current,  title,  category,  nominationsClosingDate,  startDate,  endDate,  country,  publishedAt },    ...*[      _type == "awardsProgramme"      && !(defined(nominationsClosingDate) && nominationsClosingDate >= $today)      && startDate < $today      && !(_id in coalesce(^.items[]._ref, []))    ] | order(startDate desc)[0...5]{   _id,  _type,  "slug": slug.current,  title,  category,  nominationsClosingDate,  startDate,  endDate,  country,  publishedAt }  ],  source == "events" => [    ...*[      _type == "conferenceEvent"      && coalesce(endDate, startDate) >= $today      && !(_id in coalesce(^.items[]._ref, []))    ] | order(startDate asc)[0...4]{   _id,  _type,  "slug": slug.current,  title,  category,  nominationsClosingDate,  startDate,  endDate,  country,  publishedAt },    ...*[      _type == "conferenceEvent"      && coalesce(endDate, startDate) < $today      && !(_id in coalesce(^.items[]._ref, []))    ] | order(startDate desc)[0...4]{   _id,  _type,  "slug": slug.current,  title,  category,  nominationsClosingDate,  startDate,  endDate,  country,  publishedAt }  ],  source == "research" => *[    _type == "resource"    && category == "research"    && !(_id in coalesce(^.items[]._ref, []))    && _id != coalesce(^.promo.resource._ref, "")  ] | order(defined(publishedAt) desc, publishedAt desc, legacyWpId desc)[0...3]{   _id,  _type,  "slug": slug.current,  title,  category,  nominationsClosingDate,  startDate,  endDate,  country,  publishedAt }),  button{   label,    kind,  external,  internal->{    _type,    "slug": slug.current,    brand,    brands  } },  promo{    resource->{      title,      "downloadThumbnail": downloadThumbnail{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },      "downloadFileUrl": downloadFile.asset->url,      "downloadFileName": downloadFile.asset->originalFilename,      downloadUrl    },    title,    description,    "image": image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },    link{   kind,  external,  internal->{    _type,    "slug": slug.current,    brand,    brands  } }  } },  _type == "featuredStories" => {   heading[]{ _key, style, children[]{ _key, text } },  link{   label,    kind,  external,  internal->{    _type,    "slug": slug.current,    brand,    brands  } },  "posts": posts[]->{   _id,  title,  "slug": slug.current,  brands,    "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title },  publishedAt,  excerpt,  "image": image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },  "category": category->{ title, "slug": slug.current } } },  _type == "statsBar" => {   heading[]{ _key, style, children[]{ _key, text } },  items[]{ _key, icon, value, label } },  _type == "newsletterSignup" => {   heading[]{ _key, style, children[]{ _key, text } },  body,  preferencesLabel,  options[]{    _key,    label,    defaultChecked,    "interestKey": *[_type == "subscribeModal" && _id == "subscribe-modal-" + $brand][0].interests[attribute.name == ^.attribute.name][0]._key  },  emailPlaceholder,  buttonLabel,  invalidEmailMessage,  noOptionMessage,  image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) } },  _type == "sponsoredContent" => {   label,  link{   label,    kind,  external,  internal->{    _type,    "slug": slug.current,    brand,    brands  } },  profileLabel,  "post": *[    _type == "post"    && _id == ^.post._ref    && defined(slug.current)    && defined(sponsor)    && ($brand == "clearview" || $brand in brands)  ][0]{      _id,  title,  "slug": slug.current,  brands,    "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title },  publishedAt,  excerpt,  "image": image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },  "category": category->{ title, "slug": slug.current },    "sponsor": sponsor->{      title,      "slug": slug.current,      "logo": logo{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) }    }  } },  _type == "postCards" => {     heading[]{ _key, style, children[]{ _key, text } },  link{   label,    kind,  external,  internal->{    _type,    "slug": slug.current,    brand,    brands  } },  "category": category->{ title, "slug": slug.current },  "posts": posts[$brand in @->brands]->{   _id,  title,  "slug": slug.current,  brands,    "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title },  publishedAt,  excerpt,  "image": image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },  "category": category->{ title, "slug": slug.current } },  "latest":   *[    _type == "post"    && defined(slug.current)    && $brand in brands    && defined(^.category._ref) && category._ref == ^.category._ref    && !(_id in coalesce(^.posts[]._ref, []))  ] | order(publishedAt desc)[0...6]{   _id,  title,  "slug": slug.current,  brands,    "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title },  publishedAt,  excerpt,  "image": image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },  "category": category->{ title, "slug": slug.current } } },  _type == "postBriefs" => {     heading[]{ _key, style, children[]{ _key, text } },  link{   label,    kind,  external,  internal->{    _type,    "slug": slug.current,    brand,    brands  } },  count,  "posts": posts[$brand in @->brands]->{     _id,  title,  "slug": slug.current,  brands,    "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title },  publishedAt,  excerpt,  "image": image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },  "category": category->{ title, "slug": slug.current },  "topic": primaryTopic->{ title },  briefText },  "latest":   *[    _type == "post"    && defined(slug.current)    && $brand in brands    && true    && !(_id in coalesce(^.posts[]._ref, []))  ] | order(publishedAt desc)[0...6]{     _id,  title,  "slug": slug.current,  brands,    "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title },  publishedAt,  excerpt,  "image": image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },  "category": category->{ title, "slug": slug.current },  "topic": primaryTopic->{ title },  briefText } },  _type == "weeklyRoundup" => {   heading[]{ _key, style, children[]{ _key, text } },  label,  title,  summary,  button{   label,    kind,  external,  internal->{    _type,    "slug": slug.current,    brand,    brands  } },  listLabel,  "posts": posts[$brand in @->brands]->{   _id,  title,  "slug": slug.current,  brands,    "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title },  publishedAt,  excerpt,  "image": image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },  "category": category->{ title, "slug": slug.current } },  "latest":   *[    _type == "post"    && defined(slug.current)    && $brand in brands    && true    && !(_id in coalesce(^.posts[]._ref, []))  ] | order(publishedAt desc)[0...8]{   _id,  title,  "slug": slug.current,  brands,    "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title },  publishedAt,  excerpt,  "image": image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },  "category": category->{ title, "slug": slug.current } } },  _type == "topPicks" => {   heading[]{ _key, style, children[]{ _key, text } },  link{   label,    kind,  external,  internal->{    _type,    "slug": slug.current,    brand,    brands  } },  "posts": posts[$brand in @->brands]->{   _id,  title,  "slug": slug.current,  brands,    "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title },  publishedAt,  excerpt,  "image": image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },  "category": category->{ title, "slug": slug.current }, "sponsored": defined(sponsor) },  "fill": [    ...  *[    _type == "post"    && defined(slug.current)    && $brand in brands    && !defined(sponsor) && dateTime(publishedAt) >= dateTime($today + "T00:00:00Z") - 60*60*24*7    && !(_id in coalesce(^.posts[]._ref, []))  ] | order(publishedAt desc)[0...6]{   _id,  title,  "slug": slug.current,  brands,    "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title },  publishedAt,  excerpt,  "image": image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },  "category": category->{ title, "slug": slug.current } },    ...  *[    _type == "post"    && defined(slug.current)    && $brand in brands    && !defined(sponsor) && dateTime(publishedAt) < dateTime($today + "T00:00:00Z") - 60*60*24*7    && !(_id in coalesce(^.posts[]._ref, []))  ] | order(publishedAt desc)[0...6]{   _id,  title,  "slug": slug.current,  brands,    "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title },  publishedAt,  excerpt,  "image": image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },  "category": category->{ title, "slug": slug.current } }  ] },  _type == "exploreGrid" => {   cards[]{    _key,    heading[]{ _key, style, children[]{ _key, text } },    icon,    source,    count,    deadlineLabel,    button{   label,    kind,  external,  internal->{    _type,    "slug": slug.current,    brand,    brands  } },    "items": items[@->_type != "post" || $brand in @->brands]->{   _type == "post" => { _type,   _id,  title,  "slug": slug.current,  brands,    "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title },  publishedAt,  excerpt,  "image": image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },  "category": category->{ title, "slug": slug.current } },  _type != "post" => {   _id,  _type,  "slug": slug.current,  title,  category,  nominationsClosingDate,  startDate,  endDate,  country,  publishedAt } },    "fill": select(      source == "posts" =>   *[    _type == "post"    && defined(slug.current)    && $brand in brands    && defined(^.category._ref) && category._ref == ^.category._ref    && !(_id in coalesce(^.items[]._ref, []))  ] | order(publishedAt desc)[0...6]{ _type,   _id,  title,  "slug": slug.current,  brands,    "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title },  publishedAt,  excerpt,  "image": image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },  "category": category->{ title, "slug": slug.current } },        source == "awards" => [    ...*[      _type == "awardsProgramme"      && nominationsClosingDate >= $today      && !(_id in coalesce(^.items[]._ref, []))    ] | order(nominationsClosingDate asc)[0...5]{   _id,  _type,  "slug": slug.current,  title,  category,  nominationsClosingDate,  startDate,  endDate,  country,  publishedAt },    ...*[      _type == "awardsProgramme"      && !(defined(nominationsClosingDate) && nominationsClosingDate >= $today)      && startDate >= $today      && !(_id in coalesce(^.items[]._ref, []))    ] | order(startDate asc)[0...5]{   _id,  _type,  "slug": slug.current,  title,  category,  nominationsClosingDate,  startDate,  endDate,  country,  publishedAt },    ...*[      _type == "awardsProgramme"      && !(defined(nominationsClosingDate) && nominationsClosingDate >= $today)      && startDate < $today      && !(_id in coalesce(^.items[]._ref, []))    ] | order(startDate desc)[0...5]{   _id,  _type,  "slug": slug.current,  title,  category,  nominationsClosingDate,  startDate,  endDate,  country,  publishedAt }  ],  source == "events" => [    ...*[      _type == "conferenceEvent"      && coalesce(endDate, startDate) >= $today      && !(_id in coalesce(^.items[]._ref, []))    ] | order(startDate asc)[0...4]{   _id,  _type,  "slug": slug.current,  title,  category,  nominationsClosingDate,  startDate,  endDate,  country,  publishedAt },    ...*[      _type == "conferenceEvent"      && coalesce(endDate, startDate) < $today      && !(_id in coalesce(^.items[]._ref, []))    ] | order(startDate desc)[0...4]{   _id,  _type,  "slug": slug.current,  title,  category,  nominationsClosingDate,  startDate,  endDate,  country,  publishedAt }  ],  source == "research" => *[    _type == "resource"    && category == "research"    && !(_id in coalesce(^.items[]._ref, []))    && _id != coalesce(^.promo.resource._ref, "")  ] | order(defined(publishedAt) desc, publishedAt desc, legacyWpId desc)[0...3]{   _id,  _type,  "slug": slug.current,  title,  category,  nominationsClosingDate,  startDate,  endDate,  country,  publishedAt }    )  } },  _type == "subscribeBanner" => {   heading[]{ _key, style, children[]{ _key, text } },  description,  buttonLabel,  cta{   label,    kind,  external,  internal->{    _type,    "slug": slug.current,    brand,    brands  } } },  _type == "splitLayout" => {    "main": main[]{ _key, _type,   _type == "topStories" => {   linkLabel,  label,  "slides": slides[$brand == "clearview" || $brand in @->brands]->{   _id,  title,  "slug": slug.current,  brands,    "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title },  publishedAt,  excerpt,  "image": image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },  "category": category->{ title, "slug": slug.current } },  "articles": articles[$brand == "clearview" || $brand in @->brands]->{   _id,  title,  "slug": slug.current,  brands,    "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title },  publishedAt,  excerpt,  "image": image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },  "category": category->{ title, "slug": slug.current } },  "latest": *[    _type == "post"    && defined(slug.current)    && ($brand == "clearview" || $brand in brands)    && !(_id in coalesce(^.slides[]._ref, []))    && !(_id in coalesce(^.articles[]._ref, []))  ] | order(publishedAt desc)[0...6]{   _id,  title,  "slug": slug.current,  brands,    "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title },  publishedAt,  excerpt,  "image": image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },  "category": category->{ title, "slug": slug.current } } },  _type == "sponsoredContent" => {   label,  link{   label,    kind,  external,  internal->{    _type,    "slug": slug.current,    brand,    brands  } },  profileLabel,  "post": *[    _type == "post"    && _id == ^.post._ref    && defined(slug.current)    && defined(sponsor)    && ($brand == "clearview" || $brand in brands)  ][0]{      _id,  title,  "slug": slug.current,  brands,    "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title },  publishedAt,  excerpt,  "image": image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },  "category": category->{ title, "slug": slug.current },    "sponsor": sponsor->{      title,      "slug": slug.current,      "logo": logo{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) }    }  } },  _type == "postCards" => {     heading[]{ _key, style, children[]{ _key, text } },  link{   label,    kind,  external,  internal->{    _type,    "slug": slug.current,    brand,    brands  } },  "category": category->{ title, "slug": slug.current },  "posts": posts[$brand in @->brands]->{   _id,  title,  "slug": slug.current,  brands,    "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title },  publishedAt,  excerpt,  "image": image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },  "category": category->{ title, "slug": slug.current } },  "latest":   *[    _type == "post"    && defined(slug.current)    && $brand in brands    && defined(^.category._ref) && category._ref == ^.category._ref    && !(_id in coalesce(^.posts[]._ref, []))  ] | order(publishedAt desc)[0...6]{   _id,  title,  "slug": slug.current,  brands,    "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title },  publishedAt,  excerpt,  "image": image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },  "category": category->{ title, "slug": slug.current } } },  _type == "postBriefs" => {     heading[]{ _key, style, children[]{ _key, text } },  link{   label,    kind,  external,  internal->{    _type,    "slug": slug.current,    brand,    brands  } },  count,  "posts": posts[$brand in @->brands]->{     _id,  title,  "slug": slug.current,  brands,    "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title },  publishedAt,  excerpt,  "image": image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },  "category": category->{ title, "slug": slug.current },  "topic": primaryTopic->{ title },  briefText },  "latest":   *[    _type == "post"    && defined(slug.current)    && $brand in brands    && true    && !(_id in coalesce(^.posts[]._ref, []))  ] | order(publishedAt desc)[0...6]{     _id,  title,  "slug": slug.current,  brands,    "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title },  publishedAt,  excerpt,  "image": image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },  "category": category->{ title, "slug": slug.current },  "topic": primaryTopic->{ title },  briefText } },  _type == "weeklyRoundup" => {   heading[]{ _key, style, children[]{ _key, text } },  label,  title,  summary,  button{   label,    kind,  external,  internal->{    _type,    "slug": slug.current,    brand,    brands  } },  listLabel,  "posts": posts[$brand in @->brands]->{   _id,  title,  "slug": slug.current,  brands,    "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title },  publishedAt,  excerpt,  "image": image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },  "category": category->{ title, "slug": slug.current } },  "latest":   *[    _type == "post"    && defined(slug.current)    && $brand in brands    && true    && !(_id in coalesce(^.posts[]._ref, []))  ] | order(publishedAt desc)[0...8]{   _id,  title,  "slug": slug.current,  brands,    "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title },  publishedAt,  excerpt,  "image": image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },  "category": category->{ title, "slug": slug.current } } },  _type == "publications" => {   heading[]{ _key, style, children[]{ _key, text } },  body,  cards[]{    _key,    brand,    "brandTitle": *[_type == "brand" && key.current == ^.brand][0].title,    description,    image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },    linkLabel  } },  _type == "cta" => {   heading,  text,  link{ label, href } } },    "aside": aside[]{ _key, _type,   _type == "highlights" => {   source,  count,  heading[]{ _key, style, children[]{ _key, text } },  deadlineLabel,  "items": items[]->{   _id,  _type,  "slug": slug.current,  title,  category,  nominationsClosingDate,  startDate,  endDate,  country,  publishedAt },  "fill": select(  source == "awards" => [    ...*[      _type == "awardsProgramme"      && nominationsClosingDate >= $today      && !(_id in coalesce(^.items[]._ref, []))    ] | order(nominationsClosingDate asc)[0...5]{   _id,  _type,  "slug": slug.current,  title,  category,  nominationsClosingDate,  startDate,  endDate,  country,  publishedAt },    ...*[      _type == "awardsProgramme"      && !(defined(nominationsClosingDate) && nominationsClosingDate >= $today)      && startDate >= $today      && !(_id in coalesce(^.items[]._ref, []))    ] | order(startDate asc)[0...5]{   _id,  _type,  "slug": slug.current,  title,  category,  nominationsClosingDate,  startDate,  endDate,  country,  publishedAt },    ...*[      _type == "awardsProgramme"      && !(defined(nominationsClosingDate) && nominationsClosingDate >= $today)      && startDate < $today      && !(_id in coalesce(^.items[]._ref, []))    ] | order(startDate desc)[0...5]{   _id,  _type,  "slug": slug.current,  title,  category,  nominationsClosingDate,  startDate,  endDate,  country,  publishedAt }  ],  source == "events" => [    ...*[      _type == "conferenceEvent"      && coalesce(endDate, startDate) >= $today      && !(_id in coalesce(^.items[]._ref, []))    ] | order(startDate asc)[0...4]{   _id,  _type,  "slug": slug.current,  title,  category,  nominationsClosingDate,  startDate,  endDate,  country,  publishedAt },    ...*[      _type == "conferenceEvent"      && coalesce(endDate, startDate) < $today      && !(_id in coalesce(^.items[]._ref, []))    ] | order(startDate desc)[0...4]{   _id,  _type,  "slug": slug.current,  title,  category,  nominationsClosingDate,  startDate,  endDate,  country,  publishedAt }  ],  source == "research" => *[    _type == "resource"    && category == "research"    && !(_id in coalesce(^.items[]._ref, []))    && _id != coalesce(^.promo.resource._ref, "")  ] | order(defined(publishedAt) desc, publishedAt desc, legacyWpId desc)[0...3]{   _id,  _type,  "slug": slug.current,  title,  category,  nominationsClosingDate,  startDate,  endDate,  country,  publishedAt }),  button{   label,    kind,  external,  internal->{    _type,    "slug": slug.current,    brand,    brands  } },  promo{    resource->{      title,      "downloadThumbnail": downloadThumbnail{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },      "downloadFileUrl": downloadFile.asset->url,      "downloadFileName": downloadFile.asset->originalFilename,      downloadUrl    },    title,    description,    "image": image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },    link{   kind,  external,  internal->{    _type,    "slug": slug.current,    brand,    brands  } }  } },  _type == "awardsWinners" => { heading[]{ _key, style, children[]{ _key, text } } } }  } }  }
 export type PAGE_QUERY_RESULT = {
   _id: string;
   title: string | null;
   blocks: Array<
-    | {
-        _key: string;
-        _type: "adSlot";
-        size: "billboard" | "leaderboard" | "mpu" | null;
-        label: string | null;
-        spacing:
-          | "around"
-          | "aside"
-          | "below"
-          | "belowSection"
-          | "divided"
-          | "none"
-          | "top"
-          | null;
-        unit: {
-          code: string | null;
-          size: "300x250" | "728x90" | null;
-        } | null;
-      }
     | {
         _key: string;
         _type: "cta";
@@ -10689,25 +20544,6 @@ export type PAGE_QUERY_RESULT = {
         main: Array<
           | {
               _key: string;
-              _type: "adSlot";
-              size: "billboard" | "leaderboard" | "mpu" | null;
-              label: string | null;
-              spacing:
-                | "around"
-                | "aside"
-                | "below"
-                | "belowSection"
-                | "divided"
-                | "none"
-                | "top"
-                | null;
-              unit: {
-                code: string | null;
-                size: "300x250" | "728x90" | null;
-              } | null;
-            }
-          | {
-              _key: string;
               _type: "cta";
               heading: string | null;
               text: string | null;
@@ -11217,22 +21053,16 @@ export type PAGE_QUERY_RESULT = {
         aside: Array<
           | {
               _key: string;
-              _type: "adSlot";
-              size: "billboard" | "leaderboard" | "mpu" | null;
-              label: string | null;
-              spacing:
-                | "around"
-                | "aside"
-                | "below"
-                | "belowSection"
-                | "divided"
-                | "none"
-                | "top"
-                | null;
-              unit: {
-                code: string | null;
-                size: "300x250" | "728x90" | null;
-              } | null;
+              _type: "awardsWinners";
+              heading: Array<{
+                _key: string;
+                style:
+                  "h1" | "h2" | "h3" | "h4" | "h5" | "h6" | "normal" | null;
+                children: Array<{
+                  _key: string;
+                  text: string | null;
+                }> | null;
+              }> | null;
             }
           | {
               _key: string;
@@ -12898,7 +22728,7 @@ export type POSTS_QUERY_RESULT = Array<{
 
 // Source: src/sanity/queries.ts
 // Variable: POST_QUERY
-// Query: *[_type == "post" && slug.current == $slug && $brand in brands][0]{    _id,    title,    "slug": slug.current,    brands,    publishedAt,    excerpt,    "image": image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText), credit },    "category": category->{ title, "slug": slug.current },    "primaryTopic": primaryTopic->{ title, "slug": slug.current },    "secondaryTopics": secondaryTopics[]->{ title, "slug": slug.current },    "region": select(category._ref == $peopleMoves => region->{ title, "slug": slug.current }),    "author": author->{ name, jobTitle, city, bio, "photo": photo{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) } },    content[]{      _type != "infographic" => { ... },      _type == "infographic" => { _key, _type, eyebrow, title, description, wide, narrow },      _type == "image" => { "alt": coalesce(alt, asset->altText) },      _type == "videoFile" => { "url": asset->url, "mimeType": asset->mimeType }    },    "recommendedIds": coalesce(recommended[]._ref, []),    "picks": *[      _type == "post"      && _id in coalesce(^.recommended[]._ref, [])      && _id != ^._id      && $brand in brands      && defined(slug.current)    ]{   _id,  title,  "slug": slug.current,  brands,  publishedAt,  "image": image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },  "topic": primaryTopic->{ title, "slug": slug.current } },    "fill": *[      _type == "post"      && $brand in brands      && defined(slug.current)      && defined(^.category._ref)      && category._ref == ^.category._ref      && _id != ^._id      && !(_id in coalesce(^.recommended[]._ref, []))    ] | order(publishedAt desc)[0...3]{   _id,  title,  "slug": slug.current,  brands,  publishedAt,  "image": image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },  "topic": primaryTopic->{ title, "slug": slug.current } }  }
+// Query: *[_type == "post" && slug.current == $slug && $brand in brands][0]{    _id,    title,    "slug": slug.current,    brands,    publishedAt,    excerpt,    "image": image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText), credit },    "category": category->{ title, "slug": slug.current },    "primaryTopic": primaryTopic->{ title, "slug": slug.current },    "secondaryTopics": secondaryTopics[]->{ title, "slug": slug.current },    "region": select(category._ref == $peopleMoves => region->{ title, "slug": slug.current }),    "author": author->{ name, jobTitle, city, bio, "photo": photo{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) } },    content[]{   _type != "infographic" => { ... },  _type == "infographic" => { _key, _type, eyebrow, title, description, wide, narrow },  _type == "image" => { "alt": coalesce(alt, asset->altText) },  _type == "videoFile" => { "url": asset->url, "mimeType": asset->mimeType } },    contentAfter[]{   _type != "infographic" => { ... },  _type == "infographic" => { _key, _type, eyebrow, title, description, wide, narrow },  _type == "image" => { "alt": coalesce(alt, asset->altText) },  _type == "videoFile" => { "url": asset->url, "mimeType": asset->mimeType } },    "recommendedIds": coalesce(recommended[]._ref, []),    "picks": *[      _type == "post"      && _id in coalesce(^.recommended[]._ref, [])      && _id != ^._id      && $brand in brands      && defined(slug.current)    ]{   _id,  title,  "slug": slug.current,  brands,  publishedAt,  "image": image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },  "topic": primaryTopic->{ title, "slug": slug.current } },    "fill": *[      _type == "post"      && $brand in brands      && defined(slug.current)      && defined(^.category._ref)      && category._ref == ^.category._ref      && _id != ^._id      && !(_id in coalesce(^.recommended[]._ref, []))    ] | order(publishedAt desc)[0...3]{   _id,  title,  "slug": slug.current,  brands,  publishedAt,  "image": image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },  "topic": primaryTopic->{ title, "slug": slug.current } }  }
 export type POST_QUERY_RESULT = {
   _id: string;
   title: string | null;
@@ -12943,10 +22773,80 @@ export type POST_QUERY_RESULT = {
   } | null;
   content: Array<
     | {
+        children?: Array<{
+          marks?: Array<string>;
+          text?: string;
+          _type: "span";
+          _key: string;
+        }>;
+        style?: "blockquote" | "h2" | "h3" | "h4" | "normal";
+        listItem?: "bullet" | "number";
+        markDefs?: Array<{
+          href?: string;
+          openInNewTab?: boolean;
+          _type: "link";
+          _key: string;
+        }>;
+        level?: number;
+        _type: "block";
         _key: string;
-        _type: "adBreak";
-        adminLabel?: string;
       }
+    | {
+        provider?: "issuu" | "vimeo";
+        id?: string;
+        hash?: string;
+        caption?: string;
+        _type: "embed";
+        _key: string;
+      }
+    | {
+        _key: string;
+        _type: "factBox";
+        title?: string;
+        facts?: Array<{
+          label?: string;
+          value?: string;
+          _type: "fact";
+          _key: string;
+        }>;
+        source?: string;
+        variant?: "outline" | "surface";
+      }
+    | {
+        asset?: SanityImageAssetReference;
+        media?: unknown;
+        hotspot?: SanityImageHotspot;
+        crop?: SanityImageCrop;
+        alt: string | null;
+        _type: "image";
+        _key: string;
+      }
+    | {
+        _key: string;
+        _type: "infographic";
+        eyebrow: string | null;
+        title: string | null;
+        description: string | null;
+        wide: string | null;
+        narrow: string | null;
+      }
+    | {
+        _key: string;
+        _type: "pullQuote";
+        quote?: string;
+        cite?: string;
+      }
+    | {
+        asset?: SanityFileAssetReference;
+        media?: unknown;
+        title?: string;
+        _type: "videoFile";
+        _key: string;
+        url: string | null;
+        mimeType: string | null;
+      }
+  > | null;
+  contentAfter: Array<
     | {
         children?: Array<{
           marks?: Array<string>;
@@ -13060,7 +22960,7 @@ export type POST_QUERY_RESULT = {
 
 // Source: src/sanity/queries.ts
 // Variable: ARTICLE_PAGE_QUERY
-// Query: *[_type == "articlePage" && _id == $id][0]{    recommendedHeading,    breadcrumbHomeLabel,    shareLabel,    copyLinkLabel,    linkCopiedLabel,    readTimeSuffix,    imageCreditPrefix,    shareRailLabel,    "shareLinks": coalesce(shareLinks[]{ _key, label, url, icon{ asset->{ url } } }, []),    "topAdUnit": topAdUnit->{ code, size },    "sidebarAdUnit": sidebarAdUnit->{ code, size },    "inContentAdUnit": inContentAdUnit->{ code, size }  }
+// Query: *[_type == "articlePage" && _id == $id][0]{    recommendedHeading,    breadcrumbHomeLabel,    shareLabel,    copyLinkLabel,    linkCopiedLabel,    readTimeSuffix,    imageCreditPrefix,    shareRailLabel,    "shareLinks": coalesce(shareLinks[]{ _key, label, url, icon{ asset->{ url } } }, [])  }
 export type ARTICLE_PAGE_QUERY_RESULT = {
   recommendedHeading: string | null;
   breadcrumbHomeLabel: string | null;
@@ -13082,18 +22982,6 @@ export type ARTICLE_PAGE_QUERY_RESULT = {
         } | null;
       }>
     | Array<never>;
-  topAdUnit: {
-    code: string | null;
-    size: "300x250" | "728x90" | null;
-  } | null;
-  sidebarAdUnit: {
-    code: string | null;
-    size: "300x250" | "728x90" | null;
-  } | null;
-  inContentAdUnit: {
-    code: string | null;
-    size: "300x250" | "728x90" | null;
-  } | null;
 } | null;
 
 // Source: src/sanity/queries.ts
@@ -13288,13 +23176,13 @@ export type SUBSCRIBE_CONFIG_QUERY_RESULT = {
 // Query TypeMap
 declare global {
   interface SanityQueries {
-    '\n  {\n    "header": *[_id == $headerId && _type in ["clearviewHeader", "publicationHeader"]][0]{\n      _type,\n      navigation[]{\n        _key,\n        _type,\n        label,\n        link{ \n  kind,\n  external,\n  internal->{\n    _type,\n    "slug": slug.current,\n    brand,\n    brands\n  }\n },\n        links[]{ _key, _type, label, link{ \n  kind,\n  external,\n  internal->{\n    _type,\n    "slug": slug.current,\n    brand,\n    brands\n  }\n } }\n      },\n      searchPlaceholder,\n      searchLabels,\n      subscribeLabel,\n      subscribe{ \n  label,\n  \n  kind,\n  external,\n  internal->{\n    _type,\n    "slug": slug.current,\n    brand,\n    brands\n  }\n\n }\n    },\n    "footer": *[_id == $footerId && _type in ["clearviewFooter", "publicationFooter"]][0]{\n      _type,\n      description,\n      publisherLine,\n      columns[]{\n        _key,\n        title,\n        links[]{ _key, label, link{ \n  kind,\n  external,\n  internal->{\n    _type,\n    "slug": slug.current,\n    brand,\n    brands\n  }\n } }\n      },\n      socialHeading,\n      social[]{ _key, name, url, icon{ asset->{ url } } },\n      copyright\n    },\n    "brand": *[_type == "brand" && _id == $brandId && key.current == $brand][0]{\n      title,\n      logo{ "alt": asset->altText, asset->{ url, metadata{ dimensions{ width, height } } } },\n      footerLogo{ "alt": asset->altText, asset->{ url, metadata{ dimensions{ width, height } } } }\n    },\n    "subscribeModal": *[_id == $subscribeModalId && _type == "subscribeModal"][0]{ \n  title,\n  description,\n  firstNameLabel,\n  lastNameLabel,\n  emailLabel,\n  emailPlaceholder,\n  companyLabel,\n  jobTitleLabel,\n  countryLabel,\n  countryPlaceholder,\n  industryLabel,\n  industryPlaceholder,\n  optionalMarker,\n  requiredMarker,\n  interestsLegend,\n  interests[]{ _key, label, locked, defaultChecked },\n  consentText,\n  privacyLinkLabel,\n  privacyLink{ \n  kind,\n  external,\n  internal->{\n    _type,\n    "slug": slug.current,\n    brand,\n    brands\n  }\n },\n  submitLabel,\n  firstNameError,\n  lastNameError,\n  emailMissingError,\n  emailInvalidError,\n  consentError,\n  noPublicationError,\n  genericError,\n  successTitle,\n  successText,\n  closeLabel\n }\n  }\n': SHELL_QUERY_RESULT;
-    '\n  *[_type == "page" && brand == $brand && slug.current == "home"][0]{\n    _id,\n    title,\n    blocks[]{ _key, _type, \n  _type == "adSlot" => { \n  size,\n  label,\n  spacing,\n  "unit": unit->{ code, size }\n },\n  _type == "topStories" => { \n  linkLabel,\n  label,\n  "slides": slides[$brand == "clearview" || $brand in @->brands]->{ \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  \n  "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title }\n,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n  "category": category->{ title, "slug": slug.current }\n },\n  "articles": articles[$brand == "clearview" || $brand in @->brands]->{ \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  \n  "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title }\n,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n  "category": category->{ title, "slug": slug.current }\n },\n  "latest": *[\n    _type == "post"\n    && defined(slug.current)\n    && ($brand == "clearview" || $brand in brands)\n    && !(_id in coalesce(^.slides[]._ref, []))\n    && !(_id in coalesce(^.articles[]._ref, []))\n  ] | order(publishedAt desc)[0...6]{ \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  \n  "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title }\n,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n  "category": category->{ title, "slug": slug.current }\n }\n },\n  _type == "publications" => { \n  heading[]{ _key, style, children[]{ _key, text } },\n  body,\n  cards[]{\n    _key,\n    brand,\n    "brandTitle": *[_type == "brand" && key.current == ^.brand][0].title,\n    description,\n    image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n    linkLabel\n  }\n },\n  _type == "cta" => { \n  heading,\n  text,\n  link{ label, href }\n },\n  _type == "highlights" => { \n  source,\n  count,\n  heading[]{ _key, style, children[]{ _key, text } },\n  deadlineLabel,\n  "items": items[]->{ \n  _id,\n  _type,\n  "slug": slug.current,\n  title,\n  category,\n  nominationsClosingDate,\n  startDate,\n  endDate,\n  country,\n  publishedAt\n },\n  "fill": select(\n  source == "awards" => [\n    ...*[\n      _type == "awardsProgramme"\n      && nominationsClosingDate >= $today\n      && !(_id in coalesce(^.items[]._ref, []))\n    ] | order(nominationsClosingDate asc)[0...5]{ \n  _id,\n  _type,\n  "slug": slug.current,\n  title,\n  category,\n  nominationsClosingDate,\n  startDate,\n  endDate,\n  country,\n  publishedAt\n },\n    ...*[\n      _type == "awardsProgramme"\n      && !(defined(nominationsClosingDate) && nominationsClosingDate >= $today)\n      && startDate >= $today\n      && !(_id in coalesce(^.items[]._ref, []))\n    ] | order(startDate asc)[0...5]{ \n  _id,\n  _type,\n  "slug": slug.current,\n  title,\n  category,\n  nominationsClosingDate,\n  startDate,\n  endDate,\n  country,\n  publishedAt\n },\n    ...*[\n      _type == "awardsProgramme"\n      && !(defined(nominationsClosingDate) && nominationsClosingDate >= $today)\n      && startDate < $today\n      && !(_id in coalesce(^.items[]._ref, []))\n    ] | order(startDate desc)[0...5]{ \n  _id,\n  _type,\n  "slug": slug.current,\n  title,\n  category,\n  nominationsClosingDate,\n  startDate,\n  endDate,\n  country,\n  publishedAt\n }\n  ],\n  source == "events" => [\n    ...*[\n      _type == "conferenceEvent"\n      && coalesce(endDate, startDate) >= $today\n      && !(_id in coalesce(^.items[]._ref, []))\n    ] | order(startDate asc)[0...4]{ \n  _id,\n  _type,\n  "slug": slug.current,\n  title,\n  category,\n  nominationsClosingDate,\n  startDate,\n  endDate,\n  country,\n  publishedAt\n },\n    ...*[\n      _type == "conferenceEvent"\n      && coalesce(endDate, startDate) < $today\n      && !(_id in coalesce(^.items[]._ref, []))\n    ] | order(startDate desc)[0...4]{ \n  _id,\n  _type,\n  "slug": slug.current,\n  title,\n  category,\n  nominationsClosingDate,\n  startDate,\n  endDate,\n  country,\n  publishedAt\n }\n  ],\n  source == "research" => *[\n    _type == "resource"\n    && category == "research"\n    && !(_id in coalesce(^.items[]._ref, []))\n    && _id != coalesce(^.promo.resource._ref, "")\n  ] | order(defined(publishedAt) desc, publishedAt desc, legacyWpId desc)[0...3]{ \n  _id,\n  _type,\n  "slug": slug.current,\n  title,\n  category,\n  nominationsClosingDate,\n  startDate,\n  endDate,\n  country,\n  publishedAt\n }\n),\n  button{ \n  label,\n  \n  kind,\n  external,\n  internal->{\n    _type,\n    "slug": slug.current,\n    brand,\n    brands\n  }\n\n },\n  promo{\n    resource->{\n      title,\n      "downloadThumbnail": downloadThumbnail{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n      "downloadFileUrl": downloadFile.asset->url,\n      "downloadFileName": downloadFile.asset->originalFilename,\n      downloadUrl\n    },\n    title,\n    description,\n    "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n    link{ \n  kind,\n  external,\n  internal->{\n    _type,\n    "slug": slug.current,\n    brand,\n    brands\n  }\n }\n  }\n },\n  _type == "featuredStories" => { \n  heading[]{ _key, style, children[]{ _key, text } },\n  link{ \n  label,\n  \n  kind,\n  external,\n  internal->{\n    _type,\n    "slug": slug.current,\n    brand,\n    brands\n  }\n\n },\n  "posts": posts[]->{ \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  \n  "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title }\n,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n  "category": category->{ title, "slug": slug.current }\n }\n },\n  _type == "statsBar" => { \n  heading[]{ _key, style, children[]{ _key, text } },\n  items[]{ _key, icon, value, label }\n },\n  _type == "newsletterSignup" => { \n  heading[]{ _key, style, children[]{ _key, text } },\n  body,\n  preferencesLabel,\n  options[]{\n    _key,\n    label,\n    defaultChecked,\n    "interestKey": *[_type == "subscribeModal" && _id == "subscribe-modal-" + $brand][0].interests[attribute.name == ^.attribute.name][0]._key\n  },\n  emailPlaceholder,\n  buttonLabel,\n  invalidEmailMessage,\n  noOptionMessage,\n  image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n }\n },\n  _type == "sponsoredContent" => { \n  label,\n  link{ \n  label,\n  \n  kind,\n  external,\n  internal->{\n    _type,\n    "slug": slug.current,\n    brand,\n    brands\n  }\n\n },\n  profileLabel,\n  "post": *[\n    _type == "post"\n    && _id == ^.post._ref\n    && defined(slug.current)\n    && defined(sponsor)\n    && ($brand == "clearview" || $brand in brands)\n  ][0]{\n    \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  \n  "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title }\n,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n  "category": category->{ title, "slug": slug.current }\n,\n    "sponsor": sponsor->{\n      title,\n      "slug": slug.current,\n      "logo": logo{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n }\n    }\n  }\n },\n  _type == "postCards" => { \n  \n  heading[]{ _key, style, children[]{ _key, text } },\n  link{ \n  label,\n  \n  kind,\n  external,\n  internal->{\n    _type,\n    "slug": slug.current,\n    brand,\n    brands\n  }\n\n }\n,\n  "category": category->{ title, "slug": slug.current },\n  "posts": posts[$brand in @->brands]->{ \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  \n  "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title }\n,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n  "category": category->{ title, "slug": slug.current }\n },\n  "latest": \n  *[\n    _type == "post"\n    && defined(slug.current)\n    && $brand in brands\n    && defined(^.category._ref) && category._ref == ^.category._ref\n    && !(_id in coalesce(^.posts[]._ref, []))\n  ] | order(publishedAt desc)[0...6]\n{ \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  \n  "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title }\n,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n  "category": category->{ title, "slug": slug.current }\n }\n },\n  _type == "postBriefs" => { \n  \n  heading[]{ _key, style, children[]{ _key, text } },\n  link{ \n  label,\n  \n  kind,\n  external,\n  internal->{\n    _type,\n    "slug": slug.current,\n    brand,\n    brands\n  }\n\n }\n,\n  count,\n  "posts": posts[$brand in @->brands]->{ \n  \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  \n  "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title }\n,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n  "category": category->{ title, "slug": slug.current }\n,\n  "topic": primaryTopic->{ title },\n  briefText\n },\n  "latest": \n  *[\n    _type == "post"\n    && defined(slug.current)\n    && $brand in brands\n    && true\n    && !(_id in coalesce(^.posts[]._ref, []))\n  ] | order(publishedAt desc)[0...6]\n{ \n  \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  \n  "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title }\n,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n  "category": category->{ title, "slug": slug.current }\n,\n  "topic": primaryTopic->{ title },\n  briefText\n }\n },\n  _type == "weeklyRoundup" => { \n  heading[]{ _key, style, children[]{ _key, text } },\n  label,\n  title,\n  summary,\n  button{ \n  label,\n  \n  kind,\n  external,\n  internal->{\n    _type,\n    "slug": slug.current,\n    brand,\n    brands\n  }\n\n },\n  listLabel,\n  "posts": posts[$brand in @->brands]->{ \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  \n  "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title }\n,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n  "category": category->{ title, "slug": slug.current }\n },\n  "latest": \n  *[\n    _type == "post"\n    && defined(slug.current)\n    && $brand in brands\n    && true\n    && !(_id in coalesce(^.posts[]._ref, []))\n  ] | order(publishedAt desc)[0...8]\n{ \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  \n  "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title }\n,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n  "category": category->{ title, "slug": slug.current }\n }\n },\n  _type == "topPicks" => { \n  heading[]{ _key, style, children[]{ _key, text } },\n  link{ \n  label,\n  \n  kind,\n  external,\n  internal->{\n    _type,\n    "slug": slug.current,\n    brand,\n    brands\n  }\n\n },\n  "posts": posts[$brand in @->brands]->{ \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  \n  "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title }\n,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n  "category": category->{ title, "slug": slug.current }\n, "sponsored": defined(sponsor) },\n  "fill": [\n    ...\n  *[\n    _type == "post"\n    && defined(slug.current)\n    && $brand in brands\n    && !defined(sponsor) && dateTime(publishedAt) >= dateTime($today + "T00:00:00Z") - 60*60*24*7\n    && !(_id in coalesce(^.posts[]._ref, []))\n  ] | order(publishedAt desc)[0...6]\n{ \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  \n  "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title }\n,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n  "category": category->{ title, "slug": slug.current }\n },\n    ...\n  *[\n    _type == "post"\n    && defined(slug.current)\n    && $brand in brands\n    && !defined(sponsor) && dateTime(publishedAt) < dateTime($today + "T00:00:00Z") - 60*60*24*7\n    && !(_id in coalesce(^.posts[]._ref, []))\n  ] | order(publishedAt desc)[0...6]\n{ \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  \n  "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title }\n,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n  "category": category->{ title, "slug": slug.current }\n }\n  ]\n },\n  _type == "exploreGrid" => { \n  cards[]{\n    _key,\n    heading[]{ _key, style, children[]{ _key, text } },\n    icon,\n    source,\n    count,\n    deadlineLabel,\n    button{ \n  label,\n  \n  kind,\n  external,\n  internal->{\n    _type,\n    "slug": slug.current,\n    brand,\n    brands\n  }\n\n },\n    "items": items[@->_type != "post" || $brand in @->brands]->{ \n  _type == "post" => { _type, \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  \n  "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title }\n,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n  "category": category->{ title, "slug": slug.current }\n },\n  _type != "post" => { \n  _id,\n  _type,\n  "slug": slug.current,\n  title,\n  category,\n  nominationsClosingDate,\n  startDate,\n  endDate,\n  country,\n  publishedAt\n }\n },\n    "fill": select(\n      source == "posts" => \n  *[\n    _type == "post"\n    && defined(slug.current)\n    && $brand in brands\n    && defined(^.category._ref) && category._ref == ^.category._ref\n    && !(_id in coalesce(^.items[]._ref, []))\n  ] | order(publishedAt desc)[0...6]\n{ _type, \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  \n  "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title }\n,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n  "category": category->{ title, "slug": slug.current }\n },\n      \n  source == "awards" => [\n    ...*[\n      _type == "awardsProgramme"\n      && nominationsClosingDate >= $today\n      && !(_id in coalesce(^.items[]._ref, []))\n    ] | order(nominationsClosingDate asc)[0...5]{ \n  _id,\n  _type,\n  "slug": slug.current,\n  title,\n  category,\n  nominationsClosingDate,\n  startDate,\n  endDate,\n  country,\n  publishedAt\n },\n    ...*[\n      _type == "awardsProgramme"\n      && !(defined(nominationsClosingDate) && nominationsClosingDate >= $today)\n      && startDate >= $today\n      && !(_id in coalesce(^.items[]._ref, []))\n    ] | order(startDate asc)[0...5]{ \n  _id,\n  _type,\n  "slug": slug.current,\n  title,\n  category,\n  nominationsClosingDate,\n  startDate,\n  endDate,\n  country,\n  publishedAt\n },\n    ...*[\n      _type == "awardsProgramme"\n      && !(defined(nominationsClosingDate) && nominationsClosingDate >= $today)\n      && startDate < $today\n      && !(_id in coalesce(^.items[]._ref, []))\n    ] | order(startDate desc)[0...5]{ \n  _id,\n  _type,\n  "slug": slug.current,\n  title,\n  category,\n  nominationsClosingDate,\n  startDate,\n  endDate,\n  country,\n  publishedAt\n }\n  ],\n  source == "events" => [\n    ...*[\n      _type == "conferenceEvent"\n      && coalesce(endDate, startDate) >= $today\n      && !(_id in coalesce(^.items[]._ref, []))\n    ] | order(startDate asc)[0...4]{ \n  _id,\n  _type,\n  "slug": slug.current,\n  title,\n  category,\n  nominationsClosingDate,\n  startDate,\n  endDate,\n  country,\n  publishedAt\n },\n    ...*[\n      _type == "conferenceEvent"\n      && coalesce(endDate, startDate) < $today\n      && !(_id in coalesce(^.items[]._ref, []))\n    ] | order(startDate desc)[0...4]{ \n  _id,\n  _type,\n  "slug": slug.current,\n  title,\n  category,\n  nominationsClosingDate,\n  startDate,\n  endDate,\n  country,\n  publishedAt\n }\n  ],\n  source == "research" => *[\n    _type == "resource"\n    && category == "research"\n    && !(_id in coalesce(^.items[]._ref, []))\n    && _id != coalesce(^.promo.resource._ref, "")\n  ] | order(defined(publishedAt) desc, publishedAt desc, legacyWpId desc)[0...3]{ \n  _id,\n  _type,\n  "slug": slug.current,\n  title,\n  category,\n  nominationsClosingDate,\n  startDate,\n  endDate,\n  country,\n  publishedAt\n }\n\n    )\n  }\n },\n  _type == "subscribeBanner" => { \n  heading[]{ _key, style, children[]{ _key, text } },\n  description,\n  buttonLabel,\n  cta{ \n  label,\n  \n  kind,\n  external,\n  internal->{\n    _type,\n    "slug": slug.current,\n    brand,\n    brands\n  }\n\n }\n },\n  _type == "splitLayout" => {\n    "main": main[]{ _key, _type, \n  _type == "adSlot" => { \n  size,\n  label,\n  spacing,\n  "unit": unit->{ code, size }\n },\n  _type == "topStories" => { \n  linkLabel,\n  label,\n  "slides": slides[$brand == "clearview" || $brand in @->brands]->{ \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  \n  "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title }\n,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n  "category": category->{ title, "slug": slug.current }\n },\n  "articles": articles[$brand == "clearview" || $brand in @->brands]->{ \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  \n  "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title }\n,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n  "category": category->{ title, "slug": slug.current }\n },\n  "latest": *[\n    _type == "post"\n    && defined(slug.current)\n    && ($brand == "clearview" || $brand in brands)\n    && !(_id in coalesce(^.slides[]._ref, []))\n    && !(_id in coalesce(^.articles[]._ref, []))\n  ] | order(publishedAt desc)[0...6]{ \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  \n  "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title }\n,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n  "category": category->{ title, "slug": slug.current }\n }\n },\n  _type == "sponsoredContent" => { \n  label,\n  link{ \n  label,\n  \n  kind,\n  external,\n  internal->{\n    _type,\n    "slug": slug.current,\n    brand,\n    brands\n  }\n\n },\n  profileLabel,\n  "post": *[\n    _type == "post"\n    && _id == ^.post._ref\n    && defined(slug.current)\n    && defined(sponsor)\n    && ($brand == "clearview" || $brand in brands)\n  ][0]{\n    \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  \n  "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title }\n,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n  "category": category->{ title, "slug": slug.current }\n,\n    "sponsor": sponsor->{\n      title,\n      "slug": slug.current,\n      "logo": logo{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n }\n    }\n  }\n },\n  _type == "postCards" => { \n  \n  heading[]{ _key, style, children[]{ _key, text } },\n  link{ \n  label,\n  \n  kind,\n  external,\n  internal->{\n    _type,\n    "slug": slug.current,\n    brand,\n    brands\n  }\n\n }\n,\n  "category": category->{ title, "slug": slug.current },\n  "posts": posts[$brand in @->brands]->{ \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  \n  "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title }\n,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n  "category": category->{ title, "slug": slug.current }\n },\n  "latest": \n  *[\n    _type == "post"\n    && defined(slug.current)\n    && $brand in brands\n    && defined(^.category._ref) && category._ref == ^.category._ref\n    && !(_id in coalesce(^.posts[]._ref, []))\n  ] | order(publishedAt desc)[0...6]\n{ \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  \n  "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title }\n,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n  "category": category->{ title, "slug": slug.current }\n }\n },\n  _type == "postBriefs" => { \n  \n  heading[]{ _key, style, children[]{ _key, text } },\n  link{ \n  label,\n  \n  kind,\n  external,\n  internal->{\n    _type,\n    "slug": slug.current,\n    brand,\n    brands\n  }\n\n }\n,\n  count,\n  "posts": posts[$brand in @->brands]->{ \n  \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  \n  "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title }\n,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n  "category": category->{ title, "slug": slug.current }\n,\n  "topic": primaryTopic->{ title },\n  briefText\n },\n  "latest": \n  *[\n    _type == "post"\n    && defined(slug.current)\n    && $brand in brands\n    && true\n    && !(_id in coalesce(^.posts[]._ref, []))\n  ] | order(publishedAt desc)[0...6]\n{ \n  \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  \n  "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title }\n,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n  "category": category->{ title, "slug": slug.current }\n,\n  "topic": primaryTopic->{ title },\n  briefText\n }\n },\n  _type == "weeklyRoundup" => { \n  heading[]{ _key, style, children[]{ _key, text } },\n  label,\n  title,\n  summary,\n  button{ \n  label,\n  \n  kind,\n  external,\n  internal->{\n    _type,\n    "slug": slug.current,\n    brand,\n    brands\n  }\n\n },\n  listLabel,\n  "posts": posts[$brand in @->brands]->{ \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  \n  "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title }\n,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n  "category": category->{ title, "slug": slug.current }\n },\n  "latest": \n  *[\n    _type == "post"\n    && defined(slug.current)\n    && $brand in brands\n    && true\n    && !(_id in coalesce(^.posts[]._ref, []))\n  ] | order(publishedAt desc)[0...8]\n{ \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  \n  "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title }\n,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n  "category": category->{ title, "slug": slug.current }\n }\n },\n  _type == "publications" => { \n  heading[]{ _key, style, children[]{ _key, text } },\n  body,\n  cards[]{\n    _key,\n    brand,\n    "brandTitle": *[_type == "brand" && key.current == ^.brand][0].title,\n    description,\n    image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n    linkLabel\n  }\n },\n  _type == "cta" => { \n  heading,\n  text,\n  link{ label, href }\n }\n },\n    "aside": aside[]{ _key, _type, \n  _type == "highlights" => { \n  source,\n  count,\n  heading[]{ _key, style, children[]{ _key, text } },\n  deadlineLabel,\n  "items": items[]->{ \n  _id,\n  _type,\n  "slug": slug.current,\n  title,\n  category,\n  nominationsClosingDate,\n  startDate,\n  endDate,\n  country,\n  publishedAt\n },\n  "fill": select(\n  source == "awards" => [\n    ...*[\n      _type == "awardsProgramme"\n      && nominationsClosingDate >= $today\n      && !(_id in coalesce(^.items[]._ref, []))\n    ] | order(nominationsClosingDate asc)[0...5]{ \n  _id,\n  _type,\n  "slug": slug.current,\n  title,\n  category,\n  nominationsClosingDate,\n  startDate,\n  endDate,\n  country,\n  publishedAt\n },\n    ...*[\n      _type == "awardsProgramme"\n      && !(defined(nominationsClosingDate) && nominationsClosingDate >= $today)\n      && startDate >= $today\n      && !(_id in coalesce(^.items[]._ref, []))\n    ] | order(startDate asc)[0...5]{ \n  _id,\n  _type,\n  "slug": slug.current,\n  title,\n  category,\n  nominationsClosingDate,\n  startDate,\n  endDate,\n  country,\n  publishedAt\n },\n    ...*[\n      _type == "awardsProgramme"\n      && !(defined(nominationsClosingDate) && nominationsClosingDate >= $today)\n      && startDate < $today\n      && !(_id in coalesce(^.items[]._ref, []))\n    ] | order(startDate desc)[0...5]{ \n  _id,\n  _type,\n  "slug": slug.current,\n  title,\n  category,\n  nominationsClosingDate,\n  startDate,\n  endDate,\n  country,\n  publishedAt\n }\n  ],\n  source == "events" => [\n    ...*[\n      _type == "conferenceEvent"\n      && coalesce(endDate, startDate) >= $today\n      && !(_id in coalesce(^.items[]._ref, []))\n    ] | order(startDate asc)[0...4]{ \n  _id,\n  _type,\n  "slug": slug.current,\n  title,\n  category,\n  nominationsClosingDate,\n  startDate,\n  endDate,\n  country,\n  publishedAt\n },\n    ...*[\n      _type == "conferenceEvent"\n      && coalesce(endDate, startDate) < $today\n      && !(_id in coalesce(^.items[]._ref, []))\n    ] | order(startDate desc)[0...4]{ \n  _id,\n  _type,\n  "slug": slug.current,\n  title,\n  category,\n  nominationsClosingDate,\n  startDate,\n  endDate,\n  country,\n  publishedAt\n }\n  ],\n  source == "research" => *[\n    _type == "resource"\n    && category == "research"\n    && !(_id in coalesce(^.items[]._ref, []))\n    && _id != coalesce(^.promo.resource._ref, "")\n  ] | order(defined(publishedAt) desc, publishedAt desc, legacyWpId desc)[0...3]{ \n  _id,\n  _type,\n  "slug": slug.current,\n  title,\n  category,\n  nominationsClosingDate,\n  startDate,\n  endDate,\n  country,\n  publishedAt\n }\n),\n  button{ \n  label,\n  \n  kind,\n  external,\n  internal->{\n    _type,\n    "slug": slug.current,\n    brand,\n    brands\n  }\n\n },\n  promo{\n    resource->{\n      title,\n      "downloadThumbnail": downloadThumbnail{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n      "downloadFileUrl": downloadFile.asset->url,\n      "downloadFileName": downloadFile.asset->originalFilename,\n      downloadUrl\n    },\n    title,\n    description,\n    "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n    link{ \n  kind,\n  external,\n  internal->{\n    _type,\n    "slug": slug.current,\n    brand,\n    brands\n  }\n }\n  }\n },\n  _type == "adSlot" => { \n  size,\n  label,\n  spacing,\n  "unit": unit->{ code, size }\n }\n }\n  }\n }\n  }\n': HOME_PAGE_QUERY_RESULT;
-    '\n  *[_type == "page" && slug.current == $slug && brand == $brand][0]{\n    _id,\n    title,\n    blocks[]{ _key, _type, \n  _type == "adSlot" => { \n  size,\n  label,\n  spacing,\n  "unit": unit->{ code, size }\n },\n  _type == "topStories" => { \n  linkLabel,\n  label,\n  "slides": slides[$brand == "clearview" || $brand in @->brands]->{ \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  \n  "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title }\n,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n  "category": category->{ title, "slug": slug.current }\n },\n  "articles": articles[$brand == "clearview" || $brand in @->brands]->{ \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  \n  "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title }\n,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n  "category": category->{ title, "slug": slug.current }\n },\n  "latest": *[\n    _type == "post"\n    && defined(slug.current)\n    && ($brand == "clearview" || $brand in brands)\n    && !(_id in coalesce(^.slides[]._ref, []))\n    && !(_id in coalesce(^.articles[]._ref, []))\n  ] | order(publishedAt desc)[0...6]{ \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  \n  "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title }\n,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n  "category": category->{ title, "slug": slug.current }\n }\n },\n  _type == "publications" => { \n  heading[]{ _key, style, children[]{ _key, text } },\n  body,\n  cards[]{\n    _key,\n    brand,\n    "brandTitle": *[_type == "brand" && key.current == ^.brand][0].title,\n    description,\n    image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n    linkLabel\n  }\n },\n  _type == "cta" => { \n  heading,\n  text,\n  link{ label, href }\n },\n  _type == "highlights" => { \n  source,\n  count,\n  heading[]{ _key, style, children[]{ _key, text } },\n  deadlineLabel,\n  "items": items[]->{ \n  _id,\n  _type,\n  "slug": slug.current,\n  title,\n  category,\n  nominationsClosingDate,\n  startDate,\n  endDate,\n  country,\n  publishedAt\n },\n  "fill": select(\n  source == "awards" => [\n    ...*[\n      _type == "awardsProgramme"\n      && nominationsClosingDate >= $today\n      && !(_id in coalesce(^.items[]._ref, []))\n    ] | order(nominationsClosingDate asc)[0...5]{ \n  _id,\n  _type,\n  "slug": slug.current,\n  title,\n  category,\n  nominationsClosingDate,\n  startDate,\n  endDate,\n  country,\n  publishedAt\n },\n    ...*[\n      _type == "awardsProgramme"\n      && !(defined(nominationsClosingDate) && nominationsClosingDate >= $today)\n      && startDate >= $today\n      && !(_id in coalesce(^.items[]._ref, []))\n    ] | order(startDate asc)[0...5]{ \n  _id,\n  _type,\n  "slug": slug.current,\n  title,\n  category,\n  nominationsClosingDate,\n  startDate,\n  endDate,\n  country,\n  publishedAt\n },\n    ...*[\n      _type == "awardsProgramme"\n      && !(defined(nominationsClosingDate) && nominationsClosingDate >= $today)\n      && startDate < $today\n      && !(_id in coalesce(^.items[]._ref, []))\n    ] | order(startDate desc)[0...5]{ \n  _id,\n  _type,\n  "slug": slug.current,\n  title,\n  category,\n  nominationsClosingDate,\n  startDate,\n  endDate,\n  country,\n  publishedAt\n }\n  ],\n  source == "events" => [\n    ...*[\n      _type == "conferenceEvent"\n      && coalesce(endDate, startDate) >= $today\n      && !(_id in coalesce(^.items[]._ref, []))\n    ] | order(startDate asc)[0...4]{ \n  _id,\n  _type,\n  "slug": slug.current,\n  title,\n  category,\n  nominationsClosingDate,\n  startDate,\n  endDate,\n  country,\n  publishedAt\n },\n    ...*[\n      _type == "conferenceEvent"\n      && coalesce(endDate, startDate) < $today\n      && !(_id in coalesce(^.items[]._ref, []))\n    ] | order(startDate desc)[0...4]{ \n  _id,\n  _type,\n  "slug": slug.current,\n  title,\n  category,\n  nominationsClosingDate,\n  startDate,\n  endDate,\n  country,\n  publishedAt\n }\n  ],\n  source == "research" => *[\n    _type == "resource"\n    && category == "research"\n    && !(_id in coalesce(^.items[]._ref, []))\n    && _id != coalesce(^.promo.resource._ref, "")\n  ] | order(defined(publishedAt) desc, publishedAt desc, legacyWpId desc)[0...3]{ \n  _id,\n  _type,\n  "slug": slug.current,\n  title,\n  category,\n  nominationsClosingDate,\n  startDate,\n  endDate,\n  country,\n  publishedAt\n }\n),\n  button{ \n  label,\n  \n  kind,\n  external,\n  internal->{\n    _type,\n    "slug": slug.current,\n    brand,\n    brands\n  }\n\n },\n  promo{\n    resource->{\n      title,\n      "downloadThumbnail": downloadThumbnail{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n      "downloadFileUrl": downloadFile.asset->url,\n      "downloadFileName": downloadFile.asset->originalFilename,\n      downloadUrl\n    },\n    title,\n    description,\n    "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n    link{ \n  kind,\n  external,\n  internal->{\n    _type,\n    "slug": slug.current,\n    brand,\n    brands\n  }\n }\n  }\n },\n  _type == "featuredStories" => { \n  heading[]{ _key, style, children[]{ _key, text } },\n  link{ \n  label,\n  \n  kind,\n  external,\n  internal->{\n    _type,\n    "slug": slug.current,\n    brand,\n    brands\n  }\n\n },\n  "posts": posts[]->{ \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  \n  "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title }\n,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n  "category": category->{ title, "slug": slug.current }\n }\n },\n  _type == "statsBar" => { \n  heading[]{ _key, style, children[]{ _key, text } },\n  items[]{ _key, icon, value, label }\n },\n  _type == "newsletterSignup" => { \n  heading[]{ _key, style, children[]{ _key, text } },\n  body,\n  preferencesLabel,\n  options[]{\n    _key,\n    label,\n    defaultChecked,\n    "interestKey": *[_type == "subscribeModal" && _id == "subscribe-modal-" + $brand][0].interests[attribute.name == ^.attribute.name][0]._key\n  },\n  emailPlaceholder,\n  buttonLabel,\n  invalidEmailMessage,\n  noOptionMessage,\n  image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n }\n },\n  _type == "sponsoredContent" => { \n  label,\n  link{ \n  label,\n  \n  kind,\n  external,\n  internal->{\n    _type,\n    "slug": slug.current,\n    brand,\n    brands\n  }\n\n },\n  profileLabel,\n  "post": *[\n    _type == "post"\n    && _id == ^.post._ref\n    && defined(slug.current)\n    && defined(sponsor)\n    && ($brand == "clearview" || $brand in brands)\n  ][0]{\n    \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  \n  "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title }\n,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n  "category": category->{ title, "slug": slug.current }\n,\n    "sponsor": sponsor->{\n      title,\n      "slug": slug.current,\n      "logo": logo{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n }\n    }\n  }\n },\n  _type == "postCards" => { \n  \n  heading[]{ _key, style, children[]{ _key, text } },\n  link{ \n  label,\n  \n  kind,\n  external,\n  internal->{\n    _type,\n    "slug": slug.current,\n    brand,\n    brands\n  }\n\n }\n,\n  "category": category->{ title, "slug": slug.current },\n  "posts": posts[$brand in @->brands]->{ \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  \n  "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title }\n,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n  "category": category->{ title, "slug": slug.current }\n },\n  "latest": \n  *[\n    _type == "post"\n    && defined(slug.current)\n    && $brand in brands\n    && defined(^.category._ref) && category._ref == ^.category._ref\n    && !(_id in coalesce(^.posts[]._ref, []))\n  ] | order(publishedAt desc)[0...6]\n{ \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  \n  "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title }\n,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n  "category": category->{ title, "slug": slug.current }\n }\n },\n  _type == "postBriefs" => { \n  \n  heading[]{ _key, style, children[]{ _key, text } },\n  link{ \n  label,\n  \n  kind,\n  external,\n  internal->{\n    _type,\n    "slug": slug.current,\n    brand,\n    brands\n  }\n\n }\n,\n  count,\n  "posts": posts[$brand in @->brands]->{ \n  \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  \n  "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title }\n,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n  "category": category->{ title, "slug": slug.current }\n,\n  "topic": primaryTopic->{ title },\n  briefText\n },\n  "latest": \n  *[\n    _type == "post"\n    && defined(slug.current)\n    && $brand in brands\n    && true\n    && !(_id in coalesce(^.posts[]._ref, []))\n  ] | order(publishedAt desc)[0...6]\n{ \n  \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  \n  "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title }\n,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n  "category": category->{ title, "slug": slug.current }\n,\n  "topic": primaryTopic->{ title },\n  briefText\n }\n },\n  _type == "weeklyRoundup" => { \n  heading[]{ _key, style, children[]{ _key, text } },\n  label,\n  title,\n  summary,\n  button{ \n  label,\n  \n  kind,\n  external,\n  internal->{\n    _type,\n    "slug": slug.current,\n    brand,\n    brands\n  }\n\n },\n  listLabel,\n  "posts": posts[$brand in @->brands]->{ \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  \n  "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title }\n,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n  "category": category->{ title, "slug": slug.current }\n },\n  "latest": \n  *[\n    _type == "post"\n    && defined(slug.current)\n    && $brand in brands\n    && true\n    && !(_id in coalesce(^.posts[]._ref, []))\n  ] | order(publishedAt desc)[0...8]\n{ \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  \n  "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title }\n,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n  "category": category->{ title, "slug": slug.current }\n }\n },\n  _type == "topPicks" => { \n  heading[]{ _key, style, children[]{ _key, text } },\n  link{ \n  label,\n  \n  kind,\n  external,\n  internal->{\n    _type,\n    "slug": slug.current,\n    brand,\n    brands\n  }\n\n },\n  "posts": posts[$brand in @->brands]->{ \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  \n  "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title }\n,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n  "category": category->{ title, "slug": slug.current }\n, "sponsored": defined(sponsor) },\n  "fill": [\n    ...\n  *[\n    _type == "post"\n    && defined(slug.current)\n    && $brand in brands\n    && !defined(sponsor) && dateTime(publishedAt) >= dateTime($today + "T00:00:00Z") - 60*60*24*7\n    && !(_id in coalesce(^.posts[]._ref, []))\n  ] | order(publishedAt desc)[0...6]\n{ \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  \n  "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title }\n,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n  "category": category->{ title, "slug": slug.current }\n },\n    ...\n  *[\n    _type == "post"\n    && defined(slug.current)\n    && $brand in brands\n    && !defined(sponsor) && dateTime(publishedAt) < dateTime($today + "T00:00:00Z") - 60*60*24*7\n    && !(_id in coalesce(^.posts[]._ref, []))\n  ] | order(publishedAt desc)[0...6]\n{ \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  \n  "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title }\n,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n  "category": category->{ title, "slug": slug.current }\n }\n  ]\n },\n  _type == "exploreGrid" => { \n  cards[]{\n    _key,\n    heading[]{ _key, style, children[]{ _key, text } },\n    icon,\n    source,\n    count,\n    deadlineLabel,\n    button{ \n  label,\n  \n  kind,\n  external,\n  internal->{\n    _type,\n    "slug": slug.current,\n    brand,\n    brands\n  }\n\n },\n    "items": items[@->_type != "post" || $brand in @->brands]->{ \n  _type == "post" => { _type, \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  \n  "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title }\n,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n  "category": category->{ title, "slug": slug.current }\n },\n  _type != "post" => { \n  _id,\n  _type,\n  "slug": slug.current,\n  title,\n  category,\n  nominationsClosingDate,\n  startDate,\n  endDate,\n  country,\n  publishedAt\n }\n },\n    "fill": select(\n      source == "posts" => \n  *[\n    _type == "post"\n    && defined(slug.current)\n    && $brand in brands\n    && defined(^.category._ref) && category._ref == ^.category._ref\n    && !(_id in coalesce(^.items[]._ref, []))\n  ] | order(publishedAt desc)[0...6]\n{ _type, \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  \n  "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title }\n,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n  "category": category->{ title, "slug": slug.current }\n },\n      \n  source == "awards" => [\n    ...*[\n      _type == "awardsProgramme"\n      && nominationsClosingDate >= $today\n      && !(_id in coalesce(^.items[]._ref, []))\n    ] | order(nominationsClosingDate asc)[0...5]{ \n  _id,\n  _type,\n  "slug": slug.current,\n  title,\n  category,\n  nominationsClosingDate,\n  startDate,\n  endDate,\n  country,\n  publishedAt\n },\n    ...*[\n      _type == "awardsProgramme"\n      && !(defined(nominationsClosingDate) && nominationsClosingDate >= $today)\n      && startDate >= $today\n      && !(_id in coalesce(^.items[]._ref, []))\n    ] | order(startDate asc)[0...5]{ \n  _id,\n  _type,\n  "slug": slug.current,\n  title,\n  category,\n  nominationsClosingDate,\n  startDate,\n  endDate,\n  country,\n  publishedAt\n },\n    ...*[\n      _type == "awardsProgramme"\n      && !(defined(nominationsClosingDate) && nominationsClosingDate >= $today)\n      && startDate < $today\n      && !(_id in coalesce(^.items[]._ref, []))\n    ] | order(startDate desc)[0...5]{ \n  _id,\n  _type,\n  "slug": slug.current,\n  title,\n  category,\n  nominationsClosingDate,\n  startDate,\n  endDate,\n  country,\n  publishedAt\n }\n  ],\n  source == "events" => [\n    ...*[\n      _type == "conferenceEvent"\n      && coalesce(endDate, startDate) >= $today\n      && !(_id in coalesce(^.items[]._ref, []))\n    ] | order(startDate asc)[0...4]{ \n  _id,\n  _type,\n  "slug": slug.current,\n  title,\n  category,\n  nominationsClosingDate,\n  startDate,\n  endDate,\n  country,\n  publishedAt\n },\n    ...*[\n      _type == "conferenceEvent"\n      && coalesce(endDate, startDate) < $today\n      && !(_id in coalesce(^.items[]._ref, []))\n    ] | order(startDate desc)[0...4]{ \n  _id,\n  _type,\n  "slug": slug.current,\n  title,\n  category,\n  nominationsClosingDate,\n  startDate,\n  endDate,\n  country,\n  publishedAt\n }\n  ],\n  source == "research" => *[\n    _type == "resource"\n    && category == "research"\n    && !(_id in coalesce(^.items[]._ref, []))\n    && _id != coalesce(^.promo.resource._ref, "")\n  ] | order(defined(publishedAt) desc, publishedAt desc, legacyWpId desc)[0...3]{ \n  _id,\n  _type,\n  "slug": slug.current,\n  title,\n  category,\n  nominationsClosingDate,\n  startDate,\n  endDate,\n  country,\n  publishedAt\n }\n\n    )\n  }\n },\n  _type == "subscribeBanner" => { \n  heading[]{ _key, style, children[]{ _key, text } },\n  description,\n  buttonLabel,\n  cta{ \n  label,\n  \n  kind,\n  external,\n  internal->{\n    _type,\n    "slug": slug.current,\n    brand,\n    brands\n  }\n\n }\n },\n  _type == "splitLayout" => {\n    "main": main[]{ _key, _type, \n  _type == "adSlot" => { \n  size,\n  label,\n  spacing,\n  "unit": unit->{ code, size }\n },\n  _type == "topStories" => { \n  linkLabel,\n  label,\n  "slides": slides[$brand == "clearview" || $brand in @->brands]->{ \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  \n  "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title }\n,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n  "category": category->{ title, "slug": slug.current }\n },\n  "articles": articles[$brand == "clearview" || $brand in @->brands]->{ \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  \n  "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title }\n,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n  "category": category->{ title, "slug": slug.current }\n },\n  "latest": *[\n    _type == "post"\n    && defined(slug.current)\n    && ($brand == "clearview" || $brand in brands)\n    && !(_id in coalesce(^.slides[]._ref, []))\n    && !(_id in coalesce(^.articles[]._ref, []))\n  ] | order(publishedAt desc)[0...6]{ \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  \n  "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title }\n,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n  "category": category->{ title, "slug": slug.current }\n }\n },\n  _type == "sponsoredContent" => { \n  label,\n  link{ \n  label,\n  \n  kind,\n  external,\n  internal->{\n    _type,\n    "slug": slug.current,\n    brand,\n    brands\n  }\n\n },\n  profileLabel,\n  "post": *[\n    _type == "post"\n    && _id == ^.post._ref\n    && defined(slug.current)\n    && defined(sponsor)\n    && ($brand == "clearview" || $brand in brands)\n  ][0]{\n    \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  \n  "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title }\n,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n  "category": category->{ title, "slug": slug.current }\n,\n    "sponsor": sponsor->{\n      title,\n      "slug": slug.current,\n      "logo": logo{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n }\n    }\n  }\n },\n  _type == "postCards" => { \n  \n  heading[]{ _key, style, children[]{ _key, text } },\n  link{ \n  label,\n  \n  kind,\n  external,\n  internal->{\n    _type,\n    "slug": slug.current,\n    brand,\n    brands\n  }\n\n }\n,\n  "category": category->{ title, "slug": slug.current },\n  "posts": posts[$brand in @->brands]->{ \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  \n  "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title }\n,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n  "category": category->{ title, "slug": slug.current }\n },\n  "latest": \n  *[\n    _type == "post"\n    && defined(slug.current)\n    && $brand in brands\n    && defined(^.category._ref) && category._ref == ^.category._ref\n    && !(_id in coalesce(^.posts[]._ref, []))\n  ] | order(publishedAt desc)[0...6]\n{ \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  \n  "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title }\n,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n  "category": category->{ title, "slug": slug.current }\n }\n },\n  _type == "postBriefs" => { \n  \n  heading[]{ _key, style, children[]{ _key, text } },\n  link{ \n  label,\n  \n  kind,\n  external,\n  internal->{\n    _type,\n    "slug": slug.current,\n    brand,\n    brands\n  }\n\n }\n,\n  count,\n  "posts": posts[$brand in @->brands]->{ \n  \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  \n  "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title }\n,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n  "category": category->{ title, "slug": slug.current }\n,\n  "topic": primaryTopic->{ title },\n  briefText\n },\n  "latest": \n  *[\n    _type == "post"\n    && defined(slug.current)\n    && $brand in brands\n    && true\n    && !(_id in coalesce(^.posts[]._ref, []))\n  ] | order(publishedAt desc)[0...6]\n{ \n  \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  \n  "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title }\n,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n  "category": category->{ title, "slug": slug.current }\n,\n  "topic": primaryTopic->{ title },\n  briefText\n }\n },\n  _type == "weeklyRoundup" => { \n  heading[]{ _key, style, children[]{ _key, text } },\n  label,\n  title,\n  summary,\n  button{ \n  label,\n  \n  kind,\n  external,\n  internal->{\n    _type,\n    "slug": slug.current,\n    brand,\n    brands\n  }\n\n },\n  listLabel,\n  "posts": posts[$brand in @->brands]->{ \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  \n  "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title }\n,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n  "category": category->{ title, "slug": slug.current }\n },\n  "latest": \n  *[\n    _type == "post"\n    && defined(slug.current)\n    && $brand in brands\n    && true\n    && !(_id in coalesce(^.posts[]._ref, []))\n  ] | order(publishedAt desc)[0...8]\n{ \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  \n  "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title }\n,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n  "category": category->{ title, "slug": slug.current }\n }\n },\n  _type == "publications" => { \n  heading[]{ _key, style, children[]{ _key, text } },\n  body,\n  cards[]{\n    _key,\n    brand,\n    "brandTitle": *[_type == "brand" && key.current == ^.brand][0].title,\n    description,\n    image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n    linkLabel\n  }\n },\n  _type == "cta" => { \n  heading,\n  text,\n  link{ label, href }\n }\n },\n    "aside": aside[]{ _key, _type, \n  _type == "highlights" => { \n  source,\n  count,\n  heading[]{ _key, style, children[]{ _key, text } },\n  deadlineLabel,\n  "items": items[]->{ \n  _id,\n  _type,\n  "slug": slug.current,\n  title,\n  category,\n  nominationsClosingDate,\n  startDate,\n  endDate,\n  country,\n  publishedAt\n },\n  "fill": select(\n  source == "awards" => [\n    ...*[\n      _type == "awardsProgramme"\n      && nominationsClosingDate >= $today\n      && !(_id in coalesce(^.items[]._ref, []))\n    ] | order(nominationsClosingDate asc)[0...5]{ \n  _id,\n  _type,\n  "slug": slug.current,\n  title,\n  category,\n  nominationsClosingDate,\n  startDate,\n  endDate,\n  country,\n  publishedAt\n },\n    ...*[\n      _type == "awardsProgramme"\n      && !(defined(nominationsClosingDate) && nominationsClosingDate >= $today)\n      && startDate >= $today\n      && !(_id in coalesce(^.items[]._ref, []))\n    ] | order(startDate asc)[0...5]{ \n  _id,\n  _type,\n  "slug": slug.current,\n  title,\n  category,\n  nominationsClosingDate,\n  startDate,\n  endDate,\n  country,\n  publishedAt\n },\n    ...*[\n      _type == "awardsProgramme"\n      && !(defined(nominationsClosingDate) && nominationsClosingDate >= $today)\n      && startDate < $today\n      && !(_id in coalesce(^.items[]._ref, []))\n    ] | order(startDate desc)[0...5]{ \n  _id,\n  _type,\n  "slug": slug.current,\n  title,\n  category,\n  nominationsClosingDate,\n  startDate,\n  endDate,\n  country,\n  publishedAt\n }\n  ],\n  source == "events" => [\n    ...*[\n      _type == "conferenceEvent"\n      && coalesce(endDate, startDate) >= $today\n      && !(_id in coalesce(^.items[]._ref, []))\n    ] | order(startDate asc)[0...4]{ \n  _id,\n  _type,\n  "slug": slug.current,\n  title,\n  category,\n  nominationsClosingDate,\n  startDate,\n  endDate,\n  country,\n  publishedAt\n },\n    ...*[\n      _type == "conferenceEvent"\n      && coalesce(endDate, startDate) < $today\n      && !(_id in coalesce(^.items[]._ref, []))\n    ] | order(startDate desc)[0...4]{ \n  _id,\n  _type,\n  "slug": slug.current,\n  title,\n  category,\n  nominationsClosingDate,\n  startDate,\n  endDate,\n  country,\n  publishedAt\n }\n  ],\n  source == "research" => *[\n    _type == "resource"\n    && category == "research"\n    && !(_id in coalesce(^.items[]._ref, []))\n    && _id != coalesce(^.promo.resource._ref, "")\n  ] | order(defined(publishedAt) desc, publishedAt desc, legacyWpId desc)[0...3]{ \n  _id,\n  _type,\n  "slug": slug.current,\n  title,\n  category,\n  nominationsClosingDate,\n  startDate,\n  endDate,\n  country,\n  publishedAt\n }\n),\n  button{ \n  label,\n  \n  kind,\n  external,\n  internal->{\n    _type,\n    "slug": slug.current,\n    brand,\n    brands\n  }\n\n },\n  promo{\n    resource->{\n      title,\n      "downloadThumbnail": downloadThumbnail{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n      "downloadFileUrl": downloadFile.asset->url,\n      "downloadFileName": downloadFile.asset->originalFilename,\n      downloadUrl\n    },\n    title,\n    description,\n    "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n    link{ \n  kind,\n  external,\n  internal->{\n    _type,\n    "slug": slug.current,\n    brand,\n    brands\n  }\n }\n  }\n },\n  _type == "adSlot" => { \n  size,\n  label,\n  spacing,\n  "unit": unit->{ code, size }\n }\n }\n  }\n }\n  }\n': PAGE_QUERY_RESULT;
+    '\n  {\n    "header": *[_id == $headerId && _type in ["clearviewHeader", "publicationHeader"]][0]{\n      _type,\n      navigation[]{\n        _key,\n        _type,\n        label,\n        link{ \n  kind,\n  external,\n  internal->{\n    _type,\n    "slug": slug.current,\n    brand,\n    brands\n  }\n },\n        links[]{ _key, _type, label, link{ \n  kind,\n  external,\n  internal->{\n    _type,\n    "slug": slug.current,\n    brand,\n    brands\n  }\n } }\n      },\n      searchPlaceholder,\n      searchLabels,\n      subscribeLabel,\n      subscribe{ \n  label,\n  \n  kind,\n  external,\n  internal->{\n    _type,\n    "slug": slug.current,\n    brand,\n    brands\n  }\n\n }\n    },\n    "footer": *[_id == $footerId && _type in ["clearviewFooter", "publicationFooter"]][0]{\n      _type,\n      description,\n      publisherLine,\n      columns[]{\n        _key,\n        title,\n        links[]{ _key, label, link{ \n  kind,\n  external,\n  internal->{\n    _type,\n    "slug": slug.current,\n    brand,\n    brands\n  }\n } }\n      },\n      socialHeading,\n      social[]{ _key, name, url, icon{ asset->{ url } } },\n      copyright\n    },\n    "brand": *[_type == "brand" && _id == $brandId && key.current == $brand][0]{\n      title,\n      logo{ "alt": asset->altText, asset->{ url, metadata{ dimensions{ width, height } } } },\n      footerLogo{ "alt": asset->altText, asset->{ url, metadata{ dimensions{ width, height } } } },\n      \n  advertising{\n    top{ home, other },\n    side{ home, other },\n    publications{ home, other },\n    article{ other },\n    banner3{ home },\n    banner4{ home },\n    awardsWinners{ home, other }\n  }\n\n    },\n    "subscribeModal": *[_id == $subscribeModalId && _type == "subscribeModal"][0]{ \n  title,\n  description,\n  firstNameLabel,\n  lastNameLabel,\n  emailLabel,\n  emailPlaceholder,\n  companyLabel,\n  jobTitleLabel,\n  countryLabel,\n  countryPlaceholder,\n  industryLabel,\n  industryPlaceholder,\n  optionalMarker,\n  requiredMarker,\n  interestsLegend,\n  interests[]{ _key, label, locked, defaultChecked },\n  consentText,\n  privacyLinkLabel,\n  privacyLink{ \n  kind,\n  external,\n  internal->{\n    _type,\n    "slug": slug.current,\n    brand,\n    brands\n  }\n },\n  submitLabel,\n  firstNameError,\n  lastNameError,\n  emailMissingError,\n  emailInvalidError,\n  consentError,\n  noPublicationError,\n  genericError,\n  successTitle,\n  successText,\n  closeLabel\n }\n  }\n': SHELL_QUERY_RESULT;
+    '\n  *[_type == "page" && brand == $brand && slug.current == "home"][0]{\n    _id,\n    title,\n    blocks[]{ _key, _type, \n  _type == "topStories" => { \n  linkLabel,\n  label,\n  "slides": slides[$brand == "clearview" || $brand in @->brands]->{ \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  \n  "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title }\n,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n  "category": category->{ title, "slug": slug.current }\n },\n  "articles": articles[$brand == "clearview" || $brand in @->brands]->{ \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  \n  "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title }\n,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n  "category": category->{ title, "slug": slug.current }\n },\n  "latest": *[\n    _type == "post"\n    && defined(slug.current)\n    && ($brand == "clearview" || $brand in brands)\n    && !(_id in coalesce(^.slides[]._ref, []))\n    && !(_id in coalesce(^.articles[]._ref, []))\n  ] | order(publishedAt desc)[0...6]{ \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  \n  "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title }\n,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n  "category": category->{ title, "slug": slug.current }\n }\n },\n  _type == "publications" => { \n  heading[]{ _key, style, children[]{ _key, text } },\n  body,\n  cards[]{\n    _key,\n    brand,\n    "brandTitle": *[_type == "brand" && key.current == ^.brand][0].title,\n    description,\n    image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n    linkLabel\n  }\n },\n  _type == "cta" => { \n  heading,\n  text,\n  link{ label, href }\n },\n  _type == "highlights" => { \n  source,\n  count,\n  heading[]{ _key, style, children[]{ _key, text } },\n  deadlineLabel,\n  "items": items[]->{ \n  _id,\n  _type,\n  "slug": slug.current,\n  title,\n  category,\n  nominationsClosingDate,\n  startDate,\n  endDate,\n  country,\n  publishedAt\n },\n  "fill": select(\n  source == "awards" => [\n    ...*[\n      _type == "awardsProgramme"\n      && nominationsClosingDate >= $today\n      && !(_id in coalesce(^.items[]._ref, []))\n    ] | order(nominationsClosingDate asc)[0...5]{ \n  _id,\n  _type,\n  "slug": slug.current,\n  title,\n  category,\n  nominationsClosingDate,\n  startDate,\n  endDate,\n  country,\n  publishedAt\n },\n    ...*[\n      _type == "awardsProgramme"\n      && !(defined(nominationsClosingDate) && nominationsClosingDate >= $today)\n      && startDate >= $today\n      && !(_id in coalesce(^.items[]._ref, []))\n    ] | order(startDate asc)[0...5]{ \n  _id,\n  _type,\n  "slug": slug.current,\n  title,\n  category,\n  nominationsClosingDate,\n  startDate,\n  endDate,\n  country,\n  publishedAt\n },\n    ...*[\n      _type == "awardsProgramme"\n      && !(defined(nominationsClosingDate) && nominationsClosingDate >= $today)\n      && startDate < $today\n      && !(_id in coalesce(^.items[]._ref, []))\n    ] | order(startDate desc)[0...5]{ \n  _id,\n  _type,\n  "slug": slug.current,\n  title,\n  category,\n  nominationsClosingDate,\n  startDate,\n  endDate,\n  country,\n  publishedAt\n }\n  ],\n  source == "events" => [\n    ...*[\n      _type == "conferenceEvent"\n      && coalesce(endDate, startDate) >= $today\n      && !(_id in coalesce(^.items[]._ref, []))\n    ] | order(startDate asc)[0...4]{ \n  _id,\n  _type,\n  "slug": slug.current,\n  title,\n  category,\n  nominationsClosingDate,\n  startDate,\n  endDate,\n  country,\n  publishedAt\n },\n    ...*[\n      _type == "conferenceEvent"\n      && coalesce(endDate, startDate) < $today\n      && !(_id in coalesce(^.items[]._ref, []))\n    ] | order(startDate desc)[0...4]{ \n  _id,\n  _type,\n  "slug": slug.current,\n  title,\n  category,\n  nominationsClosingDate,\n  startDate,\n  endDate,\n  country,\n  publishedAt\n }\n  ],\n  source == "research" => *[\n    _type == "resource"\n    && category == "research"\n    && !(_id in coalesce(^.items[]._ref, []))\n    && _id != coalesce(^.promo.resource._ref, "")\n  ] | order(defined(publishedAt) desc, publishedAt desc, legacyWpId desc)[0...3]{ \n  _id,\n  _type,\n  "slug": slug.current,\n  title,\n  category,\n  nominationsClosingDate,\n  startDate,\n  endDate,\n  country,\n  publishedAt\n }\n),\n  button{ \n  label,\n  \n  kind,\n  external,\n  internal->{\n    _type,\n    "slug": slug.current,\n    brand,\n    brands\n  }\n\n },\n  promo{\n    resource->{\n      title,\n      "downloadThumbnail": downloadThumbnail{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n      "downloadFileUrl": downloadFile.asset->url,\n      "downloadFileName": downloadFile.asset->originalFilename,\n      downloadUrl\n    },\n    title,\n    description,\n    "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n    link{ \n  kind,\n  external,\n  internal->{\n    _type,\n    "slug": slug.current,\n    brand,\n    brands\n  }\n }\n  }\n },\n  _type == "featuredStories" => { \n  heading[]{ _key, style, children[]{ _key, text } },\n  link{ \n  label,\n  \n  kind,\n  external,\n  internal->{\n    _type,\n    "slug": slug.current,\n    brand,\n    brands\n  }\n\n },\n  "posts": posts[]->{ \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  \n  "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title }\n,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n  "category": category->{ title, "slug": slug.current }\n }\n },\n  _type == "statsBar" => { \n  heading[]{ _key, style, children[]{ _key, text } },\n  items[]{ _key, icon, value, label }\n },\n  _type == "newsletterSignup" => { \n  heading[]{ _key, style, children[]{ _key, text } },\n  body,\n  preferencesLabel,\n  options[]{\n    _key,\n    label,\n    defaultChecked,\n    "interestKey": *[_type == "subscribeModal" && _id == "subscribe-modal-" + $brand][0].interests[attribute.name == ^.attribute.name][0]._key\n  },\n  emailPlaceholder,\n  buttonLabel,\n  invalidEmailMessage,\n  noOptionMessage,\n  image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n }\n },\n  _type == "sponsoredContent" => { \n  label,\n  link{ \n  label,\n  \n  kind,\n  external,\n  internal->{\n    _type,\n    "slug": slug.current,\n    brand,\n    brands\n  }\n\n },\n  profileLabel,\n  "post": *[\n    _type == "post"\n    && _id == ^.post._ref\n    && defined(slug.current)\n    && defined(sponsor)\n    && ($brand == "clearview" || $brand in brands)\n  ][0]{\n    \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  \n  "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title }\n,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n  "category": category->{ title, "slug": slug.current }\n,\n    "sponsor": sponsor->{\n      title,\n      "slug": slug.current,\n      "logo": logo{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n }\n    }\n  }\n },\n  _type == "postCards" => { \n  \n  heading[]{ _key, style, children[]{ _key, text } },\n  link{ \n  label,\n  \n  kind,\n  external,\n  internal->{\n    _type,\n    "slug": slug.current,\n    brand,\n    brands\n  }\n\n }\n,\n  "category": category->{ title, "slug": slug.current },\n  "posts": posts[$brand in @->brands]->{ \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  \n  "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title }\n,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n  "category": category->{ title, "slug": slug.current }\n },\n  "latest": \n  *[\n    _type == "post"\n    && defined(slug.current)\n    && $brand in brands\n    && defined(^.category._ref) && category._ref == ^.category._ref\n    && !(_id in coalesce(^.posts[]._ref, []))\n  ] | order(publishedAt desc)[0...6]\n{ \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  \n  "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title }\n,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n  "category": category->{ title, "slug": slug.current }\n }\n },\n  _type == "postBriefs" => { \n  \n  heading[]{ _key, style, children[]{ _key, text } },\n  link{ \n  label,\n  \n  kind,\n  external,\n  internal->{\n    _type,\n    "slug": slug.current,\n    brand,\n    brands\n  }\n\n }\n,\n  count,\n  "posts": posts[$brand in @->brands]->{ \n  \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  \n  "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title }\n,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n  "category": category->{ title, "slug": slug.current }\n,\n  "topic": primaryTopic->{ title },\n  briefText\n },\n  "latest": \n  *[\n    _type == "post"\n    && defined(slug.current)\n    && $brand in brands\n    && true\n    && !(_id in coalesce(^.posts[]._ref, []))\n  ] | order(publishedAt desc)[0...6]\n{ \n  \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  \n  "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title }\n,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n  "category": category->{ title, "slug": slug.current }\n,\n  "topic": primaryTopic->{ title },\n  briefText\n }\n },\n  _type == "weeklyRoundup" => { \n  heading[]{ _key, style, children[]{ _key, text } },\n  label,\n  title,\n  summary,\n  button{ \n  label,\n  \n  kind,\n  external,\n  internal->{\n    _type,\n    "slug": slug.current,\n    brand,\n    brands\n  }\n\n },\n  listLabel,\n  "posts": posts[$brand in @->brands]->{ \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  \n  "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title }\n,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n  "category": category->{ title, "slug": slug.current }\n },\n  "latest": \n  *[\n    _type == "post"\n    && defined(slug.current)\n    && $brand in brands\n    && true\n    && !(_id in coalesce(^.posts[]._ref, []))\n  ] | order(publishedAt desc)[0...8]\n{ \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  \n  "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title }\n,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n  "category": category->{ title, "slug": slug.current }\n }\n },\n  _type == "topPicks" => { \n  heading[]{ _key, style, children[]{ _key, text } },\n  link{ \n  label,\n  \n  kind,\n  external,\n  internal->{\n    _type,\n    "slug": slug.current,\n    brand,\n    brands\n  }\n\n },\n  "posts": posts[$brand in @->brands]->{ \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  \n  "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title }\n,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n  "category": category->{ title, "slug": slug.current }\n, "sponsored": defined(sponsor) },\n  "fill": [\n    ...\n  *[\n    _type == "post"\n    && defined(slug.current)\n    && $brand in brands\n    && !defined(sponsor) && dateTime(publishedAt) >= dateTime($today + "T00:00:00Z") - 60*60*24*7\n    && !(_id in coalesce(^.posts[]._ref, []))\n  ] | order(publishedAt desc)[0...6]\n{ \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  \n  "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title }\n,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n  "category": category->{ title, "slug": slug.current }\n },\n    ...\n  *[\n    _type == "post"\n    && defined(slug.current)\n    && $brand in brands\n    && !defined(sponsor) && dateTime(publishedAt) < dateTime($today + "T00:00:00Z") - 60*60*24*7\n    && !(_id in coalesce(^.posts[]._ref, []))\n  ] | order(publishedAt desc)[0...6]\n{ \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  \n  "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title }\n,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n  "category": category->{ title, "slug": slug.current }\n }\n  ]\n },\n  _type == "exploreGrid" => { \n  cards[]{\n    _key,\n    heading[]{ _key, style, children[]{ _key, text } },\n    icon,\n    source,\n    count,\n    deadlineLabel,\n    button{ \n  label,\n  \n  kind,\n  external,\n  internal->{\n    _type,\n    "slug": slug.current,\n    brand,\n    brands\n  }\n\n },\n    "items": items[@->_type != "post" || $brand in @->brands]->{ \n  _type == "post" => { _type, \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  \n  "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title }\n,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n  "category": category->{ title, "slug": slug.current }\n },\n  _type != "post" => { \n  _id,\n  _type,\n  "slug": slug.current,\n  title,\n  category,\n  nominationsClosingDate,\n  startDate,\n  endDate,\n  country,\n  publishedAt\n }\n },\n    "fill": select(\n      source == "posts" => \n  *[\n    _type == "post"\n    && defined(slug.current)\n    && $brand in brands\n    && defined(^.category._ref) && category._ref == ^.category._ref\n    && !(_id in coalesce(^.items[]._ref, []))\n  ] | order(publishedAt desc)[0...6]\n{ _type, \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  \n  "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title }\n,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n  "category": category->{ title, "slug": slug.current }\n },\n      \n  source == "awards" => [\n    ...*[\n      _type == "awardsProgramme"\n      && nominationsClosingDate >= $today\n      && !(_id in coalesce(^.items[]._ref, []))\n    ] | order(nominationsClosingDate asc)[0...5]{ \n  _id,\n  _type,\n  "slug": slug.current,\n  title,\n  category,\n  nominationsClosingDate,\n  startDate,\n  endDate,\n  country,\n  publishedAt\n },\n    ...*[\n      _type == "awardsProgramme"\n      && !(defined(nominationsClosingDate) && nominationsClosingDate >= $today)\n      && startDate >= $today\n      && !(_id in coalesce(^.items[]._ref, []))\n    ] | order(startDate asc)[0...5]{ \n  _id,\n  _type,\n  "slug": slug.current,\n  title,\n  category,\n  nominationsClosingDate,\n  startDate,\n  endDate,\n  country,\n  publishedAt\n },\n    ...*[\n      _type == "awardsProgramme"\n      && !(defined(nominationsClosingDate) && nominationsClosingDate >= $today)\n      && startDate < $today\n      && !(_id in coalesce(^.items[]._ref, []))\n    ] | order(startDate desc)[0...5]{ \n  _id,\n  _type,\n  "slug": slug.current,\n  title,\n  category,\n  nominationsClosingDate,\n  startDate,\n  endDate,\n  country,\n  publishedAt\n }\n  ],\n  source == "events" => [\n    ...*[\n      _type == "conferenceEvent"\n      && coalesce(endDate, startDate) >= $today\n      && !(_id in coalesce(^.items[]._ref, []))\n    ] | order(startDate asc)[0...4]{ \n  _id,\n  _type,\n  "slug": slug.current,\n  title,\n  category,\n  nominationsClosingDate,\n  startDate,\n  endDate,\n  country,\n  publishedAt\n },\n    ...*[\n      _type == "conferenceEvent"\n      && coalesce(endDate, startDate) < $today\n      && !(_id in coalesce(^.items[]._ref, []))\n    ] | order(startDate desc)[0...4]{ \n  _id,\n  _type,\n  "slug": slug.current,\n  title,\n  category,\n  nominationsClosingDate,\n  startDate,\n  endDate,\n  country,\n  publishedAt\n }\n  ],\n  source == "research" => *[\n    _type == "resource"\n    && category == "research"\n    && !(_id in coalesce(^.items[]._ref, []))\n    && _id != coalesce(^.promo.resource._ref, "")\n  ] | order(defined(publishedAt) desc, publishedAt desc, legacyWpId desc)[0...3]{ \n  _id,\n  _type,\n  "slug": slug.current,\n  title,\n  category,\n  nominationsClosingDate,\n  startDate,\n  endDate,\n  country,\n  publishedAt\n }\n\n    )\n  }\n },\n  _type == "subscribeBanner" => { \n  heading[]{ _key, style, children[]{ _key, text } },\n  description,\n  buttonLabel,\n  cta{ \n  label,\n  \n  kind,\n  external,\n  internal->{\n    _type,\n    "slug": slug.current,\n    brand,\n    brands\n  }\n\n }\n },\n  _type == "splitLayout" => {\n    "main": main[]{ _key, _type, \n  _type == "topStories" => { \n  linkLabel,\n  label,\n  "slides": slides[$brand == "clearview" || $brand in @->brands]->{ \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  \n  "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title }\n,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n  "category": category->{ title, "slug": slug.current }\n },\n  "articles": articles[$brand == "clearview" || $brand in @->brands]->{ \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  \n  "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title }\n,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n  "category": category->{ title, "slug": slug.current }\n },\n  "latest": *[\n    _type == "post"\n    && defined(slug.current)\n    && ($brand == "clearview" || $brand in brands)\n    && !(_id in coalesce(^.slides[]._ref, []))\n    && !(_id in coalesce(^.articles[]._ref, []))\n  ] | order(publishedAt desc)[0...6]{ \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  \n  "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title }\n,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n  "category": category->{ title, "slug": slug.current }\n }\n },\n  _type == "sponsoredContent" => { \n  label,\n  link{ \n  label,\n  \n  kind,\n  external,\n  internal->{\n    _type,\n    "slug": slug.current,\n    brand,\n    brands\n  }\n\n },\n  profileLabel,\n  "post": *[\n    _type == "post"\n    && _id == ^.post._ref\n    && defined(slug.current)\n    && defined(sponsor)\n    && ($brand == "clearview" || $brand in brands)\n  ][0]{\n    \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  \n  "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title }\n,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n  "category": category->{ title, "slug": slug.current }\n,\n    "sponsor": sponsor->{\n      title,\n      "slug": slug.current,\n      "logo": logo{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n }\n    }\n  }\n },\n  _type == "postCards" => { \n  \n  heading[]{ _key, style, children[]{ _key, text } },\n  link{ \n  label,\n  \n  kind,\n  external,\n  internal->{\n    _type,\n    "slug": slug.current,\n    brand,\n    brands\n  }\n\n }\n,\n  "category": category->{ title, "slug": slug.current },\n  "posts": posts[$brand in @->brands]->{ \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  \n  "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title }\n,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n  "category": category->{ title, "slug": slug.current }\n },\n  "latest": \n  *[\n    _type == "post"\n    && defined(slug.current)\n    && $brand in brands\n    && defined(^.category._ref) && category._ref == ^.category._ref\n    && !(_id in coalesce(^.posts[]._ref, []))\n  ] | order(publishedAt desc)[0...6]\n{ \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  \n  "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title }\n,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n  "category": category->{ title, "slug": slug.current }\n }\n },\n  _type == "postBriefs" => { \n  \n  heading[]{ _key, style, children[]{ _key, text } },\n  link{ \n  label,\n  \n  kind,\n  external,\n  internal->{\n    _type,\n    "slug": slug.current,\n    brand,\n    brands\n  }\n\n }\n,\n  count,\n  "posts": posts[$brand in @->brands]->{ \n  \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  \n  "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title }\n,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n  "category": category->{ title, "slug": slug.current }\n,\n  "topic": primaryTopic->{ title },\n  briefText\n },\n  "latest": \n  *[\n    _type == "post"\n    && defined(slug.current)\n    && $brand in brands\n    && true\n    && !(_id in coalesce(^.posts[]._ref, []))\n  ] | order(publishedAt desc)[0...6]\n{ \n  \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  \n  "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title }\n,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n  "category": category->{ title, "slug": slug.current }\n,\n  "topic": primaryTopic->{ title },\n  briefText\n }\n },\n  _type == "weeklyRoundup" => { \n  heading[]{ _key, style, children[]{ _key, text } },\n  label,\n  title,\n  summary,\n  button{ \n  label,\n  \n  kind,\n  external,\n  internal->{\n    _type,\n    "slug": slug.current,\n    brand,\n    brands\n  }\n\n },\n  listLabel,\n  "posts": posts[$brand in @->brands]->{ \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  \n  "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title }\n,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n  "category": category->{ title, "slug": slug.current }\n },\n  "latest": \n  *[\n    _type == "post"\n    && defined(slug.current)\n    && $brand in brands\n    && true\n    && !(_id in coalesce(^.posts[]._ref, []))\n  ] | order(publishedAt desc)[0...8]\n{ \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  \n  "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title }\n,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n  "category": category->{ title, "slug": slug.current }\n }\n },\n  _type == "publications" => { \n  heading[]{ _key, style, children[]{ _key, text } },\n  body,\n  cards[]{\n    _key,\n    brand,\n    "brandTitle": *[_type == "brand" && key.current == ^.brand][0].title,\n    description,\n    image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n    linkLabel\n  }\n },\n  _type == "cta" => { \n  heading,\n  text,\n  link{ label, href }\n }\n },\n    "aside": aside[]{ _key, _type, \n  _type == "highlights" => { \n  source,\n  count,\n  heading[]{ _key, style, children[]{ _key, text } },\n  deadlineLabel,\n  "items": items[]->{ \n  _id,\n  _type,\n  "slug": slug.current,\n  title,\n  category,\n  nominationsClosingDate,\n  startDate,\n  endDate,\n  country,\n  publishedAt\n },\n  "fill": select(\n  source == "awards" => [\n    ...*[\n      _type == "awardsProgramme"\n      && nominationsClosingDate >= $today\n      && !(_id in coalesce(^.items[]._ref, []))\n    ] | order(nominationsClosingDate asc)[0...5]{ \n  _id,\n  _type,\n  "slug": slug.current,\n  title,\n  category,\n  nominationsClosingDate,\n  startDate,\n  endDate,\n  country,\n  publishedAt\n },\n    ...*[\n      _type == "awardsProgramme"\n      && !(defined(nominationsClosingDate) && nominationsClosingDate >= $today)\n      && startDate >= $today\n      && !(_id in coalesce(^.items[]._ref, []))\n    ] | order(startDate asc)[0...5]{ \n  _id,\n  _type,\n  "slug": slug.current,\n  title,\n  category,\n  nominationsClosingDate,\n  startDate,\n  endDate,\n  country,\n  publishedAt\n },\n    ...*[\n      _type == "awardsProgramme"\n      && !(defined(nominationsClosingDate) && nominationsClosingDate >= $today)\n      && startDate < $today\n      && !(_id in coalesce(^.items[]._ref, []))\n    ] | order(startDate desc)[0...5]{ \n  _id,\n  _type,\n  "slug": slug.current,\n  title,\n  category,\n  nominationsClosingDate,\n  startDate,\n  endDate,\n  country,\n  publishedAt\n }\n  ],\n  source == "events" => [\n    ...*[\n      _type == "conferenceEvent"\n      && coalesce(endDate, startDate) >= $today\n      && !(_id in coalesce(^.items[]._ref, []))\n    ] | order(startDate asc)[0...4]{ \n  _id,\n  _type,\n  "slug": slug.current,\n  title,\n  category,\n  nominationsClosingDate,\n  startDate,\n  endDate,\n  country,\n  publishedAt\n },\n    ...*[\n      _type == "conferenceEvent"\n      && coalesce(endDate, startDate) < $today\n      && !(_id in coalesce(^.items[]._ref, []))\n    ] | order(startDate desc)[0...4]{ \n  _id,\n  _type,\n  "slug": slug.current,\n  title,\n  category,\n  nominationsClosingDate,\n  startDate,\n  endDate,\n  country,\n  publishedAt\n }\n  ],\n  source == "research" => *[\n    _type == "resource"\n    && category == "research"\n    && !(_id in coalesce(^.items[]._ref, []))\n    && _id != coalesce(^.promo.resource._ref, "")\n  ] | order(defined(publishedAt) desc, publishedAt desc, legacyWpId desc)[0...3]{ \n  _id,\n  _type,\n  "slug": slug.current,\n  title,\n  category,\n  nominationsClosingDate,\n  startDate,\n  endDate,\n  country,\n  publishedAt\n }\n),\n  button{ \n  label,\n  \n  kind,\n  external,\n  internal->{\n    _type,\n    "slug": slug.current,\n    brand,\n    brands\n  }\n\n },\n  promo{\n    resource->{\n      title,\n      "downloadThumbnail": downloadThumbnail{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n      "downloadFileUrl": downloadFile.asset->url,\n      "downloadFileName": downloadFile.asset->originalFilename,\n      downloadUrl\n    },\n    title,\n    description,\n    "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n    link{ \n  kind,\n  external,\n  internal->{\n    _type,\n    "slug": slug.current,\n    brand,\n    brands\n  }\n }\n  }\n },\n  _type == "awardsWinners" => { heading[]{ _key, style, children[]{ _key, text } } }\n }\n  }\n },\n    blocksMiddle[]{ _key, _type, \n  _type == "topStories" => { \n  linkLabel,\n  label,\n  "slides": slides[$brand == "clearview" || $brand in @->brands]->{ \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  \n  "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title }\n,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n  "category": category->{ title, "slug": slug.current }\n },\n  "articles": articles[$brand == "clearview" || $brand in @->brands]->{ \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  \n  "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title }\n,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n  "category": category->{ title, "slug": slug.current }\n },\n  "latest": *[\n    _type == "post"\n    && defined(slug.current)\n    && ($brand == "clearview" || $brand in brands)\n    && !(_id in coalesce(^.slides[]._ref, []))\n    && !(_id in coalesce(^.articles[]._ref, []))\n  ] | order(publishedAt desc)[0...6]{ \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  \n  "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title }\n,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n  "category": category->{ title, "slug": slug.current }\n }\n },\n  _type == "publications" => { \n  heading[]{ _key, style, children[]{ _key, text } },\n  body,\n  cards[]{\n    _key,\n    brand,\n    "brandTitle": *[_type == "brand" && key.current == ^.brand][0].title,\n    description,\n    image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n    linkLabel\n  }\n },\n  _type == "cta" => { \n  heading,\n  text,\n  link{ label, href }\n },\n  _type == "highlights" => { \n  source,\n  count,\n  heading[]{ _key, style, children[]{ _key, text } },\n  deadlineLabel,\n  "items": items[]->{ \n  _id,\n  _type,\n  "slug": slug.current,\n  title,\n  category,\n  nominationsClosingDate,\n  startDate,\n  endDate,\n  country,\n  publishedAt\n },\n  "fill": select(\n  source == "awards" => [\n    ...*[\n      _type == "awardsProgramme"\n      && nominationsClosingDate >= $today\n      && !(_id in coalesce(^.items[]._ref, []))\n    ] | order(nominationsClosingDate asc)[0...5]{ \n  _id,\n  _type,\n  "slug": slug.current,\n  title,\n  category,\n  nominationsClosingDate,\n  startDate,\n  endDate,\n  country,\n  publishedAt\n },\n    ...*[\n      _type == "awardsProgramme"\n      && !(defined(nominationsClosingDate) && nominationsClosingDate >= $today)\n      && startDate >= $today\n      && !(_id in coalesce(^.items[]._ref, []))\n    ] | order(startDate asc)[0...5]{ \n  _id,\n  _type,\n  "slug": slug.current,\n  title,\n  category,\n  nominationsClosingDate,\n  startDate,\n  endDate,\n  country,\n  publishedAt\n },\n    ...*[\n      _type == "awardsProgramme"\n      && !(defined(nominationsClosingDate) && nominationsClosingDate >= $today)\n      && startDate < $today\n      && !(_id in coalesce(^.items[]._ref, []))\n    ] | order(startDate desc)[0...5]{ \n  _id,\n  _type,\n  "slug": slug.current,\n  title,\n  category,\n  nominationsClosingDate,\n  startDate,\n  endDate,\n  country,\n  publishedAt\n }\n  ],\n  source == "events" => [\n    ...*[\n      _type == "conferenceEvent"\n      && coalesce(endDate, startDate) >= $today\n      && !(_id in coalesce(^.items[]._ref, []))\n    ] | order(startDate asc)[0...4]{ \n  _id,\n  _type,\n  "slug": slug.current,\n  title,\n  category,\n  nominationsClosingDate,\n  startDate,\n  endDate,\n  country,\n  publishedAt\n },\n    ...*[\n      _type == "conferenceEvent"\n      && coalesce(endDate, startDate) < $today\n      && !(_id in coalesce(^.items[]._ref, []))\n    ] | order(startDate desc)[0...4]{ \n  _id,\n  _type,\n  "slug": slug.current,\n  title,\n  category,\n  nominationsClosingDate,\n  startDate,\n  endDate,\n  country,\n  publishedAt\n }\n  ],\n  source == "research" => *[\n    _type == "resource"\n    && category == "research"\n    && !(_id in coalesce(^.items[]._ref, []))\n    && _id != coalesce(^.promo.resource._ref, "")\n  ] | order(defined(publishedAt) desc, publishedAt desc, legacyWpId desc)[0...3]{ \n  _id,\n  _type,\n  "slug": slug.current,\n  title,\n  category,\n  nominationsClosingDate,\n  startDate,\n  endDate,\n  country,\n  publishedAt\n }\n),\n  button{ \n  label,\n  \n  kind,\n  external,\n  internal->{\n    _type,\n    "slug": slug.current,\n    brand,\n    brands\n  }\n\n },\n  promo{\n    resource->{\n      title,\n      "downloadThumbnail": downloadThumbnail{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n      "downloadFileUrl": downloadFile.asset->url,\n      "downloadFileName": downloadFile.asset->originalFilename,\n      downloadUrl\n    },\n    title,\n    description,\n    "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n    link{ \n  kind,\n  external,\n  internal->{\n    _type,\n    "slug": slug.current,\n    brand,\n    brands\n  }\n }\n  }\n },\n  _type == "featuredStories" => { \n  heading[]{ _key, style, children[]{ _key, text } },\n  link{ \n  label,\n  \n  kind,\n  external,\n  internal->{\n    _type,\n    "slug": slug.current,\n    brand,\n    brands\n  }\n\n },\n  "posts": posts[]->{ \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  \n  "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title }\n,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n  "category": category->{ title, "slug": slug.current }\n }\n },\n  _type == "statsBar" => { \n  heading[]{ _key, style, children[]{ _key, text } },\n  items[]{ _key, icon, value, label }\n },\n  _type == "newsletterSignup" => { \n  heading[]{ _key, style, children[]{ _key, text } },\n  body,\n  preferencesLabel,\n  options[]{\n    _key,\n    label,\n    defaultChecked,\n    "interestKey": *[_type == "subscribeModal" && _id == "subscribe-modal-" + $brand][0].interests[attribute.name == ^.attribute.name][0]._key\n  },\n  emailPlaceholder,\n  buttonLabel,\n  invalidEmailMessage,\n  noOptionMessage,\n  image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n }\n },\n  _type == "sponsoredContent" => { \n  label,\n  link{ \n  label,\n  \n  kind,\n  external,\n  internal->{\n    _type,\n    "slug": slug.current,\n    brand,\n    brands\n  }\n\n },\n  profileLabel,\n  "post": *[\n    _type == "post"\n    && _id == ^.post._ref\n    && defined(slug.current)\n    && defined(sponsor)\n    && ($brand == "clearview" || $brand in brands)\n  ][0]{\n    \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  \n  "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title }\n,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n  "category": category->{ title, "slug": slug.current }\n,\n    "sponsor": sponsor->{\n      title,\n      "slug": slug.current,\n      "logo": logo{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n }\n    }\n  }\n },\n  _type == "postCards" => { \n  \n  heading[]{ _key, style, children[]{ _key, text } },\n  link{ \n  label,\n  \n  kind,\n  external,\n  internal->{\n    _type,\n    "slug": slug.current,\n    brand,\n    brands\n  }\n\n }\n,\n  "category": category->{ title, "slug": slug.current },\n  "posts": posts[$brand in @->brands]->{ \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  \n  "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title }\n,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n  "category": category->{ title, "slug": slug.current }\n },\n  "latest": \n  *[\n    _type == "post"\n    && defined(slug.current)\n    && $brand in brands\n    && defined(^.category._ref) && category._ref == ^.category._ref\n    && !(_id in coalesce(^.posts[]._ref, []))\n  ] | order(publishedAt desc)[0...6]\n{ \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  \n  "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title }\n,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n  "category": category->{ title, "slug": slug.current }\n }\n },\n  _type == "postBriefs" => { \n  \n  heading[]{ _key, style, children[]{ _key, text } },\n  link{ \n  label,\n  \n  kind,\n  external,\n  internal->{\n    _type,\n    "slug": slug.current,\n    brand,\n    brands\n  }\n\n }\n,\n  count,\n  "posts": posts[$brand in @->brands]->{ \n  \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  \n  "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title }\n,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n  "category": category->{ title, "slug": slug.current }\n,\n  "topic": primaryTopic->{ title },\n  briefText\n },\n  "latest": \n  *[\n    _type == "post"\n    && defined(slug.current)\n    && $brand in brands\n    && true\n    && !(_id in coalesce(^.posts[]._ref, []))\n  ] | order(publishedAt desc)[0...6]\n{ \n  \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  \n  "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title }\n,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n  "category": category->{ title, "slug": slug.current }\n,\n  "topic": primaryTopic->{ title },\n  briefText\n }\n },\n  _type == "weeklyRoundup" => { \n  heading[]{ _key, style, children[]{ _key, text } },\n  label,\n  title,\n  summary,\n  button{ \n  label,\n  \n  kind,\n  external,\n  internal->{\n    _type,\n    "slug": slug.current,\n    brand,\n    brands\n  }\n\n },\n  listLabel,\n  "posts": posts[$brand in @->brands]->{ \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  \n  "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title }\n,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n  "category": category->{ title, "slug": slug.current }\n },\n  "latest": \n  *[\n    _type == "post"\n    && defined(slug.current)\n    && $brand in brands\n    && true\n    && !(_id in coalesce(^.posts[]._ref, []))\n  ] | order(publishedAt desc)[0...8]\n{ \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  \n  "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title }\n,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n  "category": category->{ title, "slug": slug.current }\n }\n },\n  _type == "topPicks" => { \n  heading[]{ _key, style, children[]{ _key, text } },\n  link{ \n  label,\n  \n  kind,\n  external,\n  internal->{\n    _type,\n    "slug": slug.current,\n    brand,\n    brands\n  }\n\n },\n  "posts": posts[$brand in @->brands]->{ \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  \n  "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title }\n,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n  "category": category->{ title, "slug": slug.current }\n, "sponsored": defined(sponsor) },\n  "fill": [\n    ...\n  *[\n    _type == "post"\n    && defined(slug.current)\n    && $brand in brands\n    && !defined(sponsor) && dateTime(publishedAt) >= dateTime($today + "T00:00:00Z") - 60*60*24*7\n    && !(_id in coalesce(^.posts[]._ref, []))\n  ] | order(publishedAt desc)[0...6]\n{ \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  \n  "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title }\n,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n  "category": category->{ title, "slug": slug.current }\n },\n    ...\n  *[\n    _type == "post"\n    && defined(slug.current)\n    && $brand in brands\n    && !defined(sponsor) && dateTime(publishedAt) < dateTime($today + "T00:00:00Z") - 60*60*24*7\n    && !(_id in coalesce(^.posts[]._ref, []))\n  ] | order(publishedAt desc)[0...6]\n{ \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  \n  "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title }\n,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n  "category": category->{ title, "slug": slug.current }\n }\n  ]\n },\n  _type == "exploreGrid" => { \n  cards[]{\n    _key,\n    heading[]{ _key, style, children[]{ _key, text } },\n    icon,\n    source,\n    count,\n    deadlineLabel,\n    button{ \n  label,\n  \n  kind,\n  external,\n  internal->{\n    _type,\n    "slug": slug.current,\n    brand,\n    brands\n  }\n\n },\n    "items": items[@->_type != "post" || $brand in @->brands]->{ \n  _type == "post" => { _type, \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  \n  "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title }\n,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n  "category": category->{ title, "slug": slug.current }\n },\n  _type != "post" => { \n  _id,\n  _type,\n  "slug": slug.current,\n  title,\n  category,\n  nominationsClosingDate,\n  startDate,\n  endDate,\n  country,\n  publishedAt\n }\n },\n    "fill": select(\n      source == "posts" => \n  *[\n    _type == "post"\n    && defined(slug.current)\n    && $brand in brands\n    && defined(^.category._ref) && category._ref == ^.category._ref\n    && !(_id in coalesce(^.items[]._ref, []))\n  ] | order(publishedAt desc)[0...6]\n{ _type, \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  \n  "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title }\n,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n  "category": category->{ title, "slug": slug.current }\n },\n      \n  source == "awards" => [\n    ...*[\n      _type == "awardsProgramme"\n      && nominationsClosingDate >= $today\n      && !(_id in coalesce(^.items[]._ref, []))\n    ] | order(nominationsClosingDate asc)[0...5]{ \n  _id,\n  _type,\n  "slug": slug.current,\n  title,\n  category,\n  nominationsClosingDate,\n  startDate,\n  endDate,\n  country,\n  publishedAt\n },\n    ...*[\n      _type == "awardsProgramme"\n      && !(defined(nominationsClosingDate) && nominationsClosingDate >= $today)\n      && startDate >= $today\n      && !(_id in coalesce(^.items[]._ref, []))\n    ] | order(startDate asc)[0...5]{ \n  _id,\n  _type,\n  "slug": slug.current,\n  title,\n  category,\n  nominationsClosingDate,\n  startDate,\n  endDate,\n  country,\n  publishedAt\n },\n    ...*[\n      _type == "awardsProgramme"\n      && !(defined(nominationsClosingDate) && nominationsClosingDate >= $today)\n      && startDate < $today\n      && !(_id in coalesce(^.items[]._ref, []))\n    ] | order(startDate desc)[0...5]{ \n  _id,\n  _type,\n  "slug": slug.current,\n  title,\n  category,\n  nominationsClosingDate,\n  startDate,\n  endDate,\n  country,\n  publishedAt\n }\n  ],\n  source == "events" => [\n    ...*[\n      _type == "conferenceEvent"\n      && coalesce(endDate, startDate) >= $today\n      && !(_id in coalesce(^.items[]._ref, []))\n    ] | order(startDate asc)[0...4]{ \n  _id,\n  _type,\n  "slug": slug.current,\n  title,\n  category,\n  nominationsClosingDate,\n  startDate,\n  endDate,\n  country,\n  publishedAt\n },\n    ...*[\n      _type == "conferenceEvent"\n      && coalesce(endDate, startDate) < $today\n      && !(_id in coalesce(^.items[]._ref, []))\n    ] | order(startDate desc)[0...4]{ \n  _id,\n  _type,\n  "slug": slug.current,\n  title,\n  category,\n  nominationsClosingDate,\n  startDate,\n  endDate,\n  country,\n  publishedAt\n }\n  ],\n  source == "research" => *[\n    _type == "resource"\n    && category == "research"\n    && !(_id in coalesce(^.items[]._ref, []))\n    && _id != coalesce(^.promo.resource._ref, "")\n  ] | order(defined(publishedAt) desc, publishedAt desc, legacyWpId desc)[0...3]{ \n  _id,\n  _type,\n  "slug": slug.current,\n  title,\n  category,\n  nominationsClosingDate,\n  startDate,\n  endDate,\n  country,\n  publishedAt\n }\n\n    )\n  }\n },\n  _type == "subscribeBanner" => { \n  heading[]{ _key, style, children[]{ _key, text } },\n  description,\n  buttonLabel,\n  cta{ \n  label,\n  \n  kind,\n  external,\n  internal->{\n    _type,\n    "slug": slug.current,\n    brand,\n    brands\n  }\n\n }\n },\n  _type == "splitLayout" => {\n    "main": main[]{ _key, _type, \n  _type == "topStories" => { \n  linkLabel,\n  label,\n  "slides": slides[$brand == "clearview" || $brand in @->brands]->{ \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  \n  "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title }\n,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n  "category": category->{ title, "slug": slug.current }\n },\n  "articles": articles[$brand == "clearview" || $brand in @->brands]->{ \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  \n  "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title }\n,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n  "category": category->{ title, "slug": slug.current }\n },\n  "latest": *[\n    _type == "post"\n    && defined(slug.current)\n    && ($brand == "clearview" || $brand in brands)\n    && !(_id in coalesce(^.slides[]._ref, []))\n    && !(_id in coalesce(^.articles[]._ref, []))\n  ] | order(publishedAt desc)[0...6]{ \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  \n  "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title }\n,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n  "category": category->{ title, "slug": slug.current }\n }\n },\n  _type == "sponsoredContent" => { \n  label,\n  link{ \n  label,\n  \n  kind,\n  external,\n  internal->{\n    _type,\n    "slug": slug.current,\n    brand,\n    brands\n  }\n\n },\n  profileLabel,\n  "post": *[\n    _type == "post"\n    && _id == ^.post._ref\n    && defined(slug.current)\n    && defined(sponsor)\n    && ($brand == "clearview" || $brand in brands)\n  ][0]{\n    \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  \n  "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title }\n,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n  "category": category->{ title, "slug": slug.current }\n,\n    "sponsor": sponsor->{\n      title,\n      "slug": slug.current,\n      "logo": logo{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n }\n    }\n  }\n },\n  _type == "postCards" => { \n  \n  heading[]{ _key, style, children[]{ _key, text } },\n  link{ \n  label,\n  \n  kind,\n  external,\n  internal->{\n    _type,\n    "slug": slug.current,\n    brand,\n    brands\n  }\n\n }\n,\n  "category": category->{ title, "slug": slug.current },\n  "posts": posts[$brand in @->brands]->{ \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  \n  "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title }\n,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n  "category": category->{ title, "slug": slug.current }\n },\n  "latest": \n  *[\n    _type == "post"\n    && defined(slug.current)\n    && $brand in brands\n    && defined(^.category._ref) && category._ref == ^.category._ref\n    && !(_id in coalesce(^.posts[]._ref, []))\n  ] | order(publishedAt desc)[0...6]\n{ \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  \n  "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title }\n,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n  "category": category->{ title, "slug": slug.current }\n }\n },\n  _type == "postBriefs" => { \n  \n  heading[]{ _key, style, children[]{ _key, text } },\n  link{ \n  label,\n  \n  kind,\n  external,\n  internal->{\n    _type,\n    "slug": slug.current,\n    brand,\n    brands\n  }\n\n }\n,\n  count,\n  "posts": posts[$brand in @->brands]->{ \n  \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  \n  "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title }\n,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n  "category": category->{ title, "slug": slug.current }\n,\n  "topic": primaryTopic->{ title },\n  briefText\n },\n  "latest": \n  *[\n    _type == "post"\n    && defined(slug.current)\n    && $brand in brands\n    && true\n    && !(_id in coalesce(^.posts[]._ref, []))\n  ] | order(publishedAt desc)[0...6]\n{ \n  \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  \n  "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title }\n,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n  "category": category->{ title, "slug": slug.current }\n,\n  "topic": primaryTopic->{ title },\n  briefText\n }\n },\n  _type == "weeklyRoundup" => { \n  heading[]{ _key, style, children[]{ _key, text } },\n  label,\n  title,\n  summary,\n  button{ \n  label,\n  \n  kind,\n  external,\n  internal->{\n    _type,\n    "slug": slug.current,\n    brand,\n    brands\n  }\n\n },\n  listLabel,\n  "posts": posts[$brand in @->brands]->{ \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  \n  "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title }\n,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n  "category": category->{ title, "slug": slug.current }\n },\n  "latest": \n  *[\n    _type == "post"\n    && defined(slug.current)\n    && $brand in brands\n    && true\n    && !(_id in coalesce(^.posts[]._ref, []))\n  ] | order(publishedAt desc)[0...8]\n{ \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  \n  "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title }\n,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n  "category": category->{ title, "slug": slug.current }\n }\n },\n  _type == "publications" => { \n  heading[]{ _key, style, children[]{ _key, text } },\n  body,\n  cards[]{\n    _key,\n    brand,\n    "brandTitle": *[_type == "brand" && key.current == ^.brand][0].title,\n    description,\n    image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n    linkLabel\n  }\n },\n  _type == "cta" => { \n  heading,\n  text,\n  link{ label, href }\n }\n },\n    "aside": aside[]{ _key, _type, \n  _type == "highlights" => { \n  source,\n  count,\n  heading[]{ _key, style, children[]{ _key, text } },\n  deadlineLabel,\n  "items": items[]->{ \n  _id,\n  _type,\n  "slug": slug.current,\n  title,\n  category,\n  nominationsClosingDate,\n  startDate,\n  endDate,\n  country,\n  publishedAt\n },\n  "fill": select(\n  source == "awards" => [\n    ...*[\n      _type == "awardsProgramme"\n      && nominationsClosingDate >= $today\n      && !(_id in coalesce(^.items[]._ref, []))\n    ] | order(nominationsClosingDate asc)[0...5]{ \n  _id,\n  _type,\n  "slug": slug.current,\n  title,\n  category,\n  nominationsClosingDate,\n  startDate,\n  endDate,\n  country,\n  publishedAt\n },\n    ...*[\n      _type == "awardsProgramme"\n      && !(defined(nominationsClosingDate) && nominationsClosingDate >= $today)\n      && startDate >= $today\n      && !(_id in coalesce(^.items[]._ref, []))\n    ] | order(startDate asc)[0...5]{ \n  _id,\n  _type,\n  "slug": slug.current,\n  title,\n  category,\n  nominationsClosingDate,\n  startDate,\n  endDate,\n  country,\n  publishedAt\n },\n    ...*[\n      _type == "awardsProgramme"\n      && !(defined(nominationsClosingDate) && nominationsClosingDate >= $today)\n      && startDate < $today\n      && !(_id in coalesce(^.items[]._ref, []))\n    ] | order(startDate desc)[0...5]{ \n  _id,\n  _type,\n  "slug": slug.current,\n  title,\n  category,\n  nominationsClosingDate,\n  startDate,\n  endDate,\n  country,\n  publishedAt\n }\n  ],\n  source == "events" => [\n    ...*[\n      _type == "conferenceEvent"\n      && coalesce(endDate, startDate) >= $today\n      && !(_id in coalesce(^.items[]._ref, []))\n    ] | order(startDate asc)[0...4]{ \n  _id,\n  _type,\n  "slug": slug.current,\n  title,\n  category,\n  nominationsClosingDate,\n  startDate,\n  endDate,\n  country,\n  publishedAt\n },\n    ...*[\n      _type == "conferenceEvent"\n      && coalesce(endDate, startDate) < $today\n      && !(_id in coalesce(^.items[]._ref, []))\n    ] | order(startDate desc)[0...4]{ \n  _id,\n  _type,\n  "slug": slug.current,\n  title,\n  category,\n  nominationsClosingDate,\n  startDate,\n  endDate,\n  country,\n  publishedAt\n }\n  ],\n  source == "research" => *[\n    _type == "resource"\n    && category == "research"\n    && !(_id in coalesce(^.items[]._ref, []))\n    && _id != coalesce(^.promo.resource._ref, "")\n  ] | order(defined(publishedAt) desc, publishedAt desc, legacyWpId desc)[0...3]{ \n  _id,\n  _type,\n  "slug": slug.current,\n  title,\n  category,\n  nominationsClosingDate,\n  startDate,\n  endDate,\n  country,\n  publishedAt\n }\n),\n  button{ \n  label,\n  \n  kind,\n  external,\n  internal->{\n    _type,\n    "slug": slug.current,\n    brand,\n    brands\n  }\n\n },\n  promo{\n    resource->{\n      title,\n      "downloadThumbnail": downloadThumbnail{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n      "downloadFileUrl": downloadFile.asset->url,\n      "downloadFileName": downloadFile.asset->originalFilename,\n      downloadUrl\n    },\n    title,\n    description,\n    "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n    link{ \n  kind,\n  external,\n  internal->{\n    _type,\n    "slug": slug.current,\n    brand,\n    brands\n  }\n }\n  }\n },\n  _type == "awardsWinners" => { heading[]{ _key, style, children[]{ _key, text } } }\n }\n  }\n },\n    blocksBottom[]{ _key, _type, \n  _type == "topStories" => { \n  linkLabel,\n  label,\n  "slides": slides[$brand == "clearview" || $brand in @->brands]->{ \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  \n  "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title }\n,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n  "category": category->{ title, "slug": slug.current }\n },\n  "articles": articles[$brand == "clearview" || $brand in @->brands]->{ \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  \n  "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title }\n,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n  "category": category->{ title, "slug": slug.current }\n },\n  "latest": *[\n    _type == "post"\n    && defined(slug.current)\n    && ($brand == "clearview" || $brand in brands)\n    && !(_id in coalesce(^.slides[]._ref, []))\n    && !(_id in coalesce(^.articles[]._ref, []))\n  ] | order(publishedAt desc)[0...6]{ \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  \n  "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title }\n,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n  "category": category->{ title, "slug": slug.current }\n }\n },\n  _type == "publications" => { \n  heading[]{ _key, style, children[]{ _key, text } },\n  body,\n  cards[]{\n    _key,\n    brand,\n    "brandTitle": *[_type == "brand" && key.current == ^.brand][0].title,\n    description,\n    image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n    linkLabel\n  }\n },\n  _type == "cta" => { \n  heading,\n  text,\n  link{ label, href }\n },\n  _type == "highlights" => { \n  source,\n  count,\n  heading[]{ _key, style, children[]{ _key, text } },\n  deadlineLabel,\n  "items": items[]->{ \n  _id,\n  _type,\n  "slug": slug.current,\n  title,\n  category,\n  nominationsClosingDate,\n  startDate,\n  endDate,\n  country,\n  publishedAt\n },\n  "fill": select(\n  source == "awards" => [\n    ...*[\n      _type == "awardsProgramme"\n      && nominationsClosingDate >= $today\n      && !(_id in coalesce(^.items[]._ref, []))\n    ] | order(nominationsClosingDate asc)[0...5]{ \n  _id,\n  _type,\n  "slug": slug.current,\n  title,\n  category,\n  nominationsClosingDate,\n  startDate,\n  endDate,\n  country,\n  publishedAt\n },\n    ...*[\n      _type == "awardsProgramme"\n      && !(defined(nominationsClosingDate) && nominationsClosingDate >= $today)\n      && startDate >= $today\n      && !(_id in coalesce(^.items[]._ref, []))\n    ] | order(startDate asc)[0...5]{ \n  _id,\n  _type,\n  "slug": slug.current,\n  title,\n  category,\n  nominationsClosingDate,\n  startDate,\n  endDate,\n  country,\n  publishedAt\n },\n    ...*[\n      _type == "awardsProgramme"\n      && !(defined(nominationsClosingDate) && nominationsClosingDate >= $today)\n      && startDate < $today\n      && !(_id in coalesce(^.items[]._ref, []))\n    ] | order(startDate desc)[0...5]{ \n  _id,\n  _type,\n  "slug": slug.current,\n  title,\n  category,\n  nominationsClosingDate,\n  startDate,\n  endDate,\n  country,\n  publishedAt\n }\n  ],\n  source == "events" => [\n    ...*[\n      _type == "conferenceEvent"\n      && coalesce(endDate, startDate) >= $today\n      && !(_id in coalesce(^.items[]._ref, []))\n    ] | order(startDate asc)[0...4]{ \n  _id,\n  _type,\n  "slug": slug.current,\n  title,\n  category,\n  nominationsClosingDate,\n  startDate,\n  endDate,\n  country,\n  publishedAt\n },\n    ...*[\n      _type == "conferenceEvent"\n      && coalesce(endDate, startDate) < $today\n      && !(_id in coalesce(^.items[]._ref, []))\n    ] | order(startDate desc)[0...4]{ \n  _id,\n  _type,\n  "slug": slug.current,\n  title,\n  category,\n  nominationsClosingDate,\n  startDate,\n  endDate,\n  country,\n  publishedAt\n }\n  ],\n  source == "research" => *[\n    _type == "resource"\n    && category == "research"\n    && !(_id in coalesce(^.items[]._ref, []))\n    && _id != coalesce(^.promo.resource._ref, "")\n  ] | order(defined(publishedAt) desc, publishedAt desc, legacyWpId desc)[0...3]{ \n  _id,\n  _type,\n  "slug": slug.current,\n  title,\n  category,\n  nominationsClosingDate,\n  startDate,\n  endDate,\n  country,\n  publishedAt\n }\n),\n  button{ \n  label,\n  \n  kind,\n  external,\n  internal->{\n    _type,\n    "slug": slug.current,\n    brand,\n    brands\n  }\n\n },\n  promo{\n    resource->{\n      title,\n      "downloadThumbnail": downloadThumbnail{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n      "downloadFileUrl": downloadFile.asset->url,\n      "downloadFileName": downloadFile.asset->originalFilename,\n      downloadUrl\n    },\n    title,\n    description,\n    "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n    link{ \n  kind,\n  external,\n  internal->{\n    _type,\n    "slug": slug.current,\n    brand,\n    brands\n  }\n }\n  }\n },\n  _type == "featuredStories" => { \n  heading[]{ _key, style, children[]{ _key, text } },\n  link{ \n  label,\n  \n  kind,\n  external,\n  internal->{\n    _type,\n    "slug": slug.current,\n    brand,\n    brands\n  }\n\n },\n  "posts": posts[]->{ \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  \n  "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title }\n,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n  "category": category->{ title, "slug": slug.current }\n }\n },\n  _type == "statsBar" => { \n  heading[]{ _key, style, children[]{ _key, text } },\n  items[]{ _key, icon, value, label }\n },\n  _type == "newsletterSignup" => { \n  heading[]{ _key, style, children[]{ _key, text } },\n  body,\n  preferencesLabel,\n  options[]{\n    _key,\n    label,\n    defaultChecked,\n    "interestKey": *[_type == "subscribeModal" && _id == "subscribe-modal-" + $brand][0].interests[attribute.name == ^.attribute.name][0]._key\n  },\n  emailPlaceholder,\n  buttonLabel,\n  invalidEmailMessage,\n  noOptionMessage,\n  image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n }\n },\n  _type == "sponsoredContent" => { \n  label,\n  link{ \n  label,\n  \n  kind,\n  external,\n  internal->{\n    _type,\n    "slug": slug.current,\n    brand,\n    brands\n  }\n\n },\n  profileLabel,\n  "post": *[\n    _type == "post"\n    && _id == ^.post._ref\n    && defined(slug.current)\n    && defined(sponsor)\n    && ($brand == "clearview" || $brand in brands)\n  ][0]{\n    \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  \n  "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title }\n,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n  "category": category->{ title, "slug": slug.current }\n,\n    "sponsor": sponsor->{\n      title,\n      "slug": slug.current,\n      "logo": logo{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n }\n    }\n  }\n },\n  _type == "postCards" => { \n  \n  heading[]{ _key, style, children[]{ _key, text } },\n  link{ \n  label,\n  \n  kind,\n  external,\n  internal->{\n    _type,\n    "slug": slug.current,\n    brand,\n    brands\n  }\n\n }\n,\n  "category": category->{ title, "slug": slug.current },\n  "posts": posts[$brand in @->brands]->{ \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  \n  "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title }\n,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n  "category": category->{ title, "slug": slug.current }\n },\n  "latest": \n  *[\n    _type == "post"\n    && defined(slug.current)\n    && $brand in brands\n    && defined(^.category._ref) && category._ref == ^.category._ref\n    && !(_id in coalesce(^.posts[]._ref, []))\n  ] | order(publishedAt desc)[0...6]\n{ \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  \n  "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title }\n,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n  "category": category->{ title, "slug": slug.current }\n }\n },\n  _type == "postBriefs" => { \n  \n  heading[]{ _key, style, children[]{ _key, text } },\n  link{ \n  label,\n  \n  kind,\n  external,\n  internal->{\n    _type,\n    "slug": slug.current,\n    brand,\n    brands\n  }\n\n }\n,\n  count,\n  "posts": posts[$brand in @->brands]->{ \n  \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  \n  "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title }\n,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n  "category": category->{ title, "slug": slug.current }\n,\n  "topic": primaryTopic->{ title },\n  briefText\n },\n  "latest": \n  *[\n    _type == "post"\n    && defined(slug.current)\n    && $brand in brands\n    && true\n    && !(_id in coalesce(^.posts[]._ref, []))\n  ] | order(publishedAt desc)[0...6]\n{ \n  \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  \n  "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title }\n,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n  "category": category->{ title, "slug": slug.current }\n,\n  "topic": primaryTopic->{ title },\n  briefText\n }\n },\n  _type == "weeklyRoundup" => { \n  heading[]{ _key, style, children[]{ _key, text } },\n  label,\n  title,\n  summary,\n  button{ \n  label,\n  \n  kind,\n  external,\n  internal->{\n    _type,\n    "slug": slug.current,\n    brand,\n    brands\n  }\n\n },\n  listLabel,\n  "posts": posts[$brand in @->brands]->{ \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  \n  "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title }\n,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n  "category": category->{ title, "slug": slug.current }\n },\n  "latest": \n  *[\n    _type == "post"\n    && defined(slug.current)\n    && $brand in brands\n    && true\n    && !(_id in coalesce(^.posts[]._ref, []))\n  ] | order(publishedAt desc)[0...8]\n{ \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  \n  "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title }\n,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n  "category": category->{ title, "slug": slug.current }\n }\n },\n  _type == "topPicks" => { \n  heading[]{ _key, style, children[]{ _key, text } },\n  link{ \n  label,\n  \n  kind,\n  external,\n  internal->{\n    _type,\n    "slug": slug.current,\n    brand,\n    brands\n  }\n\n },\n  "posts": posts[$brand in @->brands]->{ \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  \n  "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title }\n,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n  "category": category->{ title, "slug": slug.current }\n, "sponsored": defined(sponsor) },\n  "fill": [\n    ...\n  *[\n    _type == "post"\n    && defined(slug.current)\n    && $brand in brands\n    && !defined(sponsor) && dateTime(publishedAt) >= dateTime($today + "T00:00:00Z") - 60*60*24*7\n    && !(_id in coalesce(^.posts[]._ref, []))\n  ] | order(publishedAt desc)[0...6]\n{ \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  \n  "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title }\n,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n  "category": category->{ title, "slug": slug.current }\n },\n    ...\n  *[\n    _type == "post"\n    && defined(slug.current)\n    && $brand in brands\n    && !defined(sponsor) && dateTime(publishedAt) < dateTime($today + "T00:00:00Z") - 60*60*24*7\n    && !(_id in coalesce(^.posts[]._ref, []))\n  ] | order(publishedAt desc)[0...6]\n{ \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  \n  "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title }\n,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n  "category": category->{ title, "slug": slug.current }\n }\n  ]\n },\n  _type == "exploreGrid" => { \n  cards[]{\n    _key,\n    heading[]{ _key, style, children[]{ _key, text } },\n    icon,\n    source,\n    count,\n    deadlineLabel,\n    button{ \n  label,\n  \n  kind,\n  external,\n  internal->{\n    _type,\n    "slug": slug.current,\n    brand,\n    brands\n  }\n\n },\n    "items": items[@->_type != "post" || $brand in @->brands]->{ \n  _type == "post" => { _type, \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  \n  "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title }\n,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n  "category": category->{ title, "slug": slug.current }\n },\n  _type != "post" => { \n  _id,\n  _type,\n  "slug": slug.current,\n  title,\n  category,\n  nominationsClosingDate,\n  startDate,\n  endDate,\n  country,\n  publishedAt\n }\n },\n    "fill": select(\n      source == "posts" => \n  *[\n    _type == "post"\n    && defined(slug.current)\n    && $brand in brands\n    && defined(^.category._ref) && category._ref == ^.category._ref\n    && !(_id in coalesce(^.items[]._ref, []))\n  ] | order(publishedAt desc)[0...6]\n{ _type, \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  \n  "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title }\n,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n  "category": category->{ title, "slug": slug.current }\n },\n      \n  source == "awards" => [\n    ...*[\n      _type == "awardsProgramme"\n      && nominationsClosingDate >= $today\n      && !(_id in coalesce(^.items[]._ref, []))\n    ] | order(nominationsClosingDate asc)[0...5]{ \n  _id,\n  _type,\n  "slug": slug.current,\n  title,\n  category,\n  nominationsClosingDate,\n  startDate,\n  endDate,\n  country,\n  publishedAt\n },\n    ...*[\n      _type == "awardsProgramme"\n      && !(defined(nominationsClosingDate) && nominationsClosingDate >= $today)\n      && startDate >= $today\n      && !(_id in coalesce(^.items[]._ref, []))\n    ] | order(startDate asc)[0...5]{ \n  _id,\n  _type,\n  "slug": slug.current,\n  title,\n  category,\n  nominationsClosingDate,\n  startDate,\n  endDate,\n  country,\n  publishedAt\n },\n    ...*[\n      _type == "awardsProgramme"\n      && !(defined(nominationsClosingDate) && nominationsClosingDate >= $today)\n      && startDate < $today\n      && !(_id in coalesce(^.items[]._ref, []))\n    ] | order(startDate desc)[0...5]{ \n  _id,\n  _type,\n  "slug": slug.current,\n  title,\n  category,\n  nominationsClosingDate,\n  startDate,\n  endDate,\n  country,\n  publishedAt\n }\n  ],\n  source == "events" => [\n    ...*[\n      _type == "conferenceEvent"\n      && coalesce(endDate, startDate) >= $today\n      && !(_id in coalesce(^.items[]._ref, []))\n    ] | order(startDate asc)[0...4]{ \n  _id,\n  _type,\n  "slug": slug.current,\n  title,\n  category,\n  nominationsClosingDate,\n  startDate,\n  endDate,\n  country,\n  publishedAt\n },\n    ...*[\n      _type == "conferenceEvent"\n      && coalesce(endDate, startDate) < $today\n      && !(_id in coalesce(^.items[]._ref, []))\n    ] | order(startDate desc)[0...4]{ \n  _id,\n  _type,\n  "slug": slug.current,\n  title,\n  category,\n  nominationsClosingDate,\n  startDate,\n  endDate,\n  country,\n  publishedAt\n }\n  ],\n  source == "research" => *[\n    _type == "resource"\n    && category == "research"\n    && !(_id in coalesce(^.items[]._ref, []))\n    && _id != coalesce(^.promo.resource._ref, "")\n  ] | order(defined(publishedAt) desc, publishedAt desc, legacyWpId desc)[0...3]{ \n  _id,\n  _type,\n  "slug": slug.current,\n  title,\n  category,\n  nominationsClosingDate,\n  startDate,\n  endDate,\n  country,\n  publishedAt\n }\n\n    )\n  }\n },\n  _type == "subscribeBanner" => { \n  heading[]{ _key, style, children[]{ _key, text } },\n  description,\n  buttonLabel,\n  cta{ \n  label,\n  \n  kind,\n  external,\n  internal->{\n    _type,\n    "slug": slug.current,\n    brand,\n    brands\n  }\n\n }\n },\n  _type == "splitLayout" => {\n    "main": main[]{ _key, _type, \n  _type == "topStories" => { \n  linkLabel,\n  label,\n  "slides": slides[$brand == "clearview" || $brand in @->brands]->{ \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  \n  "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title }\n,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n  "category": category->{ title, "slug": slug.current }\n },\n  "articles": articles[$brand == "clearview" || $brand in @->brands]->{ \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  \n  "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title }\n,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n  "category": category->{ title, "slug": slug.current }\n },\n  "latest": *[\n    _type == "post"\n    && defined(slug.current)\n    && ($brand == "clearview" || $brand in brands)\n    && !(_id in coalesce(^.slides[]._ref, []))\n    && !(_id in coalesce(^.articles[]._ref, []))\n  ] | order(publishedAt desc)[0...6]{ \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  \n  "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title }\n,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n  "category": category->{ title, "slug": slug.current }\n }\n },\n  _type == "sponsoredContent" => { \n  label,\n  link{ \n  label,\n  \n  kind,\n  external,\n  internal->{\n    _type,\n    "slug": slug.current,\n    brand,\n    brands\n  }\n\n },\n  profileLabel,\n  "post": *[\n    _type == "post"\n    && _id == ^.post._ref\n    && defined(slug.current)\n    && defined(sponsor)\n    && ($brand == "clearview" || $brand in brands)\n  ][0]{\n    \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  \n  "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title }\n,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n  "category": category->{ title, "slug": slug.current }\n,\n    "sponsor": sponsor->{\n      title,\n      "slug": slug.current,\n      "logo": logo{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n }\n    }\n  }\n },\n  _type == "postCards" => { \n  \n  heading[]{ _key, style, children[]{ _key, text } },\n  link{ \n  label,\n  \n  kind,\n  external,\n  internal->{\n    _type,\n    "slug": slug.current,\n    brand,\n    brands\n  }\n\n }\n,\n  "category": category->{ title, "slug": slug.current },\n  "posts": posts[$brand in @->brands]->{ \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  \n  "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title }\n,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n  "category": category->{ title, "slug": slug.current }\n },\n  "latest": \n  *[\n    _type == "post"\n    && defined(slug.current)\n    && $brand in brands\n    && defined(^.category._ref) && category._ref == ^.category._ref\n    && !(_id in coalesce(^.posts[]._ref, []))\n  ] | order(publishedAt desc)[0...6]\n{ \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  \n  "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title }\n,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n  "category": category->{ title, "slug": slug.current }\n }\n },\n  _type == "postBriefs" => { \n  \n  heading[]{ _key, style, children[]{ _key, text } },\n  link{ \n  label,\n  \n  kind,\n  external,\n  internal->{\n    _type,\n    "slug": slug.current,\n    brand,\n    brands\n  }\n\n }\n,\n  count,\n  "posts": posts[$brand in @->brands]->{ \n  \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  \n  "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title }\n,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n  "category": category->{ title, "slug": slug.current }\n,\n  "topic": primaryTopic->{ title },\n  briefText\n },\n  "latest": \n  *[\n    _type == "post"\n    && defined(slug.current)\n    && $brand in brands\n    && true\n    && !(_id in coalesce(^.posts[]._ref, []))\n  ] | order(publishedAt desc)[0...6]\n{ \n  \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  \n  "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title }\n,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n  "category": category->{ title, "slug": slug.current }\n,\n  "topic": primaryTopic->{ title },\n  briefText\n }\n },\n  _type == "weeklyRoundup" => { \n  heading[]{ _key, style, children[]{ _key, text } },\n  label,\n  title,\n  summary,\n  button{ \n  label,\n  \n  kind,\n  external,\n  internal->{\n    _type,\n    "slug": slug.current,\n    brand,\n    brands\n  }\n\n },\n  listLabel,\n  "posts": posts[$brand in @->brands]->{ \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  \n  "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title }\n,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n  "category": category->{ title, "slug": slug.current }\n },\n  "latest": \n  *[\n    _type == "post"\n    && defined(slug.current)\n    && $brand in brands\n    && true\n    && !(_id in coalesce(^.posts[]._ref, []))\n  ] | order(publishedAt desc)[0...8]\n{ \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  \n  "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title }\n,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n  "category": category->{ title, "slug": slug.current }\n }\n },\n  _type == "publications" => { \n  heading[]{ _key, style, children[]{ _key, text } },\n  body,\n  cards[]{\n    _key,\n    brand,\n    "brandTitle": *[_type == "brand" && key.current == ^.brand][0].title,\n    description,\n    image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n    linkLabel\n  }\n },\n  _type == "cta" => { \n  heading,\n  text,\n  link{ label, href }\n }\n },\n    "aside": aside[]{ _key, _type, \n  _type == "highlights" => { \n  source,\n  count,\n  heading[]{ _key, style, children[]{ _key, text } },\n  deadlineLabel,\n  "items": items[]->{ \n  _id,\n  _type,\n  "slug": slug.current,\n  title,\n  category,\n  nominationsClosingDate,\n  startDate,\n  endDate,\n  country,\n  publishedAt\n },\n  "fill": select(\n  source == "awards" => [\n    ...*[\n      _type == "awardsProgramme"\n      && nominationsClosingDate >= $today\n      && !(_id in coalesce(^.items[]._ref, []))\n    ] | order(nominationsClosingDate asc)[0...5]{ \n  _id,\n  _type,\n  "slug": slug.current,\n  title,\n  category,\n  nominationsClosingDate,\n  startDate,\n  endDate,\n  country,\n  publishedAt\n },\n    ...*[\n      _type == "awardsProgramme"\n      && !(defined(nominationsClosingDate) && nominationsClosingDate >= $today)\n      && startDate >= $today\n      && !(_id in coalesce(^.items[]._ref, []))\n    ] | order(startDate asc)[0...5]{ \n  _id,\n  _type,\n  "slug": slug.current,\n  title,\n  category,\n  nominationsClosingDate,\n  startDate,\n  endDate,\n  country,\n  publishedAt\n },\n    ...*[\n      _type == "awardsProgramme"\n      && !(defined(nominationsClosingDate) && nominationsClosingDate >= $today)\n      && startDate < $today\n      && !(_id in coalesce(^.items[]._ref, []))\n    ] | order(startDate desc)[0...5]{ \n  _id,\n  _type,\n  "slug": slug.current,\n  title,\n  category,\n  nominationsClosingDate,\n  startDate,\n  endDate,\n  country,\n  publishedAt\n }\n  ],\n  source == "events" => [\n    ...*[\n      _type == "conferenceEvent"\n      && coalesce(endDate, startDate) >= $today\n      && !(_id in coalesce(^.items[]._ref, []))\n    ] | order(startDate asc)[0...4]{ \n  _id,\n  _type,\n  "slug": slug.current,\n  title,\n  category,\n  nominationsClosingDate,\n  startDate,\n  endDate,\n  country,\n  publishedAt\n },\n    ...*[\n      _type == "conferenceEvent"\n      && coalesce(endDate, startDate) < $today\n      && !(_id in coalesce(^.items[]._ref, []))\n    ] | order(startDate desc)[0...4]{ \n  _id,\n  _type,\n  "slug": slug.current,\n  title,\n  category,\n  nominationsClosingDate,\n  startDate,\n  endDate,\n  country,\n  publishedAt\n }\n  ],\n  source == "research" => *[\n    _type == "resource"\n    && category == "research"\n    && !(_id in coalesce(^.items[]._ref, []))\n    && _id != coalesce(^.promo.resource._ref, "")\n  ] | order(defined(publishedAt) desc, publishedAt desc, legacyWpId desc)[0...3]{ \n  _id,\n  _type,\n  "slug": slug.current,\n  title,\n  category,\n  nominationsClosingDate,\n  startDate,\n  endDate,\n  country,\n  publishedAt\n }\n),\n  button{ \n  label,\n  \n  kind,\n  external,\n  internal->{\n    _type,\n    "slug": slug.current,\n    brand,\n    brands\n  }\n\n },\n  promo{\n    resource->{\n      title,\n      "downloadThumbnail": downloadThumbnail{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n      "downloadFileUrl": downloadFile.asset->url,\n      "downloadFileName": downloadFile.asset->originalFilename,\n      downloadUrl\n    },\n    title,\n    description,\n    "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n    link{ \n  kind,\n  external,\n  internal->{\n    _type,\n    "slug": slug.current,\n    brand,\n    brands\n  }\n }\n  }\n },\n  _type == "awardsWinners" => { heading[]{ _key, style, children[]{ _key, text } } }\n }\n  }\n }\n  }\n': HOME_PAGE_QUERY_RESULT;
+    '\n  *[_type == "page" && slug.current == $slug && brand == $brand][0]{\n    _id,\n    title,\n    blocks[]{ _key, _type, \n  _type == "topStories" => { \n  linkLabel,\n  label,\n  "slides": slides[$brand == "clearview" || $brand in @->brands]->{ \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  \n  "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title }\n,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n  "category": category->{ title, "slug": slug.current }\n },\n  "articles": articles[$brand == "clearview" || $brand in @->brands]->{ \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  \n  "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title }\n,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n  "category": category->{ title, "slug": slug.current }\n },\n  "latest": *[\n    _type == "post"\n    && defined(slug.current)\n    && ($brand == "clearview" || $brand in brands)\n    && !(_id in coalesce(^.slides[]._ref, []))\n    && !(_id in coalesce(^.articles[]._ref, []))\n  ] | order(publishedAt desc)[0...6]{ \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  \n  "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title }\n,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n  "category": category->{ title, "slug": slug.current }\n }\n },\n  _type == "publications" => { \n  heading[]{ _key, style, children[]{ _key, text } },\n  body,\n  cards[]{\n    _key,\n    brand,\n    "brandTitle": *[_type == "brand" && key.current == ^.brand][0].title,\n    description,\n    image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n    linkLabel\n  }\n },\n  _type == "cta" => { \n  heading,\n  text,\n  link{ label, href }\n },\n  _type == "highlights" => { \n  source,\n  count,\n  heading[]{ _key, style, children[]{ _key, text } },\n  deadlineLabel,\n  "items": items[]->{ \n  _id,\n  _type,\n  "slug": slug.current,\n  title,\n  category,\n  nominationsClosingDate,\n  startDate,\n  endDate,\n  country,\n  publishedAt\n },\n  "fill": select(\n  source == "awards" => [\n    ...*[\n      _type == "awardsProgramme"\n      && nominationsClosingDate >= $today\n      && !(_id in coalesce(^.items[]._ref, []))\n    ] | order(nominationsClosingDate asc)[0...5]{ \n  _id,\n  _type,\n  "slug": slug.current,\n  title,\n  category,\n  nominationsClosingDate,\n  startDate,\n  endDate,\n  country,\n  publishedAt\n },\n    ...*[\n      _type == "awardsProgramme"\n      && !(defined(nominationsClosingDate) && nominationsClosingDate >= $today)\n      && startDate >= $today\n      && !(_id in coalesce(^.items[]._ref, []))\n    ] | order(startDate asc)[0...5]{ \n  _id,\n  _type,\n  "slug": slug.current,\n  title,\n  category,\n  nominationsClosingDate,\n  startDate,\n  endDate,\n  country,\n  publishedAt\n },\n    ...*[\n      _type == "awardsProgramme"\n      && !(defined(nominationsClosingDate) && nominationsClosingDate >= $today)\n      && startDate < $today\n      && !(_id in coalesce(^.items[]._ref, []))\n    ] | order(startDate desc)[0...5]{ \n  _id,\n  _type,\n  "slug": slug.current,\n  title,\n  category,\n  nominationsClosingDate,\n  startDate,\n  endDate,\n  country,\n  publishedAt\n }\n  ],\n  source == "events" => [\n    ...*[\n      _type == "conferenceEvent"\n      && coalesce(endDate, startDate) >= $today\n      && !(_id in coalesce(^.items[]._ref, []))\n    ] | order(startDate asc)[0...4]{ \n  _id,\n  _type,\n  "slug": slug.current,\n  title,\n  category,\n  nominationsClosingDate,\n  startDate,\n  endDate,\n  country,\n  publishedAt\n },\n    ...*[\n      _type == "conferenceEvent"\n      && coalesce(endDate, startDate) < $today\n      && !(_id in coalesce(^.items[]._ref, []))\n    ] | order(startDate desc)[0...4]{ \n  _id,\n  _type,\n  "slug": slug.current,\n  title,\n  category,\n  nominationsClosingDate,\n  startDate,\n  endDate,\n  country,\n  publishedAt\n }\n  ],\n  source == "research" => *[\n    _type == "resource"\n    && category == "research"\n    && !(_id in coalesce(^.items[]._ref, []))\n    && _id != coalesce(^.promo.resource._ref, "")\n  ] | order(defined(publishedAt) desc, publishedAt desc, legacyWpId desc)[0...3]{ \n  _id,\n  _type,\n  "slug": slug.current,\n  title,\n  category,\n  nominationsClosingDate,\n  startDate,\n  endDate,\n  country,\n  publishedAt\n }\n),\n  button{ \n  label,\n  \n  kind,\n  external,\n  internal->{\n    _type,\n    "slug": slug.current,\n    brand,\n    brands\n  }\n\n },\n  promo{\n    resource->{\n      title,\n      "downloadThumbnail": downloadThumbnail{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n      "downloadFileUrl": downloadFile.asset->url,\n      "downloadFileName": downloadFile.asset->originalFilename,\n      downloadUrl\n    },\n    title,\n    description,\n    "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n    link{ \n  kind,\n  external,\n  internal->{\n    _type,\n    "slug": slug.current,\n    brand,\n    brands\n  }\n }\n  }\n },\n  _type == "featuredStories" => { \n  heading[]{ _key, style, children[]{ _key, text } },\n  link{ \n  label,\n  \n  kind,\n  external,\n  internal->{\n    _type,\n    "slug": slug.current,\n    brand,\n    brands\n  }\n\n },\n  "posts": posts[]->{ \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  \n  "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title }\n,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n  "category": category->{ title, "slug": slug.current }\n }\n },\n  _type == "statsBar" => { \n  heading[]{ _key, style, children[]{ _key, text } },\n  items[]{ _key, icon, value, label }\n },\n  _type == "newsletterSignup" => { \n  heading[]{ _key, style, children[]{ _key, text } },\n  body,\n  preferencesLabel,\n  options[]{\n    _key,\n    label,\n    defaultChecked,\n    "interestKey": *[_type == "subscribeModal" && _id == "subscribe-modal-" + $brand][0].interests[attribute.name == ^.attribute.name][0]._key\n  },\n  emailPlaceholder,\n  buttonLabel,\n  invalidEmailMessage,\n  noOptionMessage,\n  image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n }\n },\n  _type == "sponsoredContent" => { \n  label,\n  link{ \n  label,\n  \n  kind,\n  external,\n  internal->{\n    _type,\n    "slug": slug.current,\n    brand,\n    brands\n  }\n\n },\n  profileLabel,\n  "post": *[\n    _type == "post"\n    && _id == ^.post._ref\n    && defined(slug.current)\n    && defined(sponsor)\n    && ($brand == "clearview" || $brand in brands)\n  ][0]{\n    \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  \n  "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title }\n,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n  "category": category->{ title, "slug": slug.current }\n,\n    "sponsor": sponsor->{\n      title,\n      "slug": slug.current,\n      "logo": logo{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n }\n    }\n  }\n },\n  _type == "postCards" => { \n  \n  heading[]{ _key, style, children[]{ _key, text } },\n  link{ \n  label,\n  \n  kind,\n  external,\n  internal->{\n    _type,\n    "slug": slug.current,\n    brand,\n    brands\n  }\n\n }\n,\n  "category": category->{ title, "slug": slug.current },\n  "posts": posts[$brand in @->brands]->{ \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  \n  "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title }\n,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n  "category": category->{ title, "slug": slug.current }\n },\n  "latest": \n  *[\n    _type == "post"\n    && defined(slug.current)\n    && $brand in brands\n    && defined(^.category._ref) && category._ref == ^.category._ref\n    && !(_id in coalesce(^.posts[]._ref, []))\n  ] | order(publishedAt desc)[0...6]\n{ \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  \n  "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title }\n,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n  "category": category->{ title, "slug": slug.current }\n }\n },\n  _type == "postBriefs" => { \n  \n  heading[]{ _key, style, children[]{ _key, text } },\n  link{ \n  label,\n  \n  kind,\n  external,\n  internal->{\n    _type,\n    "slug": slug.current,\n    brand,\n    brands\n  }\n\n }\n,\n  count,\n  "posts": posts[$brand in @->brands]->{ \n  \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  \n  "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title }\n,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n  "category": category->{ title, "slug": slug.current }\n,\n  "topic": primaryTopic->{ title },\n  briefText\n },\n  "latest": \n  *[\n    _type == "post"\n    && defined(slug.current)\n    && $brand in brands\n    && true\n    && !(_id in coalesce(^.posts[]._ref, []))\n  ] | order(publishedAt desc)[0...6]\n{ \n  \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  \n  "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title }\n,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n  "category": category->{ title, "slug": slug.current }\n,\n  "topic": primaryTopic->{ title },\n  briefText\n }\n },\n  _type == "weeklyRoundup" => { \n  heading[]{ _key, style, children[]{ _key, text } },\n  label,\n  title,\n  summary,\n  button{ \n  label,\n  \n  kind,\n  external,\n  internal->{\n    _type,\n    "slug": slug.current,\n    brand,\n    brands\n  }\n\n },\n  listLabel,\n  "posts": posts[$brand in @->brands]->{ \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  \n  "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title }\n,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n  "category": category->{ title, "slug": slug.current }\n },\n  "latest": \n  *[\n    _type == "post"\n    && defined(slug.current)\n    && $brand in brands\n    && true\n    && !(_id in coalesce(^.posts[]._ref, []))\n  ] | order(publishedAt desc)[0...8]\n{ \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  \n  "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title }\n,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n  "category": category->{ title, "slug": slug.current }\n }\n },\n  _type == "topPicks" => { \n  heading[]{ _key, style, children[]{ _key, text } },\n  link{ \n  label,\n  \n  kind,\n  external,\n  internal->{\n    _type,\n    "slug": slug.current,\n    brand,\n    brands\n  }\n\n },\n  "posts": posts[$brand in @->brands]->{ \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  \n  "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title }\n,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n  "category": category->{ title, "slug": slug.current }\n, "sponsored": defined(sponsor) },\n  "fill": [\n    ...\n  *[\n    _type == "post"\n    && defined(slug.current)\n    && $brand in brands\n    && !defined(sponsor) && dateTime(publishedAt) >= dateTime($today + "T00:00:00Z") - 60*60*24*7\n    && !(_id in coalesce(^.posts[]._ref, []))\n  ] | order(publishedAt desc)[0...6]\n{ \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  \n  "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title }\n,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n  "category": category->{ title, "slug": slug.current }\n },\n    ...\n  *[\n    _type == "post"\n    && defined(slug.current)\n    && $brand in brands\n    && !defined(sponsor) && dateTime(publishedAt) < dateTime($today + "T00:00:00Z") - 60*60*24*7\n    && !(_id in coalesce(^.posts[]._ref, []))\n  ] | order(publishedAt desc)[0...6]\n{ \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  \n  "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title }\n,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n  "category": category->{ title, "slug": slug.current }\n }\n  ]\n },\n  _type == "exploreGrid" => { \n  cards[]{\n    _key,\n    heading[]{ _key, style, children[]{ _key, text } },\n    icon,\n    source,\n    count,\n    deadlineLabel,\n    button{ \n  label,\n  \n  kind,\n  external,\n  internal->{\n    _type,\n    "slug": slug.current,\n    brand,\n    brands\n  }\n\n },\n    "items": items[@->_type != "post" || $brand in @->brands]->{ \n  _type == "post" => { _type, \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  \n  "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title }\n,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n  "category": category->{ title, "slug": slug.current }\n },\n  _type != "post" => { \n  _id,\n  _type,\n  "slug": slug.current,\n  title,\n  category,\n  nominationsClosingDate,\n  startDate,\n  endDate,\n  country,\n  publishedAt\n }\n },\n    "fill": select(\n      source == "posts" => \n  *[\n    _type == "post"\n    && defined(slug.current)\n    && $brand in brands\n    && defined(^.category._ref) && category._ref == ^.category._ref\n    && !(_id in coalesce(^.items[]._ref, []))\n  ] | order(publishedAt desc)[0...6]\n{ _type, \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  \n  "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title }\n,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n  "category": category->{ title, "slug": slug.current }\n },\n      \n  source == "awards" => [\n    ...*[\n      _type == "awardsProgramme"\n      && nominationsClosingDate >= $today\n      && !(_id in coalesce(^.items[]._ref, []))\n    ] | order(nominationsClosingDate asc)[0...5]{ \n  _id,\n  _type,\n  "slug": slug.current,\n  title,\n  category,\n  nominationsClosingDate,\n  startDate,\n  endDate,\n  country,\n  publishedAt\n },\n    ...*[\n      _type == "awardsProgramme"\n      && !(defined(nominationsClosingDate) && nominationsClosingDate >= $today)\n      && startDate >= $today\n      && !(_id in coalesce(^.items[]._ref, []))\n    ] | order(startDate asc)[0...5]{ \n  _id,\n  _type,\n  "slug": slug.current,\n  title,\n  category,\n  nominationsClosingDate,\n  startDate,\n  endDate,\n  country,\n  publishedAt\n },\n    ...*[\n      _type == "awardsProgramme"\n      && !(defined(nominationsClosingDate) && nominationsClosingDate >= $today)\n      && startDate < $today\n      && !(_id in coalesce(^.items[]._ref, []))\n    ] | order(startDate desc)[0...5]{ \n  _id,\n  _type,\n  "slug": slug.current,\n  title,\n  category,\n  nominationsClosingDate,\n  startDate,\n  endDate,\n  country,\n  publishedAt\n }\n  ],\n  source == "events" => [\n    ...*[\n      _type == "conferenceEvent"\n      && coalesce(endDate, startDate) >= $today\n      && !(_id in coalesce(^.items[]._ref, []))\n    ] | order(startDate asc)[0...4]{ \n  _id,\n  _type,\n  "slug": slug.current,\n  title,\n  category,\n  nominationsClosingDate,\n  startDate,\n  endDate,\n  country,\n  publishedAt\n },\n    ...*[\n      _type == "conferenceEvent"\n      && coalesce(endDate, startDate) < $today\n      && !(_id in coalesce(^.items[]._ref, []))\n    ] | order(startDate desc)[0...4]{ \n  _id,\n  _type,\n  "slug": slug.current,\n  title,\n  category,\n  nominationsClosingDate,\n  startDate,\n  endDate,\n  country,\n  publishedAt\n }\n  ],\n  source == "research" => *[\n    _type == "resource"\n    && category == "research"\n    && !(_id in coalesce(^.items[]._ref, []))\n    && _id != coalesce(^.promo.resource._ref, "")\n  ] | order(defined(publishedAt) desc, publishedAt desc, legacyWpId desc)[0...3]{ \n  _id,\n  _type,\n  "slug": slug.current,\n  title,\n  category,\n  nominationsClosingDate,\n  startDate,\n  endDate,\n  country,\n  publishedAt\n }\n\n    )\n  }\n },\n  _type == "subscribeBanner" => { \n  heading[]{ _key, style, children[]{ _key, text } },\n  description,\n  buttonLabel,\n  cta{ \n  label,\n  \n  kind,\n  external,\n  internal->{\n    _type,\n    "slug": slug.current,\n    brand,\n    brands\n  }\n\n }\n },\n  _type == "splitLayout" => {\n    "main": main[]{ _key, _type, \n  _type == "topStories" => { \n  linkLabel,\n  label,\n  "slides": slides[$brand == "clearview" || $brand in @->brands]->{ \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  \n  "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title }\n,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n  "category": category->{ title, "slug": slug.current }\n },\n  "articles": articles[$brand == "clearview" || $brand in @->brands]->{ \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  \n  "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title }\n,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n  "category": category->{ title, "slug": slug.current }\n },\n  "latest": *[\n    _type == "post"\n    && defined(slug.current)\n    && ($brand == "clearview" || $brand in brands)\n    && !(_id in coalesce(^.slides[]._ref, []))\n    && !(_id in coalesce(^.articles[]._ref, []))\n  ] | order(publishedAt desc)[0...6]{ \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  \n  "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title }\n,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n  "category": category->{ title, "slug": slug.current }\n }\n },\n  _type == "sponsoredContent" => { \n  label,\n  link{ \n  label,\n  \n  kind,\n  external,\n  internal->{\n    _type,\n    "slug": slug.current,\n    brand,\n    brands\n  }\n\n },\n  profileLabel,\n  "post": *[\n    _type == "post"\n    && _id == ^.post._ref\n    && defined(slug.current)\n    && defined(sponsor)\n    && ($brand == "clearview" || $brand in brands)\n  ][0]{\n    \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  \n  "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title }\n,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n  "category": category->{ title, "slug": slug.current }\n,\n    "sponsor": sponsor->{\n      title,\n      "slug": slug.current,\n      "logo": logo{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n }\n    }\n  }\n },\n  _type == "postCards" => { \n  \n  heading[]{ _key, style, children[]{ _key, text } },\n  link{ \n  label,\n  \n  kind,\n  external,\n  internal->{\n    _type,\n    "slug": slug.current,\n    brand,\n    brands\n  }\n\n }\n,\n  "category": category->{ title, "slug": slug.current },\n  "posts": posts[$brand in @->brands]->{ \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  \n  "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title }\n,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n  "category": category->{ title, "slug": slug.current }\n },\n  "latest": \n  *[\n    _type == "post"\n    && defined(slug.current)\n    && $brand in brands\n    && defined(^.category._ref) && category._ref == ^.category._ref\n    && !(_id in coalesce(^.posts[]._ref, []))\n  ] | order(publishedAt desc)[0...6]\n{ \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  \n  "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title }\n,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n  "category": category->{ title, "slug": slug.current }\n }\n },\n  _type == "postBriefs" => { \n  \n  heading[]{ _key, style, children[]{ _key, text } },\n  link{ \n  label,\n  \n  kind,\n  external,\n  internal->{\n    _type,\n    "slug": slug.current,\n    brand,\n    brands\n  }\n\n }\n,\n  count,\n  "posts": posts[$brand in @->brands]->{ \n  \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  \n  "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title }\n,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n  "category": category->{ title, "slug": slug.current }\n,\n  "topic": primaryTopic->{ title },\n  briefText\n },\n  "latest": \n  *[\n    _type == "post"\n    && defined(slug.current)\n    && $brand in brands\n    && true\n    && !(_id in coalesce(^.posts[]._ref, []))\n  ] | order(publishedAt desc)[0...6]\n{ \n  \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  \n  "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title }\n,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n  "category": category->{ title, "slug": slug.current }\n,\n  "topic": primaryTopic->{ title },\n  briefText\n }\n },\n  _type == "weeklyRoundup" => { \n  heading[]{ _key, style, children[]{ _key, text } },\n  label,\n  title,\n  summary,\n  button{ \n  label,\n  \n  kind,\n  external,\n  internal->{\n    _type,\n    "slug": slug.current,\n    brand,\n    brands\n  }\n\n },\n  listLabel,\n  "posts": posts[$brand in @->brands]->{ \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  \n  "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title }\n,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n  "category": category->{ title, "slug": slug.current }\n },\n  "latest": \n  *[\n    _type == "post"\n    && defined(slug.current)\n    && $brand in brands\n    && true\n    && !(_id in coalesce(^.posts[]._ref, []))\n  ] | order(publishedAt desc)[0...8]\n{ \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  \n  "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title }\n,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n  "category": category->{ title, "slug": slug.current }\n }\n },\n  _type == "publications" => { \n  heading[]{ _key, style, children[]{ _key, text } },\n  body,\n  cards[]{\n    _key,\n    brand,\n    "brandTitle": *[_type == "brand" && key.current == ^.brand][0].title,\n    description,\n    image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n    linkLabel\n  }\n },\n  _type == "cta" => { \n  heading,\n  text,\n  link{ label, href }\n }\n },\n    "aside": aside[]{ _key, _type, \n  _type == "highlights" => { \n  source,\n  count,\n  heading[]{ _key, style, children[]{ _key, text } },\n  deadlineLabel,\n  "items": items[]->{ \n  _id,\n  _type,\n  "slug": slug.current,\n  title,\n  category,\n  nominationsClosingDate,\n  startDate,\n  endDate,\n  country,\n  publishedAt\n },\n  "fill": select(\n  source == "awards" => [\n    ...*[\n      _type == "awardsProgramme"\n      && nominationsClosingDate >= $today\n      && !(_id in coalesce(^.items[]._ref, []))\n    ] | order(nominationsClosingDate asc)[0...5]{ \n  _id,\n  _type,\n  "slug": slug.current,\n  title,\n  category,\n  nominationsClosingDate,\n  startDate,\n  endDate,\n  country,\n  publishedAt\n },\n    ...*[\n      _type == "awardsProgramme"\n      && !(defined(nominationsClosingDate) && nominationsClosingDate >= $today)\n      && startDate >= $today\n      && !(_id in coalesce(^.items[]._ref, []))\n    ] | order(startDate asc)[0...5]{ \n  _id,\n  _type,\n  "slug": slug.current,\n  title,\n  category,\n  nominationsClosingDate,\n  startDate,\n  endDate,\n  country,\n  publishedAt\n },\n    ...*[\n      _type == "awardsProgramme"\n      && !(defined(nominationsClosingDate) && nominationsClosingDate >= $today)\n      && startDate < $today\n      && !(_id in coalesce(^.items[]._ref, []))\n    ] | order(startDate desc)[0...5]{ \n  _id,\n  _type,\n  "slug": slug.current,\n  title,\n  category,\n  nominationsClosingDate,\n  startDate,\n  endDate,\n  country,\n  publishedAt\n }\n  ],\n  source == "events" => [\n    ...*[\n      _type == "conferenceEvent"\n      && coalesce(endDate, startDate) >= $today\n      && !(_id in coalesce(^.items[]._ref, []))\n    ] | order(startDate asc)[0...4]{ \n  _id,\n  _type,\n  "slug": slug.current,\n  title,\n  category,\n  nominationsClosingDate,\n  startDate,\n  endDate,\n  country,\n  publishedAt\n },\n    ...*[\n      _type == "conferenceEvent"\n      && coalesce(endDate, startDate) < $today\n      && !(_id in coalesce(^.items[]._ref, []))\n    ] | order(startDate desc)[0...4]{ \n  _id,\n  _type,\n  "slug": slug.current,\n  title,\n  category,\n  nominationsClosingDate,\n  startDate,\n  endDate,\n  country,\n  publishedAt\n }\n  ],\n  source == "research" => *[\n    _type == "resource"\n    && category == "research"\n    && !(_id in coalesce(^.items[]._ref, []))\n    && _id != coalesce(^.promo.resource._ref, "")\n  ] | order(defined(publishedAt) desc, publishedAt desc, legacyWpId desc)[0...3]{ \n  _id,\n  _type,\n  "slug": slug.current,\n  title,\n  category,\n  nominationsClosingDate,\n  startDate,\n  endDate,\n  country,\n  publishedAt\n }\n),\n  button{ \n  label,\n  \n  kind,\n  external,\n  internal->{\n    _type,\n    "slug": slug.current,\n    brand,\n    brands\n  }\n\n },\n  promo{\n    resource->{\n      title,\n      "downloadThumbnail": downloadThumbnail{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n      "downloadFileUrl": downloadFile.asset->url,\n      "downloadFileName": downloadFile.asset->originalFilename,\n      downloadUrl\n    },\n    title,\n    description,\n    "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n    link{ \n  kind,\n  external,\n  internal->{\n    _type,\n    "slug": slug.current,\n    brand,\n    brands\n  }\n }\n  }\n },\n  _type == "awardsWinners" => { heading[]{ _key, style, children[]{ _key, text } } }\n }\n  }\n }\n  }\n': PAGE_QUERY_RESULT;
     '\n  *[_type == "page" && brand == $brand && defined(slug.current) && slug.current != "home"]{\n    "slug": slug.current\n  }\n': PAGE_SLUGS_QUERY_RESULT;
     '\n  *[_type == "post" && $brand in brands] | order(publishedAt desc){\n    _id,\n    title,\n    "slug": slug.current,\n    publishedAt,\n    excerpt,\n    image\n  }\n': POSTS_QUERY_RESULT;
-    '\n  *[_type == "post" && slug.current == $slug && $brand in brands][0]{\n    _id,\n    title,\n    "slug": slug.current,\n    brands,\n    publishedAt,\n    excerpt,\n    "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n, credit },\n    "category": category->{ title, "slug": slug.current },\n    "primaryTopic": primaryTopic->{ title, "slug": slug.current },\n    "secondaryTopics": secondaryTopics[]->{ title, "slug": slug.current },\n    "region": select(category._ref == $peopleMoves => region->{ title, "slug": slug.current }),\n    "author": author->{ name, jobTitle, city, bio, "photo": photo{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n } },\n    content[]{\n      _type != "infographic" => { ... },\n      _type == "infographic" => { _key, _type, eyebrow, title, description, wide, narrow },\n      _type == "image" => { "alt": coalesce(alt, asset->altText) },\n      _type == "videoFile" => { "url": asset->url, "mimeType": asset->mimeType }\n    },\n    "recommendedIds": coalesce(recommended[]._ref, []),\n    "picks": *[\n      _type == "post"\n      && _id in coalesce(^.recommended[]._ref, [])\n      && _id != ^._id\n      && $brand in brands\n      && defined(slug.current)\n    ]{ \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  publishedAt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n  "topic": primaryTopic->{ title, "slug": slug.current }\n },\n    "fill": *[\n      _type == "post"\n      && $brand in brands\n      && defined(slug.current)\n      && defined(^.category._ref)\n      && category._ref == ^.category._ref\n      && _id != ^._id\n      && !(_id in coalesce(^.recommended[]._ref, []))\n    ] | order(publishedAt desc)[0...3]{ \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  publishedAt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n  "topic": primaryTopic->{ title, "slug": slug.current }\n }\n  }\n': POST_QUERY_RESULT;
-    '\n  *[_type == "articlePage" && _id == $id][0]{\n    recommendedHeading,\n    breadcrumbHomeLabel,\n    shareLabel,\n    copyLinkLabel,\n    linkCopiedLabel,\n    readTimeSuffix,\n    imageCreditPrefix,\n    shareRailLabel,\n    "shareLinks": coalesce(shareLinks[]{ _key, label, url, icon{ asset->{ url } } }, []),\n    "topAdUnit": topAdUnit->{ code, size },\n    "sidebarAdUnit": sidebarAdUnit->{ code, size },\n    "inContentAdUnit": inContentAdUnit->{ code, size }\n  }\n': ARTICLE_PAGE_QUERY_RESULT;
+    '\n  *[_type == "post" && slug.current == $slug && $brand in brands][0]{\n    _id,\n    title,\n    "slug": slug.current,\n    brands,\n    publishedAt,\n    excerpt,\n    "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n, credit },\n    "category": category->{ title, "slug": slug.current },\n    "primaryTopic": primaryTopic->{ title, "slug": slug.current },\n    "secondaryTopics": secondaryTopics[]->{ title, "slug": slug.current },\n    "region": select(category._ref == $peopleMoves => region->{ title, "slug": slug.current }),\n    "author": author->{ name, jobTitle, city, bio, "photo": photo{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n } },\n    content[]{ \n  _type != "infographic" => { ... },\n  _type == "infographic" => { _key, _type, eyebrow, title, description, wide, narrow },\n  _type == "image" => { "alt": coalesce(alt, asset->altText) },\n  _type == "videoFile" => { "url": asset->url, "mimeType": asset->mimeType }\n },\n    contentAfter[]{ \n  _type != "infographic" => { ... },\n  _type == "infographic" => { _key, _type, eyebrow, title, description, wide, narrow },\n  _type == "image" => { "alt": coalesce(alt, asset->altText) },\n  _type == "videoFile" => { "url": asset->url, "mimeType": asset->mimeType }\n },\n    "recommendedIds": coalesce(recommended[]._ref, []),\n    "picks": *[\n      _type == "post"\n      && _id in coalesce(^.recommended[]._ref, [])\n      && _id != ^._id\n      && $brand in brands\n      && defined(slug.current)\n    ]{ \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  publishedAt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n  "topic": primaryTopic->{ title, "slug": slug.current }\n },\n    "fill": *[\n      _type == "post"\n      && $brand in brands\n      && defined(slug.current)\n      && defined(^.category._ref)\n      && category._ref == ^.category._ref\n      && _id != ^._id\n      && !(_id in coalesce(^.recommended[]._ref, []))\n    ] | order(publishedAt desc)[0...3]{ \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  publishedAt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n  "topic": primaryTopic->{ title, "slug": slug.current }\n }\n  }\n': POST_QUERY_RESULT;
+    '\n  *[_type == "articlePage" && _id == $id][0]{\n    recommendedHeading,\n    breadcrumbHomeLabel,\n    shareLabel,\n    copyLinkLabel,\n    linkCopiedLabel,\n    readTimeSuffix,\n    imageCreditPrefix,\n    shareRailLabel,\n    "shareLinks": coalesce(shareLinks[]{ _key, label, url, icon{ asset->{ url } } }, [])\n  }\n': ARTICLE_PAGE_QUERY_RESULT;
     '\n  *[_type == "mostRead" && _id == $id][0]{\n    title,\n    "ids": coalesce(posts[]._ref, []),\n    "posts": *[\n      _type == "post"\n      && _id in coalesce(^.posts[]._ref, [])\n      && $brand in brands\n      && defined(slug.current)\n    ]{ \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  publishedAt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n  "topic": primaryTopic->{ title, "slug": slug.current }\n }\n  }\n': MOST_READ_QUERY_RESULT;
     '\n  *[\n    _type == "post"\n    && $brand in brands\n    && defined(slug.current)\n    && slug.current != $slug\n  ] | order(publishedAt desc)[0...$limit]{ \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  publishedAt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n  "topic": primaryTopic->{ title, "slug": slug.current }\n }\n': MOST_READ_LATEST_QUERY_RESULT;
     '\n  *[_type == "post" && defined(slug.current) && $brand in brands]{\n    "slug": slug.current\n  }\n': POST_SLUGS_QUERY_RESULT;

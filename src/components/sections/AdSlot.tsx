@@ -21,7 +21,7 @@ const SPACINGS = {
 export type AdSlotSpacing = keyof typeof SPACINGS
 
 /**
- * What a hidden position (no unit picked, or too narrow for its banner) leaves behind: one gap instead of its two,
+ * What a hidden position (no unit set, or too narrow for its banner) leaves behind: one gap instead of its two,
  * so its neighbours neither touch nor sit around an empty band. Only spacings that separate two neighbours on both
  * sides leave one; the others sit next to a neighbour that brings its own spacing (a section's padding, the lead
  * stories' top space), so they leave nothing.
@@ -39,10 +39,6 @@ const HIDDEN_GAPS = {
 /** Where the position hides at the container's width, its gap shows instead (`AD_SLOT_FITS`). */
 const GAP_WHEN_NARROW = 'hidden @max-leaderboard:block'
 
-export function isAdSlotSpacing(value: unknown): value is AdSlotSpacing {
-  return typeof value === 'string' && Object.hasOwn(SPACINGS, value)
-}
-
 /**
  * A banner position with its page gutter.
  *
@@ -53,7 +49,7 @@ export function isAdSlotSpacing(value: unknown): value is AdSlotSpacing {
  * The `aside` spacing replaces the gutter with the sidebar's own inset.
  *
  * The gutter sits on an `@container`, the vertical spacing on the element inside it, so a 728 × 90 position too
- * narrow for its banner hides together with its spacing (`AD_SLOT_FITS`). With no unit picked the position is hidden on
+ * narrow for its banner hides together with its spacing (`AD_SLOT_FITS`). With no unit set the position is hidden on
  * the live site (`AD_SLOT_UNSET`). Either way it leaves its `HIDDEN_GAPS` gap behind.
  */
 export function AdSlot({
