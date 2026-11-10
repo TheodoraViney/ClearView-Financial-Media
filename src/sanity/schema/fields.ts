@@ -7,7 +7,6 @@ import {
   defineField,
 } from 'sanity'
 
-import { type AdPosition, POSITION_UNIT_SIZE } from '@/lib/gam'
 import { HEADING_LEVELS, type HeadingLevel, isHeadingLevel } from '@/lib/headings'
 import { LINKABLE_TYPES, isAllowedLinkTarget } from '@/lib/links'
 
@@ -403,61 +402,3 @@ export const brevoSenderField = brevoField('brevoSender', 'Sender', 'sender')
 
 /** One yes/no Brevo contact attribute, e.g. WB_NEWSLETTER. */
 export const brevoAttributeField = brevoField('brevoAttribute', 'Brevo attribute', 'attribute')
-
-/**
- * The Google Ad Manager unit a banner position shows. `position` is fixed (the article page's banners) or read from
- * the parent object (an ad slot's Size). The picker lists only units of the position's size, and validation catches a
- * unit left over after the Size changed. An empty unit is a warning, not an error.
- */
-export function adUnitField({
-  name = 'unit',
-  title = 'Ad unit',
-  description,
-  position,
-}: {
-  name?: string
-  title?: string
-  description?: string
-  position: AdPosition | ((parent: unknown) => string | undefined)
-}) {
-  const sizeFor = (parent: unknown): string | undefined => {
-    const key = typeof position === 'function' ? position(parent) : position
-
-    return key && Object.hasOwn(POSITION_UNIT_SIZE, key) ? POSITION_UNIT_SIZE[key as AdPosition] : undefined
-  }
-
-  return defineField({
-    name,
-    title,
-    type: 'reference',
-    to: [{ type: 'adUnit' }],
-    description,
-    options: {
-      disableNew: true,
-      filter: ({ parent }) => {
-        const size = sizeFor(parent)
-
-        return size ? { filter: 'size == $size', params: { size } } : {}
-      },
-    },
-    // Not required: a position whose unit does not exist in GAM yet stays an empty reserved box, and the page still saves.
-    validation: (Rule) => [
-      Rule.custom((value: { _ref?: string } | undefined) =>
-        value?._ref ? true : 'No ad unit: the banner stays empty on the site',
-      ).warning(),
-      Rule.custom(async (value: { _ref?: string } | undefined, context) => {
-        const size = sizeFor(context.parent)
-
-        if (!value?._ref || !size) {
-          return true
-        }
-
-        const unitSize = await context
-          .getClient({ apiVersion: '2026-09-01' })
-          .fetch<string | null>('*[_id == $id][0].size', { id: value._ref })
-
-        return unitSize === size || `This position takes a ${size} unit; the picked unit is ${unitSize ?? 'missing'}`
-      }),
-    ],
-  })
-}

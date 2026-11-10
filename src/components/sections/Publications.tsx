@@ -1,6 +1,9 @@
+import { AD_SLOT_FITS, AD_SLOT_UNSET, AdSlot } from '@/components/ui/AdSlot'
 import { ArrowLink } from '@/components/ui/ArrowLink'
 import { Heading } from '@/components/ui/Heading'
 import { Media, type MediaImage } from '@/components/ui/Media'
+import type { ShellVariant } from '@/components/ui/motion'
+import { adPositionLabel, type AdUnitView } from '@/lib/gam'
 import { type HeadingLevel } from '@/lib/headings'
 
 export type PublicationCard = {
@@ -16,6 +19,10 @@ export type PublicationsProps = {
   heading: { as: HeadingLevel; text: string } | null
   body?: string
   cards: PublicationCard[]
+  /** The "Banner after Publications" unit; null hides the banner on the live site (labelled placeholder in draft). */
+  banner: AdUnitView | null
+  /** The banner's look: `group` (ClearView, the default) or `publication`. */
+  look?: ShellVariant
 }
 
 // Card image sizes. Mobile: full width at 3:2, cropped at the sides: × (16/9) / (3/2) ≈ 1.19 → 120vw.
@@ -29,10 +36,12 @@ const imageSizes = (count: number) =>
 /**
  * Home intro: the page heading (H1 by default, the level is chosen in the CMS), a short text and one card per editorial publication.
  * Cards stack on mobile, put the image beside the text on tablet and sit in an auto-fit grid on desktop.
+ * The banner after the cards (ClearView Banner Position 2) takes the section's gap above it. The design draws it
+ * 970 × 90; GAM has no such unit, so it serves 728 × 90, centred in the box.
  */
-export function Publications({ heading, body, cards }: PublicationsProps) {
+export function Publications({ heading, body, cards, banner, look = 'group' }: PublicationsProps) {
   return (
-    <section className="flex flex-col gap-7 border-t border-border px-gutter py-section md:gap-10 lg:gap-16">
+    <section className="@container flex flex-col gap-7 border-t border-border px-gutter py-section md:gap-10 lg:gap-16">
       <div className="flex flex-col gap-4 lg:flex-row lg:flex-wrap lg:items-end lg:gap-8">
         {heading && (
           <Heading
@@ -76,6 +85,12 @@ export function Publications({ heading, body, cards }: PublicationsProps) {
           ))}
         </ul>
       )}
+
+      {/* A flex item of the section (the @container), so when hidden, where the column is narrower than the banner or
+          with no unit, it takes the gap above it along. */}
+      <div role="complementary" aria-label="Advertisement" className={banner ? AD_SLOT_FITS.billboard : AD_SLOT_UNSET}>
+        <AdSlot size="billboard" look={look} unit={banner} label={adPositionLabel('publications')} />
+      </div>
     </section>
   )
 }

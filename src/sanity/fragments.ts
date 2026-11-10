@@ -9,6 +9,31 @@ export const IMAGE = /* groq */ `
   "alt": coalesce(alt, asset->altText)
 `
 
+/**
+ * One member of a post's body field (`content`, `contentAfter`): the Portable Text member as stored, plus the image
+ * alt fallback and the video file URL. An infographic sends only what the page shows: its generation metadata is
+ * left out of the page, though it stays readable to anyone through the public dataset API.
+ */
+export const ARTICLE_BODY = /* groq */ `
+  _type != "infographic" => { ... },
+  _type == "infographic" => { _key, _type, eyebrow, title, description, wide, narrow },
+  _type == "image" => { "alt": coalesce(alt, asset->altText) },
+  _type == "videoFile" => { "url": asset->url, "mimeType": asset->mimeType }
+`
+
+/** Brand settings → Advertising: one GAM unit code per position and page type (AD_POSITIONS in src/lib/gam.ts). */
+export const ADVERTISING = /* groq */ `
+  advertising{
+    top{ home, other },
+    side{ home, other },
+    publications{ home, other },
+    article{ other },
+    banner3{ home },
+    banner4{ home },
+    awardsWinners{ home, other }
+  }
+`
+
 /** A linkField value without its label (`withLabel: false`). `internal` is dereferenced to what resolveHref needs and nothing more. */
 export const LINK_TARGET = /* groq */ `
   kind,
@@ -196,13 +221,6 @@ const PUBLICATIONS = /* groq */ `
   }
 `
 
-const AD_SLOT = /* groq */ `
-  size,
-  label,
-  spacing,
-  "unit": unit->{ code, size }
-`
-
 // News Analysis and News in Brief: picks, then the brand's latest posts of the block's category.
 // Picks dereference through BRAND_POST_PICK: a post taken off the page brand after picking drops out.
 const POST_LIST = /* groq */ `
@@ -247,7 +265,6 @@ const WEEKLY_ROUNDUP = /* groq */ `
 
 // adminLabel is CMS-only and deliberately not projected.
 const MAIN_COLUMN_BLOCKS = /* groq */ `
-  _type == "adSlot" => { ${AD_SLOT} },
   _type == "topStories" => { ${TOP_STORIES} },
   _type == "sponsoredContent" => { ${SPONSORED_CONTENT} },
   _type == "postCards" => { ${POST_CARDS} },
@@ -349,9 +366,10 @@ const HIGHLIGHTS = /* groq */ `
   }
 `
 
+// Awards Winners carries only its heading: its banner unit comes from Brand settings.
 const ASIDE_BLOCKS = /* groq */ `
   _type == "highlights" => { ${HIGHLIGHTS} },
-  _type == "adSlot" => { ${AD_SLOT} }
+  _type == "awardsWinners" => { heading[]{ _key, style, children[]{ _key, text } } }
 `
 
 // Picks (a sponsor set after picking is flagged, and the adapter drops it), then the brand's newest unsponsored posts:
@@ -451,7 +469,6 @@ export const SUBSCRIBE_MODAL = /* groq */ `
 
 /** One member of a page's `blocks[]`. Use as `blocks[]{ _key, _type, ${BLOCKS_PROJECTION} }`. */
 export const BLOCKS_PROJECTION = /* groq */ `
-  _type == "adSlot" => { ${AD_SLOT} },
   _type == "topStories" => { ${TOP_STORIES} },
   _type == "publications" => { ${PUBLICATIONS} },
   _type == "cta" => { ${CTA} },

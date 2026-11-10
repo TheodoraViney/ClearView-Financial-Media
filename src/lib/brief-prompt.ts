@@ -56,15 +56,18 @@ Before answering, check: exactly five sentences in the order of the instructions
 /** The article as the model reads it. */
 export type BriefArticle = { title: string; text: string }
 
-/** Title, standfirst and body of a post, as plain text. */
+/** Title, standfirst and body (the text before and after the banner) of a post, as plain text. */
 export function postToBriefArticle(post: {
   title?: string | null
   excerpt?: string | null
   content?: readonly PlainBlock[] | null
+  contentAfter?: readonly PlainBlock[] | null
 }): BriefArticle {
   return {
     title: post.title?.trim() ?? '',
-    text: [post.excerpt?.trim(), portableTextToPlain(post.content)].filter(Boolean).join('\n\n'),
+    text: [post.excerpt?.trim(), portableTextToPlain(post.content), portableTextToPlain(post.contentAfter)]
+      .filter(Boolean)
+      .join('\n\n'),
   }
 }
 

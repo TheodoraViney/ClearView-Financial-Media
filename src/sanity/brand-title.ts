@@ -8,6 +8,7 @@ import {
   subscribeModalDocumentId,
   type BrandKey,
 } from '@/brands'
+import { toAdUnits, type AdPageType, type AdUnits } from '@/lib/gam'
 
 import { cachedSanity, type DynamicFetchOptions } from './live'
 import { SHELL_QUERY } from './queries'
@@ -54,4 +55,14 @@ export async function fetchBrandTitle(brand: BrandKey, options: DynamicFetchOpti
   const { data } = await fetchShell(brand, options)
 
   return brandTitle(brand, data.brand?.title)
+}
+
+/**
+ * The brand's ad units for a page type, from Brand settings → Advertising via the shell query (the layout's cache
+ * entry). Codes are stega-cleaned: they become part of the ad request path.
+ */
+export async function fetchAdUnits(brand: BrandKey, page: AdPageType, options: DynamicFetchOptions): Promise<AdUnits> {
+  const { data } = await fetchShell(brand, options)
+
+  return toAdUnits(stegaClean(data.brand?.advertising), page)
 }

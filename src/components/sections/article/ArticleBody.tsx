@@ -6,7 +6,7 @@ import { Figure } from '@/components/ui/Figure'
 import { Media } from '@/components/ui/Media'
 import { PullQuote } from '@/components/ui/PullQuote'
 import { cx } from '@/components/ui/cx'
-import type { AdUnitView } from '@/lib/gam'
+import { adPositionLabel, type AdUnitView } from '@/lib/gam'
 import { safeHref } from '@/lib/links'
 import { toImage } from '@/sanity/image'
 
@@ -180,32 +180,42 @@ const components: PortableTextComponents = {
 }
 
 /**
- * A post's Portable Text body in the article column. Spacing between members comes from `.article-flow`.
- * `inContentAdUnit` is the brand's unit for the in-content banners (`adBreak`), which the editor only places.
+ * The article banner (728 × 90) in the text column, a block member of `.article-flow`. Hidden where the column is
+ * narrower than the banner (inside an `@container`), and on the live site when the brand has no unit for it.
+ */
+export function ArticleBanner({ unit }: { unit: AdUnitView | null }) {
+  return (
+    <div
+      data-flow="block"
+      role="complementary"
+      aria-label="Advertisement, in article"
+      className={unit ? AD_SLOT_FITS.leaderboard : AD_SLOT_UNSET}
+    >
+      <AdSlot size="leaderboard" unit={unit} label={adPositionLabel('article')} />
+    </div>
+  )
+}
+
+/**
+ * A post's Portable Text body in the article column: the text before the banner, the article banner, then the text
+ * after it. With no text after, the banner closes the body. Spacing between members comes from `.article-flow`.
  */
 export function ArticleBody({
   value,
-  inContentAdUnit,
+  after,
+  banner,
 }: {
-  value: PortableTextProps['value']
-  inContentAdUnit?: AdUnitView | null
+  value: PortableTextProps['value'] | null | undefined
+  after: PortableTextProps['value'] | null | undefined
+  /** The brand's article banner unit; null hides the banner on the live site. */
+  banner: AdUnitView | null
 }) {
-  const withAds: PortableTextComponents = {
-    ...components,
-    types: {
-      ...components.types,
-      adBreak: () => (
-        <div data-flow="block" role="complementary" aria-label="Advertisement, in article" className={inContentAdUnit ? AD_SLOT_FITS.leaderboard : AD_SLOT_UNSET}>
-          <AdSlot size="leaderboard" unit={inContentAdUnit} />
-        </div>
-      ),
-    },
-  }
-
   return (
-    // A container for the in-content banners, which hide where the column is narrower than 728.
+    // A container for the article banner, which hides where the column is narrower than 728.
     <div className="article-flow @container min-w-0">
-      <PortableText value={value} components={withAds} />
+      {value && <PortableText value={value} components={components} />}
+      <ArticleBanner unit={banner} />
+      {after && <PortableText value={after} components={components} />}
     </div>
   )
 }

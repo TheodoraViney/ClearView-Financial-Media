@@ -2,7 +2,12 @@ import { defineField, defineType } from 'sanity'
 
 import { BRAND_KEYS, BRANDS } from '@/brands'
 
-import { blocksField } from '../blocks'
+import { pageBlocksField } from '../blocks'
+
+// The home page is the page with the slug "home". Its banners sit between three block lists; other pages have one.
+const isHome = (document: unknown) =>
+  (document as { slug?: { current?: string } } | undefined)?.slug?.current === 'home'
+const notHome = ({ document }: { document?: unknown }) => !isHome(document)
 
 export const page = defineType({
   name: 'page',
@@ -60,6 +65,20 @@ export const page = defineType({
       },
       validation: (Rule) => Rule.required(),
     }),
-    blocksField,
+    // `blocks` keeps its name on the home page too, so its blocks above Banner 3 needed no move.
+    pageBlocksField('blocks', {
+      title: 'Blocks',
+      description: 'On the home page: the blocks above Banner 3. Banners are placed by the page template.',
+    }),
+    pageBlocksField('blocksMiddle', {
+      title: 'Blocks between Banner 3 and Banner 4',
+      description: 'Home page only. Leave empty to show no Banner 4.',
+      hidden: notHome,
+    }),
+    pageBlocksField('blocksBottom', {
+      title: 'Blocks below Banner 4',
+      description: 'Home page only.',
+      hidden: notHome,
+    }),
   ],
 })

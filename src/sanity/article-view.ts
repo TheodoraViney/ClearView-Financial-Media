@@ -17,7 +17,7 @@ import {
   type ArticleView,
 } from '@/lib/article'
 import { archiveCanonicalUrl, archivePlainText, type ArchiveRecord } from '@/lib/archive'
-import { toAdUnitView, type AdUnitView } from '@/lib/gam'
+import type { AdUnits } from '@/lib/gam'
 import { absolutePostUrl, resolveHref } from '@/lib/links'
 import { shareHref } from '@/lib/share-links'
 
@@ -105,16 +105,6 @@ function bodyWords(body: Body | null): number {
   }, 0)
 }
 
-/** The brand's top and sidebar banner units. The in-content unit goes to the post body, which renders its banners. */
-function toArticleAds(copy: PageCopy): ArticleView['ads'] {
-  return { top: toAdUnitView(stegaClean(copy?.topAdUnit)), sidebar: toAdUnitView(stegaClean(copy?.sidebarAdUnit)) }
-}
-
-/** The brand's in-content banner unit, for the post body's `adBreak` banners. */
-export function inContentAdUnit(copy: PageCopy): AdUnitView | null {
-  return toAdUnitView(stegaClean(copy?.inContentAdUnit))
-}
-
 /** The brand's labels, each falling back to the design text while the document or the field is missing. */
 function toCopy(copy: PageCopy): ArticlePageCopy {
   const keys = Object.keys(ARTICLE_PAGE_COPY_DEFAULTS) as (keyof ArticlePageCopy)[]
@@ -144,12 +134,16 @@ function toShareLinks(copy: PageCopy, url: string, title: string): ArticleShareL
   })
 }
 
-/** A Sanity post as the article page's props. `body` is the rendered Portable Text. */
+/**
+ * A Sanity post as the article page's props. `body` is the rendered Portable Text with the article banner; `ads` are
+ * the brand's units for other pages, of which the page shows Top and Side.
+ */
 export function fromPost({
   post,
   mostRead,
   mostReadFill,
   copy,
+  ads,
   brand,
   body,
 }: {
@@ -157,6 +151,7 @@ export function fromPost({
   mostRead: MostRead
   mostReadFill: StegaBranded<MostReadAutoFill>
   copy: PageCopy
+  ads: AdUnits
   brand: EditorialBrandKey
   body: ReactNode
 }): ArticleView {
@@ -186,14 +181,14 @@ export function fromPost({
         }
       : null,
     hero: image ? { image, credit: post.image?.credit ?? null } : null,
-    readingMinutes: readingMinutes(bodyWords(post.content)),
+    readingMinutes: readingMinutes(bodyWords(post.content) + bodyWords(post.contentAfter)),
     body,
     shareUrl,
     shareLinks: toShareLinks(copy, shareUrl, post.title ?? ''),
     recommended,
     mostRead: toMostRead(post._id, mostRead, mostReadFill, brand),
     copy: toCopy(copy),
-    ads: toArticleAds(copy),
+    ads: { top: ads.top, side: ads.side },
   }
 }
 
@@ -226,6 +221,7 @@ export function fromArchiveRecord({
   mostRead,
   mostReadFill,
   copy,
+  ads,
   brand,
   logo,
   body,
@@ -234,6 +230,7 @@ export function fromArchiveRecord({
   mostRead: MostRead
   mostReadFill: StegaBranded<MostReadAutoFill>
   copy: PageCopy
+  ads: AdUnits
   brand: EditorialBrandKey
   /** The brand logo for the grey plate in the hero's place when the record has no image. */
   logo: { src: string; width: number; height: number } | null
@@ -262,6 +259,6 @@ export function fromArchiveRecord({
     recommended: [],
     mostRead: toMostRead(null, mostRead, mostReadFill, brand),
     copy: toCopy(copy),
-    ads: toArticleAds(copy),
+    ads: { top: ads.top, side: ads.side },
   }
 }

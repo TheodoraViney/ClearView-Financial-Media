@@ -1,11 +1,12 @@
 import { defineQuery } from 'next-sanity'
 
-import { ARTICLE_CARD, BLOCKS_PROJECTION, BRAND_TITLES, IMAGE, LINK, LINK_TARGET, SUBSCRIBE_MODAL } from './fragments'
+import { ADVERTISING, ARTICLE_BODY, ARTICLE_CARD, BLOCKS_PROJECTION, BRAND_TITLES, IMAGE, LINK, LINK_TARGET, SUBSCRIBE_MODAL } from './fragments'
 
 // The site shell: the brand's header and footer documents, its Brand settings and its subscribe pop-up, in one round
 // trip. Those ids derive from $brand (headerDocumentId / footerDocumentId / brandDocumentId /
 // subscribeModalDocumentId), and the Brand settings match is also checked against $brand.
 // navLink stores its visible text in `label`, so its link has no label of its own (LINK_TARGET).
+// The brand's ad unit codes ride along, so a page reads them from the layout's cache entry (fetchShell).
 export const SHELL_QUERY = defineQuery(`
   {
     "header": *[_id == $headerId && _type in ["clearviewHeader", "publicationHeader"]][0]{
@@ -38,17 +39,21 @@ export const SHELL_QUERY = defineQuery(`
     "brand": *[_type == "brand" && _id == $brandId && key.current == $brand][0]{
       title,
       logo{ "alt": asset->altText, asset->{ url, metadata{ dimensions{ width, height } } } },
-      footerLogo{ "alt": asset->altText, asset->{ url, metadata{ dimensions{ width, height } } } }
+      footerLogo{ "alt": asset->altText, asset->{ url, metadata{ dimensions{ width, height } } } },
+      ${ADVERTISING}
     },
     "subscribeModal": *[_id == $subscribeModalId && _type == "subscribeModal"][0]{ ${SUBSCRIBE_MODAL} }
   }
 `)
 
+// The home page's three block lists, rendered around Banner 3 and Banner 4.
 export const HOME_PAGE_QUERY = defineQuery(`
   *[_type == "page" && brand == $brand && slug.current == "home"][0]{
     _id,
     title,
-    blocks[]{ _key, _type, ${BLOCKS_PROJECTION} }
+    blocks[]{ _key, _type, ${BLOCKS_PROJECTION} },
+    blocksMiddle[]{ _key, _type, ${BLOCKS_PROJECTION} },
+    blocksBottom[]{ _key, _type, ${BLOCKS_PROJECTION} }
   }
 `)
 
@@ -78,9 +83,7 @@ export const POSTS_QUERY = defineQuery(`
 `)
 
 // The article page. `$peopleMoves` is the People Moves category id: a region left on another category is not returned.
-// The body keeps its Portable Text members as stored, plus the image alt fallback and the video file URL. An
-// infographic sends only what the page shows: its generation metadata is left out of the page, though it stays
-// readable to anyone through the public dataset API.
+// The body is two Portable Text fields, the text before and after the article banner (ARTICLE_BODY).
 // Recommended: the editor's picks on this brand (`picks`, reordered by `recommendedIds` in the adapter), then the latest
 // posts of the same category (`fill`) for the empty places. The Studio unsets an emptied array, hence the coalesce.
 export const POST_QUERY = defineQuery(`
@@ -97,12 +100,8 @@ export const POST_QUERY = defineQuery(`
     "secondaryTopics": secondaryTopics[]->{ title, "slug": slug.current },
     "region": select(category._ref == $peopleMoves => region->{ title, "slug": slug.current }),
     "author": author->{ name, jobTitle, city, bio, "photo": photo{ ${IMAGE} } },
-    content[]{
-      _type != "infographic" => { ... },
-      _type == "infographic" => { _key, _type, eyebrow, title, description, wide, narrow },
-      _type == "image" => { "alt": coalesce(alt, asset->altText) },
-      _type == "videoFile" => { "url": asset->url, "mimeType": asset->mimeType }
-    },
+    content[]{ ${ARTICLE_BODY} },
+    contentAfter[]{ ${ARTICLE_BODY} },
     "recommendedIds": coalesce(recommended[]._ref, []),
     "picks": *[
       _type == "post"
@@ -135,10 +134,7 @@ export const ARTICLE_PAGE_QUERY = defineQuery(`
     readTimeSuffix,
     imageCreditPrefix,
     shareRailLabel,
-    "shareLinks": coalesce(shareLinks[]{ _key, label, url, icon{ asset->{ url } } }, []),
-    "topAdUnit": topAdUnit->{ code, size },
-    "sidebarAdUnit": sidebarAdUnit->{ code, size },
-    "inContentAdUnit": inContentAdUnit->{ code, size }
+    "shareLinks": coalesce(shareLinks[]{ _key, label, url, icon{ asset->{ url } } }, [])
   }
 `)
 

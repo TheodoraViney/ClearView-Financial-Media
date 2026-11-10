@@ -9,6 +9,7 @@ import { Figure } from '@/components/ui/Figure'
 import { Media } from '@/components/ui/Media'
 import { Meta } from '@/components/ui/Meta'
 import type { ArticleView } from '@/lib/article'
+import { adPositionLabel } from '@/lib/gam'
 import { formatLongDate } from '@/lib/dates'
 
 import { ShareActions, ShareProvider, ShareRail } from './ArticleShare.client'
@@ -64,7 +65,7 @@ export function ArticlePage({ article }: { article: ArticleView }) {
           {/* Hidden with its spacing and landmark where the column is narrower than the 728 × 90 banner, or with no unit. */}
           <div className={cx(`@container ${PAD}`, !article.ads.top && AD_SLOT_UNSET)}>
             <div role="complementary" aria-label="Advertisement, top" className={cx('pt-6 md:pt-10', article.ads.top && AD_SLOT_FITS.leaderboard)}>
-              <AdSlot size="leaderboard" unit={article.ads.top} />
+              <AdSlot size="leaderboard" unit={article.ads.top} label={adPositionLabel('top')} />
             </div>
           </div>
 
@@ -206,8 +207,8 @@ export function ArticlePage({ article }: { article: ArticleView }) {
       >
         {/* The sidebar is already a complementary landmark: its banner gets no landmark of its own. */}
         <div className="flex flex-col gap-8 header:sticky header:top-rail">
-          <div className={cx(!article.ads.sidebar && AD_SLOT_UNSET)}>
-            <AdSlot size="mpu" unit={article.ads.sidebar} />
+          <div className={cx(!article.ads.side && AD_SLOT_UNSET)}>
+            <AdSlot size="mpu" unit={article.ads.side} label={adPositionLabel('side')} />
           </div>
           {article.mostRead && <MostRead title={article.mostRead.title} items={article.mostRead.items} />}
         </div>

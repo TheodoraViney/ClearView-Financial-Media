@@ -1,6 +1,7 @@
 import type { BrandKey } from '@/brands'
+import type { AdUnits } from '@/lib/gam'
 
-import { AdSlot } from './AdSlot'
+import { AwardsWinners } from './AwardsWinners'
 import { Cta } from './Cta'
 import { ExploreGrid } from './ExploreGrid'
 import { FeaturedStories } from './FeaturedStories'
@@ -21,17 +22,20 @@ import type { PageBlock } from './types'
 /**
  * `today` is the UK date the page query ran with (`$today`), for date-dependent lines such as the awards meta.
  * `now` is the hourly-cached ISO time that server-rendered relative dates ("2 hours ago") count from.
+ * `ads` are the brand's units for the page type, for the blocks that carry a banner of their own (Awards Winners).
  */
 export function BlockRenderer({
   blocks,
   brand,
   today,
   now,
+  ads,
 }: {
   blocks: PageBlock[] | null | undefined
   brand: BrandKey
   today: string
   now: string
+  ads: AdUnits
 }) {
   if (!blocks?.length) {
     return null
@@ -40,16 +44,26 @@ export function BlockRenderer({
   return (
     <>
       {blocks.map((block) => (
-        <Block key={block._key} block={block} brand={brand} today={today} now={now} />
+        <Block key={block._key} block={block} brand={brand} today={today} now={now} ads={ads} />
       ))}
     </>
   )
 }
 
-function Block({ block, brand, today, now }: { block: PageBlock; brand: BrandKey; today: string; now: string }) {
+function Block({
+  block,
+  brand,
+  today,
+  now,
+  ads,
+}: {
+  block: PageBlock
+  brand: BrandKey
+  today: string
+  now: string
+  ads: AdUnits
+}) {
   switch (block._type) {
-    case 'adSlot':
-      return <AdSlot block={block} brand={brand} />
     case 'cta':
       return <Cta block={block} brand={brand} />
     case 'topStories':
@@ -57,7 +71,7 @@ function Block({ block, brand, today, now }: { block: PageBlock; brand: BrandKey
     case 'sponsoredContent':
       return <SponsoredContent block={block} brand={brand} />
     case 'publications':
-      return <Publications block={block} brand={brand} />
+      return <Publications block={block} brand={brand} unit={ads.publications} />
     case 'highlights':
       return <Highlights block={block} brand={brand} today={today} />
     case 'splitLayout':
@@ -65,7 +79,7 @@ function Block({ block, brand, today, now }: { block: PageBlock; brand: BrandKey
         <SplitLayout
           block={block}
           brand={brand}
-          renderBlocks={(blocks) => <BlockRenderer blocks={blocks} brand={brand} today={today} now={now} />}
+          renderBlocks={(blocks) => <BlockRenderer blocks={blocks} brand={brand} today={today} now={now} ads={ads} />}
         />
       )
     case 'featuredStories':
@@ -87,6 +101,9 @@ function Block({ block, brand, today, now }: { block: PageBlock; brand: BrandKey
       return <ExploreGrid block={block} brand={brand} today={today} />
     case 'subscribeBanner':
       return <SubscribeBanner block={block} brand={brand} />
+    // Sidebar only.
+    case 'awardsWinners':
+      return <AwardsWinners block={block} brand={brand} unit={ads.awardsWinners} />
     default:
       return unknownBlock(block)
   }

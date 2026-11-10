@@ -26,14 +26,10 @@ export const AD_SLOT_FITS = {
 } satisfies Record<AdSlotSize, string>
 
 /**
- * A position with no ad unit picked: hidden on the live site, shown in draft mode so editors can still find and fill
+ * A position with no ad unit set: hidden on the live site, shown in draft mode so editors can still find and fill
  * it in Presentation. Put it on the element that carries the position's spacing, in place of `AD_SLOT_FITS`.
  */
 export const AD_SLOT_UNSET = 'hidden in-data-preview:block'
-
-export function isAdSlotSize(value: unknown): value is AdSlotSize {
-  return typeof value === 'string' && Object.hasOwn(SIZES, value)
-}
 
 /**
  * `group` (ClearView, the default): dashed border, transparent surface, label 13 / 14 / 16 regular, MPU centred.

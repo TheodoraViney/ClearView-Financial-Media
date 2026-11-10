@@ -40,6 +40,7 @@ import { isEditorialBrandKey } from '@/brands'
 import { ArchiveBody } from '@/components/sections/article/ArchiveBody'
 import { ArticlePage } from '@/components/sections/article/ArticlePage'
 import type { ArchiveRecord } from '@/lib/archive'
+import { toAdUnits } from '@/lib/gam'
 import { fromArchiveRecord } from '@/sanity/article-view'
 
 const args = process.argv.slice(2)
@@ -118,6 +119,8 @@ const IFRAME_HOSTS = /^https:\/\/(?:player\.vimeo\.com|www\.youtube\.com\/embed|
 
 const COPY = null
 const LOGO = { src: 'https://cdn.sanity.io/logo.svg', width: 176, height: 32 }
+// No units: the banners render as hidden reserved boxes.
+const ADS = toAdUnits(null, 'other')
 
 const started = Date.now()
 let rendered = 0
@@ -170,9 +173,10 @@ for (const [index, id] of ids.entries()) {
         mostRead: null,
         mostReadFill: [],
         copy: COPY,
+        ads: ADS,
         brand: isEditorialBrandKey(record.publications[0] ?? '') ? (record.publications[0] as 'wealthbriefing') : 'wealthbriefing',
         logo: LOGO,
-        body: <ArchiveBody html={body} videoId={record.media.videoId} title={record.title} />,
+        body: <ArchiveBody html={body} videoId={record.media.videoId} title={record.title} banner={ADS.article} />,
       })
       const html = renderToString(<ArticlePage article={article} />)
       const h1 = /<h1[^>]*>([\s\S]*?)<\/h1>/.exec(html)?.[1] ?? ''

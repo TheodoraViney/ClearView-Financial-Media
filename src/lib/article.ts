@@ -3,7 +3,7 @@ import { type ReactNode } from 'react'
 import type { MediaImage } from '@/components/ui/Media'
 
 import type { ArticlePageCopy } from './article-copy'
-import type { AdUnitView } from './gam'
+import type { AdUnits } from './gam'
 
 /*
  * The article page's props, independent of where the article comes from. A Sanity post
@@ -59,8 +59,8 @@ export type ArticleView = {
   mostRead: { title: string; items: ArticleCardView[] } | null
   /** The page's labels from the brand's "Article page" document, design texts where it is missing. */
   copy: ArticlePageCopy
-  /** The brand's banner units from its "Article page" document; null hides that banner on the live site. */
-  ads: { top: AdUnitView | null; sidebar: AdUnitView | null }
+  /** The brand's Top and Side banner units from Brand settings; null hides that banner on the live site. */
+  ads: Pick<AdUnits, 'top' | 'side'>
 }
 
 const WORDS_PER_MINUTE = 200

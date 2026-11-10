@@ -2,6 +2,7 @@ import { stegaClean } from 'next-sanity'
 
 import { brandOrigin, EDITORIAL_BRAND_KEYS, isBrandKey } from '@/brands'
 import { Publications as PublicationsSection, type PublicationCard } from '@/components/sections/Publications'
+import type { AdUnitView } from '@/lib/gam'
 import { brandTitle } from '@/sanity/brand-title'
 import { toHeading } from '@/sanity/heading'
 import { toImage } from '@/sanity/image'
@@ -36,11 +37,20 @@ function toCard(card: Card): PublicationCard | null {
   }
 }
 
-export function Publications({ block }: BlockProps<'publications'>) {
+/** `unit` is the brand's "Banner after Publications" unit, shown under the cards. */
+export function Publications({ block, brand, unit }: BlockProps<'publications'> & { unit: AdUnitView | null }) {
   const cards = (block.cards ?? []).map(toCard).filter((card): card is PublicationCard => card !== null)
 
   // The design sets this heading as the page H1.
   const heading = toHeading(block.heading)
 
-  return <PublicationsSection heading={heading} body={block.body ?? undefined} cards={cards} />
+  return (
+    <PublicationsSection
+      heading={heading}
+      body={block.body ?? undefined}
+      cards={cards}
+      banner={unit}
+      look={brand === 'clearview' ? 'group' : 'publication'}
+    />
+  )
 }
