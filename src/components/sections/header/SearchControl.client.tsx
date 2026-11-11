@@ -5,13 +5,11 @@ import { useEffect, useId, useRef, useState, type FormEvent, type KeyboardEvent 
 
 import { cx } from '@/components/ui/cx'
 import { IconButton } from '@/components/ui/IconButton'
+import { SEARCH_PATH } from '@/lib/search-page'
 
 import { HEADER_DESKTOP_QUERY, useHeaderState } from './HeaderState.client'
 import { SearchSuggestions } from './SearchSuggestions.client'
 import type { SearchLabels } from './types'
-
-/** Results page. Not built yet: the form points at the final URL and 404s until it exists. */
-const SEARCH_PATH = '/search'
 
 // Per layout: the button and field size (ClearView shrinks to 32px from the header breakpoint)
 // and the button hover (ClearView fades on desktop, everything else takes the brand tint).

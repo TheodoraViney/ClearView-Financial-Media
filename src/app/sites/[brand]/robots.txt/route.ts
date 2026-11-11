@@ -1,8 +1,9 @@
 import { brandOrigin, isBrandKey, isEditorialBrandKey } from '@/brands'
 
 /**
- * `/robots.txt` per brand. Production lets crawlers in and names the archive
- * sitemap on the editorial brands; ClearView has no archive. Every other
+ * `/robots.txt` per brand. Production lets crawlers in, except into the search
+ * results page (also noindex), and names the archive sitemap on the editorial
+ * brands; ClearView has no archive. Every other
  * environment (staging, previews, local) shuts crawlers out, so a vercel.app
  * host never competes with the live domain.
  */
@@ -19,6 +20,7 @@ export async function GET(_request: Request, { params }: RouteContext<'/sites/[b
           'User-agent: *',
           'Disallow: /api/',
           'Disallow: /studio',
+          'Disallow: /search',
           ...(isEditorialBrandKey(brand) ? ['', `Sitemap: ${brandOrigin(brand)}/archive/sitemap/index.xml`] : []),
         ]
       : ['User-agent: *', 'Disallow: /']
