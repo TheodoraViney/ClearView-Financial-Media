@@ -5,7 +5,6 @@ import {
   ARTICLE_BODY,
   ARTICLE_CARD,
   BLOCKS_PROJECTION,
-  BRAND_TITLES,
   IMAGE,
   LINK,
   LINK_TARGET,
@@ -338,51 +337,38 @@ export const NEWSLETTER_LATEST_POST_IDS_QUERY = defineQuery(`
   ] | order(publishedAt desc)[0...20]._id
 `)
 
-// Header search suggestions, read by searchSite in src/lib/search.ts. Titles only (posts: title and excerpt, the title
-// weighted 3x), never body text. $q is the user's term as a GROQ param, never interpolated, with a trailing `*` so the last
-// word matches as a prefix. $brands is the editorial keys on ClearView and the current brand elsewhere; the shared group
-// records have no brand field and show on every host. Undated records sort after dated ones (GROQ puts null first in
-// desc).
-export const SITE_SEARCH_QUERY = defineQuery(`
-  {
-    "posts": *[
-      _type == "post"
-      && defined(slug.current)
-      && count(brands[@ in $brands]) > 0
-      && (title match $q || excerpt match $q)
-    ] | score(boost(title match $q, 3), excerpt match $q)
-      | order(_score desc, defined(publishedAt) desc, publishedAt desc)[0...5]{
-        title,
-        "slug": slug.current,
-        brands,
-        ${BRAND_TITLES},
-        publishedAt
-      },
-    "events": *[_type == "conferenceEvent" && defined(slug.current) && title match $q]
-      | score(title match $q)
-      | order(_score desc, defined(startDate) desc, startDate desc)[0...3]{
-        title,
-        "slug": slug.current,
-        startDate,
-        endDate,
-        hideDateTime
-      },
-    "awards": *[_type == "awardsProgramme" && defined(slug.current) && title match $q]
-      | score(title match $q)
-      | order(_score desc, defined(startDate) desc, startDate desc)[0...3]{
-        title,
-        "slug": slug.current,
-        startDate,
-        endDate,
-        hideDateTime
-      },
-    "resources": *[_type == "resource" && defined(slug.current) && title match $q]
-      | score(title match $q)
-      | order(_score desc, defined(publishedAt) desc, publishedAt desc)[0...3]{
-        title,
-        "slug": slug.current,
-        publishedAt
-      }
+// The CMS side of the Algolia index (src/lib/search-index.ts): every published post, conference event, awards edition
+// and resource with a slug, flattened to what cmsSearchRecord needs. Bodies come as plain text; the record keeps a
+// short extract of it.
+const SEARCH_RECORD_PROJECTION = `
+  _id,
+  _type,
+  title,
+  "slug": slug.current,
+  brands,
+  excerpt,
+  "author": author->name,
+  "category": category->title,
+  "bodyText": select(
+    _type == "post" => pt::text(content),
+    _type == "resource" => pt::text(body)
+  ),
+  publishedAt,
+  startDate,
+  endDate,
+  hideDateTime
+`
+
+export const SEARCH_RECORDS_QUERY = defineQuery(`
+  *[_type in ["post", "conferenceEvent", "awardsProgramme", "resource"] && defined(slug.current)]{
+    ${SEARCH_RECORD_PROJECTION}
+  }
+`)
+
+// The same records for a set of ids, for the publish webhook. An id that is not returned was unpublished or deleted.
+export const SEARCH_RECORDS_BY_ID_QUERY = defineQuery(`
+  *[_id in $ids && _type in ["post", "conferenceEvent", "awardsProgramme", "resource"] && defined(slug.current)]{
+    ${SEARCH_RECORD_PROJECTION}
   }
 `)
 

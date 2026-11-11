@@ -23283,39 +23283,136 @@ export type NEWSLETTER_ARTICLES_PER_ISSUE_QUERY_RESULT = number | null;
 export type NEWSLETTER_LATEST_POST_IDS_QUERY_RESULT = Array<string>;
 
 // Source: src/sanity/queries.ts
-// Variable: SITE_SEARCH_QUERY
-// Query: {    "posts": *[      _type == "post"      && defined(slug.current)      && count(brands[@ in $brands]) > 0      && (title match $q || excerpt match $q)    ] | score(boost(title match $q, 3), excerpt match $q)      | order(_score desc, defined(publishedAt) desc, publishedAt desc)[0...5]{        title,        "slug": slug.current,        brands,          "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title },        publishedAt      },    "events": *[_type == "conferenceEvent" && defined(slug.current) && title match $q]      | score(title match $q)      | order(_score desc, defined(startDate) desc, startDate desc)[0...3]{        title,        "slug": slug.current,        startDate,        endDate,        hideDateTime      },    "awards": *[_type == "awardsProgramme" && defined(slug.current) && title match $q]      | score(title match $q)      | order(_score desc, defined(startDate) desc, startDate desc)[0...3]{        title,        "slug": slug.current,        startDate,        endDate,        hideDateTime      },    "resources": *[_type == "resource" && defined(slug.current) && title match $q]      | score(title match $q)      | order(_score desc, defined(publishedAt) desc, publishedAt desc)[0...3]{        title,        "slug": slug.current,        publishedAt      }  }
-export type SITE_SEARCH_QUERY_RESULT = {
-  posts: Array<{
-    title: string | null;
-    slug: string | null;
-    brands: Array<string> | null;
-    brandTitles: Array<{
-      key: string | null;
+// Variable: SEARCH_RECORDS_QUERY
+// Query: *[_type in ["post", "conferenceEvent", "awardsProgramme", "resource"] && defined(slug.current)]{      _id,  _type,  title,  "slug": slug.current,  brands,  excerpt,  "author": author->name,  "category": category->title,  "bodyText": select(    _type == "post" => pt::text(content),    _type == "resource" => pt::text(body)  ),  publishedAt,  startDate,  endDate,  hideDateTime  }
+export type SEARCH_RECORDS_QUERY_RESULT = Array<
+  | {
+      _id: string;
+      _type: "awardsProgramme";
       title: string | null;
-    }>;
-    publishedAt: string | null;
-  }>;
-  events: Array<{
-    title: string | null;
-    slug: string | null;
-    startDate: string | null;
-    endDate: string | null;
-    hideDateTime: boolean | null;
-  }>;
-  awards: Array<{
-    title: string | null;
-    slug: string | null;
-    startDate: string | null;
-    endDate: string | null;
-    hideDateTime: boolean | null;
-  }>;
-  resources: Array<{
-    title: string | null;
-    slug: string | null;
-    publishedAt: string | null;
-  }>;
-};
+      slug: string | null;
+      brands: null;
+      excerpt: null;
+      author: null;
+      category: null;
+      bodyText: null;
+      publishedAt: null;
+      startDate: string | null;
+      endDate: string | null;
+      hideDateTime: boolean | null;
+    }
+  | {
+      _id: string;
+      _type: "conferenceEvent";
+      title: string | null;
+      slug: string | null;
+      brands: null;
+      excerpt: null;
+      author: null;
+      category: null;
+      bodyText: null;
+      publishedAt: null;
+      startDate: string | null;
+      endDate: string | null;
+      hideDateTime: boolean | null;
+    }
+  | {
+      _id: string;
+      _type: "post";
+      title: string | null;
+      slug: string | null;
+      brands: Array<string> | null;
+      excerpt: string | null;
+      author: string | null;
+      category: string | null;
+      bodyText: string;
+      publishedAt: string | null;
+      startDate: null;
+      endDate: null;
+      hideDateTime: null;
+    }
+  | {
+      _id: string;
+      _type: "resource";
+      title: string | null;
+      slug: string | null;
+      brands: null;
+      excerpt: null;
+      author: null;
+      category: null;
+      bodyText: string;
+      publishedAt: string | null;
+      startDate: null;
+      endDate: null;
+      hideDateTime: null;
+    }
+>;
+
+// Source: src/sanity/queries.ts
+// Variable: SEARCH_RECORDS_BY_ID_QUERY
+// Query: *[_id in $ids && _type in ["post", "conferenceEvent", "awardsProgramme", "resource"] && defined(slug.current)]{      _id,  _type,  title,  "slug": slug.current,  brands,  excerpt,  "author": author->name,  "category": category->title,  "bodyText": select(    _type == "post" => pt::text(content),    _type == "resource" => pt::text(body)  ),  publishedAt,  startDate,  endDate,  hideDateTime  }
+export type SEARCH_RECORDS_BY_ID_QUERY_RESULT = Array<
+  | {
+      _id: string;
+      _type: "awardsProgramme";
+      title: string | null;
+      slug: string | null;
+      brands: null;
+      excerpt: null;
+      author: null;
+      category: null;
+      bodyText: null;
+      publishedAt: null;
+      startDate: string | null;
+      endDate: string | null;
+      hideDateTime: boolean | null;
+    }
+  | {
+      _id: string;
+      _type: "conferenceEvent";
+      title: string | null;
+      slug: string | null;
+      brands: null;
+      excerpt: null;
+      author: null;
+      category: null;
+      bodyText: null;
+      publishedAt: null;
+      startDate: string | null;
+      endDate: string | null;
+      hideDateTime: boolean | null;
+    }
+  | {
+      _id: string;
+      _type: "post";
+      title: string | null;
+      slug: string | null;
+      brands: Array<string> | null;
+      excerpt: string | null;
+      author: string | null;
+      category: string | null;
+      bodyText: string;
+      publishedAt: string | null;
+      startDate: null;
+      endDate: null;
+      hideDateTime: null;
+    }
+  | {
+      _id: string;
+      _type: "resource";
+      title: string | null;
+      slug: string | null;
+      brands: null;
+      excerpt: null;
+      author: null;
+      category: null;
+      bodyText: string;
+      publishedAt: string | null;
+      startDate: null;
+      endDate: null;
+      hideDateTime: null;
+    }
+>;
 
 // Source: src/sanity/queries.ts
 // Variable: SUBSCRIBE_CONFIG_QUERY
@@ -23356,7 +23453,8 @@ declare global {
     '\n  *[_type == "newsletterIssue" && _id in [$id, $draftId]]._id\n': NEWSLETTER_ISSUE_EXISTING_IDS_QUERY_RESULT;
     '\n  *[_type == "brand" && _id == $brandId && key.current == $brand][0].newsletter.articlesPerIssue\n': NEWSLETTER_ARTICLES_PER_ISSUE_QUERY_RESULT;
     '\n  *[\n    _type == "post"\n    && $brand in brands\n    && defined(publishedAt)\n    && dateTime(publishedAt) <= dateTime(now())\n  ] | order(publishedAt desc)[0...20]._id\n': NEWSLETTER_LATEST_POST_IDS_QUERY_RESULT;
-    '\n  {\n    "posts": *[\n      _type == "post"\n      && defined(slug.current)\n      && count(brands[@ in $brands]) > 0\n      && (title match $q || excerpt match $q)\n    ] | score(boost(title match $q, 3), excerpt match $q)\n      | order(_score desc, defined(publishedAt) desc, publishedAt desc)[0...5]{\n        title,\n        "slug": slug.current,\n        brands,\n        \n  "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title }\n,\n        publishedAt\n      },\n    "events": *[_type == "conferenceEvent" && defined(slug.current) && title match $q]\n      | score(title match $q)\n      | order(_score desc, defined(startDate) desc, startDate desc)[0...3]{\n        title,\n        "slug": slug.current,\n        startDate,\n        endDate,\n        hideDateTime\n      },\n    "awards": *[_type == "awardsProgramme" && defined(slug.current) && title match $q]\n      | score(title match $q)\n      | order(_score desc, defined(startDate) desc, startDate desc)[0...3]{\n        title,\n        "slug": slug.current,\n        startDate,\n        endDate,\n        hideDateTime\n      },\n    "resources": *[_type == "resource" && defined(slug.current) && title match $q]\n      | score(title match $q)\n      | order(_score desc, defined(publishedAt) desc, publishedAt desc)[0...3]{\n        title,\n        "slug": slug.current,\n        publishedAt\n      }\n  }\n': SITE_SEARCH_QUERY_RESULT;
+    '\n  *[_type in ["post", "conferenceEvent", "awardsProgramme", "resource"] && defined(slug.current)]{\n    \n  _id,\n  _type,\n  title,\n  "slug": slug.current,\n  brands,\n  excerpt,\n  "author": author->name,\n  "category": category->title,\n  "bodyText": select(\n    _type == "post" => pt::text(content),\n    _type == "resource" => pt::text(body)\n  ),\n  publishedAt,\n  startDate,\n  endDate,\n  hideDateTime\n\n  }\n': SEARCH_RECORDS_QUERY_RESULT;
+    '\n  *[_id in $ids && _type in ["post", "conferenceEvent", "awardsProgramme", "resource"] && defined(slug.current)]{\n    \n  _id,\n  _type,\n  title,\n  "slug": slug.current,\n  brands,\n  excerpt,\n  "author": author->name,\n  "category": category->title,\n  "bodyText": select(\n    _type == "post" => pt::text(content),\n    _type == "resource" => pt::text(body)\n  ),\n  publishedAt,\n  startDate,\n  endDate,\n  hideDateTime\n\n  }\n': SEARCH_RECORDS_BY_ID_QUERY_RESULT;
     '\n  {\n    "modal": *[_id == $subscribeModalId && _type == "subscribeModal"][0]{\n      interests[]{ _key, "attribute": attribute.name, locked }\n    },\n    "settings": *[_id == $subscribeSettingsId && _type == "subscribeFormSettings"][0]{\n      "listId": list.id,\n      "templateId": confirmationTemplate.id\n    }\n  }\n': SUBSCRIBE_CONFIG_QUERY_RESULT;
   }
 }
