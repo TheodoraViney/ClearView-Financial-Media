@@ -54,6 +54,13 @@ export type ArchiveRecord = {
   /** Type label per brand, such as "Breaking News". */
   types: Record<string, string>
   author: { name: string | null; jobTitle: string | null; location: string | null; [key: string]: unknown } | null
+  /** Legacy taxonomy. Shown only in search results until the client approves a mapping to CMS categories. */
+  taxonomy?: {
+    categories?: string[] | null
+    region?: string | null
+    country?: string | null
+    [key: string]: unknown
+  } | null
   media: {
     /** `/archive-media/...` or an external https URL. */
     image: string | null
