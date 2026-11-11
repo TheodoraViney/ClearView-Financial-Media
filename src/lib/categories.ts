@@ -1,8 +1,29 @@
 import type { HeadingValue } from '@/sanity/heading'
 
 import type { ArticleCardView, ArticleLink } from './article'
-import type { CategoriesLabels } from './categories-copy'
 import type { AdUnits } from './gam'
+
+/** The Categories page is the page with this slug, one per editorial brand (`page-categories-{brand}`). */
+export const CATEGORIES_PAGE_SLUG = 'categories'
+
+/** The list labels on the Categories page. All are required there, so the page renders them as the CMS holds them. */
+export const CATEGORIES_LABEL_KEYS = [
+  'topicsLabel',
+  'allTopicsLabel',
+  'regionsLabel',
+  'allRegionsLabel',
+  'sortLabel',
+  'sortLatestLabel',
+  'sortOldestLabel',
+  'selectedLabel',
+  'clearFiltersLabel',
+  'emptyStateText',
+  'readArticleLabel',
+  'previousLabel',
+  'nextLabel',
+] as const
+
+export type CategoriesLabels = Record<(typeof CATEGORIES_LABEL_KEYS)[number], string>
 
 /*
  * The Categories page (the articles list) and its URL state, shared by the server page and the filter controls.

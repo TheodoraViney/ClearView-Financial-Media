@@ -1,13 +1,7 @@
 import { defineArrayMember, defineField, defineType } from 'sanity'
 
 import { BRAND_KEYS, BRANDS } from '@/brands'
-import {
-  CATEGORIES_INTRO_DEFAULT,
-  CATEGORIES_LABEL_DEFAULTS,
-  CATEGORIES_PAGE_SLUG,
-  CATEGORIES_RELATED_HEADING_DEFAULT,
-  type CategoriesLabels,
-} from '@/lib/categories-copy'
+import { CATEGORIES_PAGE_SLUG, type CategoriesLabels } from '@/lib/categories'
 
 import { pageBlocksField } from '../blocks'
 import { headingField } from '../fields'
@@ -31,13 +25,13 @@ const requiredOnCategories = (value: unknown, context: { document?: unknown }) =
     ? true
     : 'Required'
 
-const label = (name: keyof CategoriesLabels, title: string, description: string) =>
+const label = (name: keyof CategoriesLabels, title: string, description: string, initialValue: string) =>
   defineField({
     name,
     title,
     type: 'string',
     description,
-    initialValue: CATEGORIES_LABEL_DEFAULTS[name],
+    initialValue,
     validation: (Rule) => Rule.custom(requiredOnCategories),
   })
 
@@ -106,7 +100,7 @@ export const page = defineType({
       rows: 3,
       description: 'Shown under the title.',
       hidden: notCategories,
-      initialValue: CATEGORIES_INTRO_DEFAULT,
+      initialValue: 'Explore the latest wealth-management news, analysis, interviews, research and industry insights.',
       validation: (Rule) => Rule.custom(requiredOnCategories),
     }),
     defineField({
@@ -116,19 +110,19 @@ export const page = defineType({
       hidden: notCategories,
       options: { collapsible: true, collapsed: true },
       fields: [
-        label('topicsLabel', 'Topics filter label', 'Above the topics filter.'),
-        label('allTopicsLabel', 'All topics option', 'Topics filter text when nothing is selected, and its first option.'),
-        label('regionsLabel', 'Region filter label', 'Above the region filter.'),
-        label('allRegionsLabel', 'All regions option', 'Region filter text when nothing is selected, and its first option.'),
-        label('sortLabel', 'Sort label', 'Above the date sort.'),
-        label('sortLatestLabel', 'Latest first option', 'Date sort option, the default.'),
-        label('sortOldestLabel', 'Oldest first option', 'Date sort option.'),
-        label('selectedLabel', 'Selected count suffix', 'Follows the number when two or more options are chosen, for example "3 selected".'),
-        label('clearFiltersLabel', 'Clear filters button', 'In the open filter and in the empty state.'),
-        label('emptyStateText', 'Empty state text', 'Shown when no article matches the filters.'),
-        label('readArticleLabel', 'Read article link', 'On the featured story and on every card.'),
-        label('previousLabel', 'Previous page button', 'Pagination.'),
-        label('nextLabel', 'Next page button', 'Pagination.'),
+        label('topicsLabel', 'Topics filter label', 'Above the topics filter.', 'Topics'),
+        label('allTopicsLabel', 'All topics option', 'Topics filter text when nothing is selected, and its first option.', 'All topics'),
+        label('regionsLabel', 'Region filter label', 'Above the region filter.', 'Geographical focus'),
+        label('allRegionsLabel', 'All regions option', 'Region filter text when nothing is selected, and its first option.', 'All regions'),
+        label('sortLabel', 'Sort label', 'Above the date sort.', 'Date sort'),
+        label('sortLatestLabel', 'Latest first option', 'Date sort option, the default.', 'Latest first'),
+        label('sortOldestLabel', 'Oldest first option', 'Date sort option.', 'Oldest first'),
+        label('selectedLabel', 'Selected count suffix', 'Follows the number when two or more options are chosen, for example "3 selected".', 'selected'),
+        label('clearFiltersLabel', 'Clear filters button', 'In the open filter and in the empty state.', 'Clear filters'),
+        label('emptyStateText', 'Empty state text', 'Shown when no article matches the filters.', 'No articles match the selected filters.'),
+        label('readArticleLabel', 'Read article link', 'On the featured story and on every card.', 'Read article'),
+        label('previousLabel', 'Previous page button', 'Pagination.', 'Previous'),
+        label('nextLabel', 'Next page button', 'Pagination.', 'Next'),
       ],
     }),
     defineField({
@@ -140,7 +134,7 @@ export const page = defineType({
       fields: [
         headingField('heading', {
           defaultLevel: 'h2',
-          initialText: CATEGORIES_RELATED_HEADING_DEFAULT,
+          initialText: 'Explore related topics',
           requiredWhen: ({ document }) => isCategories(document),
         }),
         defineField({

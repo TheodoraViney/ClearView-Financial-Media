@@ -1,8 +1,9 @@
 import { stegaClean, type StegaBranded } from 'next-sanity'
 
 import { isBrandKey, type EditorialBrandKey } from '@/brands'
-import { ARTICLE_PAGE_COPY_DEFAULTS } from '@/lib/article-copy'
 import {
+  CATEGORIES_LABEL_KEYS,
+  type CategoriesLabels,
   CATEGORIES_PATH,
   categoryHref,
   clearFiltersHref,
@@ -18,7 +19,6 @@ import {
   type CategoriesState,
   type CategoriesView,
 } from '@/lib/categories'
-import { CATEGORIES_INTRO_DEFAULT, CATEGORIES_LABEL_DEFAULTS, type CategoriesLabels } from '@/lib/categories-copy'
 import type { AdUnits } from '@/lib/gam'
 import { resolveHref } from '@/lib/links'
 
@@ -63,7 +63,7 @@ type Filters = ReturnType<typeof resolveCategoriesFilters>
  */
 export function categoriesHeading(page: NonNullable<PageData['page']>, filters: Pick<Filters, 'category' | 'topic'>) {
   const term = filters.category ?? filters.topic
-  const intro = page.intro || CATEGORIES_INTRO_DEFAULT
+  const intro = page.intro
 
   return term?.title
     ? { title: term.title, intro: term.description || intro, term: true }
@@ -71,9 +71,7 @@ export function categoriesHeading(page: NonNullable<PageData['page']>, filters: 
 }
 
 function toLabels(labels: NonNullable<PageData['page']>['listLabels']): CategoriesLabels {
-  const keys = Object.keys(CATEGORIES_LABEL_DEFAULTS) as (keyof CategoriesLabels)[]
-
-  return Object.fromEntries(keys.map((key) => [key, labels?.[key] || CATEGORIES_LABEL_DEFAULTS[key]])) as CategoriesLabels
+  return Object.fromEntries(CATEGORIES_LABEL_KEYS.map((key) => [key, labels?.[key] ?? ''])) as CategoriesLabels
 }
 
 function toCard(item: ListItem, brand: EditorialBrandKey): CategoriesCardView | null {
@@ -141,7 +139,7 @@ export function toCategoriesView({
     title: heading.title,
     intro: heading.intro,
     breadcrumb: [
-      { label: data.homeLabel || ARTICLE_PAGE_COPY_DEFAULTS.breadcrumbHomeLabel, href: '/' },
+      { label: data.homeLabel ?? '', href: '/' },
       ...(heading.term ? [{ label: pageTitle, href: CATEGORIES_PATH }, { label: heading.title }] : [{ label: pageTitle }]),
     ],
     labels: toLabels(page.listLabels),

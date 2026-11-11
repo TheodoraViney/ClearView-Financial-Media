@@ -2,7 +2,7 @@ import Form from 'next/form'
 
 import { Button } from '@/components/ui/Button'
 import { Dropdown } from '@/components/ui/Dropdown'
-import type { CategoriesLabels } from '@/lib/categories-copy'
+import type { CategoriesLabels } from '@/lib/categories'
 import { CATEGORIES_PATH, categoriesHref, type CategoriesView } from '@/lib/categories'
 
 /**
