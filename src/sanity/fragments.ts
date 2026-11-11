@@ -28,7 +28,7 @@ export const ADVERTISING = /* groq */ `
     side{ home, other },
     publications{ home, other },
     article{ other },
-    banner3{ home },
+    banner3{ home, other },
     banner4{ home },
     awardsWinners{ home, other }
   }
@@ -110,6 +110,13 @@ export const ARTICLE_CARD = /* groq */ `
   publishedAt,
   "image": image{ ${IMAGE} },
   "topic": primaryTopic->{ title, "slug": slug.current }
+`
+
+/** A post in the Categories page list: the article card plus its category (the card label) and standfirst (the featured story). */
+export const LISTING_CARD = /* groq */ `
+  ${ARTICLE_CARD},
+  excerpt,
+  "category": category->{ title, "slug": slug.current }
 `
 
 const CTA = /* groq */ `

@@ -197,8 +197,11 @@ main :where(*) {
   --container-article: 54rem;
   /* Article infographic: from 560px the wide SVG variant shows, below it the narrow one */
   --container-infographic: 35rem;
-  /* A 728 × 90 banner box: in a narrower container it is hidden, as the legacy sites hide the leaderboard on phones */
-  --container-leaderboard: 45.5rem;
+  /*
+   * The narrowest leaderboard box: 468px, its 468 × 60 fallback size (src/lib/gam.ts). Between 468 and 727 the box
+   * requests 468 × 60; in a narrower container it is hidden, as the legacy sites hide the leaderboard on phones.
+   */
+  --container-leaderboard: 29.25rem;
 
   /* ClearView footer brand column basis on desktop (410.667px in the clearview-footer master) */
   --spacing-footer-brand: 25.6667rem;
@@ -233,6 +236,13 @@ main :where(*) {
 
   /* Active publication nav item: 2px bar drawn inside the bottom edge, in the text colour */
   --inset-shadow-bar: inset 0 -2px 0 currentColor;
+
+  /* Categories page featured story headline, 28/32 on every breakpoint */
+  --text-title-2xl: 1.75rem;
+  --text-title-2xl--line-height: 2rem;
+
+  /* Dropdown panel (Categories filters, shared-shell select-dropdown) */
+  --shadow-dropdown: 0 12px 24px -12px rgb(31 43 50 / 0.18), 0 2px 4px rgb(31 43 50 / 0.04);
 }
 
 /* Tokens that resolve per brand or per breakpoint at the element */
@@ -400,6 +410,25 @@ main :where(*) {
   background-color: currentColor;
   mask: var(--icon) center / contain no-repeat;
 }
+
+/*
+ * Dropdown panel (ui/Dropdown): opacity 180ms ease-out, the rise and scale 220ms ease-smooth, as select-dropdown.
+ * Visibility flips at the end of the close (220ms), so the fade plays and the closed panel leaves the tab order;
+ * the open state adds `delay-0` so it shows at once.
+ */
+@utility transition-dropdown {
+  transition-property: opacity, translate, scale, visibility;
+  transition-duration: 180ms, 220ms, 220ms, 0s;
+  transition-timing-function: var(--ease-out), var(--ease-smooth), var(--ease-smooth), linear;
+  transition-delay: 0s, 0s, 0s, 220ms;
+
+  @media (prefers-reduced-motion: reduce) {
+    transition-delay: 0s;
+  }
+}
+
+/* The page runs without JavaScript: progressive-enhancement fallbacks (Categories filters show their panels and a submit button) */
+@custom-variant noscript (@media (scripting: none));
 
 /* The current page's nav link (aria-current="page") */
 @custom-variant current (&[aria-current='page']);

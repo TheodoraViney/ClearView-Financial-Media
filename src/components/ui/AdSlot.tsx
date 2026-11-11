@@ -15,8 +15,8 @@ const SIZES = {
 export type AdSlotSize = keyof typeof SIZES
 
 /**
- * Hides a 728 × 90 position where its container is narrower than the banner (phones, small tablets), as the legacy
- * sites do. A container query, so it holds from the first paint and nothing shifts. Put it on the element that also
+ * Hides a 728 × 90 position where its container is narrower than its 468 × 60 fallback (phones), as the legacy sites
+ * do; between 468 and 727 the box stays and requests 468 × 60 (`adSizes` in src/lib/gam.ts). A container query, so it holds from the first paint and nothing shifts. Put it on the element that also
  * carries the position's vertical spacing, inside an `@container` whose content box is the box's width.
  */
 export const AD_SLOT_FITS = {

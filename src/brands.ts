@@ -33,6 +33,9 @@ export const mostReadDocumentId = (key: EditorialBrandKey): string => `most-read
 /** Id of an editorial brand's "Article page" document: the article template's labels. */
 export const articlePageDocumentId = (key: EditorialBrandKey): string => `article-page-${key}`
 
+/** Id of an editorial brand's Categories page (the articles list): the page document with the slug "categories". */
+export const categoriesPageDocumentId = (key: EditorialBrandKey): string => `page-categories-${key}`
+
 /** Id of a brand's subscribe pop-up document: its copy and interests. One per brand, ClearView included. */
 export const subscribeModalDocumentId = (key: BrandKey): string => `subscribe-modal-${key}`
 

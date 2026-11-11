@@ -2,6 +2,7 @@ import Link from 'next/link'
 import { type ReactNode } from 'react'
 
 import { cx } from './cx'
+import { Icon } from './Icon'
 import { Meta } from './Meta'
 import { EASE, type Motion } from './motion'
 
@@ -10,6 +11,9 @@ const VARIANTS = {
   inverse: { text: 'text-white', hover: 'hover:opacity-75' },
   // Brand-coloured hover (article Most read).
   accent: { text: 'text-foreground', hover: 'hover:text-accent' },
+  // Full-width row: title and a chevron on the right, bottom rule, accent hover, no meta (shared-shell category-item:
+  // Categories "Explore related topics"). The parent's grid hides the last row's rule.
+  row: { text: 'text-foreground', hover: 'hover:text-accent' },
 }
 
 // Title plus meta line, used in the awards, events and research lists.
@@ -18,7 +22,7 @@ const VARIANTS = {
 export function ListLink({
   href,
   title,
-  meta,
+  meta = [],
   variant = 'default',
   motion = 'smooth',
   metaClassName,
@@ -26,16 +30,31 @@ export function ListLink({
 }: {
   href?: string | null
   title: string
-  meta: ReactNode[]
+  /** Not shown by `row`. */
+  meta?: ReactNode[]
   variant?: keyof typeof VARIANTS
   motion?: Motion
   // Extra classes for the meta line, e.g. `leading-none` where the design sets it 13/13 (Explore cards).
   metaClassName?: string
   className?: string
 }) {
-  const classes = cx('flex flex-col gap-2', VARIANTS[variant].text, href && VARIANTS[variant].hover, className)
+  const row = variant === 'row'
+  const classes = cx(
+    row
+      ? // 56px minimum; the keyboard outline sits inside the row, because the parent list clips its last rule.
+        'flex min-h-14 items-center justify-between gap-3 border-b border-border py-4 focus-visible:-outline-offset-2'
+      : 'flex flex-col gap-2',
+    VARIANTS[variant].text,
+    href && VARIANTS[variant].hover,
+    className,
+  )
 
-  const content = (
+  const content = row ? (
+    <>
+      <span className="min-w-0 text-base leading-title font-medium">{title}</span>
+      <Icon name="chevron-right" />
+    </>
+  ) : (
     <>
       <span className="text-base leading-title font-medium">{title}</span>
       {meta.length > 0 && (

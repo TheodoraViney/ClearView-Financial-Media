@@ -17,6 +17,7 @@ import {
   type ArticleView,
 } from '@/lib/article'
 import { archiveCanonicalUrl, archivePlainText, type ArchiveRecord } from '@/lib/archive'
+import { categoryHref, topicHref } from '@/lib/categories'
 import type { AdUnits } from '@/lib/gam'
 import { absolutePostUrl, resolveHref } from '@/lib/links'
 import { shareHref } from '@/lib/share-links'
@@ -34,9 +35,12 @@ type Body = NonNullable<Post['content']>
 
 const RECOMMENDED_COUNT = 3
 
-// Listing pages filter by these query parameters (one articles page, categories and topics as filters).
-const listingHref = (filter: 'category' | 'topic', slug: string | null) =>
-  slug ? `/articles?${filter}=${encodeURIComponent(stegaClean(slug))}` : null
+// The Categories page (the articles list) filtered by the category or the topic.
+const listingHref = (filter: 'category' | 'topic', slug: string | null) => {
+  const clean = stegaClean(slug)
+
+  return clean ? (filter === 'category' ? categoryHref(clean) : topicHref(clean)) : null
+}
 
 function toLink(term: { title: string | null; slug: string | null } | null, filter: 'category' | 'topic'): ArticleLink | null {
   return term?.title ? { label: term.title, href: listingHref(filter, term.slug) } : null
@@ -192,7 +196,8 @@ export function fromPost({
   }
 }
 
-function toMostRead(
+/** Most read as the right rail shows it, or null when no post fills it. `currentId` is the post being read, if any. */
+export function toMostRead(
   currentId: string | null,
   mostRead: MostRead,
   fill: StegaBranded<MostReadAutoFill>,

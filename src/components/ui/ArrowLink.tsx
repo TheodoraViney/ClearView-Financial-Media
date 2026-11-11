@@ -15,9 +15,12 @@ const VARIANTS = {
 // `fade`: the whole link fades to 60% over 180ms ease-out and the chevron stays still. The 44px target applies on
 // every breakpoint and its overhang is taken back with negative vertical margins (44 - 14 = 30, 15 each side), so the
 // row it sits in keeps the text height (sponsored content header and company profile link).
+// `static`: no hover of its own and no touch target, for the label inside a whole-card link (the card is the target
+// and carries the hover); use it without `href`.
 const HOVERS = {
-  shift: 'lg:min-h-0',
-  fade: '-my-3.75 transition-opacity duration-180 ease-out hover:opacity-60',
+  shift: 'min-h-11 lg:min-h-0',
+  fade: 'min-h-11 -my-3.75 transition-opacity duration-180 ease-out hover:opacity-60',
+  static: '',
 }
 
 // Renders as a span when the whole card is already the link.
@@ -42,7 +45,7 @@ export function ArrowLink({
 }) {
   const shift = hover === 'shift'
   const classes = cx(
-    'group inline-flex min-h-11 items-center gap-2 self-start text-sm leading-none whitespace-nowrap',
+    'group inline-flex items-center gap-2 self-start text-sm leading-none whitespace-nowrap',
     HOVERS[hover],
     VARIANTS[variant].base,
     shift && hoverColor && VARIANTS[variant].hover,

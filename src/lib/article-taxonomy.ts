@@ -6,6 +6,3 @@
 
 /** Seeded categories have the fixed id `category-{slug}`. Editor-made ones get generated ids. */
 export const categoryDocumentId = (slug: string): string => `category-${slug}`
-
-/** The post's region field applies only to this category. */
-export const PEOPLE_MOVES_CATEGORY_ID = categoryDocumentId('people-moves')

@@ -116,8 +116,9 @@ function pageType(pathname: string): string {
 
 /**
  * The ad inside a reserved banner box. Covers the box (and the editor-only label) once a creative fills it. Requests
- * nothing when the box is smaller than the creative or hidden (`AD_SLOT_FITS` hides a 728 × 90 box where it does not
- * fit); the box keeps its size either way, so nothing shifts.
+ * the largest of the unit's sizes the box fits (a leaderboard box under 728px wide asks for 468 × 60), measured once
+ * when the slot registers; nothing when no size fits or the box is hidden (`AD_SLOT_FITS` hides a leaderboard box under
+ * 468px). The box keeps its size either way, so nothing shifts.
  */
 export function AdFill({ unit }: { unit: AdUnitView }) {
   const ref = useRef<HTMLDivElement>(null)
@@ -125,13 +126,21 @@ export function AdFill({ unit }: { unit: AdUnitView }) {
   const pathname = usePathname()
   const canRegister = useSyncExternalStore(subscribe, () => ready, () => false)
   const [filled, setFilled] = useState(false)
-  const { code, width, height } = unit
+  const { code, sizes } = unit
+  // A string, so a re-render with an equal (but new) sizes array keeps the slot.
+  const sizesKey = sizes.map((size) => size.join('x')).join(',')
 
   useEffect(() => {
     const box = ref.current?.parentElement
-
     // Border included: the ad layer covers the box's 1px border, so a 300 × 250 creative fills a 300 × 250 MPU box.
-    if (!canRegister || !box || box.offsetWidth < width || box.offsetHeight < height) {
+    const size =
+      box &&
+      sizesKey
+        .split(',')
+        .map((value) => value.split('x').map(Number))
+        .find(([width, height]) => box.offsetWidth >= width && box.offsetHeight >= height)
+
+    if (!canRegister || !size) {
       return
     }
 
@@ -143,7 +152,7 @@ export function AdFill({ unit }: { unit: AdUnitView }) {
     }
 
     gpt((googletag) => {
-      slot = googletag.defineSlot(adUnitPath(code), [width, height], id)
+      slot = googletag.defineSlot(adUnitPath(code), [size[0], size[1]], id)
 
       if (!slot) {
         return
@@ -164,7 +173,7 @@ export function AdFill({ unit }: { unit: AdUnitView }) {
         }
       })
     }
-  }, [canRegister, code, width, height, id, pathname])
+  }, [canRegister, code, sizesKey, id, pathname])
 
   return (
     <div

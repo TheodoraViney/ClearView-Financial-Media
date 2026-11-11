@@ -1,6 +1,7 @@
 import Link from 'next/link'
 import type { CSSProperties } from 'react'
 
+import { MostRead } from '@/components/sections/MostRead'
 import { AD_SLOT_FITS, AD_SLOT_UNSET, AdSlot } from '@/components/ui/AdSlot'
 import { Avatar } from '@/components/ui/Avatar'
 import { Breadcrumb, type BreadcrumbItem } from '@/components/ui/Breadcrumb'
@@ -14,7 +15,6 @@ import { formatLongDate } from '@/lib/dates'
 
 import { ShareActions, ShareProvider, ShareRail } from './ArticleShare.client'
 import { AuthorModule } from './AuthorModule'
-import { MostRead } from './MostRead'
 import { RecommendedArticles } from './RecommendedArticles'
 
 // Side padding of the main column: 16 / 32, and 64 from the header breakpoint (the article design's desktop starts at 1200).
@@ -62,7 +62,7 @@ export function ArticlePage({ article }: { article: ArticleView }) {
       {/* The column divider is the main column's right border: on the rail it would take 1px of the 300px banner. */}
       <div className="flex min-w-0 flex-col header:border-r header:border-border">
         <ShareProvider url={article.shareUrl} title={article.title} linkCopiedLabel={copy.linkCopiedLabel}>
-          {/* Hidden with its spacing and landmark where the column is narrower than the 728 × 90 banner, or with no unit. */}
+          {/* Hidden with its spacing and landmark where the column is too narrow for a leaderboard (`AD_SLOT_FITS`), or with no unit. */}
           <div className={cx(`@container ${PAD}`, !article.ads.top && AD_SLOT_UNSET)}>
             <div role="complementary" aria-label="Advertisement, top" className={cx('pt-6 md:pt-10', article.ads.top && AD_SLOT_FITS.leaderboard)}>
               <AdSlot size="leaderboard" unit={article.ads.top} label={adPositionLabel('top')} />

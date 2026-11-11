@@ -180,8 +180,9 @@ const components: PortableTextComponents = {
 }
 
 /**
- * The article banner (728 × 90) in the text column, a block member of `.article-flow`. Hidden where the column is
- * narrower than the banner (inside an `@container`), and on the live site when the brand has no unit for it.
+ * The article banner (728 × 90, 468 × 60 in a narrower column) in the text column, a block member of `.article-flow`.
+ * Hidden where the column is too narrow even for 468 × 60 (`AD_SLOT_FITS`, inside an `@container`), and on the live
+ * site when the brand has no unit for it.
  */
 export function ArticleBanner({ unit }: { unit: AdUnitView | null }) {
   return (

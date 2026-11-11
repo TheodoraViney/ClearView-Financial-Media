@@ -49,7 +49,7 @@ const GAP_WHEN_NARROW = 'hidden @max-leaderboard:block'
  * The `aside` spacing replaces the gutter with the sidebar's own inset.
  *
  * The gutter sits on an `@container`, the vertical spacing on the element inside it, so a 728 × 90 position too
- * narrow for its banner hides together with its spacing (`AD_SLOT_FITS`). With no unit set the position is hidden on
+ * narrow even for its 468 × 60 fallback hides together with its spacing (`AD_SLOT_FITS`). With no unit set the position is hidden on
  * the live site (`AD_SLOT_UNSET`). Either way it leaves its `HIDDEN_GAPS` gap behind.
  */
 export function AdSlot({

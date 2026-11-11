@@ -10,7 +10,7 @@ import { defineField, defineType } from 'sanity'
  * - category: exactly one per post (Comment & Analysis, News, News from
  *   Compliance Matters, People Moves). Plays the role of the legacy article type.
  * - topic: one primary and up to three secondary per post.
- * - region: People Moves posts only.
+ * - region: exactly one per post, its geographical focus.
  *
  * Created once with the values in the design. The legacy site used more
  * categories and regions, so editors may extend the lists here. Category ids

@@ -20,10 +20,35 @@ export const AD_POSITIONS = {
   side: { title: 'Side banner', width: 300, height: 250, pages: ['home', 'other'] },
   publications: { title: 'Banner after Publications', width: 728, height: 90, pages: ['home', 'other'] },
   article: { title: 'Article banner', width: 728, height: 90, pages: ['other'] },
-  banner3: { title: 'Banner 3', width: 728, height: 90, pages: ['home'] },
+  banner3: { title: 'Banner 3', width: 728, height: 90, pages: ['home', 'other'] },
   banner4: { title: 'Banner 4', width: 728, height: 90, pages: ['home'] },
   awardsWinners: { title: 'Awards Winners MPU', width: 300, height: 250, pages: ['home', 'other'] },
 } as const satisfies Record<string, { title: string; width: number; height: number; pages: readonly AdPageType[] }>
+
+export type AdSize = readonly [width: number, height: number]
+
+/**
+ * The sizes a position's unit can request, largest first. A 728 × 90 position falls back to the IAB full banner,
+ * 468 × 60, where its box is narrower than 728: a tablet column (704) or the main column beside the right rail at
+ * 1200–1355. The design keeps the 90px-high box there; 468 × 60 is the largest standard banner that fits it.
+ * The box shows from 468px wide (`--container-leaderboard`); below that it is hidden, as before.
+ */
+const FALLBACK_SIZES: Record<string, readonly AdSize[]> = {
+  '728x90': [[468, 60]],
+}
+
+export function adSizes(position: AdPosition): readonly AdSize[] {
+  const { width, height } = AD_POSITIONS[position]
+
+  return [[width, height], ...(FALLBACK_SIZES[`${width}x${height}`] ?? [])]
+}
+
+/** The Brand settings field title: every size the unit must accept in GAM, e.g. "728 × 90 or 468 × 60". */
+export function adSizesLabel(position: AdPosition): string {
+  return adSizes(position)
+    .map(([width, height]) => `${width} × ${height}`)
+    .join(' or ')
+}
 
 export type AdPosition = keyof typeof AD_POSITIONS
 
@@ -64,8 +89,11 @@ export function adUnitPath(code: string): string {
   return `/${GAM_NETWORK_CODE}/${code}`
 }
 
-/** The unit a position shows: its GAM code and the position's creative size. */
-export type AdUnitView = { code: string; width: number; height: number }
+/**
+ * The unit a position shows: its GAM code, the position's design size and every size it may request, largest first
+ * (`AdFill` requests the largest one its box fits).
+ */
+export type AdUnitView = { code: string; width: number; height: number; sizes: readonly AdSize[] }
 
 /** Every position's unit on one page; null hides the position on the live site. */
 export type AdUnits = Record<AdPosition, AdUnitView | null>
@@ -87,7 +115,7 @@ export function toAdUnits(advertising: AdvertisingValue, page: AdPageType): AdUn
       const code = positionShowsOn(position, page) ? advertising?.[position]?.[page] : null
       const { width, height } = AD_POSITIONS[position]
 
-      return [position, isAdUnitCode(code) ? { code, width, height } : null]
+      return [position, isAdUnitCode(code) ? { code, width, height, sizes: adSizes(position) } : null]
     }),
   ) as AdUnits
 }

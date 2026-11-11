@@ -1,6 +1,17 @@
 import { defineQuery } from 'next-sanity'
 
-import { ADVERTISING, ARTICLE_BODY, ARTICLE_CARD, BLOCKS_PROJECTION, BRAND_TITLES, IMAGE, LINK, LINK_TARGET, SUBSCRIBE_MODAL } from './fragments'
+import {
+  ADVERTISING,
+  ARTICLE_BODY,
+  ARTICLE_CARD,
+  BLOCKS_PROJECTION,
+  BRAND_TITLES,
+  IMAGE,
+  LINK,
+  LINK_TARGET,
+  LISTING_CARD,
+  SUBSCRIBE_MODAL,
+} from './fragments'
 
 // The site shell: the brand's header and footer documents, its Brand settings and its subscribe pop-up, in one round
 // trip. Those ids derive from $brand (headerDocumentId / footerDocumentId / brandDocumentId /
@@ -65,8 +76,9 @@ export const PAGE_QUERY = defineQuery(`
   }
 `)
 
+// The home page and the Categories page have routes of their own (src/app/sites/[brand]/categories).
 export const PAGE_SLUGS_QUERY = defineQuery(`
-  *[_type == "page" && brand == $brand && defined(slug.current) && slug.current != "home"]{
+  *[_type == "page" && brand == $brand && defined(slug.current) && !(slug.current in ["home", "categories"])]{
     "slug": slug.current
   }
 `)
@@ -82,7 +94,7 @@ export const POSTS_QUERY = defineQuery(`
   }
 `)
 
-// The article page. `$peopleMoves` is the People Moves category id: a region left on another category is not returned.
+// The article page.
 // The body is two Portable Text fields, the text before and after the article banner (ARTICLE_BODY).
 // Recommended: the editor's picks on this brand (`picks`, reordered by `recommendedIds` in the adapter), then the latest
 // posts of the same category (`fill`) for the empty places. The Studio unsets an emptied array, hence the coalesce.
@@ -98,7 +110,7 @@ export const POST_QUERY = defineQuery(`
     "category": category->{ title, "slug": slug.current },
     "primaryTopic": primaryTopic->{ title, "slug": slug.current },
     "secondaryTopics": secondaryTopics[]->{ title, "slug": slug.current },
-    "region": select(category._ref == $peopleMoves => region->{ title, "slug": slug.current }),
+    "region": region->{ title, "slug": slug.current },
     "author": author->{ name, jobTitle, city, bio, "photo": photo{ ${IMAGE} } },
     content[]{ ${ARTICLE_BODY} },
     contentAfter[]{ ${ARTICLE_BODY} },
@@ -163,6 +175,89 @@ export const MOST_READ_LATEST_QUERY = defineQuery(`
     && defined(slug.current)
     && slug.current != $slug
   ] | order(publishedAt desc)[0...$limit]{ ${ARTICLE_CARD} }
+`)
+
+// The Categories page (`$id` from categoriesPageDocumentId) and its filter options. Topics and regions are the ones
+// with at least one post on this brand, alphabetical; categories are all of them, as links to the list come from
+// articles and Related topics. The page resolves URL slugs against these lists, so the list query takes ids only.
+// Related topics: the editor's categories and topics in order; unpublished ones dereference to null and drop out.
+// The Home breadcrumb label is the article page's (`$articlePageId`).
+export const CATEGORIES_PAGE_QUERY = defineQuery(`
+  {
+    "page": *[_type == "page" && _id == $id && brand == $brand][0]{
+      _id,
+      title,
+      intro,
+      listLabels{
+        topicsLabel,
+        allTopicsLabel,
+        regionsLabel,
+        allRegionsLabel,
+        sortLabel,
+        sortLatestLabel,
+        sortOldestLabel,
+        selectedLabel,
+        clearFiltersLabel,
+        emptyStateText,
+        readArticleLabel,
+        previousLabel,
+        nextLabel
+      },
+      relatedTopics{
+        heading[]{ _key, style, children[]{ _key, text } },
+        "items": items[defined(@->slug.current)]->{ _id, _type, title, "slug": slug.current }
+      }
+    },
+    "homeLabel": *[_type == "articlePage" && _id == $articlePageId][0].breadcrumbHomeLabel,
+    "topics": *[
+      _type == "topic"
+      && defined(slug.current)
+      && count(*[
+        _type == "post"
+        && $brand in brands
+        && defined(slug.current)
+        && (primaryTopic._ref == ^._id || ^._id in secondaryTopics[]._ref)
+      ]) > 0
+    ] | order(title asc){ _id, title, "slug": slug.current, description },
+    "regions": *[
+      _type == "region"
+      && defined(slug.current)
+      && count(*[_type == "post" && $brand in brands && defined(slug.current) && region._ref == ^._id]) > 0
+    ] | order(title asc){ _id, title, "slug": slug.current },
+    "categories": *[_type == "category" && defined(slug.current)] | order(title asc){
+      _id,
+      title,
+      "slug": slug.current,
+      description
+    }
+  }
+`)
+
+// The Categories page list: the brand's posts matching the filters, and the page's slice of them. Filters are ids
+// resolved from the URL by the page, always passed (an empty array or "" means no filter), never built into the query
+// string. A topic matches the main or a secondary topic. Two queries because order() takes no parameter; the oldest
+// order is the exact reverse of the latest, `_id` breaking ties.
+const CATEGORIES_FILTER = /* groq */ `
+  _type == "post"
+  && $brand in brands
+  && defined(slug.current)
+  && (count($topicIds) == 0 || primaryTopic._ref in $topicIds || count(secondaryTopics[_ref in $topicIds]) > 0)
+  && (count($regionIds) == 0 || region._ref in $regionIds)
+  && ($categoryId == "" || category._ref == $categoryId)
+`
+
+export const CATEGORIES_LATEST_QUERY = defineQuery(`
+  {
+    "total": count(*[${CATEGORIES_FILTER}]),
+    "items": *[${CATEGORIES_FILTER}] | order(publishedAt desc, _id desc)[$start...$end]{ ${LISTING_CARD} }
+  }
+`)
+
+export const CATEGORIES_OLDEST_QUERY = defineQuery(`
+  {
+    "total": count(*[${CATEGORIES_FILTER}]),
+    "items": *[${CATEGORIES_FILTER}] | order(publishedAt asc, _id asc)[$start...$end]{ ${LISTING_CARD} }
+  }
 `)
 
 export const POST_SLUGS_QUERY = defineQuery(`
