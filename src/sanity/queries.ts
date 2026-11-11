@@ -356,7 +356,16 @@ const SEARCH_RECORD_PROJECTION = `
   publishedAt,
   startDate,
   endDate,
-  hideDateTime
+  hideDateTime,
+  "region": region->title,
+  country,
+  eventType,
+  "image": select(
+    _type == "post" => image{ asset, crop, "alt": coalesce(alt, asset->altText) },
+    _type == "resource" => downloadThumbnail{ asset, crop, "alt": coalesce(alt, asset->altText) },
+    photographs[defined(asset)][0]{ asset, crop, "alt": coalesce(alt, asset->altText) }
+  ),
+  "logo": logo{ asset, crop, "alt": coalesce(alt, asset->altText) }
 `
 
 export const SEARCH_RECORDS_QUERY = defineQuery(`
@@ -383,5 +392,42 @@ export const SUBSCRIBE_CONFIG_QUERY = defineQuery(`
       "listId": list.id,
       "templateId": confirmationTemplate.id
     }
+  }
+`)
+
+// The brand's Search page copy (`$id` from searchPageDocumentId). Every field is required; toSearchPageCopy in
+// src/lib/search-page-copy.ts returns null until the document is seeded and complete.
+export const SEARCH_PAGE_QUERY = defineQuery(`
+  *[_id == $id && _type == "searchPage"][0]{
+    title,
+    breadcrumbHome,
+    breadcrumbCurrent,
+    placeholder,
+    submitLabel,
+    allLabel,
+    articlesLabel,
+    awardsLabel,
+    eventsLabel,
+    researchLabel,
+    yearLabel,
+    allYearsLabel,
+    selectedLabel,
+    clearFiltersLabel,
+    clearAllLabel,
+    summaryTemplate,
+    typeSuffix,
+    resultSingular,
+    resultPlural,
+    articleType,
+    awardType,
+    eventType,
+    researchType,
+    previousLabel,
+    nextLabel,
+    emptyQueryTitle,
+    emptyQueryText,
+    noResultsTitle,
+    noResultsText,
+    newSearchLabel
   }
 `)

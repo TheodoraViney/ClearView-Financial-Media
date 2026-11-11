@@ -12,6 +12,7 @@ import { FolderIcon } from '@sanity/icons/Folder'
 import { InboxIcon } from '@sanity/icons/Inbox'
 import { InsertBelowIcon } from '@sanity/icons/InsertBelow'
 import { MenuIcon } from '@sanity/icons/Menu'
+import { SearchIcon } from '@sanity/icons/Search'
 import { SparklesIcon } from '@sanity/icons/Sparkles'
 import { StarIcon } from '@sanity/icons/Star'
 import { TagIcon } from '@sanity/icons/Tag'
@@ -30,6 +31,7 @@ import {
   headerDocumentId,
   isEditorialBrandKey,
   mostReadDocumentId,
+  searchPageDocumentId,
   subscribeModalDocumentId,
 } from '@/brands'
 import { BRIEF_SETTINGS_ID } from '@/lib/brief-prompt'
@@ -109,6 +111,10 @@ export const structure: StructureResolver = (S) =>
                         .child(S.document().schemaType('articlePage').documentId(articlePageDocumentId(key))),
                     ]
                   : []),
+                S.listItem()
+                  .title('Search page')
+                  .icon(SearchIcon)
+                  .child(S.document().schemaType('searchPage').documentId(searchPageDocumentId(key))),
                 S.listItem()
                   .title('Brand settings')
                   .icon(CogIcon)

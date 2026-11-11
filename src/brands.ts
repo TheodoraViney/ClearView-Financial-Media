@@ -36,6 +36,9 @@ export const articlePageDocumentId = (key: EditorialBrandKey): string => `articl
 /** Id of an editorial brand's Categories page (the articles list): the page document with the slug "categories". */
 export const categoriesPageDocumentId = (key: EditorialBrandKey): string => `page-categories-${key}`
 
+/** Id of a brand's "Search page" document: the search results page's copy. One per brand, ClearView included. */
+export const searchPageDocumentId = (key: BrandKey): string => `search-page-${key}`
+
 /** Id of a brand's subscribe pop-up document: its copy and interests. One per brand, ClearView included. */
 export const subscribeModalDocumentId = (key: BrandKey): string => `subscribe-modal-${key}`
 

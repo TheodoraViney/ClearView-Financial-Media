@@ -1120,6 +1120,44 @@ export type InfographicSettings = {
   instructions?: string;
 };
 
+export type SearchPage = {
+  _id: string;
+  _type: "searchPage";
+  _createdAt: string;
+  _updatedAt: string;
+  _rev: string;
+  title?: string;
+  breadcrumbHome?: string;
+  breadcrumbCurrent?: string;
+  placeholder?: string;
+  submitLabel?: string;
+  allLabel?: string;
+  articlesLabel?: string;
+  awardsLabel?: string;
+  eventsLabel?: string;
+  researchLabel?: string;
+  yearLabel?: string;
+  allYearsLabel?: string;
+  selectedLabel?: string;
+  clearFiltersLabel?: string;
+  clearAllLabel?: string;
+  summaryTemplate?: string;
+  typeSuffix?: string;
+  resultSingular?: string;
+  resultPlural?: string;
+  articleType?: string;
+  awardType?: string;
+  eventType?: string;
+  researchType?: string;
+  previousLabel?: string;
+  nextLabel?: string;
+  emptyQueryTitle?: string;
+  emptyQueryText?: string;
+  noResultsTitle?: string;
+  noResultsText?: string;
+  newSearchLabel?: string;
+};
+
 export type ArticlePage = {
   _id: string;
   _type: "articlePage";
@@ -2609,6 +2647,7 @@ export type AllSanitySchemaTypes =
   | SubscribeModal
   | BriefSettings
   | InfographicSettings
+  | SearchPage
   | ArticlePage
   | MostRead
   | PublicationFooter
@@ -23284,7 +23323,7 @@ export type NEWSLETTER_LATEST_POST_IDS_QUERY_RESULT = Array<string>;
 
 // Source: src/sanity/queries.ts
 // Variable: SEARCH_RECORDS_QUERY
-// Query: *[_type in ["post", "conferenceEvent", "awardsProgramme", "resource"] && defined(slug.current)]{      _id,  _type,  title,  "slug": slug.current,  brands,  excerpt,  "author": author->name,  "category": category->title,  "bodyText": select(    _type == "post" => pt::text(content),    _type == "resource" => pt::text(body)  ),  publishedAt,  startDate,  endDate,  hideDateTime  }
+// Query: *[_type in ["post", "conferenceEvent", "awardsProgramme", "resource"] && defined(slug.current)]{      _id,  _type,  title,  "slug": slug.current,  brands,  excerpt,  "author": author->name,  "category": category->title,  "bodyText": select(    _type == "post" => pt::text(content),    _type == "resource" => pt::text(body)  ),  publishedAt,  startDate,  endDate,  hideDateTime,  "region": region->title,  country,  eventType,  "image": select(    _type == "post" => image{ asset, crop, "alt": coalesce(alt, asset->altText) },    _type == "resource" => downloadThumbnail{ asset, crop, "alt": coalesce(alt, asset->altText) },    photographs[defined(asset)][0]{ asset, crop, "alt": coalesce(alt, asset->altText) }  ),  "logo": logo{ asset, crop, "alt": coalesce(alt, asset->altText) }  }
 export type SEARCH_RECORDS_QUERY_RESULT = Array<
   | {
       _id: string;
@@ -23300,6 +23339,269 @@ export type SEARCH_RECORDS_QUERY_RESULT = Array<
       startDate: string | null;
       endDate: string | null;
       hideDateTime: boolean | null;
+      region: null;
+      country:
+        | "AD"
+        | "AE"
+        | "AF"
+        | "AG"
+        | "AI"
+        | "AL"
+        | "AM"
+        | "AO"
+        | "AQ"
+        | "AR"
+        | "AS"
+        | "AT"
+        | "AU"
+        | "AW"
+        | "AX"
+        | "AZ"
+        | "BA"
+        | "BB"
+        | "BD"
+        | "BE"
+        | "BF"
+        | "BG"
+        | "BH"
+        | "BI"
+        | "BJ"
+        | "BL"
+        | "BM"
+        | "BN"
+        | "BO"
+        | "BQ"
+        | "BR"
+        | "BS"
+        | "BT"
+        | "BV"
+        | "BW"
+        | "BY"
+        | "BZ"
+        | "CA"
+        | "CC"
+        | "CD"
+        | "CF"
+        | "CG"
+        | "CH"
+        | "CI"
+        | "CK"
+        | "CL"
+        | "CM"
+        | "CN"
+        | "CO"
+        | "CR"
+        | "CU"
+        | "CV"
+        | "CW"
+        | "CX"
+        | "CY"
+        | "CZ"
+        | "DE"
+        | "DJ"
+        | "DK"
+        | "DM"
+        | "DO"
+        | "DZ"
+        | "EC"
+        | "EE"
+        | "EG"
+        | "EH"
+        | "ER"
+        | "ES"
+        | "ET"
+        | "FI"
+        | "FJ"
+        | "FK"
+        | "FM"
+        | "FO"
+        | "FR"
+        | "GA"
+        | "GB"
+        | "GD"
+        | "GE"
+        | "GF"
+        | "GG"
+        | "GH"
+        | "GI"
+        | "GL"
+        | "GM"
+        | "GN"
+        | "GP"
+        | "GQ"
+        | "GR"
+        | "GS"
+        | "GT"
+        | "GU"
+        | "GW"
+        | "GY"
+        | "HK"
+        | "HM"
+        | "HN"
+        | "HR"
+        | "HT"
+        | "HU"
+        | "ID"
+        | "IE"
+        | "IL"
+        | "IM"
+        | "IN"
+        | "IO"
+        | "IQ"
+        | "IR"
+        | "IS"
+        | "IT"
+        | "JE"
+        | "JM"
+        | "JO"
+        | "JP"
+        | "KE"
+        | "KG"
+        | "KH"
+        | "KI"
+        | "KM"
+        | "KN"
+        | "KP"
+        | "KR"
+        | "KW"
+        | "KY"
+        | "KZ"
+        | "LA"
+        | "LB"
+        | "LC"
+        | "LI"
+        | "LK"
+        | "LR"
+        | "LS"
+        | "LT"
+        | "LU"
+        | "LV"
+        | "LY"
+        | "MA"
+        | "MC"
+        | "MD"
+        | "ME"
+        | "MF"
+        | "MG"
+        | "MH"
+        | "MK"
+        | "ML"
+        | "MM"
+        | "MN"
+        | "MO"
+        | "MP"
+        | "MQ"
+        | "MR"
+        | "MS"
+        | "MT"
+        | "MU"
+        | "MV"
+        | "MW"
+        | "MX"
+        | "MY"
+        | "MZ"
+        | "NA"
+        | "NC"
+        | "NE"
+        | "NF"
+        | "NG"
+        | "NI"
+        | "NL"
+        | "NO"
+        | "NP"
+        | "NR"
+        | "NU"
+        | "NZ"
+        | "OM"
+        | "PA"
+        | "PE"
+        | "PF"
+        | "PG"
+        | "PH"
+        | "PK"
+        | "PL"
+        | "PM"
+        | "PN"
+        | "PR"
+        | "PS"
+        | "PT"
+        | "PW"
+        | "PY"
+        | "QA"
+        | "RE"
+        | "RO"
+        | "RS"
+        | "RU"
+        | "RW"
+        | "SA"
+        | "SB"
+        | "SC"
+        | "SD"
+        | "SE"
+        | "SG"
+        | "SH"
+        | "SI"
+        | "SJ"
+        | "SK"
+        | "SL"
+        | "SM"
+        | "SN"
+        | "SO"
+        | "SR"
+        | "SS"
+        | "ST"
+        | "SV"
+        | "SX"
+        | "SY"
+        | "SZ"
+        | "TC"
+        | "TD"
+        | "TF"
+        | "TG"
+        | "TH"
+        | "TJ"
+        | "TK"
+        | "TL"
+        | "TM"
+        | "TN"
+        | "TO"
+        | "TR"
+        | "TT"
+        | "TV"
+        | "TW"
+        | "TZ"
+        | "UA"
+        | "UG"
+        | "UM"
+        | "US"
+        | "UY"
+        | "UZ"
+        | "VA"
+        | "VC"
+        | "VE"
+        | "VG"
+        | "VI"
+        | "VN"
+        | "VU"
+        | "WF"
+        | "WS"
+        | "YE"
+        | "YT"
+        | "ZA"
+        | "ZM"
+        | "ZW"
+        | null;
+      eventType: null;
+      image: {
+        asset: SanityImageAssetReference;
+        crop: SanityImageCrop | null;
+        alt: string | null;
+      } | null;
+      logo: {
+        asset: SanityImageAssetReference | null;
+        crop: SanityImageCrop | null;
+        alt: string | null;
+      } | null;
     }
   | {
       _id: string;
@@ -23315,6 +23617,269 @@ export type SEARCH_RECORDS_QUERY_RESULT = Array<
       startDate: string | null;
       endDate: string | null;
       hideDateTime: boolean | null;
+      region: null;
+      country:
+        | "AD"
+        | "AE"
+        | "AF"
+        | "AG"
+        | "AI"
+        | "AL"
+        | "AM"
+        | "AO"
+        | "AQ"
+        | "AR"
+        | "AS"
+        | "AT"
+        | "AU"
+        | "AW"
+        | "AX"
+        | "AZ"
+        | "BA"
+        | "BB"
+        | "BD"
+        | "BE"
+        | "BF"
+        | "BG"
+        | "BH"
+        | "BI"
+        | "BJ"
+        | "BL"
+        | "BM"
+        | "BN"
+        | "BO"
+        | "BQ"
+        | "BR"
+        | "BS"
+        | "BT"
+        | "BV"
+        | "BW"
+        | "BY"
+        | "BZ"
+        | "CA"
+        | "CC"
+        | "CD"
+        | "CF"
+        | "CG"
+        | "CH"
+        | "CI"
+        | "CK"
+        | "CL"
+        | "CM"
+        | "CN"
+        | "CO"
+        | "CR"
+        | "CU"
+        | "CV"
+        | "CW"
+        | "CX"
+        | "CY"
+        | "CZ"
+        | "DE"
+        | "DJ"
+        | "DK"
+        | "DM"
+        | "DO"
+        | "DZ"
+        | "EC"
+        | "EE"
+        | "EG"
+        | "EH"
+        | "ER"
+        | "ES"
+        | "ET"
+        | "FI"
+        | "FJ"
+        | "FK"
+        | "FM"
+        | "FO"
+        | "FR"
+        | "GA"
+        | "GB"
+        | "GD"
+        | "GE"
+        | "GF"
+        | "GG"
+        | "GH"
+        | "GI"
+        | "GL"
+        | "GM"
+        | "GN"
+        | "GP"
+        | "GQ"
+        | "GR"
+        | "GS"
+        | "GT"
+        | "GU"
+        | "GW"
+        | "GY"
+        | "HK"
+        | "HM"
+        | "HN"
+        | "HR"
+        | "HT"
+        | "HU"
+        | "ID"
+        | "IE"
+        | "IL"
+        | "IM"
+        | "IN"
+        | "IO"
+        | "IQ"
+        | "IR"
+        | "IS"
+        | "IT"
+        | "JE"
+        | "JM"
+        | "JO"
+        | "JP"
+        | "KE"
+        | "KG"
+        | "KH"
+        | "KI"
+        | "KM"
+        | "KN"
+        | "KP"
+        | "KR"
+        | "KW"
+        | "KY"
+        | "KZ"
+        | "LA"
+        | "LB"
+        | "LC"
+        | "LI"
+        | "LK"
+        | "LR"
+        | "LS"
+        | "LT"
+        | "LU"
+        | "LV"
+        | "LY"
+        | "MA"
+        | "MC"
+        | "MD"
+        | "ME"
+        | "MF"
+        | "MG"
+        | "MH"
+        | "MK"
+        | "ML"
+        | "MM"
+        | "MN"
+        | "MO"
+        | "MP"
+        | "MQ"
+        | "MR"
+        | "MS"
+        | "MT"
+        | "MU"
+        | "MV"
+        | "MW"
+        | "MX"
+        | "MY"
+        | "MZ"
+        | "NA"
+        | "NC"
+        | "NE"
+        | "NF"
+        | "NG"
+        | "NI"
+        | "NL"
+        | "NO"
+        | "NP"
+        | "NR"
+        | "NU"
+        | "NZ"
+        | "OM"
+        | "PA"
+        | "PE"
+        | "PF"
+        | "PG"
+        | "PH"
+        | "PK"
+        | "PL"
+        | "PM"
+        | "PN"
+        | "PR"
+        | "PS"
+        | "PT"
+        | "PW"
+        | "PY"
+        | "QA"
+        | "RE"
+        | "RO"
+        | "RS"
+        | "RU"
+        | "RW"
+        | "SA"
+        | "SB"
+        | "SC"
+        | "SD"
+        | "SE"
+        | "SG"
+        | "SH"
+        | "SI"
+        | "SJ"
+        | "SK"
+        | "SL"
+        | "SM"
+        | "SN"
+        | "SO"
+        | "SR"
+        | "SS"
+        | "ST"
+        | "SV"
+        | "SX"
+        | "SY"
+        | "SZ"
+        | "TC"
+        | "TD"
+        | "TF"
+        | "TG"
+        | "TH"
+        | "TJ"
+        | "TK"
+        | "TL"
+        | "TM"
+        | "TN"
+        | "TO"
+        | "TR"
+        | "TT"
+        | "TV"
+        | "TW"
+        | "TZ"
+        | "UA"
+        | "UG"
+        | "UM"
+        | "US"
+        | "UY"
+        | "UZ"
+        | "VA"
+        | "VC"
+        | "VE"
+        | "VG"
+        | "VI"
+        | "VN"
+        | "VU"
+        | "WF"
+        | "WS"
+        | "YE"
+        | "YT"
+        | "ZA"
+        | "ZM"
+        | "ZW"
+        | null;
+      eventType: "briefing" | "summit" | "webinar" | null;
+      image: {
+        asset: SanityImageAssetReference;
+        crop: SanityImageCrop | null;
+        alt: string | null;
+      } | null;
+      logo: {
+        asset: SanityImageAssetReference | null;
+        crop: SanityImageCrop | null;
+        alt: string | null;
+      } | null;
     }
   | {
       _id: string;
@@ -23330,6 +23895,15 @@ export type SEARCH_RECORDS_QUERY_RESULT = Array<
       startDate: null;
       endDate: null;
       hideDateTime: null;
+      region: string | null;
+      country: null;
+      eventType: null;
+      image: {
+        asset: SanityImageAssetReference | null;
+        crop: SanityImageCrop | null;
+        alt: string | null;
+      } | null;
+      logo: null;
     }
   | {
       _id: string;
@@ -23345,12 +23919,21 @@ export type SEARCH_RECORDS_QUERY_RESULT = Array<
       startDate: null;
       endDate: null;
       hideDateTime: null;
+      region: null;
+      country: null;
+      eventType: null;
+      image: {
+        asset: SanityImageAssetReference | null;
+        crop: SanityImageCrop | null;
+        alt: string | null;
+      } | null;
+      logo: null;
     }
 >;
 
 // Source: src/sanity/queries.ts
 // Variable: SEARCH_RECORDS_BY_ID_QUERY
-// Query: *[_id in $ids && _type in ["post", "conferenceEvent", "awardsProgramme", "resource"] && defined(slug.current)]{      _id,  _type,  title,  "slug": slug.current,  brands,  excerpt,  "author": author->name,  "category": category->title,  "bodyText": select(    _type == "post" => pt::text(content),    _type == "resource" => pt::text(body)  ),  publishedAt,  startDate,  endDate,  hideDateTime  }
+// Query: *[_id in $ids && _type in ["post", "conferenceEvent", "awardsProgramme", "resource"] && defined(slug.current)]{      _id,  _type,  title,  "slug": slug.current,  brands,  excerpt,  "author": author->name,  "category": category->title,  "bodyText": select(    _type == "post" => pt::text(content),    _type == "resource" => pt::text(body)  ),  publishedAt,  startDate,  endDate,  hideDateTime,  "region": region->title,  country,  eventType,  "image": select(    _type == "post" => image{ asset, crop, "alt": coalesce(alt, asset->altText) },    _type == "resource" => downloadThumbnail{ asset, crop, "alt": coalesce(alt, asset->altText) },    photographs[defined(asset)][0]{ asset, crop, "alt": coalesce(alt, asset->altText) }  ),  "logo": logo{ asset, crop, "alt": coalesce(alt, asset->altText) }  }
 export type SEARCH_RECORDS_BY_ID_QUERY_RESULT = Array<
   | {
       _id: string;
@@ -23366,6 +23949,269 @@ export type SEARCH_RECORDS_BY_ID_QUERY_RESULT = Array<
       startDate: string | null;
       endDate: string | null;
       hideDateTime: boolean | null;
+      region: null;
+      country:
+        | "AD"
+        | "AE"
+        | "AF"
+        | "AG"
+        | "AI"
+        | "AL"
+        | "AM"
+        | "AO"
+        | "AQ"
+        | "AR"
+        | "AS"
+        | "AT"
+        | "AU"
+        | "AW"
+        | "AX"
+        | "AZ"
+        | "BA"
+        | "BB"
+        | "BD"
+        | "BE"
+        | "BF"
+        | "BG"
+        | "BH"
+        | "BI"
+        | "BJ"
+        | "BL"
+        | "BM"
+        | "BN"
+        | "BO"
+        | "BQ"
+        | "BR"
+        | "BS"
+        | "BT"
+        | "BV"
+        | "BW"
+        | "BY"
+        | "BZ"
+        | "CA"
+        | "CC"
+        | "CD"
+        | "CF"
+        | "CG"
+        | "CH"
+        | "CI"
+        | "CK"
+        | "CL"
+        | "CM"
+        | "CN"
+        | "CO"
+        | "CR"
+        | "CU"
+        | "CV"
+        | "CW"
+        | "CX"
+        | "CY"
+        | "CZ"
+        | "DE"
+        | "DJ"
+        | "DK"
+        | "DM"
+        | "DO"
+        | "DZ"
+        | "EC"
+        | "EE"
+        | "EG"
+        | "EH"
+        | "ER"
+        | "ES"
+        | "ET"
+        | "FI"
+        | "FJ"
+        | "FK"
+        | "FM"
+        | "FO"
+        | "FR"
+        | "GA"
+        | "GB"
+        | "GD"
+        | "GE"
+        | "GF"
+        | "GG"
+        | "GH"
+        | "GI"
+        | "GL"
+        | "GM"
+        | "GN"
+        | "GP"
+        | "GQ"
+        | "GR"
+        | "GS"
+        | "GT"
+        | "GU"
+        | "GW"
+        | "GY"
+        | "HK"
+        | "HM"
+        | "HN"
+        | "HR"
+        | "HT"
+        | "HU"
+        | "ID"
+        | "IE"
+        | "IL"
+        | "IM"
+        | "IN"
+        | "IO"
+        | "IQ"
+        | "IR"
+        | "IS"
+        | "IT"
+        | "JE"
+        | "JM"
+        | "JO"
+        | "JP"
+        | "KE"
+        | "KG"
+        | "KH"
+        | "KI"
+        | "KM"
+        | "KN"
+        | "KP"
+        | "KR"
+        | "KW"
+        | "KY"
+        | "KZ"
+        | "LA"
+        | "LB"
+        | "LC"
+        | "LI"
+        | "LK"
+        | "LR"
+        | "LS"
+        | "LT"
+        | "LU"
+        | "LV"
+        | "LY"
+        | "MA"
+        | "MC"
+        | "MD"
+        | "ME"
+        | "MF"
+        | "MG"
+        | "MH"
+        | "MK"
+        | "ML"
+        | "MM"
+        | "MN"
+        | "MO"
+        | "MP"
+        | "MQ"
+        | "MR"
+        | "MS"
+        | "MT"
+        | "MU"
+        | "MV"
+        | "MW"
+        | "MX"
+        | "MY"
+        | "MZ"
+        | "NA"
+        | "NC"
+        | "NE"
+        | "NF"
+        | "NG"
+        | "NI"
+        | "NL"
+        | "NO"
+        | "NP"
+        | "NR"
+        | "NU"
+        | "NZ"
+        | "OM"
+        | "PA"
+        | "PE"
+        | "PF"
+        | "PG"
+        | "PH"
+        | "PK"
+        | "PL"
+        | "PM"
+        | "PN"
+        | "PR"
+        | "PS"
+        | "PT"
+        | "PW"
+        | "PY"
+        | "QA"
+        | "RE"
+        | "RO"
+        | "RS"
+        | "RU"
+        | "RW"
+        | "SA"
+        | "SB"
+        | "SC"
+        | "SD"
+        | "SE"
+        | "SG"
+        | "SH"
+        | "SI"
+        | "SJ"
+        | "SK"
+        | "SL"
+        | "SM"
+        | "SN"
+        | "SO"
+        | "SR"
+        | "SS"
+        | "ST"
+        | "SV"
+        | "SX"
+        | "SY"
+        | "SZ"
+        | "TC"
+        | "TD"
+        | "TF"
+        | "TG"
+        | "TH"
+        | "TJ"
+        | "TK"
+        | "TL"
+        | "TM"
+        | "TN"
+        | "TO"
+        | "TR"
+        | "TT"
+        | "TV"
+        | "TW"
+        | "TZ"
+        | "UA"
+        | "UG"
+        | "UM"
+        | "US"
+        | "UY"
+        | "UZ"
+        | "VA"
+        | "VC"
+        | "VE"
+        | "VG"
+        | "VI"
+        | "VN"
+        | "VU"
+        | "WF"
+        | "WS"
+        | "YE"
+        | "YT"
+        | "ZA"
+        | "ZM"
+        | "ZW"
+        | null;
+      eventType: null;
+      image: {
+        asset: SanityImageAssetReference;
+        crop: SanityImageCrop | null;
+        alt: string | null;
+      } | null;
+      logo: {
+        asset: SanityImageAssetReference | null;
+        crop: SanityImageCrop | null;
+        alt: string | null;
+      } | null;
     }
   | {
       _id: string;
@@ -23381,6 +24227,269 @@ export type SEARCH_RECORDS_BY_ID_QUERY_RESULT = Array<
       startDate: string | null;
       endDate: string | null;
       hideDateTime: boolean | null;
+      region: null;
+      country:
+        | "AD"
+        | "AE"
+        | "AF"
+        | "AG"
+        | "AI"
+        | "AL"
+        | "AM"
+        | "AO"
+        | "AQ"
+        | "AR"
+        | "AS"
+        | "AT"
+        | "AU"
+        | "AW"
+        | "AX"
+        | "AZ"
+        | "BA"
+        | "BB"
+        | "BD"
+        | "BE"
+        | "BF"
+        | "BG"
+        | "BH"
+        | "BI"
+        | "BJ"
+        | "BL"
+        | "BM"
+        | "BN"
+        | "BO"
+        | "BQ"
+        | "BR"
+        | "BS"
+        | "BT"
+        | "BV"
+        | "BW"
+        | "BY"
+        | "BZ"
+        | "CA"
+        | "CC"
+        | "CD"
+        | "CF"
+        | "CG"
+        | "CH"
+        | "CI"
+        | "CK"
+        | "CL"
+        | "CM"
+        | "CN"
+        | "CO"
+        | "CR"
+        | "CU"
+        | "CV"
+        | "CW"
+        | "CX"
+        | "CY"
+        | "CZ"
+        | "DE"
+        | "DJ"
+        | "DK"
+        | "DM"
+        | "DO"
+        | "DZ"
+        | "EC"
+        | "EE"
+        | "EG"
+        | "EH"
+        | "ER"
+        | "ES"
+        | "ET"
+        | "FI"
+        | "FJ"
+        | "FK"
+        | "FM"
+        | "FO"
+        | "FR"
+        | "GA"
+        | "GB"
+        | "GD"
+        | "GE"
+        | "GF"
+        | "GG"
+        | "GH"
+        | "GI"
+        | "GL"
+        | "GM"
+        | "GN"
+        | "GP"
+        | "GQ"
+        | "GR"
+        | "GS"
+        | "GT"
+        | "GU"
+        | "GW"
+        | "GY"
+        | "HK"
+        | "HM"
+        | "HN"
+        | "HR"
+        | "HT"
+        | "HU"
+        | "ID"
+        | "IE"
+        | "IL"
+        | "IM"
+        | "IN"
+        | "IO"
+        | "IQ"
+        | "IR"
+        | "IS"
+        | "IT"
+        | "JE"
+        | "JM"
+        | "JO"
+        | "JP"
+        | "KE"
+        | "KG"
+        | "KH"
+        | "KI"
+        | "KM"
+        | "KN"
+        | "KP"
+        | "KR"
+        | "KW"
+        | "KY"
+        | "KZ"
+        | "LA"
+        | "LB"
+        | "LC"
+        | "LI"
+        | "LK"
+        | "LR"
+        | "LS"
+        | "LT"
+        | "LU"
+        | "LV"
+        | "LY"
+        | "MA"
+        | "MC"
+        | "MD"
+        | "ME"
+        | "MF"
+        | "MG"
+        | "MH"
+        | "MK"
+        | "ML"
+        | "MM"
+        | "MN"
+        | "MO"
+        | "MP"
+        | "MQ"
+        | "MR"
+        | "MS"
+        | "MT"
+        | "MU"
+        | "MV"
+        | "MW"
+        | "MX"
+        | "MY"
+        | "MZ"
+        | "NA"
+        | "NC"
+        | "NE"
+        | "NF"
+        | "NG"
+        | "NI"
+        | "NL"
+        | "NO"
+        | "NP"
+        | "NR"
+        | "NU"
+        | "NZ"
+        | "OM"
+        | "PA"
+        | "PE"
+        | "PF"
+        | "PG"
+        | "PH"
+        | "PK"
+        | "PL"
+        | "PM"
+        | "PN"
+        | "PR"
+        | "PS"
+        | "PT"
+        | "PW"
+        | "PY"
+        | "QA"
+        | "RE"
+        | "RO"
+        | "RS"
+        | "RU"
+        | "RW"
+        | "SA"
+        | "SB"
+        | "SC"
+        | "SD"
+        | "SE"
+        | "SG"
+        | "SH"
+        | "SI"
+        | "SJ"
+        | "SK"
+        | "SL"
+        | "SM"
+        | "SN"
+        | "SO"
+        | "SR"
+        | "SS"
+        | "ST"
+        | "SV"
+        | "SX"
+        | "SY"
+        | "SZ"
+        | "TC"
+        | "TD"
+        | "TF"
+        | "TG"
+        | "TH"
+        | "TJ"
+        | "TK"
+        | "TL"
+        | "TM"
+        | "TN"
+        | "TO"
+        | "TR"
+        | "TT"
+        | "TV"
+        | "TW"
+        | "TZ"
+        | "UA"
+        | "UG"
+        | "UM"
+        | "US"
+        | "UY"
+        | "UZ"
+        | "VA"
+        | "VC"
+        | "VE"
+        | "VG"
+        | "VI"
+        | "VN"
+        | "VU"
+        | "WF"
+        | "WS"
+        | "YE"
+        | "YT"
+        | "ZA"
+        | "ZM"
+        | "ZW"
+        | null;
+      eventType: "briefing" | "summit" | "webinar" | null;
+      image: {
+        asset: SanityImageAssetReference;
+        crop: SanityImageCrop | null;
+        alt: string | null;
+      } | null;
+      logo: {
+        asset: SanityImageAssetReference | null;
+        crop: SanityImageCrop | null;
+        alt: string | null;
+      } | null;
     }
   | {
       _id: string;
@@ -23396,6 +24505,15 @@ export type SEARCH_RECORDS_BY_ID_QUERY_RESULT = Array<
       startDate: null;
       endDate: null;
       hideDateTime: null;
+      region: string | null;
+      country: null;
+      eventType: null;
+      image: {
+        asset: SanityImageAssetReference | null;
+        crop: SanityImageCrop | null;
+        alt: string | null;
+      } | null;
+      logo: null;
     }
   | {
       _id: string;
@@ -23411,6 +24529,15 @@ export type SEARCH_RECORDS_BY_ID_QUERY_RESULT = Array<
       startDate: null;
       endDate: null;
       hideDateTime: null;
+      region: null;
+      country: null;
+      eventType: null;
+      image: {
+        asset: SanityImageAssetReference | null;
+        crop: SanityImageCrop | null;
+        alt: string | null;
+      } | null;
+      logo: null;
     }
 >;
 
@@ -23430,6 +24557,42 @@ export type SUBSCRIBE_CONFIG_QUERY_RESULT = {
     templateId: number | null;
   } | null;
 };
+
+// Source: src/sanity/queries.ts
+// Variable: SEARCH_PAGE_QUERY
+// Query: *[_id == $id && _type == "searchPage"][0]{    title,    breadcrumbHome,    breadcrumbCurrent,    placeholder,    submitLabel,    allLabel,    articlesLabel,    awardsLabel,    eventsLabel,    researchLabel,    yearLabel,    allYearsLabel,    selectedLabel,    clearFiltersLabel,    clearAllLabel,    summaryTemplate,    typeSuffix,    resultSingular,    resultPlural,    articleType,    awardType,    eventType,    researchType,    previousLabel,    nextLabel,    emptyQueryTitle,    emptyQueryText,    noResultsTitle,    noResultsText,    newSearchLabel  }
+export type SEARCH_PAGE_QUERY_RESULT = {
+  title: string | null;
+  breadcrumbHome: string | null;
+  breadcrumbCurrent: string | null;
+  placeholder: string | null;
+  submitLabel: string | null;
+  allLabel: string | null;
+  articlesLabel: string | null;
+  awardsLabel: string | null;
+  eventsLabel: string | null;
+  researchLabel: string | null;
+  yearLabel: string | null;
+  allYearsLabel: string | null;
+  selectedLabel: string | null;
+  clearFiltersLabel: string | null;
+  clearAllLabel: string | null;
+  summaryTemplate: string | null;
+  typeSuffix: string | null;
+  resultSingular: string | null;
+  resultPlural: string | null;
+  articleType: string | null;
+  awardType: string | null;
+  eventType: string | null;
+  researchType: string | null;
+  previousLabel: string | null;
+  nextLabel: string | null;
+  emptyQueryTitle: string | null;
+  emptyQueryText: string | null;
+  noResultsTitle: string | null;
+  noResultsText: string | null;
+  newSearchLabel: string | null;
+} | null;
 
 // Query TypeMap
 declare global {
@@ -23453,9 +24616,10 @@ declare global {
     '\n  *[_type == "newsletterIssue" && _id in [$id, $draftId]]._id\n': NEWSLETTER_ISSUE_EXISTING_IDS_QUERY_RESULT;
     '\n  *[_type == "brand" && _id == $brandId && key.current == $brand][0].newsletter.articlesPerIssue\n': NEWSLETTER_ARTICLES_PER_ISSUE_QUERY_RESULT;
     '\n  *[\n    _type == "post"\n    && $brand in brands\n    && defined(publishedAt)\n    && dateTime(publishedAt) <= dateTime(now())\n  ] | order(publishedAt desc)[0...20]._id\n': NEWSLETTER_LATEST_POST_IDS_QUERY_RESULT;
-    '\n  *[_type in ["post", "conferenceEvent", "awardsProgramme", "resource"] && defined(slug.current)]{\n    \n  _id,\n  _type,\n  title,\n  "slug": slug.current,\n  brands,\n  excerpt,\n  "author": author->name,\n  "category": category->title,\n  "bodyText": select(\n    _type == "post" => pt::text(content),\n    _type == "resource" => pt::text(body)\n  ),\n  publishedAt,\n  startDate,\n  endDate,\n  hideDateTime\n\n  }\n': SEARCH_RECORDS_QUERY_RESULT;
-    '\n  *[_id in $ids && _type in ["post", "conferenceEvent", "awardsProgramme", "resource"] && defined(slug.current)]{\n    \n  _id,\n  _type,\n  title,\n  "slug": slug.current,\n  brands,\n  excerpt,\n  "author": author->name,\n  "category": category->title,\n  "bodyText": select(\n    _type == "post" => pt::text(content),\n    _type == "resource" => pt::text(body)\n  ),\n  publishedAt,\n  startDate,\n  endDate,\n  hideDateTime\n\n  }\n': SEARCH_RECORDS_BY_ID_QUERY_RESULT;
+    '\n  *[_type in ["post", "conferenceEvent", "awardsProgramme", "resource"] && defined(slug.current)]{\n    \n  _id,\n  _type,\n  title,\n  "slug": slug.current,\n  brands,\n  excerpt,\n  "author": author->name,\n  "category": category->title,\n  "bodyText": select(\n    _type == "post" => pt::text(content),\n    _type == "resource" => pt::text(body)\n  ),\n  publishedAt,\n  startDate,\n  endDate,\n  hideDateTime,\n  "region": region->title,\n  country,\n  eventType,\n  "image": select(\n    _type == "post" => image{ asset, crop, "alt": coalesce(alt, asset->altText) },\n    _type == "resource" => downloadThumbnail{ asset, crop, "alt": coalesce(alt, asset->altText) },\n    photographs[defined(asset)][0]{ asset, crop, "alt": coalesce(alt, asset->altText) }\n  ),\n  "logo": logo{ asset, crop, "alt": coalesce(alt, asset->altText) }\n\n  }\n': SEARCH_RECORDS_QUERY_RESULT;
+    '\n  *[_id in $ids && _type in ["post", "conferenceEvent", "awardsProgramme", "resource"] && defined(slug.current)]{\n    \n  _id,\n  _type,\n  title,\n  "slug": slug.current,\n  brands,\n  excerpt,\n  "author": author->name,\n  "category": category->title,\n  "bodyText": select(\n    _type == "post" => pt::text(content),\n    _type == "resource" => pt::text(body)\n  ),\n  publishedAt,\n  startDate,\n  endDate,\n  hideDateTime,\n  "region": region->title,\n  country,\n  eventType,\n  "image": select(\n    _type == "post" => image{ asset, crop, "alt": coalesce(alt, asset->altText) },\n    _type == "resource" => downloadThumbnail{ asset, crop, "alt": coalesce(alt, asset->altText) },\n    photographs[defined(asset)][0]{ asset, crop, "alt": coalesce(alt, asset->altText) }\n  ),\n  "logo": logo{ asset, crop, "alt": coalesce(alt, asset->altText) }\n\n  }\n': SEARCH_RECORDS_BY_ID_QUERY_RESULT;
     '\n  {\n    "modal": *[_id == $subscribeModalId && _type == "subscribeModal"][0]{\n      interests[]{ _key, "attribute": attribute.name, locked }\n    },\n    "settings": *[_id == $subscribeSettingsId && _type == "subscribeFormSettings"][0]{\n      "listId": list.id,\n      "templateId": confirmationTemplate.id\n    }\n  }\n': SUBSCRIBE_CONFIG_QUERY_RESULT;
+    '\n  *[_id == $id && _type == "searchPage"][0]{\n    title,\n    breadcrumbHome,\n    breadcrumbCurrent,\n    placeholder,\n    submitLabel,\n    allLabel,\n    articlesLabel,\n    awardsLabel,\n    eventsLabel,\n    researchLabel,\n    yearLabel,\n    allYearsLabel,\n    selectedLabel,\n    clearFiltersLabel,\n    clearAllLabel,\n    summaryTemplate,\n    typeSuffix,\n    resultSingular,\n    resultPlural,\n    articleType,\n    awardType,\n    eventType,\n    researchType,\n    previousLabel,\n    nextLabel,\n    emptyQueryTitle,\n    emptyQueryText,\n    noResultsTitle,\n    noResultsText,\n    newSearchLabel\n  }\n': SEARCH_PAGE_QUERY_RESULT;
   }
 }
 // Lets @sanity/client releases that predate the global registry read it too
