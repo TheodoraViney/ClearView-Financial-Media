@@ -8,6 +8,7 @@ import { archiveArticlePath, archiveCanonicalUrl } from './archive'
 import { formatDateRange, formatLongDate } from './dates'
 import { resolveHref, sharedRecordHref } from './links'
 import { SEARCH_INDEX, type SearchRecord } from './search-index'
+import { brandFilter } from './search-query'
 import { normalizeSearchTerm, type SearchItem, type SearchSections } from './search-term'
 
 const EMPTY: SearchSections = { posts: [], events: [], awards: [], resources: [] }
@@ -34,9 +35,7 @@ export async function searchSite(q: string | null | undefined, brand: BrandKey):
     query: term,
     hitsPerPage: 20,
     distinct: LIMITS.posts,
-    ...(brand === 'clearview'
-      ? {}
-      : { filters: `publications:${brand} OR section:events OR section:awards OR section:resources` }),
+    filters: brandFilter(brand) ?? undefined,
   })
 
   const sections: SearchSections = { posts: [], events: [], awards: [], resources: [] }
@@ -52,36 +51,51 @@ export async function searchSite(q: string | null | undefined, brand: BrandKey):
   return sections
 }
 
-function toItem(hit: SearchRecord, brand: BrandKey): SearchItem[] {
+/**
+ * The URL of a search hit on a brand's host, or null when it has no route. An archived article opens on its home
+ * publication from ClearView and on the current host elsewhere; a post as resolveHref links it; events, awards and
+ * resources on ClearView.
+ */
+export function searchHitHref(
+  hit: Pick<SearchRecord, 'kind' | 'slug' | 'publications' | 'archiveId'>,
+  brand: BrandKey,
+): string | null {
   switch (hit.kind) {
     case 'archive': {
       if (!hit.archiveId) {
-        return []
+        return null
       }
 
       const record = { id: hit.archiveId, slug: hit.slug, publications: hit.publications }
 
-      return item(
-        hit.title,
-        brand === 'clearview' ? archiveCanonicalUrl(record, brand) : archiveArticlePath(record),
-        articleMeta(hit, brand),
-      )
+      return brand === 'clearview' ? archiveCanonicalUrl(record, brand) : archiveArticlePath(record)
     }
     case 'post':
-      return item(
-        hit.title,
-        resolveHref({ kind: 'internal', internal: { _type: 'post', slug: hit.slug, brands: hit.publications } }, brand),
-        articleMeta(hit, brand),
+      return resolveHref(
+        { kind: 'internal', internal: { _type: 'post', slug: hit.slug, brands: hit.publications } },
+        brand,
       )
     case 'conferenceEvent':
     case 'awardsProgramme':
-      return item(
-        hit.title,
-        sharedRecordHref(hit.kind, hit.slug, brand),
-        hit.hideDateTime ? null : formatDateRange(hit.date, hit.endDate),
-      )
     case 'resource':
-      return item(hit.title, sharedRecordHref('resource', hit.slug, brand), formatLongDate(hit.date))
+      return sharedRecordHref(hit.kind, hit.slug, brand)
+    default:
+      return null
+  }
+}
+
+function toItem(hit: SearchRecord, brand: BrandKey): SearchItem[] {
+  const href = searchHitHref(hit, brand)
+
+  switch (hit.kind) {
+    case 'archive':
+    case 'post':
+      return item(hit.title, href, articleMeta(hit, brand))
+    case 'conferenceEvent':
+    case 'awardsProgramme':
+      return item(hit.title, href, hit.hideDateTime ? null : formatDateRange(hit.date, hit.endDate))
+    case 'resource':
+      return item(hit.title, href, formatLongDate(hit.date))
     default:
       return []
   }
@@ -89,11 +103,12 @@ function toItem(hit: SearchRecord, brand: BrandKey): SearchItem[] {
 
 /** The publication on ClearView, which lists all three; the date on a publication host. */
 function articleMeta(hit: SearchRecord, brand: BrandKey): string | null {
-  if (brand !== 'clearview') {
-    return formatLongDate(hit.date)
-  }
+  return brand === 'clearview' ? homePublicationTitle(hit.publications) : formatLongDate(hit.date)
+}
 
-  const home = hit.publications.find(isBrandKey)
+/** The name of an article's home publication, the first valid brand key; null when it has none. */
+export function homePublicationTitle(publications: string[]): string | null {
+  const home = publications.find(isBrandKey)
 
   return home ? brandTitle(home, null) : null
 }

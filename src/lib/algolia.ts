@@ -42,9 +42,30 @@ const indexPath = (index: string) => `/1/indexes/${encodeURIComponent(index)}`
 
 export type AlgoliaHit<T> = T & { objectID: string }
 
+/** One search response. `facets` holds the counts per value of each requested facet. */
+export type AlgoliaResult<T> = {
+  hits: AlgoliaHit<T>[]
+  nbHits: number
+  page: number
+  nbPages: number
+  hitsPerPage: number
+  facets?: Record<string, Record<string, number>>
+}
+
 /** One search on one index, with the search-only key. Each call is one billed search request. */
 export function algoliaSearch<T>(index: string, params: Record<string, unknown>) {
-  return request<{ hits: AlgoliaHit<T>[]; nbHits: number }>(false, 'POST', `${indexPath(index)}/query`, params)
+  return request<AlgoliaResult<T>>(false, 'POST', `${indexPath(index)}/query`, params)
+}
+
+export type AlgoliaQuery = { indexName: string } & Record<string, unknown>
+
+/** Several searches in one HTTP call, results in request order. Each query is still one billed search request. */
+export async function algoliaMultiSearch<T>(requests: AlgoliaQuery[]) {
+  const { results } = await request<{ results: AlgoliaResult<T>[] }>(false, 'POST', '/1/indexes/*/queries', {
+    requests,
+  })
+
+  return results
 }
 
 type Task = { taskID: number }

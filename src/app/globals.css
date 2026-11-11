@@ -186,6 +186,8 @@ main :where(*) {
   --color-light-blue-grey: #63788c;
   /* Sponsored content card surface */
   --color-surface-subtle: #fafafa;
+  /* Search result thumbnail frame behind an image (search-result-card) */
+  --color-surface-thumb: #f5f5f5;
 }
 
 @theme {
@@ -243,6 +245,32 @@ main :where(*) {
 
   /* Dropdown panel (Categories filters, shared-shell select-dropdown) */
   --shadow-dropdown: 0 12px 24px -12px rgb(31 43 50 / 0.18), 0 2px 4px rgb(31 43 50 / 0.04);
+
+  /* Report cover or logo contained in a search result thumbnail: the shadow follows the painted image, not its box */
+  --drop-shadow-cover: 0 4px 10px rgb(31 43 50 / 0.16);
+
+  /* Search empty state: the magnifier wanders over the panel every 10s (wbSearchScan in the search results design) */
+  --animate-search-scan: search-scan 10s cubic-bezier(0.37, 0, 0.63, 1) 0.6s infinite;
+
+  @keyframes search-scan {
+    0%,
+    6% {
+      transform: translate(0, 0) rotate(0deg);
+    }
+    28% {
+      transform: translate(-26px, -8px) rotate(-14deg);
+    }
+    54% {
+      transform: translate(25px, -11px) rotate(12deg);
+    }
+    78% {
+      transform: translate(-15px, 12px) rotate(-9deg);
+    }
+    96%,
+    100% {
+      transform: translate(0, 0) rotate(0deg);
+    }
+  }
 }
 
 /* Tokens that resolve per brand or per breakpoint at the element */
@@ -333,6 +361,17 @@ main :where(*) {
 /* Numbered list row (Weekly Roundup "In this edition"): 24px number column */
 @utility grid-cols-numbered {
   grid-template-columns: 1.5rem minmax(0, 1fr);
+}
+
+/* Search result row on mobile: text column + 112px thumbnail */
+@utility grid-cols-result {
+  grid-template-columns: minmax(0, 1fr) 7rem;
+}
+
+/* A contained image in a search result thumbnail is 82% of the frame's height, centred (9% above and below) */
+@utility inset-y-cover {
+  top: 9%;
+  bottom: 9%;
 }
 
 /* Label / value rows of a definition list (article fact box): 140px label column */

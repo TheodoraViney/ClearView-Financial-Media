@@ -1,6 +1,7 @@
 import { MostRead } from '@/components/sections/MostRead'
 import { AD_SLOT_FITS, AD_SLOT_UNSET, AdSlot } from '@/components/ui/AdSlot'
 import { cx } from '@/components/ui/cx'
+import { Pagination } from '@/components/ui/Pagination'
 import type { CategoriesView } from '@/lib/categories'
 import { adPositionLabel } from '@/lib/gam'
 
@@ -8,7 +9,6 @@ import { ArticleGrid } from './ArticleGrid'
 import { CategoriesHeader } from './CategoriesHeader'
 import { CategoryFilters } from './CategoryFilters'
 import { FeaturedStory } from './FeaturedStory'
-import { Pagination } from './Pagination'
 import { RelatedTopics } from './RelatedTopics'
 
 // Side padding of the main column: 16 / 32, and 64 from the header breakpoint (the design's desktop starts at 1200).
@@ -77,10 +77,12 @@ export function CategoriesPage({ view }: { view: CategoriesView }) {
 
         <div className={PAD}>
           <Pagination
-            pagination={view.pagination}
+            pages={view.pagination.pages}
+            previousHref={view.pagination.previousHref}
+            nextHref={view.pagination.nextHref}
             previousLabel={labels.previousLabel}
             nextLabel={labels.nextLabel}
-            className={SECTION}
+            className={cx('border-t border-border pt-8', SECTION)}
           />
         </div>
 

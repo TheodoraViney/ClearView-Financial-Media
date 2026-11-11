@@ -45,7 +45,8 @@ const FITS = {
   contain: { box: '', image: 'object-contain object-left' },
 }
 
-const isSvg = (src: string) => src.split('?', 1)[0]?.toLowerCase().endsWith('.svg') ?? false
+/** SVGs bypass the loader (`unoptimized`). */
+export const isSvg = (src: string) => src.split('?', 1)[0]?.toLowerCase().endsWith('.svg') ?? false
 
 /**
  * An image in a box. `sizes` is a plain upper bound of the rendered width per breakpoint (vw or px). Where the

@@ -19,6 +19,7 @@ import { page } from './documents/page'
 import { person } from './documents/person'
 import { post } from './documents/post'
 import { resource } from './documents/resource'
+import { searchPage } from './documents/search-page'
 import { subscribeFormSettings } from './documents/subscribe-form-settings'
 import { subscribeModal } from './documents/subscribe-modal'
 import { objectTypes } from './objects'
@@ -37,6 +38,7 @@ export const documentTypes = [
   author,
   mostRead,
   articlePage,
+  searchPage,
   infographicSettings,
   briefSettings,
   subscribeModal,
