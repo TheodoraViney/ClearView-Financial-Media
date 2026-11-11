@@ -13,6 +13,8 @@ import { Checkbox } from '@/components/ui/Checkbox'
 import { CheckboxGroup } from '@/components/ui/CheckboxGroup'
 import { Container } from '@/components/ui/Container'
 import { DefinitionList } from '@/components/ui/DefinitionList'
+import { EmptyState } from '@/components/ui/EmptyState'
+import { FilterChip } from '@/components/ui/FilterChip'
 import { EmailField } from '@/components/ui/EmailField'
 import { Figure } from '@/components/ui/Figure'
 import { FormField } from '@/components/ui/FormField'
@@ -23,8 +25,10 @@ import { Input } from '@/components/ui/Input'
 import { ListLink } from '@/components/ui/ListLink'
 import { Media } from '@/components/ui/Media'
 import { Meta } from '@/components/ui/Meta'
+import { Pagination } from '@/components/ui/Pagination'
 import { PromoRow } from '@/components/ui/PromoRow'
 import { PullQuote } from '@/components/ui/PullQuote'
+import { SearchResultCard } from '@/components/ui/SearchResultCard'
 import { Select } from '@/components/ui/Select'
 
 import { ActionButtonDemo } from './ActionButtonDemo.client'
@@ -451,6 +455,94 @@ export default async function UiPage({
               meta={['Entry deadline: 30 Apr 2025']}
             />
           </Row>
+        </Group>
+
+        <Group title="FilterChip (link; 44 below header, 36 from it; selected: accent, tick, aria-current)">
+          <Row label="content type">
+            <FilterChip href="?chip=all" label="All" count={29} selected />
+            <FilterChip href="?chip=article" label="Articles" count={20} />
+            <FilterChip href="?chip=award" label="Awards" count={4} />
+            <FilterChip href="?chip=event" label="Events" count={1} />
+            <FilterChip href="?chip=none" label="No count" />
+          </Row>
+        </Group>
+
+        <Group title="SearchResultCard (8 / 3 of 12 columns from md, 1fr 112px on mobile; slot always reserved)">
+          <ol className="max-w-237 border-t border-border">
+            <li>
+              <SearchResultCard
+                href="#"
+                typeLabel="Article"
+                date="12 October 2026"
+                meta={['Strategy', 'United Kingdom']}
+                title="Expanding Footprint Marks Significant Year For Barclays' International Private Bank"
+                summary="The international private bank discusses its strategy and recent expansion, including a new Singapore booking centre, and why it expects growth to continue across Asia and the Middle East next year."
+                image={{ src: 'https://cdn.sanity.io/images/hcxqlh4h/production/167912c956d9ae5113719006fadf680ab259247f-1900x993.jpg' }}
+              />
+            </li>
+            <li>
+              <SearchResultCard
+                href="#"
+                typeLabel="Research"
+                date="15 October 2024"
+                meta={['WM Market Reports']}
+                title="WealthBriefing’s Tech And Ops Trends In Wealth Management Research Report"
+                summary="The twelfth edition of WealthBriefing’s annual technology and operations trends report."
+                image={{ src: 'https://cdn.sanity.io/images/hcxqlh4h/production/e25b292bdf557ce72c0713eaecb69daba0b3ee35-700x1400.jpg' }}
+                imageFit="contain"
+              />
+            </li>
+            <li>
+              <SearchResultCard
+                href="#"
+                typeLabel="Award"
+                date="18 November 2026"
+                meta={['Dubai']}
+                title="The Thirteenth WealthBriefing MENA Awards for Excellence 2026"
+                summary={null}
+                image={null}
+              />
+            </li>
+          </ol>
+        </Group>
+
+        <Group title="Pagination (touch: 44 below header, 36 from it; fixed: 36, Categories)">
+          <Row label="size=touch strongCurrent">
+            <Pagination
+              className="max-w-237"
+              size="touch"
+              strongCurrent
+              label="Search results pages"
+              pages={[1, 2, 3, 4, 5, null, 12].map((page) => (page ? { page, href: `?page=${page}`, current: page === 2 } : null))}
+              previousHref="?page=1"
+              nextHref="?page=3"
+              previousLabel="Previous"
+              nextLabel="Next"
+            />
+          </Row>
+          <Row label="size=fixed (Categories)">
+            <Pagination
+              className="max-w-237"
+              pages={[1, null, 48, 49, 50, null, 99].map((page) => (page ? { page, href: `?page=${page}`, current: page === 49 } : null))}
+              previousHref="?page=48"
+              nextHref="?page=50"
+              previousLabel="Previous"
+              nextLabel="Next"
+            />
+          </Row>
+        </Group>
+
+        <Group title="EmptyState (brand tint panel, magnifier scan, action slot)">
+          <EmptyState
+            className="max-w-237"
+            title="No results found"
+            text="Sorry, we couldn’t find any results for ‘wealth managment’. Try a different search term or check your spelling."
+            action={
+              <Button variant="outline-accent" size="compact" href="#" className="px-5">
+                Start New Search
+              </Button>
+            }
+          />
         </Group>
 
         <Group title="Breadcrumb">

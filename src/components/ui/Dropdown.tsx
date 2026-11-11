@@ -38,6 +38,7 @@ export function Dropdown({
   selectedLabel,
   clear,
   syncKey,
+  hideLabel = false,
   className,
 }: {
   /** Unique on the page: prefixes the label, value and panel ids. */
@@ -54,6 +55,8 @@ export function Dropdown({
   clear?: { label: string; href: string }
   /** The URL state the inputs reflect, see `DropdownDisclosure`. */
   syncKey: string
+  /** Keeps the label for screen readers only, for a trigger that sits in line with other controls (search Year). */
+  hideLabel?: boolean
   className?: string
 }) {
   const selected = options.filter((option) => option.selected)
@@ -67,7 +70,10 @@ export function Dropdown({
 
   return (
     <div className={cx('flex min-w-0 flex-col gap-2', className)}>
-      <span id={`${id}-label`} className="text-caption leading-none font-medium text-foreground">
+      <span
+        id={`${id}-label`}
+        className={hideLabel ? 'sr-only' : 'text-caption leading-none font-medium text-foreground'}
+      >
         {label}
       </span>
       <DropdownDisclosure
@@ -100,6 +106,7 @@ export function Dropdown({
               <div className="mt-4 flex items-center border-t border-border pt-4">
                 <Link
                   href={clear.href}
+                  prefetch={false}
                   scroll={false}
                   className="-my-2.75 inline-flex min-h-9 items-center text-sm leading-none whitespace-nowrap text-accent transition-opacity duration-180 ease-out hover:opacity-60"
                 >

@@ -8,17 +8,20 @@ const VARIANTS = {
 }
 
 // "Publication | date" line. Items after the first get the divider.
-// `accentFirst` draws the first item in the brand accent (the category label on the publication homes).
+// `accentFirst` draws the first item in the brand accent (the category label on the publication homes);
+// `strongFirst` sets it in weight 500 (the type label of a search result).
 export function Meta({
   items,
   variant = 'default',
   accentFirst = false,
+  strongFirst = false,
   nowrap = false,
   className,
 }: {
   items: ReactNode[]
   variant?: keyof typeof VARIANTS
   accentFirst?: boolean
+  strongFirst?: boolean
   /** One line, no wrapping: the first item shrinks and is cut with an ellipsis, the others keep their width. */
   nowrap?: boolean
   className?: string
@@ -40,6 +43,7 @@ export function Meta({
               index > 0 && 'h-3.25',
               variant === 'inverse' && 'border-white/20',
               index === 0 && accentFirst && 'text-accent',
+              index === 0 && strongFirst && 'font-medium',
             )}
           >
             {item}

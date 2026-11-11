@@ -17,7 +17,7 @@ export function Breadcrumb({ items, className }: { items: BreadcrumbItem[]; clas
               </span>
             )}
             {item.href ? (
-              <Link href={item.href} className="transition-colors duration-180 ease-out hover:text-accent">
+              <Link href={item.href} prefetch={false} className="transition-colors duration-180 ease-out hover:text-accent">
                 {item.label}
               </Link>
             ) : (
