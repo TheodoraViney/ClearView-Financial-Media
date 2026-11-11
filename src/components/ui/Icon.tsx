@@ -3,12 +3,14 @@ import type { SVGProps } from 'react'
 import { cx } from './cx'
 import { CheckIcon } from './icons/check'
 import { CheckSmIcon } from './icons/check-sm'
+import { ChevronLeftIcon } from './icons/chevron-left'
 import { ChevronDownIcon } from './icons/chevron-down'
 import { ChevronRightIcon } from './icons/chevron-right'
 import { CloseIcon } from './icons/close'
 import { CommentIcon } from './icons/comment'
 import { DocumentIcon } from './icons/document'
 import { DownloadIcon } from './icons/download'
+import { DropdownChevronIcon } from './icons/dropdown-chevron'
 import { GlassesIcon } from './icons/glasses'
 import { LinkIcon } from './icons/link'
 import { MenuIcon } from './icons/menu'
@@ -25,9 +27,11 @@ import { StatPublicIcon } from './icons/stat-public'
 import { StatSearchIcon } from './icons/stat-search'
 import { StatStarIcon } from './icons/stat-star'
 import { StatUserIcon } from './icons/stat-user'
+import { TickIcon } from './icons/tick'
 
 export const iconMap = {
   'chevron-right': ChevronRightIcon,
+  'chevron-left': ChevronLeftIcon,
   'chevron-down': ChevronDownIcon,
   search: SearchIcon,
   close: CloseIcon,
@@ -37,6 +41,8 @@ export const iconMap = {
   check: CheckIcon,
   'check-sm': CheckSmIcon,
   'select-chevron': SelectChevronIcon,
+  'dropdown-chevron': DropdownChevronIcon,
+  tick: TickIcon,
   star: StarIcon,
   public: PublicIcon,
   document: DocumentIcon,

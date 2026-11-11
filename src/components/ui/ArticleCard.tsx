@@ -1,6 +1,7 @@
 import Link from 'next/link'
 import { type ReactNode } from 'react'
 
+import { ArrowLink } from './ArrowLink'
 import { cx } from './cx'
 import { Media, type MediaImage } from './Media'
 import { Meta } from './Meta'
@@ -14,6 +15,9 @@ import { Meta } from './Meta'
 // `variant="pick"` is the publication home's Top Picks card: 16:10 image, meta (accent category with `metaAccent`, then the
 // date, both 500), a 20/24 headline clamped to 3 lines and the summary clamped to 2; brand-coloured hover, slow zoom.
 // Same source order trick as `stacked`.
+// `variant="grid"` is the Categories list card: 3:2 image (the `light` placeholder when there is none), meta
+// "Category | date", a 20/24 headline and the accent "Read article ›" label (`readLabel`); the whole card is the link,
+// with an accent hover over 180ms ease-out and the slow zoom. Same source order trick as `stacked`.
 export function ArticleCard({
   href,
   title,
@@ -24,6 +28,7 @@ export function ArticleCard({
   variant = 'featured',
   summary,
   metaAccent = false,
+  readLabel,
   className,
 }: {
   href: string
@@ -32,13 +37,35 @@ export function ArticleCard({
   image?: MediaImage | null
   sizes: string
   tall?: boolean
-  variant?: 'featured' | 'stacked' | 'pick'
+  variant?: 'featured' | 'stacked' | 'pick' | 'grid'
   /** `pick` only. */
   summary?: string | null
   /** `pick` only: the first meta item is the category, drawn in the accent. */
   metaAccent?: boolean
+  /** `grid` only: the visible link label under the headline. */
+  readLabel?: string
   className?: string
 }) {
+  if (variant === 'grid') {
+    return (
+      <Link
+        href={href}
+        className={cx('group flex min-w-0 flex-col gap-4 text-foreground transition-colors duration-180 ease-out hover:text-accent', className)}
+      >
+        <span className="flex flex-col gap-3">
+          <span className="text-title-lg font-medium text-pretty">{title}</span>
+          {meta.length > 0 && <Meta items={meta} className="order-first leading-none" />}
+        </span>
+        <Media image={image} sizes={sizes} ratio="3/2" zoom="slow" className="order-first w-full" />
+        {readLabel && (
+          <ArrowLink variant="accent" hover="static">
+            {readLabel}
+          </ArrowLink>
+        )}
+      </Link>
+    )
+  }
+
   if (variant === 'pick') {
     return (
       <Link

@@ -27,9 +27,17 @@ const PLACEMENTS = {
  * A fixed banner position of a page template, showing the brand's unit from Brand settings. Without a unit it is
  * hidden on the live site and shows its labelled placeholder in draft mode.
  */
-export function PageAd({ position, ads, brand }: { position: PagePosition; ads: AdUnits; brand: BrandKey }) {
+export function PageAd({
+  position,
+  ads,
+  brand,
+}: {
+  position: PagePosition
+  ads: Partial<Pick<AdUnits, PagePosition>>
+  brand: BrandKey
+}) {
   const look = brand === 'clearview' ? 'group' : 'publication'
   const { size, spacing } = PLACEMENTS[look][position]
 
-  return <AdSlot size={size} spacing={spacing} look={look} unit={ads[position]} label={adPositionLabel(position)} />
+  return <AdSlot size={size} spacing={spacing} look={look} unit={ads[position] ?? null} label={adPositionLabel(position)} />
 }

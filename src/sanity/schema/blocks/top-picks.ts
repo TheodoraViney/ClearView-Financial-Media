@@ -31,7 +31,7 @@ export const topPicks = defineType({
     headingField('heading', { title: 'Heading', defaultLevel: 'h2', initialText: 'Top Picks', required: true }),
     defineField({
       ...linkField({ required: true, labelRequired: true, description: 'The "View all" link beside the heading.' }),
-      initialValue: { kind: 'external', external: '/articles', label: 'View all top picks' },
+      initialValue: { kind: 'external', external: '/categories', label: 'View all top picks' },
     }),
     defineField({
       name: 'posts',

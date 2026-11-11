@@ -179,7 +179,7 @@ export const postCards = defineType({
   icon: DocumentsIcon,
   fields: postListFields({
     heading: 'News Analysis',
-    link: { external: '/articles?category=comment-and-analysis', label: 'View all news analysis' },
+    link: { external: '/categories?category=comment-and-analysis', label: 'View all news analysis' },
     category: 'comment-and-analysis',
     max: POST_CARDS_COUNT,
   }),
@@ -200,7 +200,7 @@ export const postBriefs = defineType({
   icon: UlistIcon,
   fields: postListFields({
     heading: 'News in Brief',
-    link: { external: '/articles', label: 'View all news' },
+    link: { external: '/categories', label: 'View all news' },
     max: briefCount,
     extra: [
       defineField({

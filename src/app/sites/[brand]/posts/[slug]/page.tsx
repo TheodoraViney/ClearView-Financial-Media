@@ -11,7 +11,6 @@ import {
 } from '@/brands'
 import { ArticleBody } from '@/components/sections/article/ArticleBody'
 import { ArticlePage } from '@/components/sections/article/ArticlePage'
-import { PEOPLE_MOVES_CATEGORY_ID } from '@/lib/article-taxonomy'
 import { fromPost } from '@/sanity/article-view'
 import { fetchAdUnits } from '@/sanity/brand-title'
 import {
@@ -108,7 +107,7 @@ async function CachedPost({
   const [{ data: post }, { data: mostRead }, mostReadFill, { data: copy }, ads] = await Promise.all([
     cachedSanity({
       query: POST_QUERY,
-      params: { brand, slug, peopleMoves: PEOPLE_MOVES_CATEGORY_ID },
+      params: { brand, slug },
       perspective,
       variant,
       stega,

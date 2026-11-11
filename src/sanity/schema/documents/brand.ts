@@ -5,6 +5,7 @@ import {
   AD_PAGE_TYPE_TITLES,
   AD_POSITION_KEYS,
   AD_POSITIONS,
+  adSizesLabel,
   type AdPageType,
   type AdPosition,
   type AdvertisingValue,
@@ -36,7 +37,7 @@ const POSITION_DESCRIPTIONS: Record<AdPosition, string> = {
   side: 'At the top of the right column, on pages that have one.',
   publications: 'Under the cards of the Publications block, wherever that block is placed.',
   article: 'In the article text, between "Text before the banner" and "Text after the banner".',
-  banner3: 'Home page, under the blocks above Banner 3.',
+  banner3: 'Home page, under the blocks above Banner 3. Other pages: in the Categories list, after the first row of cards.',
   banner4: 'Home page, under the blocks between Banner 3 and Banner 4. Not shown while that list is empty.',
   awardsWinners: 'Inside the Awards Winners block in a sidebar.',
 }
@@ -216,11 +217,11 @@ export const brand = defineType({
         'Google Ad Manager units for the fixed banner positions. Home page units show on the home page, other pages units everywhere else.',
       hidden: ({ currentUser }) => !isAdministrator(currentUser),
       fields: AD_POSITION_KEYS.map((position) => {
-        const { title, width, height, pages } = AD_POSITIONS[position]
+        const { title, pages } = AD_POSITIONS[position]
 
         return defineField({
           name: position,
-          title: `${title}, ${width} × ${height}`,
+          title: `${title}, ${adSizesLabel(position)}`,
           type: 'object',
           description: POSITION_DESCRIPTIONS[position],
           hidden: position === 'article' ? ({ document }) => !isPublication(document?._id) : undefined,

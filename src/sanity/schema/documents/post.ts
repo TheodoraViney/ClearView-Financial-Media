@@ -2,7 +2,6 @@ import { defineArrayMember, defineField, defineType } from 'sanity'
 
 import { BRANDS, EDITORIAL_BRAND_KEYS } from '@/brands'
 import { BRIEF_MAX_CHARS, BRIEF_TARGET_MIN_CHARS } from '@/lib/brief-prompt'
-import { PEOPLE_MOVES_CATEGORY_ID } from '@/lib/article-taxonomy'
 
 import { BriefTextInput } from '@/sanity/components/brief-text-input'
 
@@ -13,12 +12,8 @@ type RefValue = { _ref?: string } | undefined
 type PostDocument = {
   _id?: string
   brands?: string[]
-  category?: RefValue
   primaryTopic?: RefValue
 }
-
-const isPeopleMoves = (document: unknown) =>
-  (document as PostDocument | undefined)?.category?._ref === PEOPLE_MOVES_CATEGORY_ID
 
 const publishedId = (id: string | undefined) => String(id ?? '').replace(/^drafts\./, '')
 
@@ -113,20 +108,9 @@ export const post = defineType({
       title: 'Region',
       type: 'reference',
       to: [{ type: 'region' }],
-      description: 'Where the move happened. People Moves only.',
+      description: 'The geographical focus of the article. Used by the region filter on the articles list.',
       options: { disableNew: true },
-      hidden: ({ document }) => !isPeopleMoves(document),
-      validation: (Rule) =>
-        Rule.custom((value: RefValue, context) => {
-          const peopleMoves = isPeopleMoves(context.document)
-
-          if (peopleMoves && !value?._ref) {
-            return 'Choose the region of this move'
-          }
-
-          // The field is hidden for other categories, so a region left over from People Moves must be cleared here.
-          return !peopleMoves && value?._ref ? 'Region applies to People Moves only — clear it' : true
-        }),
+      validation: (Rule) => Rule.required(),
     }),
     defineField({
       name: 'author',

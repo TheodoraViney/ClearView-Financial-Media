@@ -286,11 +286,13 @@ export const headingField = (
     /** The heading text a new block starts with, e.g. the design copy. Empty when not set. */
     initialText?: string
     required?: boolean
+    /** Required only while this returns true, e.g. on some documents of a type. Ignored when `required` is set. */
+    requiredWhen?: (context: ValidationContext) => boolean
     description?: string
     group?: string
   },
 ) => {
-  const { title = 'Heading', defaultLevel, initialText = '', required = false, group } = options
+  const { title = 'Heading', defaultLevel, initialText = '', required = false, requiredWhen, group } = options
   const description =
     options.description ?? 'Choose the heading level in the style menu. The size on the page stays the same.'
 
@@ -320,14 +322,14 @@ export const headingField = (
       },
     ],
     validation: (Rule) =>
-      Rule.custom((value: unknown) => {
+      Rule.custom((value: unknown, context) => {
         const blocks = (Array.isArray(value) ? value : []) as HeadingBlockValue[]
         const filled = blocks.filter((block) =>
           (block.children ?? []).some((child) => (child.text ?? '').trim() !== ''),
         )
 
         if (filled.length === 0) {
-          return required ? 'Enter a heading' : true
+          return required || requiredWhen?.(context) ? 'Enter a heading' : true
         }
 
         if (blocks.length > 1) {
