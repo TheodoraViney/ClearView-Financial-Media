@@ -74,6 +74,8 @@ export type BrevoContact = {
   attributes: Record<string, unknown>
   listIds: number[]
   emailBlacklisted: boolean
+  /** When Brevo last changed the contact, ISO 8601; null when Brevo leaves it out. */
+  modifiedAt: string | null
 }
 
 /** One contact by email address, or null when Brevo has no such contact (404). Read only. */
@@ -83,12 +85,14 @@ export async function getContact(email: string): Promise<BrevoContact | null> {
       attributes?: Record<string, unknown> | null
       listIds?: number[] | null
       emailBlacklisted?: boolean | null
+      modifiedAt?: string | null
     }>(`/contacts/${encodeURIComponent(email)}?identifierType=email_id`)
 
     return {
       attributes: contact?.attributes ?? {},
       listIds: contact?.listIds ?? [],
       emailBlacklisted: contact?.emailBlacklisted === true,
+      modifiedAt: typeof contact?.modifiedAt === 'string' ? contact.modifiedAt : null,
     }
   } catch (error) {
     if (error instanceof BrevoError && error.status === 404) {
@@ -142,6 +146,27 @@ export async function upsertContact({
   await brevoFetch('/contacts', {
     method: 'POST',
     body: { email, attributes, listIds, updateEnabled: true },
+  })
+}
+
+/**
+ * Sends one transactional email, outside any campaign or template: for the team's own notifications, never readers.
+ * The sender is one of the account's senders by id. Every address in `to` sees the others. 201 with the message id.
+ */
+export async function sendTransactionalEmail({
+  senderId,
+  to,
+  subject,
+  htmlContent,
+}: {
+  senderId: number
+  to: string[]
+  subject: string
+  htmlContent: string
+}): Promise<void> {
+  await brevoFetch('/smtp/email', {
+    method: 'POST',
+    body: { sender: { id: senderId }, to: to.map((email) => ({ email })), subject, htmlContent },
   })
 }
 

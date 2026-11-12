@@ -24,6 +24,7 @@ import type { StructureResolver } from 'sanity/structure'
 import {
   BRAND_KEYS,
   BRANDS,
+  SIGNUP_NOTIFICATION_SETTINGS_ID,
   SUBSCRIBE_FORM_SETTINGS_ID,
   articlePageDocumentId,
   brandDocumentId,
@@ -147,7 +148,7 @@ export const structure: StructureResolver = (S) =>
                 .child(S.document().schemaType('briefSettings').documentId(BRIEF_SETTINGS_ID)),
             ]),
         ),
-      // What every subscribe form shares: the Brevo list and the confirmation email.
+      // What every subscribe form shares: the Brevo list and the confirmation email; and who hears about new signups.
       S.listItem()
         .title('Forms')
         .icon(InboxIcon)
@@ -159,6 +160,12 @@ export const structure: StructureResolver = (S) =>
                 .title('Subscribe form settings')
                 .icon(CogIcon)
                 .child(S.document().schemaType('subscribeFormSettings').documentId(SUBSCRIBE_FORM_SETTINGS_ID)),
+              S.listItem()
+                .title('Signup notifications')
+                .icon(EnvelopeIcon)
+                .child(
+                  S.document().schemaType('signupNotificationSettings').documentId(SIGNUP_NOTIFICATION_SETTINGS_ID),
+                ),
             ]),
         ),
       S.divider(),

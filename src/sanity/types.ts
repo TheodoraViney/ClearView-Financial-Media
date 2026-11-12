@@ -1038,6 +1038,16 @@ export type NewsletterIssue = {
   sendRequestedAt?: string;
 };
 
+export type SignupNotificationSettings = {
+  _id: string;
+  _type: "signupNotificationSettings";
+  _createdAt: string;
+  _updatedAt: string;
+  _rev: string;
+  notifyEmails?: Array<string>;
+  notifySender?: BrevoSender;
+};
+
 export type SubscribeFormSettings = {
   _id: string;
   _type: "subscribeFormSettings";
@@ -2643,6 +2653,7 @@ export type AllSanitySchemaTypes =
   | Slug
   | AwardCategory
   | NewsletterIssue
+  | SignupNotificationSettings
   | SubscribeFormSettings
   | SubscribeModal
   | BriefSettings
@@ -24594,6 +24605,25 @@ export type SEARCH_PAGE_QUERY_RESULT = {
   newSearchLabel: string | null;
 } | null;
 
+// Source: src/sanity/queries.ts
+// Variable: SIGNUP_NOTIFICATION_SETTINGS_QUERY
+// Query: *[_id == $id && _type == "signupNotificationSettings"][0]{    notifyEmails,    "senderId": notifySender.id  }
+export type SIGNUP_NOTIFICATION_SETTINGS_QUERY_RESULT = {
+  notifyEmails: Array<string> | null;
+  senderId: number | null;
+} | null;
+
+// Source: src/sanity/queries.ts
+// Variable: SIGNUP_INTEREST_LABELS_QUERY
+// Query: *[_type == "subscribeModal" && _id in $ids]{    _id,    interests[]{ label, "attribute": attribute.name }  }
+export type SIGNUP_INTEREST_LABELS_QUERY_RESULT = Array<{
+  _id: string;
+  interests: Array<{
+    label: string | null;
+    attribute: string | null;
+  }> | null;
+}>;
+
 // Query TypeMap
 declare global {
   interface SanityQueries {
@@ -24620,6 +24650,8 @@ declare global {
     '\n  *[_id in $ids && _type in ["post", "conferenceEvent", "awardsProgramme", "resource"] && defined(slug.current)]{\n    \n  _id,\n  _type,\n  title,\n  "slug": slug.current,\n  brands,\n  excerpt,\n  "author": author->name,\n  "category": category->title,\n  "bodyText": select(\n    _type == "post" => pt::text(content),\n    _type == "resource" => pt::text(body)\n  ),\n  publishedAt,\n  startDate,\n  endDate,\n  hideDateTime,\n  "region": region->title,\n  country,\n  eventType,\n  "image": select(\n    _type == "post" => image{ asset, crop, "alt": coalesce(alt, asset->altText) },\n    _type == "resource" => downloadThumbnail{ asset, crop, "alt": coalesce(alt, asset->altText) },\n    photographs[defined(asset)][0]{ asset, crop, "alt": coalesce(alt, asset->altText) }\n  ),\n  "logo": logo{ asset, crop, "alt": coalesce(alt, asset->altText) }\n\n  }\n': SEARCH_RECORDS_BY_ID_QUERY_RESULT;
     '\n  {\n    "modal": *[_id == $subscribeModalId && _type == "subscribeModal"][0]{\n      interests[]{ _key, "attribute": attribute.name, locked }\n    },\n    "settings": *[_id == $subscribeSettingsId && _type == "subscribeFormSettings"][0]{\n      "listId": list.id,\n      "templateId": confirmationTemplate.id\n    }\n  }\n': SUBSCRIBE_CONFIG_QUERY_RESULT;
     '\n  *[_id == $id && _type == "searchPage"][0]{\n    title,\n    breadcrumbHome,\n    breadcrumbCurrent,\n    placeholder,\n    submitLabel,\n    allLabel,\n    articlesLabel,\n    awardsLabel,\n    eventsLabel,\n    researchLabel,\n    yearLabel,\n    allYearsLabel,\n    selectedLabel,\n    clearFiltersLabel,\n    clearAllLabel,\n    summaryTemplate,\n    typeSuffix,\n    resultSingular,\n    resultPlural,\n    articleType,\n    awardType,\n    eventType,\n    researchType,\n    previousLabel,\n    nextLabel,\n    emptyQueryTitle,\n    emptyQueryText,\n    noResultsTitle,\n    noResultsText,\n    newSearchLabel\n  }\n': SEARCH_PAGE_QUERY_RESULT;
+    '\n  *[_id == $id && _type == "signupNotificationSettings"][0]{\n    notifyEmails,\n    "senderId": notifySender.id\n  }\n': SIGNUP_NOTIFICATION_SETTINGS_QUERY_RESULT;
+    '\n  *[_type == "subscribeModal" && _id in $ids]{\n    _id,\n    interests[]{ label, "attribute": attribute.name }\n  }\n': SIGNUP_INTEREST_LABELS_QUERY_RESULT;
   }
 }
 // Lets @sanity/client releases that predate the global registry read it too
