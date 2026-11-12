@@ -13,7 +13,10 @@ import {
   positionShowsOn,
 } from '@/lib/gam'
 import { NEWSLETTER_COPY_DEFAULTS, NEWSLETTER_TITLE_PLACEHOLDER } from '@/lib/newsletter-copy'
+import { lookupAdUnit } from '@/sanity/ad-unit-lookup'
+import { AdUnitCodeInput } from '@/sanity/components/ad-unit-code-input'
 import { BrandColorsInput } from '@/sanity/components/brand-colors-input'
+import { apiVersion } from '@/sanity/env'
 
 import { brevoSenderField } from '../fields'
 
@@ -45,8 +48,24 @@ const POSITION_DESCRIPTIONS: Record<AdPosition, string> = {
 const PAGE_TYPE_NAMES: Record<AdPageType, string> = { home: 'the home page', other: 'other pages' }
 
 /**
+ * The Ad Manager check of a well-formed code (src/sanity/ad-unit-lookup.ts), or null when there is nothing to report
+ * from it: no token, or a newer value in the field.
+ */
+const lookUp = async (value: string, context: ValidationContext) => {
+  const token = context.getClient({ apiVersion }).config().token
+
+  return token ? lookupAdUnit(value, token, `${context.document?._id}:${context.path?.join('.')}`) : null
+}
+
+const STATUS_NAMES = { INACTIVE: 'inactive', ARCHIVED: 'archived' } as const
+
+/**
  * A position's unit code for one page type. A unit may show once per page (GAM leaves a second slot with the same
  * unit empty), so a code already used by another position for the same page type is an error.
+ *
+ * The code is also checked against Google Ad Manager: a code it does not know, or a unit without the position's
+ * size, blocks publishing, since that banner would never fill. An inactive or archived unit, or a check that could not
+ * run, is only a warning, so an Ad Manager outage never stops anyone publishing.
  */
 const adUnitCodeField = (position: AdPosition, page: AdPageType) =>
   defineField({
@@ -55,7 +74,39 @@ const adUnitCodeField = (position: AdPosition, page: AdPageType) =>
     type: 'string',
     description:
       'The Code column in Google Ad Manager → Inventory → Ad units, e.g. WB_Leaderboard_Homepage_Only. Not the Name column. Empty: not shown on the live site.',
-    validation: (Rule) =>
+    components: { input: AdUnitCodeInput },
+    validation: (Rule) => [
+      Rule.custom(async (value: string | undefined, context) => {
+        if (!isAdUnitCode(value)) {
+          return true
+        }
+
+        const lookup = await lookUp(value, context)
+        const { width, height } = AD_POSITIONS[position]
+
+        if (lookup?.status === 'missing') {
+          return `Google Ad Manager has no ad unit with the code ${value}. Copy it from the Code column.`
+        }
+
+        return lookup?.status === 'found' && !lookup.unit.sizes.includes(`${width}x${height}`)
+          ? `${lookup.unit.name} has no ${width} × ${height} size in Google Ad Manager, so this banner stays empty.`
+          : true
+      }),
+      Rule.custom(async (value: string | undefined, context) => {
+        if (!isAdUnitCode(value)) {
+          return true
+        }
+
+        const lookup = await lookUp(value, context)
+
+        if (lookup?.status === 'error') {
+          return `Could not check the unit with Google Ad Manager: ${lookup.error}`
+        }
+
+        return lookup?.status === 'found' && lookup.unit.status !== 'ACTIVE'
+          ? `${lookup.unit.name} is ${STATUS_NAMES[lookup.unit.status]} in Google Ad Manager, so this banner stays empty.`
+          : true
+      }).warning(),
       Rule.custom((value: string | undefined, context) => {
         if (!value) {
           return true
@@ -74,6 +125,7 @@ const adUnitCodeField = (position: AdPosition, page: AdPageType) =>
           ? `${AD_POSITIONS[clash].title} uses this unit on ${PAGE_TYPE_NAMES[page]} too. A unit shows once per page.`
           : true
       }),
+    ]
   })
 
 const emailCopy = (name: keyof typeof NEWSLETTER_COPY_DEFAULTS, title: string, description: string) =>
