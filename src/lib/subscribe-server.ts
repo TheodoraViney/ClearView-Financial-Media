@@ -1,6 +1,6 @@
 import 'server-only'
 
-import type { NextRequest } from 'next/server'
+import { after, type NextRequest } from 'next/server'
 
 import {
   brandOrigin,
@@ -24,13 +24,10 @@ import {
   type BrevoContact,
 } from './brevo'
 import { HONEYPOT_FIELD } from './honeypot'
-import {
-  isEmailAddress,
-  SUBSCRIBE_MAX_LENGTH,
-  SUBSCRIBE_OPTION_ATTRIBUTES,
-  type SubscribeField,
-  type SubscribeResponse,
-} from './subscribe'
+import { notifySignup } from './signup-notification'
+import { createSignupToken, readSignupToken, signupNotifySecret, type SignupToken } from './signup-token'
+import { isEmailAddress, SUBSCRIBE_MAX_LENGTH, type SubscribeField, type SubscribeResponse } from './subscribe'
+import { ATTRIBUTE, isConfirmed, maskEmails } from './subscribe-contact'
 import { NO_OPTIONS, subscribeOptions, type SubscribeOptions } from './subscribe-options'
 
 /**
@@ -49,27 +46,18 @@ import { NO_OPTIONS, subscribeOptions, type SubscribeOptions } from './subscribe
  *    at most it joins the list and gets SOURCE when it has none. Anything new or different, or anyone else (new, unconfirmed, blacklisted): double
  *    opt-in, so the owner of the address confirms every change by clicking. The answer is the same success either
  *    way.
+ * 5. The team hears about a reader who joins the website list or adds interests (src/lib/signup-notification.ts),
+ *    after the response: at once on the no-email path, otherwise when the click lands on `GET
+ *    /api/subscribe/confirmed` with the encrypted token (src/lib/signup-token.ts) that the confirmation redirect carries.
  *
  * Rate limiting is not done here: it is a firewall rule on this path.
  */
 
-// Brevo attribute names the server sets itself. Structure, not copy.
-const ATTRIBUTE = {
-  firstName: 'FIRSTNAME',
-  lastName: 'LASTNAME',
-  company: 'COMPANY_NAME',
-  jobTitle: 'JOB_TITLE',
-  ...SUBSCRIBE_OPTION_ATTRIBUTES,
-  consent: 'GDPR_CONSENT',
-  source: 'SOURCE',
-  doubleOptIn: 'DOUBLE_OPT-IN',
-} as const
-
 /** What SOURCE gets on a contact that has none yet. */
 const SIGNUP_SOURCE = 'Newsletter Signup'
 
-/** Brevo's value of DOUBLE_OPT-IN once a contact has clicked a confirmation email. */
-const DOUBLE_OPT_IN_CONFIRMED = '1'
+/** Where Brevo sends the reader after the confirmation click; the route is src/app/api/subscribe/confirmed. */
+const CONFIRMED_PATH = '/api/subscribe/confirmed'
 
 /** Largest body accepted. The form sends well under 2 KB. */
 const MAX_BODY_BYTES = 16_384
@@ -151,8 +139,6 @@ function log(brand: BrandKey | null, context: string, error?: unknown) {
     console.error(prefix)
   }
 }
-
-const maskEmails = (text: string) => text.replace(/[^\s@"'<>]+@[^\s@"'<>]+/g, '[email]')
 
 /** `POST /api/subscribe`. Always answers JSON shaped as SubscribeResponse, never cached. */
 export async function handleSubscribe(request: NextRequest, deps: SubscribeDeps = DEFAULT_DEPS): Promise<Response> {
@@ -375,7 +361,14 @@ function invalidFields(request: SignupRequest, brand: BrandKey): SubscribeField[
  * reader chose (names, company, job title, country, industry, interest flags); consent and SOURCE are added when it
  * is sent.
  */
-type Signup = { email: string; attributes: BrevoAttributes; listId: number; templateId: number }
+type Signup = {
+  email: string
+  attributes: BrevoAttributes
+  /** The interest attributes it sets true, also in `attributes`. */
+  interests: string[]
+  listId: number
+  templateId: number
+}
 
 /**
  * Maps the request's keys to Brevo through the documents, and checks country and industry against Brevo's options.
@@ -461,7 +454,7 @@ function resolveSignup(
     attributes[name] = true
   }
 
-  return { email: request.email, attributes, listId, templateId }
+  return { email: request.email, attributes, interests: [...flags], listId, templateId }
 }
 
 const isBrevoId = (value: unknown): value is number => typeof value === 'number' && Number.isInteger(value) && value > 0
@@ -473,9 +466,39 @@ function hasNoSource(contact: BrevoContact | null) {
   return value === undefined || value === null || value === '' || (Array.isArray(value) && value.length === 0)
 }
 
-/** Confirmed once before, by any double opt-in, and still reachable. Only those can skip the confirmation email. */
-const isConfirmed = (contact: BrevoContact | null): contact is BrevoContact =>
-  contact !== null && contact.attributes[ATTRIBUTE.doubleOptIn] === DOUBLE_OPT_IN_CONFIRMED && !contact.emailBlacklisted
+/**
+ * What the team's notification says about this signup. New: the contact is not both confirmed and on the website
+ * list, whatever it holds (imported, or never clicked), so every interest it ticks counts as added. Otherwise only the
+ * interests it does not hold as true yet are added.
+ */
+function signupChange(contact: BrevoContact | null, interests: string[], listId: number) {
+  const isNew = !(isConfirmed(contact) && contact.listIds.includes(listId))
+  const added = isNew ? interests : interests.filter((name) => contact?.attributes[name] !== true)
+
+  return { isNew, added }
+}
+
+// Logged once per instance: a missing secret is configuration, not a per-signup event.
+let warnedNoSecret = false
+
+/**
+ * Where Brevo sends the reader after the click: the confirmed route with a token, or the brand home when
+ * SIGNUP_NOTIFY_SECRET is unset, so the signup works and only the notification is lost.
+ */
+function confirmationRedirect(token: Omit<SignupToken, 'iat'>): string {
+  const secret = signupNotifySecret()
+
+  if (!secret) {
+    if (!warnedNoSecret) {
+      warnedNoSecret = true
+      log(token.brand, 'SIGNUP_NOTIFY_SECRET missing: confirmed signups are not notified')
+    }
+
+    return `${brandOrigin(token.brand)}/`
+  }
+
+  return `${brandOrigin(token.brand)}${CONFIRMED_PATH}?t=${createSignupToken(token, secret)}`
+}
 
 /**
  * True when the contact already holds every value: each flag already true, each text the same, each multiple-choice
@@ -550,6 +573,13 @@ async function subscribe(brand: BrandKey, body: Record<string, unknown>, deps: S
         })
       }
 
+      // A confirmed reader joining the website list now, with no click to wait for, is a signup the team hears about.
+      if (joinList) {
+        const { added } = signupChange(contact, signup.interests, signup.listId)
+
+        after(() => notifySignup({ brand, email: signup.email, contact, added, isNew: true }))
+      }
+
       return success
     }
 
@@ -562,7 +592,11 @@ async function subscribe(brand: BrandKey, body: Record<string, unknown>, deps: S
       },
       listIds: [signup.listId],
       templateId: signup.templateId,
-      redirectionUrl: `${brandOrigin(brand)}/`,
+      redirectionUrl: confirmationRedirect({
+        email: signup.email,
+        brand,
+        ...signupChange(contact, signup.interests, signup.listId),
+      }),
     })
 
     return success
@@ -574,4 +608,109 @@ async function subscribe(brand: BrandKey, body: Record<string, unknown>, deps: S
     log(brand, 'Brevo failed', error)
     return genericFailure(502)
   }
+}
+
+/**
+ * Replay guard for the confirmed route. The token stays valid for 30 days and the URL can be opened again (back
+ * button, history, a forwarded link), so a click only counts when Brevo changed the contact after the token was issued
+ * and within the last 15 minutes: the confirmation itself. Tokens already handled by this instance are skipped too, so
+ * a burst of repeats inside that window sends one email. The set is per instance and bounded; it is not a ledger.
+ * Known limits: a mail scanner that confirms without following the redirect, then a human click after 15 minutes,
+ * sends nothing; two clicks landing on different instances within 15 minutes can send two.
+ */
+const CONFIRMATION_WINDOW_MS = 15 * 60 * 1000
+const MODIFIED_SKEW_MS = 60 * 1000
+const HANDLED_TOKENS_MAX = 500
+const handledTokens = new Set<string>()
+
+/** Marks a token handled; false when it was already. Drops the oldest beyond HANDLED_TOKENS_MAX. */
+function claimToken(token: string) {
+  if (handledTokens.has(token)) {
+    return false
+  }
+
+  handledTokens.add(token)
+
+  if (handledTokens.size > HANDLED_TOKENS_MAX) {
+    handledTokens.delete(handledTokens.values().next().value as string)
+  }
+
+  return true
+}
+
+// Milliseconds after the click at which the contact is read: Brevo may redirect before it has saved the change.
+const CONFIRMATION_ATTEMPTS_MS = [0, 3_000, 10_000]
+
+/**
+ * Whether a confirmation click is one the team hears about: the contact is confirmed, on the website list, holds
+ * every interest the signup added, and was changed by this confirmation (see CONFIRMATION_WINDOW_MS). Nothing added
+ * (a confirmed reader changing only their name, say) is no news.
+ */
+function shouldNotifyConfirmed(
+  contact: BrevoContact | null,
+  token: SignupToken,
+  listId: number | null | undefined,
+  now: number,
+): contact is BrevoContact {
+  const modifiedAt = contact?.modifiedAt ? Date.parse(contact.modifiedAt) : NaN
+
+  return (
+    isConfirmed(contact) &&
+    isBrevoId(listId) &&
+    contact.listIds.includes(listId) &&
+    token.added.length > 0 &&
+    token.added.every((name) => contact.attributes[name] === true) &&
+    modifiedAt >= token.iat * 1000 - MODIFIED_SKEW_MS &&
+    modifiedAt >= now - CONFIRMATION_WINDOW_MS
+  )
+}
+
+/**
+ * `GET /api/subscribe/confirmed?t=`, where Brevo sends the reader after the confirmation click. Reads the token and
+ * answers 303 to the brand home at once, never cached and never saying why nothing was sent. After the response it
+ * checks the contact as Brevo holds it, a few times while Brevo catches up, and emails the team. The brand comes from
+ * the Host, as for the signup, and must be the one the token was made on.
+ */
+export function handleSubscribeConfirmed(request: NextRequest, deps: SubscribeDeps = DEFAULT_DEPS): Response {
+  const home = new Response(null, { status: 303, headers: { Location: '/', 'Cache-Control': 'no-store' } })
+  const brand = resolveBrandFromHost(request.headers.get('host') ?? '') ?? fallbackBrand(request.cookies.get('brand')?.value)
+  const secret = signupNotifySecret()
+  const value = request.nextUrl.searchParams.get('t')
+
+  if (!brand || !secret || !value) {
+    return home
+  }
+
+  const token = readSignupToken(value, secret)
+
+  if (!token || token.brand !== brand) {
+    log(brand, 'confirmed: refused token')
+    return home
+  }
+
+  // Nothing added is never notified, so there is nothing to check.
+  if (token.added.length === 0 || !claimToken(value)) {
+    return home
+  }
+
+  after(async () => {
+    const started = Date.now()
+
+    for (const at of CONFIRMATION_ATTEMPTS_MS) {
+      await new Promise((resolve) => setTimeout(resolve, Math.max(0, started + at - Date.now())))
+
+      try {
+        const [contact, config] = await Promise.all([deps.getContact(token.email), deps.loadConfig(brand)])
+
+        if (shouldNotifyConfirmed(contact, token, config.settings?.listId, Date.now())) {
+          await notifySignup({ brand, email: token.email, contact, added: token.added, isNew: token.isNew })
+          return
+        }
+      } catch (error) {
+        log(brand, 'confirmed: check failed', error)
+      }
+    }
+  })
+
+  return home
 }

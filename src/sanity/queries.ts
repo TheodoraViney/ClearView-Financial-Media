@@ -431,3 +431,22 @@ export const SEARCH_PAGE_QUERY = defineQuery(`
     newSearchLabel
   }
 `)
+
+// Who hears about a confirmed signup (`$id` is SIGNUP_NOTIFICATION_SETTINGS_ID): the team's addresses and the Brevo
+// sender the notification comes from. The id is dotted, so this must be fetched with the read token; without one it
+// returns null. See src/lib/signup-notification.ts.
+export const SIGNUP_NOTIFICATION_SETTINGS_QUERY = defineQuery(`
+  *[_id == $id && _type == "signupNotificationSettings"][0]{
+    notifyEmails,
+    "senderId": notifySender.id
+  }
+`)
+
+// Every brand's pop-up interests with their labels (`$ids` from subscribeModalDocumentId), so the signup notification
+// names an attribute a reader holds from another brand's pop-up too.
+export const SIGNUP_INTEREST_LABELS_QUERY = defineQuery(`
+  *[_type == "subscribeModal" && _id in $ids]{
+    _id,
+    interests[]{ label, "attribute": attribute.name }
+  }
+`)

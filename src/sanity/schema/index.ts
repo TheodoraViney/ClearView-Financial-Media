@@ -20,6 +20,7 @@ import { person } from './documents/person'
 import { post } from './documents/post'
 import { resource } from './documents/resource'
 import { searchPage } from './documents/search-page'
+import { signupNotificationSettings } from './documents/signup-notification-settings'
 import { subscribeFormSettings } from './documents/subscribe-form-settings'
 import { subscribeModal } from './documents/subscribe-modal'
 import { objectTypes } from './objects'
@@ -43,6 +44,7 @@ export const documentTypes = [
   briefSettings,
   subscribeModal,
   subscribeFormSettings,
+  signupNotificationSettings,
   newsletterIssue,
   awardsProgrammeGroup,
   awardsProgramme,

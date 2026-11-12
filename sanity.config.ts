@@ -96,6 +96,7 @@ const SINGLETON_TYPES = new Set([
   'briefSettings',
   'subscribeModal',
   'subscribeFormSettings',
+  'signupNotificationSettings',
 ])
 
 const SINGLETON_REMOVED_ACTIONS = new Set(['duplicate', 'delete'])

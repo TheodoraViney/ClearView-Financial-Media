@@ -83,7 +83,7 @@ Next treats `_`-prefixed app folders as private and the URL-encoded workaround b
 
 - Brand assignment is stored as brand KEY strings, not references. `post.brands` is a checkbox multiselect of editorial brands. `page.brand` is a radio of all four.
 - Brand settings documents have fixed ids `brand-{key}` from `brandDocumentId()` in `src/brands.ts`.
-- Never put a `.` in a document id. Sanity gives anonymous readers access to root-path ids only, and the site reads published content without a token so it stays CDN-cacheable. A dotted id is invisible to the site.
+- Never put a `.` in a document id. Sanity gives anonymous readers access to root-path ids only, and the site reads published content without a token so it stays CDN-cacheable. A dotted id is invisible to the site. The one exception is `settings.signup-notifications` (`SIGNUP_NOTIFICATION_SETTINGS_ID` in `src/brands.ts`): dotted so the public API cannot read the team's addresses, and read on the server with the read token.
 - Every content query in `src/sanity/queries.ts` takes `$brand` and filters by it. Fetching a post on the wrong brand host returns 404, never a redirect.
 
 ### Caching

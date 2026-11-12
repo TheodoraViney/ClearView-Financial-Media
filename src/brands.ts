@@ -45,6 +45,12 @@ export const subscribeModalDocumentId = (key: BrandKey): string => `subscribe-mo
 /** Id of the one subscribe form settings document, shared by every brand: the Brevo list and confirmation email. */
 export const SUBSCRIBE_FORM_SETTINGS_ID = 'subscribe-form-settings'
 
+/**
+ * Id of the one signup notifications document: the team's addresses for new-signup emails. The one deliberate
+ * dotted id: the public dataset API cannot read it, so the server reads it with the read token.
+ */
+export const SIGNUP_NOTIFICATION_SETTINGS_ID = 'settings.signup-notifications'
+
 export function isBrandKey(value: string): value is BrandKey {
   return (BRAND_KEYS as readonly string[]).includes(value)
 }
