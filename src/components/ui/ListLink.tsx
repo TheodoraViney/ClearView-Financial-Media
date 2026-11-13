@@ -25,6 +25,7 @@ export function ListLink({
   meta = [],
   variant = 'default',
   motion = 'smooth',
+  relaxed = false,
   metaClassName,
   className,
 }: {
@@ -34,6 +35,8 @@ export function ListLink({
   meta?: ReactNode[]
   variant?: keyof typeof VARIANTS
   motion?: Motion
+  /** 16px between title and meta instead of 8 (shared-shell other-awards-programme-card `relaxed`). Not used by `row`. */
+  relaxed?: boolean
   // Extra classes for the meta line, e.g. `leading-none` where the design sets it 13/13 (Explore cards).
   metaClassName?: string
   className?: string
@@ -43,7 +46,7 @@ export function ListLink({
     row
       ? // 56px minimum; the keyboard outline sits inside the row, because the parent list clips its last rule.
         'flex min-h-14 items-center justify-between gap-3 border-b border-border py-4 focus-visible:-outline-offset-2'
-      : 'flex flex-col gap-2',
+      : cx('flex flex-col', relaxed ? 'gap-4' : 'gap-2'),
     VARIANTS[variant].text,
     href && VARIANTS[variant].hover,
     className,

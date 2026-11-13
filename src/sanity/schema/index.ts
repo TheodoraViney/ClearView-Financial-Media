@@ -4,6 +4,7 @@ import { articlePage } from './documents/article-page'
 import { category, region, topic } from './documents/article-taxonomy'
 import { author } from './documents/author'
 import { awardCategory } from './documents/award-category'
+import { awardCategoryPage } from './documents/award-category-page'
 import { awardsProgramme } from './documents/awards-programme'
 import { awardsProgrammeGroup } from './documents/awards-programme-group'
 import { brand } from './documents/brand'
@@ -40,6 +41,7 @@ export const documentTypes = [
   mostRead,
   articlePage,
   searchPage,
+  awardCategoryPage,
   infographicSettings,
   briefSettings,
   subscribeModal,

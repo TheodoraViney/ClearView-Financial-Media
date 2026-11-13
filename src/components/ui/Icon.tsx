@@ -1,6 +1,7 @@
 import type { SVGProps } from 'react'
 
 import { cx } from './cx'
+import { CardChevronIcon } from './icons/card-chevron'
 import { CheckIcon } from './icons/check'
 import { CheckSmIcon } from './icons/check-sm'
 import { ChevronLeftIcon } from './icons/chevron-left'
@@ -33,6 +34,7 @@ export const iconMap = {
   'chevron-right': ChevronRightIcon,
   'chevron-left': ChevronLeftIcon,
   'chevron-down': ChevronDownIcon,
+  'card-chevron': CardChevronIcon,
   search: SearchIcon,
   close: CloseIcon,
   menu: MenuIcon,
