@@ -1139,6 +1139,7 @@ export type AwardCategoryPage = {
   _createdAt: string;
   _updatedAt: string;
   _rev: string;
+  breadcrumbHomeLabel?: string;
   breadcrumbAwardsLabel?: string;
   detailsHeading?: string;
   eligibilityLabel?: string;
@@ -1146,7 +1147,26 @@ export type AwardCategoryPage = {
   judgingLabel?: string;
   winnersHeading?: string;
   winnerLabel?: string;
-  otherProgrammesHeading?: string;
+  otherProgrammesHeading?: Array<{
+    children?: Array<{
+      marks?: Array<string>;
+      text?: string;
+      _type: "span";
+      _key: string;
+    }>;
+    style?: "normal" | "h1" | "h2" | "h3" | "h4" | "h5" | "h6";
+    listItem?: never;
+    markDefs?: null;
+    level?: number;
+    _type: "block";
+    _key: string;
+  }>;
+  otherProgrammes?: Array<{
+    edition?: AwardsProgrammeReference;
+    title?: string;
+    _type: "otherProgrammePick";
+    _key: string;
+  }>;
   launchingSoonLabel?: string;
   submissionsOpenLabel?: string;
   ceremonyDueLabel?: string;
@@ -24688,7 +24708,7 @@ export type AWARD_CATEGORY_QUERY_RESULT = {
 
 // Source: src/sanity/queries.ts
 // Variable: OTHER_AWARDS_QUERY
-// Query: [    ...*[      _type == "awardsProgramme"      && nominationsClosingDate >= $today      && coalesce(programme->slug.current, "") != $programme    ] | order(nominationsClosingDate asc)[0...12]{      _id, title, "slug": slug.current, "programmeId": programme._ref,      startDate, endDate, country, nominationsOpeningDate, nominationsClosingDate    },    ...*[      _type == "awardsProgramme"      && !(defined(nominationsClosingDate) && nominationsClosingDate >= $today)      && startDate >= $today      && coalesce(programme->slug.current, "") != $programme    ] | order(startDate asc)[0...12]{      _id, title, "slug": slug.current, "programmeId": programme._ref,      startDate, endDate, country, nominationsOpeningDate, nominationsClosingDate    }  ]
+// Query: [    ...*[      _type == "awardsProgramme"      && nominationsClosingDate >= $today      && coalesce(programme->slug.current, "") != $programme    ] | order(nominationsClosingDate asc)[0...12]{   _id, title, "slug": slug.current, "programmeId": programme._ref,  startDate, endDate, country, nominationsOpeningDate, nominationsClosingDate },    ...*[      _type == "awardsProgramme"      && !(defined(nominationsClosingDate) && nominationsClosingDate >= $today)      && startDate >= $today      && coalesce(programme->slug.current, "") != $programme    ] | order(startDate asc)[0...12]{   _id, title, "slug": slug.current, "programmeId": programme._ref,  startDate, endDate, country, nominationsOpeningDate, nominationsClosingDate }  ]
 export type OTHER_AWARDS_QUERY_RESULT = Array<{
   _id: string;
   title: string | null;
@@ -24953,8 +24973,9 @@ export type OTHER_AWARDS_QUERY_RESULT = Array<{
 
 // Source: src/sanity/queries.ts
 // Variable: AWARD_CATEGORY_PAGE_QUERY
-// Query: *[_id == $id && _type == "awardCategoryPage"][0]{    breadcrumbAwardsLabel,    detailsHeading,    eligibilityLabel,    recognisesLabel,    judgingLabel,    winnersHeading,    winnerLabel,    otherProgrammesHeading,    launchingSoonLabel,    submissionsOpenLabel,    ceremonyDueLabel  }
+// Query: *[_id == $id && _type == "awardCategoryPage"][0]{    breadcrumbHomeLabel,    breadcrumbAwardsLabel,    detailsHeading,    eligibilityLabel,    recognisesLabel,    judgingLabel,    winnersHeading,    winnerLabel,    otherProgrammesHeading[]{ _key, style, children[]{ _key, text } },    "otherProgrammes": otherProgrammes[]{ _key, title, "edition": edition->{   _id, title, "slug": slug.current, "programmeId": programme._ref,  startDate, endDate, country, nominationsOpeningDate, nominationsClosingDate } },    launchingSoonLabel,    submissionsOpenLabel,    ceremonyDueLabel  }
 export type AWARD_CATEGORY_PAGE_QUERY_RESULT = {
+  breadcrumbHomeLabel: string | null;
   breadcrumbAwardsLabel: string | null;
   detailsHeading: string | null;
   eligibilityLabel: string | null;
@@ -24962,7 +24983,279 @@ export type AWARD_CATEGORY_PAGE_QUERY_RESULT = {
   judgingLabel: string | null;
   winnersHeading: string | null;
   winnerLabel: string | null;
-  otherProgrammesHeading: string | null;
+  otherProgrammesHeading: Array<{
+    _key: string;
+    style: "h1" | "h2" | "h3" | "h4" | "h5" | "h6" | "normal" | null;
+    children: Array<{
+      _key: string;
+      text: string | null;
+    }> | null;
+  }> | null;
+  otherProgrammes: Array<{
+    _key: string;
+    title: string | null;
+    edition: {
+      _id: string;
+      title: string | null;
+      slug: string | null;
+      programmeId: string | null;
+      startDate: string | null;
+      endDate: string | null;
+      country:
+        | "AD"
+        | "AE"
+        | "AF"
+        | "AG"
+        | "AI"
+        | "AL"
+        | "AM"
+        | "AO"
+        | "AQ"
+        | "AR"
+        | "AS"
+        | "AT"
+        | "AU"
+        | "AW"
+        | "AX"
+        | "AZ"
+        | "BA"
+        | "BB"
+        | "BD"
+        | "BE"
+        | "BF"
+        | "BG"
+        | "BH"
+        | "BI"
+        | "BJ"
+        | "BL"
+        | "BM"
+        | "BN"
+        | "BO"
+        | "BQ"
+        | "BR"
+        | "BS"
+        | "BT"
+        | "BV"
+        | "BW"
+        | "BY"
+        | "BZ"
+        | "CA"
+        | "CC"
+        | "CD"
+        | "CF"
+        | "CG"
+        | "CH"
+        | "CI"
+        | "CK"
+        | "CL"
+        | "CM"
+        | "CN"
+        | "CO"
+        | "CR"
+        | "CU"
+        | "CV"
+        | "CW"
+        | "CX"
+        | "CY"
+        | "CZ"
+        | "DE"
+        | "DJ"
+        | "DK"
+        | "DM"
+        | "DO"
+        | "DZ"
+        | "EC"
+        | "EE"
+        | "EG"
+        | "EH"
+        | "ER"
+        | "ES"
+        | "ET"
+        | "FI"
+        | "FJ"
+        | "FK"
+        | "FM"
+        | "FO"
+        | "FR"
+        | "GA"
+        | "GB"
+        | "GD"
+        | "GE"
+        | "GF"
+        | "GG"
+        | "GH"
+        | "GI"
+        | "GL"
+        | "GM"
+        | "GN"
+        | "GP"
+        | "GQ"
+        | "GR"
+        | "GS"
+        | "GT"
+        | "GU"
+        | "GW"
+        | "GY"
+        | "HK"
+        | "HM"
+        | "HN"
+        | "HR"
+        | "HT"
+        | "HU"
+        | "ID"
+        | "IE"
+        | "IL"
+        | "IM"
+        | "IN"
+        | "IO"
+        | "IQ"
+        | "IR"
+        | "IS"
+        | "IT"
+        | "JE"
+        | "JM"
+        | "JO"
+        | "JP"
+        | "KE"
+        | "KG"
+        | "KH"
+        | "KI"
+        | "KM"
+        | "KN"
+        | "KP"
+        | "KR"
+        | "KW"
+        | "KY"
+        | "KZ"
+        | "LA"
+        | "LB"
+        | "LC"
+        | "LI"
+        | "LK"
+        | "LR"
+        | "LS"
+        | "LT"
+        | "LU"
+        | "LV"
+        | "LY"
+        | "MA"
+        | "MC"
+        | "MD"
+        | "ME"
+        | "MF"
+        | "MG"
+        | "MH"
+        | "MK"
+        | "ML"
+        | "MM"
+        | "MN"
+        | "MO"
+        | "MP"
+        | "MQ"
+        | "MR"
+        | "MS"
+        | "MT"
+        | "MU"
+        | "MV"
+        | "MW"
+        | "MX"
+        | "MY"
+        | "MZ"
+        | "NA"
+        | "NC"
+        | "NE"
+        | "NF"
+        | "NG"
+        | "NI"
+        | "NL"
+        | "NO"
+        | "NP"
+        | "NR"
+        | "NU"
+        | "NZ"
+        | "OM"
+        | "PA"
+        | "PE"
+        | "PF"
+        | "PG"
+        | "PH"
+        | "PK"
+        | "PL"
+        | "PM"
+        | "PN"
+        | "PR"
+        | "PS"
+        | "PT"
+        | "PW"
+        | "PY"
+        | "QA"
+        | "RE"
+        | "RO"
+        | "RS"
+        | "RU"
+        | "RW"
+        | "SA"
+        | "SB"
+        | "SC"
+        | "SD"
+        | "SE"
+        | "SG"
+        | "SH"
+        | "SI"
+        | "SJ"
+        | "SK"
+        | "SL"
+        | "SM"
+        | "SN"
+        | "SO"
+        | "SR"
+        | "SS"
+        | "ST"
+        | "SV"
+        | "SX"
+        | "SY"
+        | "SZ"
+        | "TC"
+        | "TD"
+        | "TF"
+        | "TG"
+        | "TH"
+        | "TJ"
+        | "TK"
+        | "TL"
+        | "TM"
+        | "TN"
+        | "TO"
+        | "TR"
+        | "TT"
+        | "TV"
+        | "TW"
+        | "TZ"
+        | "UA"
+        | "UG"
+        | "UM"
+        | "US"
+        | "UY"
+        | "UZ"
+        | "VA"
+        | "VC"
+        | "VE"
+        | "VG"
+        | "VI"
+        | "VN"
+        | "VU"
+        | "WF"
+        | "WS"
+        | "YE"
+        | "YT"
+        | "ZA"
+        | "ZM"
+        | "ZW"
+        | null;
+      nominationsOpeningDate: string | null;
+      nominationsClosingDate: string | null;
+    } | null;
+  }> | null;
   launchingSoonLabel: string | null;
   submissionsOpenLabel: string | null;
   ceremonyDueLabel: string | null;
@@ -24997,8 +25290,8 @@ declare global {
     '\n  *[_id == $id && _type == "signupNotificationSettings"][0]{\n    notifyEmails,\n    "senderId": notifySender.id\n  }\n': SIGNUP_NOTIFICATION_SETTINGS_QUERY_RESULT;
     '\n  *[_type == "subscribeModal" && _id in $ids]{\n    _id,\n    interests[]{ label, "attribute": attribute.name }\n  }\n': SIGNUP_INTEREST_LABELS_QUERY_RESULT;
     '\n  *[_type == "awardCategory" && slug.current == $category][0]{\n    _id,\n    title,\n    "slug": slug.current,\n    categoryGroup,\n    description,\n    eligibility,\n    recognises,\n    judging,\n    "programme": *[_type == "awardsProgrammeGroup" && slug.current == $programme][0]{ _id, title, "slug": slug.current },\n    "editions": *[\n      _type == "awardsProgramme"\n      && programme->slug.current == $programme\n      && ^._id in winners[].category._ref\n    ] | order(startDate desc){\n      _id,\n      title,\n      "slug": slug.current,\n      startDate,\n      "winners": winners[category._ref == ^.^._id]{\n        _key,\n        categoryGroup,\n        "company": company->{ title, "slug": slug.current, "logo": logo{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n } }\n      }\n    }\n  }\n': AWARD_CATEGORY_QUERY_RESULT;
-    '\n  [\n    ...*[\n      _type == "awardsProgramme"\n      && nominationsClosingDate >= $today\n      && coalesce(programme->slug.current, "") != $programme\n    ] | order(nominationsClosingDate asc)[0...12]{\n      _id, title, "slug": slug.current, "programmeId": programme._ref,\n      startDate, endDate, country, nominationsOpeningDate, nominationsClosingDate\n    },\n    ...*[\n      _type == "awardsProgramme"\n      && !(defined(nominationsClosingDate) && nominationsClosingDate >= $today)\n      && startDate >= $today\n      && coalesce(programme->slug.current, "") != $programme\n    ] | order(startDate asc)[0...12]{\n      _id, title, "slug": slug.current, "programmeId": programme._ref,\n      startDate, endDate, country, nominationsOpeningDate, nominationsClosingDate\n    }\n  ]\n': OTHER_AWARDS_QUERY_RESULT;
-    '\n  *[_id == $id && _type == "awardCategoryPage"][0]{\n    breadcrumbAwardsLabel,\n    detailsHeading,\n    eligibilityLabel,\n    recognisesLabel,\n    judgingLabel,\n    winnersHeading,\n    winnerLabel,\n    otherProgrammesHeading,\n    launchingSoonLabel,\n    submissionsOpenLabel,\n    ceremonyDueLabel\n  }\n': AWARD_CATEGORY_PAGE_QUERY_RESULT;
+    '\n  [\n    ...*[\n      _type == "awardsProgramme"\n      && nominationsClosingDate >= $today\n      && coalesce(programme->slug.current, "") != $programme\n    ] | order(nominationsClosingDate asc)[0...12]{ \n  _id, title, "slug": slug.current, "programmeId": programme._ref,\n  startDate, endDate, country, nominationsOpeningDate, nominationsClosingDate\n },\n    ...*[\n      _type == "awardsProgramme"\n      && !(defined(nominationsClosingDate) && nominationsClosingDate >= $today)\n      && startDate >= $today\n      && coalesce(programme->slug.current, "") != $programme\n    ] | order(startDate asc)[0...12]{ \n  _id, title, "slug": slug.current, "programmeId": programme._ref,\n  startDate, endDate, country, nominationsOpeningDate, nominationsClosingDate\n }\n  ]\n': OTHER_AWARDS_QUERY_RESULT;
+    '\n  *[_id == $id && _type == "awardCategoryPage"][0]{\n    breadcrumbHomeLabel,\n    breadcrumbAwardsLabel,\n    detailsHeading,\n    eligibilityLabel,\n    recognisesLabel,\n    judgingLabel,\n    winnersHeading,\n    winnerLabel,\n    otherProgrammesHeading[]{ _key, style, children[]{ _key, text } },\n    "otherProgrammes": otherProgrammes[]{ _key, title, "edition": edition->{ \n  _id, title, "slug": slug.current, "programmeId": programme._ref,\n  startDate, endDate, country, nominationsOpeningDate, nominationsClosingDate\n } },\n    launchingSoonLabel,\n    submissionsOpenLabel,\n    ceremonyDueLabel\n  }\n': AWARD_CATEGORY_PAGE_QUERY_RESULT;
   }
 }
 // Lets @sanity/client releases that predate the global registry read it too

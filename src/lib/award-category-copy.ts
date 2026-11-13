@@ -4,6 +4,7 @@
  * Pure: no Sanity or Next imports, so the Studio validation and the page share the template rule.
  */
 export const AWARD_CATEGORY_PAGE_COPY_KEYS = [
+  'breadcrumbHomeLabel',
   'breadcrumbAwardsLabel',
   'detailsHeading',
   'eligibilityLabel',
@@ -11,7 +12,6 @@ export const AWARD_CATEGORY_PAGE_COPY_KEYS = [
   'judgingLabel',
   'winnersHeading',
   'winnerLabel',
-  'otherProgrammesHeading',
   'launchingSoonLabel',
   'submissionsOpenLabel',
   'ceremonyDueLabel',

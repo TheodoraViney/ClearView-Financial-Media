@@ -3,10 +3,11 @@ import { stegaClean, type StegaBranded } from 'next-sanity'
 import type { Definition } from '@/components/ui/DefinitionList'
 import {
   categoryGroupLabel,
+  EDITION_STATUS_LABELS,
   editionStatus,
+  otherProgrammeEditions,
   type AwardCategoryView,
   type AwardYearView,
-  type EditionStatus,
   type OtherProgrammeView,
 } from '@/lib/award-category'
 import {
@@ -20,6 +21,7 @@ import { formatDateRange } from '@/lib/dates'
 import type { AdUnits } from '@/lib/gam'
 import { AWARDS_LISTING_PATH, sharedRecordHref } from '@/lib/links'
 
+import { toHeading } from './heading'
 import { toImage } from './image'
 import type {
   AWARD_CATEGORY_PAGE_QUERY_RESULT,
@@ -27,26 +29,19 @@ import type {
   OTHER_AWARDS_QUERY_RESULT,
 } from './types'
 
-/** Editions in the "Other awards programmes" list: the next one of each other programme. */
-export const OTHER_PROGRAMMES_COUNT = 2
-
 type CategoryData = StegaBranded<AWARD_CATEGORY_QUERY_RESULT>
 type OthersData = StegaBranded<OTHER_AWARDS_QUERY_RESULT>
 type CopyData = StegaBranded<AWARD_CATEGORY_PAGE_QUERY_RESULT>
 type Category = NonNullable<CategoryData>
 type Edition = Category['editions'][number]
+type SidebarEdition = OthersData[number]
+type Pick = NonNullable<NonNullable<CopyData>['otherProgrammes']>[number]
 
 const filled = <T extends string>(value: T | null | undefined): value is T => Boolean(stegaClean(value)?.trim())
 
 /** The labels as the CMS holds them, stega kept for click-to-edit. Every label is required in the Studio. */
 function toCopy(copy: NonNullable<CopyData>): AwardCategoryPageCopy {
   return Object.fromEntries(AWARD_CATEGORY_PAGE_COPY_KEYS.map((key) => [key, copy[key] ?? ''])) as AwardCategoryPageCopy
-}
-
-const STATUS_LABELS: Record<EditionStatus, AwardCategoryPageCopyKey> = {
-  launchingSoon: 'launchingSoonLabel',
-  submissionsOpen: 'submissionsOpenLabel',
-  ceremonyDue: 'ceremonyDueLabel',
 }
 
 /**
@@ -108,46 +103,39 @@ function toDetails(category: Category, copy: AwardCategoryPageCopy): Definition[
   })
 }
 
+function toOtherProgramme(edition: SidebarEdition, title: string, copy: AwardCategoryPageCopy, today: string): OtherProgrammeView {
+  const status = editionStatus(
+    {
+      nominationsOpeningDate: stegaClean(edition.nominationsOpeningDate),
+      nominationsClosingDate: stegaClean(edition.nominationsClosingDate),
+      startDate: stegaClean(edition.startDate),
+    },
+    today,
+  )
+  const place = countryName(stegaClean(edition.country))
+  const dates = formatDateRange(stegaClean(edition.startDate), stegaClean(edition.endDate))
+
+  return {
+    key: edition._id,
+    title,
+    href: sharedRecordHref('awardsProgramme', edition.slug, 'clearview'),
+    status: status ? copy[EDITION_STATUS_LABELS[status]] : null,
+    highlight: status === 'submissionsOpen',
+    meta: [place, dates].filter((part): part is string => Boolean(part)),
+  }
+}
+
+/** Other awards programmes: the shared selection (otherProgrammeEditions), without the page's own programme. */
 function toOtherProgrammes(
-  editions: OthersData,
+  picks: Pick[] | null | undefined,
+  others: OthersData,
+  pageProgrammeId: string,
   copy: AwardCategoryPageCopy,
   today: string,
 ): OtherProgrammeView[] {
-  const seen = new Set<string>()
-  const items: OtherProgrammeView[] = []
-
-  for (const edition of editions) {
-    // One edition per programme: the tiers arrive in order, so the first one seen is the programme's next.
-    const programme = stegaClean(edition.programmeId) ?? edition._id
-    const status = editionStatus(
-      {
-        nominationsOpeningDate: stegaClean(edition.nominationsOpeningDate),
-        nominationsClosingDate: stegaClean(edition.nominationsClosingDate),
-        startDate: stegaClean(edition.startDate),
-      },
-      today,
-    )
-
-    if (!status || !edition.title || seen.has(programme) || items.length >= OTHER_PROGRAMMES_COUNT) {
-      continue
-    }
-
-    seen.add(programme)
-
-    const place = countryName(stegaClean(edition.country))
-    const dates = formatDateRange(stegaClean(edition.startDate), stegaClean(edition.endDate))
-
-    items.push({
-      key: edition._id,
-      title: edition.title,
-      href: sharedRecordHref('awardsProgramme', edition.slug, 'clearview'),
-      status: copy[STATUS_LABELS[status]],
-      highlight: status === 'submissionsOpen',
-      meta: [place, dates].filter((part): part is string => Boolean(part)),
-    })
-  }
-
-  return items
+  return otherProgrammeEditions(picks, others, { today, excludeProgramme: pageProgrammeId, clean: stegaClean }).map(
+    ({ edition, title }) => toOtherProgramme(edition, title, copy, today),
+  )
 }
 
 /** The award category page as plain props. `category` must have passed `isAwardedCategory`. */
@@ -181,13 +169,20 @@ export function toAwardCategoryView({
 
   return {
     title,
-    breadcrumb: [{ label: copy.breadcrumbAwardsLabel, href: AWARDS_LISTING_PATH }, { label: title }],
+    breadcrumb: [
+      { label: copy.breadcrumbHomeLabel, href: '/' },
+      { label: copy.breadcrumbAwardsLabel, href: AWARDS_LISTING_PATH },
+      { label: title },
+    ],
     edition: latest?.title ? { title: latest.title, href: sharedRecordHref('awardsProgramme', latest.slug, 'clearview') } : null,
     groups,
     description: filled(category.description) ? category.description : null,
     details: toDetails(category, copy),
     years: toYears(category.editions, copy.winnerLabel),
-    otherProgrammes: toOtherProgrammes(others, copy, today),
+    otherProgrammes: {
+      heading: toHeading(rawCopy.otherProgrammesHeading),
+      items: toOtherProgrammes(rawCopy.otherProgrammes, others, category.programme._id, copy, today),
+    },
     copy,
     ads: { top: ads.top, side: ads.side },
   }

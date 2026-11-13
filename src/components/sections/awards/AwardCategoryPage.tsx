@@ -5,9 +5,10 @@ import { AwardWinnerCard } from '@/components/ui/AwardWinnerCard'
 import { Breadcrumb } from '@/components/ui/Breadcrumb'
 import { cx } from '@/components/ui/cx'
 import { DefinitionList } from '@/components/ui/DefinitionList'
+import { Heading } from '@/components/ui/Heading'
 import { ListLink } from '@/components/ui/ListLink'
 import { Meta } from '@/components/ui/Meta'
-import type { AwardCategoryView, AwardYearView, OtherProgrammeView } from '@/lib/award-category'
+import type { AwardCategoryView, AwardYearView } from '@/lib/award-category'
 import { adPositionLabel } from '@/lib/gam'
 
 import { WinnersByYear } from './WinnersByYear.client'
@@ -108,10 +109,9 @@ export function AwardCategoryPage({ view }: { view: AwardCategoryView }) {
         <div className={cx('w-full', !view.ads.side && AD_SLOT_UNSET)}>
           <AdSlot size="mpu" unit={view.ads.side} label={adPositionLabel('side')} />
         </div>
-        {view.otherProgrammes.length > 0 && (
+        {view.otherProgrammes.items.length > 0 && (
           <OtherProgrammes
-            heading={copy.otherProgrammesHeading}
-            items={view.otherProgrammes}
+            {...view.otherProgrammes}
             className="w-full header:sticky header:top-rail header:w-75"
           />
         )}
@@ -133,21 +133,25 @@ function YearWinners({ year }: { year: AwardYearView }) {
   )
 }
 
-/** Other awards programmes (shared-shell other-awards-programme-card, `relaxed`): title, then status | place | date. */
+/**
+ * Other awards programmes (shared-shell other-awards-programme-card, `relaxed`): title, then status | place | date.
+ * A picked past edition has no status. The heading's tag comes from the CMS; the list shows without it when it is empty.
+ */
 function OtherProgrammes({
   heading,
   items,
   className,
-}: {
-  heading: string
-  items: OtherProgrammeView[]
-  className?: string
-}) {
+}: AwardCategoryView['otherProgrammes'] & { className?: string }) {
   return (
-    <section aria-labelledby="other-programmes-heading" className={cx('flex flex-col gap-6', className)}>
-      <h2 id="other-programmes-heading" className="text-title-lg leading-tight font-medium">
-        {heading}
-      </h2>
+    <section
+      aria-labelledby={heading ? 'other-programmes-heading' : undefined}
+      className={cx('flex flex-col gap-6', className)}
+    >
+      {heading && (
+        <Heading as={heading.as} id="other-programmes-heading" className="text-title-lg leading-tight font-medium">
+          {heading.text}
+        </Heading>
+      )}
       <ul className="flex flex-col border-t border-border">
         {items.map((item) => (
           <li key={item.key} className="border-b border-border last:border-b-0">
@@ -157,9 +161,13 @@ function OtherProgrammes({
               href={item.href}
               title={item.title}
               meta={[
-                <span key="status" className={item.highlight ? 'text-accent' : undefined}>
-                  {item.status}
-                </span>,
+                ...(item.status
+                  ? [
+                      <span key="status" className={item.highlight ? 'text-accent' : undefined}>
+                        {item.status}
+                      </span>,
+                    ]
+                  : []),
                 ...item.meta,
               ]}
               className="pt-4 pb-6"

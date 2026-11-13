@@ -9,6 +9,8 @@ import {
   LINK,
   LINK_TARGET,
   LISTING_CARD,
+  OTHER_AWARDS_EDITION,
+  OTHER_AWARDS_FILL,
   SUBSCRIBE_MODAL,
 } from './fragments'
 
@@ -485,35 +487,15 @@ export const AWARD_CATEGORY_QUERY = defineQuery(`
   }
 `)
 
-// The award category page's sidebar: upcoming editions of other programmes (`$programme` is the page's programme
-// slug), in the highlights awards order (RECORD_FILL_BRANCHES): open or upcoming nominations by closing date, then
-// ceremonies ahead by date. Past editions are left out. The adapter keeps one edition per programme and derives the
-// status from the dates with the same `$today` (cachedUkToday), so the list and its labels change once a day.
-export const OTHER_AWARDS_QUERY = defineQuery(`
-  [
-    ...*[
-      _type == "awardsProgramme"
-      && nominationsClosingDate >= $today
-      && coalesce(programme->slug.current, "") != $programme
-    ] | order(nominationsClosingDate asc)[0...12]{
-      _id, title, "slug": slug.current, "programmeId": programme._ref,
-      startDate, endDate, country, nominationsOpeningDate, nominationsClosingDate
-    },
-    ...*[
-      _type == "awardsProgramme"
-      && !(defined(nominationsClosingDate) && nominationsClosingDate >= $today)
-      && startDate >= $today
-      && coalesce(programme->slug.current, "") != $programme
-    ] | order(startDate asc)[0...12]{
-      _id, title, "slug": slug.current, "programmeId": programme._ref,
-      startDate, endDate, country, nominationsOpeningDate, nominationsClosingDate
-    }
-  ]
-`)
+// The award category page's sidebar: OTHER_AWARDS_FILL (fragments.ts), shared with the Studio panel.
+export const OTHER_AWARDS_QUERY = defineQuery(`${OTHER_AWARDS_FILL}`)
 
-// The award category page labels (`$id` is AWARD_CATEGORY_PAGE_ID). The page 404s until this document is published.
+// The award category page labels and the editor's sidebar picks (`$id` is AWARD_CATEGORY_PAGE_ID), one cached result
+// for every category page. A pick whose edition is unpublished or deleted dereferences to a null edition and is dropped
+// by the adapter. The page 404s until this document is published.
 export const AWARD_CATEGORY_PAGE_QUERY = defineQuery(`
   *[_id == $id && _type == "awardCategoryPage"][0]{
+    breadcrumbHomeLabel,
     breadcrumbAwardsLabel,
     detailsHeading,
     eligibilityLabel,
@@ -521,7 +503,8 @@ export const AWARD_CATEGORY_PAGE_QUERY = defineQuery(`
     judgingLabel,
     winnersHeading,
     winnerLabel,
-    otherProgrammesHeading,
+    otherProgrammesHeading[]{ _key, style, children[]{ _key, text } },
+    "otherProgrammes": otherProgrammes[]{ _key, title, "edition": edition->{ ${OTHER_AWARDS_EDITION} } },
     launchingSoonLabel,
     submissionsOpenLabel,
     ceremonyDueLabel
