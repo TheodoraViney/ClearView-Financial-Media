@@ -27,6 +27,16 @@ export const presentationTools: PluginOptions[] = BRAND_KEYS.map((key) =>
           filter: '_type == "post" && slug.current == $slug && $brand in brands',
           params: { brand: key },
         },
+        // Award category pages live on ClearView only. Their copy (description, eligibility, recognition, judging) is
+        // on the category itself, so the category is the document to edit.
+        ...(key === 'clearview'
+          ? [
+              {
+                route: '/awards/:programme/:category',
+                filter: '_type == "awardCategory" && slug.current == $category',
+              },
+            ]
+          : []),
         {
           route: '/:slug',
           filter: '_type == "page" && brand == $brand && slug.current == $slug',

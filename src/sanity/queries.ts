@@ -9,6 +9,8 @@ import {
   LINK,
   LINK_TARGET,
   LISTING_CARD,
+  OTHER_AWARDS_EDITION,
+  OTHER_AWARDS_FILL,
   SUBSCRIBE_MODAL,
 } from './fragments'
 
@@ -448,5 +450,63 @@ export const SIGNUP_INTEREST_LABELS_QUERY = defineQuery(`
   *[_type == "subscribeModal" && _id in $ids]{
     _id,
     interests[]{ label, "attribute": attribute.name }
+  }
+`)
+
+// An award category page: one category as awarded by one evergreen programme (`$programme` and `$category` are the
+// slugs). Shared records carry no brand: the page is served on ClearView only, which the route checks.
+// `^.^` inside the editions' winner filter is the category. `editions` holds only the programme's
+// editions that have a winner in the category, newest first, each with those winner rows. The copy (description,
+// eligibility, recognises, judging) is the category's own and shows on every programme's page for it.
+export const AWARD_CATEGORY_QUERY = defineQuery(`
+  *[_type == "awardCategory" && slug.current == $category][0]{
+    _id,
+    title,
+    "slug": slug.current,
+    categoryGroup,
+    description,
+    eligibility,
+    recognises,
+    judging,
+    "programme": *[_type == "awardsProgrammeGroup" && slug.current == $programme][0]{ _id, title, "slug": slug.current },
+    "editions": *[
+      _type == "awardsProgramme"
+      && programme->slug.current == $programme
+      && ^._id in winners[].category._ref
+    ] | order(startDate desc){
+      _id,
+      title,
+      "slug": slug.current,
+      startDate,
+      "winners": winners[category._ref == ^.^._id]{
+        _key,
+        categoryGroup,
+        "company": company->{ title, "slug": slug.current, "logo": logo{ ${IMAGE} } }
+      }
+    }
+  }
+`)
+
+// The award category page's sidebar: OTHER_AWARDS_FILL (fragments.ts), shared with the Studio panel.
+export const OTHER_AWARDS_QUERY = defineQuery(`${OTHER_AWARDS_FILL}`)
+
+// The award category page labels and the editor's sidebar picks (`$id` is AWARD_CATEGORY_PAGE_ID), one cached result
+// for every category page. A pick whose edition is unpublished or deleted dereferences to a null edition and is dropped
+// by the adapter. The page 404s until this document is published.
+export const AWARD_CATEGORY_PAGE_QUERY = defineQuery(`
+  *[_id == $id && _type == "awardCategoryPage"][0]{
+    breadcrumbHomeLabel,
+    breadcrumbAwardsLabel,
+    detailsHeading,
+    eligibilityLabel,
+    recognisesLabel,
+    judgingLabel,
+    winnersHeading,
+    winnerLabel,
+    otherProgrammesHeading[]{ _key, style, children[]{ _key, text } },
+    "otherProgrammes": otherProgrammes[]{ _key, title, "edition": edition->{ ${OTHER_AWARDS_EDITION} } },
+    launchingSoonLabel,
+    submissionsOpenLabel,
+    ceremonyDueLabel
   }
 `)

@@ -12,7 +12,14 @@ import { defineField, defineType } from 'sanity'
  * A document rather than a row because template 07 is an award category page,
  * so a category needs its own address. A Winner has no such template and stays
  * a row on AwardsProgramme.
+ *
+ * The page copy (description, eligibility, recognition, judging) is plain text on the category, so it is the same on
+ * every programme's page for it.
  */
+// Categories are shared: "Overall Private Bank" is awarded by both the Channel Islands and the MENA programmes.
+const SHARED_COPY =
+  'Optional, hidden when empty. Shows on the page of every programme that awards this category, so write it for any programme; a programme that needs its own wording needs its own category.'
+
 export const awardCategory = defineType({
   name: 'awardCategory',
   title: 'Award category',
@@ -42,7 +49,34 @@ export const awardCategory = defineType({
     defineField({
       name: 'description',
       title: 'Description',
-      type: 'richText',
+      type: 'text',
+      rows: 3,
+      description: `Under the title on the category page. ${SHARED_COPY}`,
+      validation: (Rule) => Rule.max(400).warning('Longer than 400 characters; one short paragraph reads best'),
+    }),
+    defineField({
+      name: 'eligibility',
+      title: 'Eligibility',
+      type: 'text',
+      rows: 3,
+      description: `Who can enter, under Category details. ${SHARED_COPY}`,
+      validation: (Rule) => Rule.max(400).warning('Longer than 400 characters; keep it to a sentence or two'),
+    }),
+    defineField({
+      name: 'recognises',
+      title: 'What the category recognises',
+      type: 'text',
+      rows: 3,
+      description: `What the judges look for, under Category details. ${SHARED_COPY}`,
+      validation: (Rule) => Rule.max(400).warning('Longer than 400 characters; keep it to a sentence or two'),
+    }),
+    defineField({
+      name: 'judging',
+      title: 'Judging context',
+      type: 'text',
+      rows: 3,
+      description: `How the category is judged, under Category details. ${SHARED_COPY}`,
+      validation: (Rule) => Rule.max(400).warning('Longer than 400 characters; keep it to a sentence or two'),
     }),
   ],
   preview: {

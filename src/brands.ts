@@ -42,6 +42,9 @@ export const searchPageDocumentId = (key: BrandKey): string => `search-page-${ke
 /** Id of a brand's subscribe pop-up document: its copy and interests. One per brand, ClearView included. */
 export const subscribeModalDocumentId = (key: BrandKey): string => `subscribe-modal-${key}`
 
+/** Id of the one "Award category page" document: the award category template's labels. ClearView only. */
+export const AWARD_CATEGORY_PAGE_ID = 'award-category-page'
+
 /** Id of the one subscribe form settings document, shared by every brand: the Brevo list and confirmation email. */
 export const SUBSCRIBE_FORM_SETTINGS_ID = 'subscribe-form-settings'
 

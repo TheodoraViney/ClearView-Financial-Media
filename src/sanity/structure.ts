@@ -22,6 +22,7 @@ import { UsersIcon } from '@sanity/icons/Users'
 import type { StructureResolver } from 'sanity/structure'
 
 import {
+  AWARD_CATEGORY_PAGE_ID,
   BRAND_KEYS,
   BRANDS,
   SIGNUP_NOTIFICATION_SETTINGS_ID,
@@ -110,6 +111,15 @@ export const structure: StructureResolver = (S) =>
                         .title('Article page')
                         .icon(DocumentTextIcon)
                         .child(S.document().schemaType('articlePage').documentId(articlePageDocumentId(key))),
+                    ]
+                  : []),
+                // The award category pages live on ClearView Publishing only, like the other shared records.
+                ...(key === 'clearview'
+                  ? [
+                      S.listItem()
+                        .title('Award category page')
+                        .icon(TagIcon)
+                        .child(S.document().schemaType('awardCategoryPage').documentId(AWARD_CATEGORY_PAGE_ID)),
                     ]
                   : []),
                 S.listItem()

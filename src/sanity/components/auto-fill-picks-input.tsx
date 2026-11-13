@@ -9,11 +9,11 @@ import { apiVersion, dataset, projectId } from '@/sanity/env'
 
 /**
  * Picks field input for every block that fills its empty places automatically (Top stories, News Analysis, News in
- * Brief, Weekly Roundup, Top Picks, Highlights, Explore cards). Renders the default array input, then a panel
+ * Brief, Weekly Roundup, Top Picks, Highlights, Explore cards), and the award category page's awards programmes. Renders the default array input, then a panel
  * "Shown automatically now" with the items the site fills in right now, in site order, computed with the site's own
  * fill queries and counts (src/sanity/auto-fill.ts) against published content.
  *
- * "Pin" / "Pin these" append those items as references to the picks, so the editor can take them over and reorder
+ * "Pin" / "Pin these" append those items as references (or as pick objects holding one, per the spec) to the picks, so the editor can take them over and reorder
  * them. Nothing is written unless the editor clicks; empty places keep filling automatically as before.
  */
 
@@ -24,7 +24,7 @@ type LoadState =
   | { status: 'error' }
 
 type Block = Record<string, unknown> & { _type?: string }
-type RefItem = { _ref?: string }
+type RefItem = Record<string, unknown> & { _ref?: string }
 
 const DEBOUNCE_MS = 400
 
@@ -50,9 +50,10 @@ const randomKey = () => Math.random().toString(36).slice(2, 14).padEnd(12, '0')
 export function AutoFillPicksInput(props: ArrayOfObjectsInputProps) {
   const { path, onChange, value, readOnly } = props
   const block = useFormValue(path.slice(0, -1)) as Block | undefined
-  const brand = useFormValue(['brand']) as string | undefined
+  const formBrand = useFormValue(['brand']) as string | undefined
   const field = String(path[path.length - 1])
   const spec = autoFillSpec(block?._type, field)
+  const brand = spec?.brand ?? formBrand
   // Published content only, as the live site sees it; no CDN, so a publish shows at once.
   const client = useClient({ apiVersion })
   const published = useMemo(() => client.withConfig({ perspective: 'published', useCdn: false }), [client])
@@ -69,11 +70,13 @@ export function AutoFillPicksInput(props: ArrayOfObjectsInputProps) {
     let cancelled = false
     const timer = setTimeout(() => {
       setState((current) => (current.status === 'ready' ? current : { status: 'loading' }))
+      const today = ukToday()
+
       published
-        .fetch<AutoFillResult>(spec.query, { block, brand, today: ukToday() })
+        .fetch<AutoFillResult>(spec.query, { ...spec.params, block, brand, today })
         .then((result) => {
           if (!cancelled) {
-            setState({ status: 'ready', items: spec.select(result, block, brand) })
+            setState({ status: 'ready', items: spec.select(result, block, brand, today) })
           }
         })
         .catch(() => {
@@ -94,12 +97,20 @@ export function AutoFillPicksInput(props: ArrayOfObjectsInputProps) {
   const current = (value ?? []) as RefItem[]
   const room = spec && block && brand ? Math.max(0, spec.max(block, brand) - current.length) : 0
 
+  // Picks are plain references, or objects holding one in `spec.pin.field`.
+  const pinAs = spec?.pin
+  const refOf = (item: RefItem) => (pinAs ? (item[pinAs.field] as RefItem | undefined)?._ref : item._ref)
+
   const pin = (items: AutoFillItem[]) => {
-    const taken = new Set(current.map((item) => item._ref))
+    const taken = new Set(current.map(refOf))
     const refs = items
       .filter((item) => !taken.has(item._id))
       .slice(0, room)
-      .map((item) => ({ _type: 'reference', _ref: item._id, _key: randomKey() }))
+      .map((item) =>
+        pinAs
+          ? { _type: pinAs.type, _key: randomKey(), [pinAs.field]: { _type: 'reference', _ref: item._id } }
+          : { _type: 'reference', _ref: item._id, _key: randomKey() },
+      )
 
     if (refs.length > 0) {
       onChange(PatchEvent.from([setIfMissing([]), insert(refs, 'after', [-1])]))
@@ -119,7 +130,7 @@ export function AutoFillPicksInput(props: ArrayOfObjectsInputProps) {
                     Shown automatically now
                   </Text>
                   <Text size={0} muted>
-                    Fills the empty places on the site. Published posts only.
+                    {spec.hint ?? 'Fills the empty places on the site. Published posts only.'}
                   </Text>
                 </Stack>
               </Box>
@@ -167,7 +178,7 @@ export function AutoFillPicksInput(props: ArrayOfObjectsInputProps) {
 
 function AutoFillRow({ item, onPin }: { item: AutoFillItem; onPin?: () => void }) {
   const thumbnail = thumbnailUrl(item.image)
-  const date = dateOf(item)
+  const date = item.subtitle || dateOf(item)
 
   return (
     <Flex align="center" gap={3}>

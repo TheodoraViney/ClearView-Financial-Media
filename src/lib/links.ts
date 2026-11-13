@@ -183,3 +183,31 @@ export function sharedRecordHref(
 
   return currentBrand === 'clearview' ? path : `${brandOrigin('clearview')}${path}`
 }
+
+/**
+ * The ClearView awards listing, a legacy clearviewpublishing.com path kept as it is (`/events-category/awards`). The
+ * award category page's breadcrumb links here.
+ */
+export const AWARDS_LISTING_PATH = '/events-category/awards'
+
+/**
+ * Href of an award category page: `/awards/{programme}/{category}`, the category as awarded by one evergreen
+ * programme (awardsProgrammeGroup). Shared record rules as `sharedRecordHref`: relative on the ClearView host,
+ * absolute to the ClearView origin on every other brand host, no trailing slash. Null without both slugs.
+ */
+export function awardCategoryHref(
+  programmeSlug: string | null | undefined,
+  categorySlug: string | null | undefined,
+  currentBrand: BrandKey,
+): string | null {
+  const programme = stegaClean(programmeSlug)?.trim()
+  const category = stegaClean(categorySlug)?.trim()
+
+  if (!programme || !category) {
+    return null
+  }
+
+  const path = `${pathFor(programme, '/awards')}${pathFor(category)}`
+
+  return currentBrand === 'clearview' ? path : `${brandOrigin('clearview')}${path}`
+}

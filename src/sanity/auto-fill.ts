@@ -10,6 +10,15 @@
  *   not published, or no longer on the page brand, frees its place;
  * - counts and the picks-then-fill merge are the site's (schema constants, src/lib/picks.ts).
  */
+import {
+  EDITION_STATUS_LABELS,
+  editionStatus,
+  OTHER_PROGRAMMES_COUNT,
+  otherProgrammeEditions,
+  type SidebarEditionFields,
+} from '@/lib/award-category'
+import { countryName } from '@/lib/countries'
+import { formatDateRange } from '@/lib/dates'
 import { countOr, picksThenFill, present, topStoriesSplit } from '@/lib/picks'
 
 import {
@@ -17,6 +26,8 @@ import {
   BRAND_ITEM_PICK,
   BRAND_POST_PICK,
   EXPLORE_POSTS_FILL,
+  OTHER_AWARDS_EDITION,
+  OTHER_AWARDS_FILL,
   POST_BRIEFS_FILL,
   POST_LIST_FILL,
   RECORD_FILL_BRANCHES,
@@ -51,6 +62,8 @@ export type AutoFillItem = {
   endDate?: string | null
   image?: string | null
   sponsored?: boolean | null
+  /** A line under the title in place of the date, when the list has more to say (awards sidebar: status, country, dates). */
+  subtitle?: string | null
 }
 
 type Ref = { _id: string; _type?: string; sponsored?: boolean | null }
@@ -60,12 +73,23 @@ export type AutoFillResult = { picks: (Ref | null)[] | null; slides?: (Ref | nul
 type Block = Record<string, unknown> & { _type?: string; count?: unknown; source?: unknown }
 
 export type AutoFillSpec = {
-  /** GROQ run with `$block`, `$brand` and `$today`. */
+  /** GROQ run with `$block`, `$brand`, `$today` and `params`. */
   query: string
-  /** The fill items the site shows now, in site order. */
-  select: (result: AutoFillResult, block: Block, brand: string) => AutoFillItem[]
+  /** Extra query parameters. */
+  params?: Record<string, unknown>
+  /** The fill items the site shows now, in site order. `today` is the UK date the query ran with. */
+  select: (result: AutoFillResult, block: Block, brand: string, today: string) => AutoFillItem[]
   /** The most picks the field allows (Studio validation), so pinning never exceeds it. */
   max: (block: Block, brand: string) => number
+  /** A fixed brand, for a document without a `brand` field (a singleton of one brand). */
+  brand?: string
+  /**
+   * How a pin is stored when the picks are objects holding the reference (`{ _type: type, [field]: reference }`);
+   * plain references otherwise.
+   */
+  pin?: { type: string; field: string }
+  /** The panel's explanation line, when the default (posts) one does not fit. */
+  hint?: string
 }
 
 // The fields the panel lists. Posts carry the image; shared records come in the HIGHLIGHT_ITEM shape of the fill.
@@ -90,6 +114,18 @@ const ofType = <T extends { _type?: string }>(items: (T | null)[] | null | undef
   (items ?? []).filter((item): item is T => item !== null && item._type === type)
 
 const recordType = (source: unknown) => highlightsSourceOf(source)?.type
+
+type SidebarEdition = SidebarEditionFields & { endDate: string | null; country: string | null }
+type OtherProgrammesResult = {
+  picks: { title: string | null; edition: SidebarEdition | null }[] | null
+  fill: SidebarEdition[] | null
+}
+
+/**
+ * The award category page's sidebar fill matches no page programme here (the Studio has no category page): GROQ
+ * compares it with each programme's slug, and a slug never holds a NUL character.
+ */
+const NO_PROGRAMME = '\u0000'
 
 const SPECS: Record<string, AutoFillSpec> = {
   'topStories.slides': {
@@ -184,6 +220,42 @@ const SPECS: Record<string, AutoFillSpec> = {
       )
     },
     max: (block) => countOr(block.count, EXPLORE_CARD_ITEM_MAX, EXPLORE_CARD_ITEM_MAX),
+  },
+  'awardCategoryPage.otherProgrammes': {
+    query: /* groq */ `$block{
+      "picks": otherProgrammes[]{ title, "edition": edition->{ ${OTHER_AWARDS_EDITION} } },
+      "fill": ${OTHER_AWARDS_FILL}
+    }`,
+    params: { programme: NO_PROGRAMME },
+    brand: 'clearview',
+    pin: { type: 'otherProgrammePick', field: 'edition' },
+    hint: "Fills the empty places on the site. Published editions only. On a programme's own category pages, its edition is replaced by the next one.",
+    select: (result, block, _brand, today) => {
+      const { picks, fill } = result as unknown as OtherProgrammesResult
+
+      return otherProgrammeEditions(picks, fill ?? [], { today, excludeProgramme: null })
+        .filter((item) => !item.picked)
+        .map(({ edition, title }) => {
+          const status = editionStatus(edition, today)
+          const label = status ? block[EDITION_STATUS_LABELS[status]] : null
+
+          return {
+            _id: edition._id,
+            _type: 'awardsProgramme',
+            title,
+            startDate: edition.startDate,
+            endDate: edition.endDate,
+            subtitle: [
+              typeof label === 'string' ? label : null,
+              countryName(edition.country),
+              formatDateRange(edition.startDate, edition.endDate),
+            ]
+              .filter(Boolean)
+              .join(' · '),
+          }
+        })
+    },
+    max: () => OTHER_PROGRAMMES_COUNT,
   },
 }
 

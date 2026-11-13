@@ -495,3 +495,30 @@ export const BLOCKS_PROJECTION = /* groq */ `
     "aside": aside[]{ _key, _type, ${ASIDE_BLOCKS} }
   }
 ` as const
+
+// One edition in the award category page's sidebar: its own fields and its programme, for the one-per-programme rule.
+export const OTHER_AWARDS_EDITION = /* groq */ `
+  _id, title, "slug": slug.current, "programmeId": programme._ref,
+  startDate, endDate, country, nominationsOpeningDate, nominationsClosingDate
+`
+
+// The award category page's sidebar: upcoming editions of other programmes (`$programme` is the page's programme
+// slug), in the highlights awards order (RECORD_FILL_BRANCHES): open or upcoming nominations by closing date, then
+// ceremonies ahead by date. Past editions are left out. The adapter keeps one edition per programme and derives the
+// status from the dates with the same `$today` (cachedUkToday), so the list and its labels change once a day.
+// The Studio panel "Shown automatically now" runs it too (src/sanity/auto-fill.ts).
+export const OTHER_AWARDS_FILL = /* groq */ `
+  [
+    ...*[
+      _type == "awardsProgramme"
+      && nominationsClosingDate >= $today
+      && coalesce(programme->slug.current, "") != $programme
+    ] | order(nominationsClosingDate asc)[0...12]{ ${OTHER_AWARDS_EDITION} },
+    ...*[
+      _type == "awardsProgramme"
+      && !(defined(nominationsClosingDate) && nominationsClosingDate >= $today)
+      && startDate >= $today
+      && coalesce(programme->slug.current, "") != $programme
+    ] | order(startDate asc)[0...12]{ ${OTHER_AWARDS_EDITION} }
+  ]
+`

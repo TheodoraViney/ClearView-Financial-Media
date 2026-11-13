@@ -92,6 +92,7 @@ const SINGLETON_TYPES = new Set([
   'publicationFooter',
   'mostRead',
   'articlePage',
+  'awardCategoryPage',
   'infographicSettings',
   'briefSettings',
   'subscribeModal',

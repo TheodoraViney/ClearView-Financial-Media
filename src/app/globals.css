@@ -379,6 +379,11 @@ main :where(*) {
   grid-template-columns: 8.75rem minmax(0, 1fr);
 }
 
+/* DefinitionList `detail` (award category details) from md: label and copy on a 4 / 8 split, as the design. */
+@utility grid-cols-detail {
+  grid-template-columns: minmax(0, 4fr) minmax(0, 8fr);
+}
+
 /*
  * Height of the article's share rail, reserved beside the text so a short body never lets the rail hang over what
  * follows: its label plus one 44px button per item in `--share-items` (the CMS networks and copy link), 4px apart.
