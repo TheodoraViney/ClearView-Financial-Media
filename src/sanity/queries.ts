@@ -279,6 +279,8 @@ export const NEWSLETTER_ISSUE_VERSIONS_QUERY = defineQuery(`
     _rev,
     brand,
     subject,
+    topBanner{ use, image, link },
+    bottomBanner{ use, image, link },
     segment{ id, name },
     scheduledAt,
     status,
@@ -289,8 +291,8 @@ export const NEWSLETTER_ISSUE_VERSIONS_QUERY = defineQuery(`
   }
 `)
 
-// What the email and the Brevo campaign need: the publication's Brand settings (with the email copy; an unset field
-// hides its element) and the issue's posts. Raw ids, so `_id in $postIds` matches published posts only (a draft's id
+// What the email and the Brevo campaign need: the publication's Brand settings (with its default banners and the email
+// copy; an unset field hides its element) and the issue's posts. Raw ids, so `_id in $postIds` matches published posts only (a draft's id
 // carries the `drafts.` prefix), and only posts that are still on the issue's brand. The caller restores the issue's
 // order.
 export const NEWSLETTER_EMAIL_QUERY = defineQuery(`
@@ -300,7 +302,9 @@ export const NEWSLETTER_EMAIL_QUERY = defineQuery(`
       domain,
       logo,
       "senderId": newsletter.sender.id,
-      "copy": newsletter.copy{ featuredLabel, readFullStory, readMore, footerText, unsubscribe }
+      "topBanner": newsletter.topBanner{ image, link },
+      "bottomBanner": newsletter.bottomBanner{ image, link },
+      "copy": newsletter.copy{ featuredLabel, readFullStory, readMore, advertisementLabel, footerText, unsubscribe }
     },
     "posts": *[_type == "post" && _id in $postIds && $brand in brands]{
       _id,

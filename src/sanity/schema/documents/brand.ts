@@ -12,6 +12,7 @@ import {
   isAdUnitCode,
   positionShowsOn,
 } from '@/lib/gam'
+import { NEWSLETTER_BANNER_SLOTS, NEWSLETTER_BANNERS } from '@/lib/newsletter-banners'
 import { NEWSLETTER_COPY_DEFAULTS, NEWSLETTER_TITLE_PLACEHOLDER } from '@/lib/newsletter-copy'
 import { lookupAdUnit } from '@/sanity/ad-unit-lookup'
 import { AdUnitCodeInput } from '@/sanity/components/ad-unit-code-input'
@@ -19,6 +20,7 @@ import { BrandColorsInput } from '@/sanity/components/brand-colors-input'
 import { apiVersion } from '@/sanity/env'
 
 import { brevoSenderField } from '../fields'
+import { bannerFields } from '../newsletter-banner'
 
 // Only the three publications send a newsletter and carry articles; ClearView's brand document has no Newsletter tab
 // and no article banner. Matched on the fixed document id (the draft id carries a `drafts.` prefix).
@@ -231,6 +233,25 @@ export const brand = defineType({
           validation: (Rule) =>
             Rule.integer().min(1).max(20).custom(requiredForNewsletter('Required to start a newsletter issue')),
         }),
+        ...NEWSLETTER_BANNER_SLOTS.map((slot) => {
+          const { title, width, height, where } = NEWSLETTER_BANNERS[slot]
+
+          return defineField({
+            name: slot,
+            title: `${title} (${width} × ${height})`,
+            type: 'object',
+            description: `Sponsor banner ${where} in every issue, until it is changed here. An issue can show its own banner or none instead. Leave the image and link empty for no banner.`,
+            options: { collapsible: true, collapsed: false },
+            // Both or neither: a banner needs its image and its link.
+            fields: bannerFields(slot, {
+              required: (parent) => {
+                const banner = parent as { image?: { asset?: unknown }; link?: string } | undefined
+
+                return Boolean(banner?.image?.asset || banner?.link)
+              },
+            }),
+          })
+        }),
         defineField({
           name: 'copy',
           title: 'Email copy',
@@ -245,6 +266,7 @@ export const brand = defineType({
               'Read more link',
               'Link under every other article. Leave empty to hide it; the headline still links to the article.',
             ),
+            emailCopy('advertisementLabel', 'Advertisement label', 'Small label above each banner. Leave empty to hide it.'),
             emailCopy(
               'footerText',
               'Footer text',
