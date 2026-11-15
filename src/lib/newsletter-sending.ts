@@ -21,7 +21,7 @@ import {
   unscheduleEmailCampaign,
   updateEmailCampaign,
 } from './brevo'
-import { renderNewsletterEmail } from './newsletter-email'
+import { renderNewsletterEmail, type NewsletterEmailBanner } from './newsletter-email'
 import { isLockedStatus } from './newsletter-status'
 import type { StudioUser } from './studio-auth'
 
@@ -311,11 +311,30 @@ async function buildCampaign(issueId: string, version: IssueVersion, action: 'te
       subject,
       date: issueDate(action, version.scheduledAt),
       posts: ordered,
+      topBanner: chosenBanner(version.topBanner, settings?.topBanner),
+      bottomBanner: chosenBanner(version.bottomBanner, settings?.bottomBanner),
     }),
     recipients: { segmentIds: [segment.id] },
   }
 
   return { fields, segment }
+}
+
+/**
+ * The banner an issue shows in a place: its own, none, or (by default, and for issues created before the choice
+ * existed) the brand's from Brand settings → Newsletter.
+ */
+function chosenBanner(
+  issue: IssueVersion['topBanner'],
+  brandBanner: NewsletterEmailBanner | undefined,
+): NewsletterEmailBanner {
+  const use = issue?.use ?? 'brand'
+
+  if (use === 'none') {
+    return null
+  }
+
+  return use === 'own' ? { image: issue?.image ?? null, link: issue?.link ?? null } : (brandBanner ?? null)
 }
 
 /**

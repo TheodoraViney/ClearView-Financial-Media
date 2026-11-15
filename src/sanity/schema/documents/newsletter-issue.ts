@@ -8,9 +8,11 @@ import {
 } from 'sanity'
 
 import { isEditorialBrandKey } from '@/brands'
+import { ISSUE_BANNER_CHOICES, NEWSLETTER_BANNERS, type NewsletterBannerSlot } from '@/lib/newsletter-banners'
 import { isLockedStatus } from '@/lib/newsletter-status'
 
 import { brevoSegmentField } from '../fields'
+import { bannerFields } from '../newsletter-banner'
 
 const STATUS_OPTIONS = [
   { title: 'Draft', value: 'draft' },
@@ -35,6 +37,35 @@ const postsOfIssueBrand: ReferenceFilterResolver = ({ document }) => ({
   params: { brand: (document as { brand?: string }).brand ?? '' },
   perspective: 'published',
 })
+
+const usesOwnBanner = (parent: unknown) => (parent as { use?: string } | undefined)?.use === 'own'
+
+/**
+ * A banner place of the issue: the brand's banner from Brand settings → Newsletter (the default), the issue's own, or
+ * none. The image and link show only for an own banner.
+ */
+const bannerField = (slot: NewsletterBannerSlot) => {
+  const { title, width, height, where } = NEWSLETTER_BANNERS[slot]
+
+  return defineField({
+    name: slot,
+    title: `${title} (${width} × ${height})`,
+    type: 'object',
+    group: 'content',
+    description: `Sponsor banner ${where}. ${LOCKED_NOTE}`,
+    readOnly: lockedByStatus,
+    fields: [
+      defineField({
+        name: 'use',
+        title: 'Show',
+        type: 'string',
+        options: { list: [...ISSUE_BANNER_CHOICES], layout: 'radio', direction: 'horizontal' },
+        initialValue: 'brand',
+      }),
+      ...bannerFields(slot, { hidden: ({ parent }) => !usesOwnBanner(parent), required: usesOwnBanner }),
+    ],
+  })
+}
 
 /**
  * One daily email of an editorial publication, sent as a Brevo email campaign.
@@ -75,6 +106,7 @@ export const newsletterIssue = defineType({
       readOnly: lockedByStatus,
       validation: (Rule) => Rule.required(),
     }),
+    bannerField('topBanner'),
     defineField({
       name: 'posts',
       title: 'Posts',
@@ -91,6 +123,7 @@ export const newsletterIssue = defineType({
       ],
       validation: (Rule) => Rule.required().min(1).unique(),
     }),
+    bannerField('bottomBanner'),
     brevoSegmentField('segment', {
       title: 'Segment',
       description: `The Brevo segment that gets this issue, for example the publication's newsletter readers. To try an issue first, pick a small test segment. ${LOCKED_NOTE}`,
