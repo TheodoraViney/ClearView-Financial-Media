@@ -632,6 +632,15 @@ body {
     border-radius: var(--radius-sm);
   }
 
+  /* A player held for consent (ArchiveProse): the slot takes the player's spacing. */
+  :where([data-consent-embed]) {
+    margin-block: 0 1.25rem;
+  }
+
+  :where([data-consent-embed] > *) {
+    margin-block: 0;
+  }
+
   /* The libsyn podcast player is a fixed-height strip, not a video. */
   :where(iframe[src*='libsyn.com']) {
     aspect-ratio: auto;
@@ -662,4 +671,81 @@ body {
     font-size: 0.75em;
     line-height: 0;
   }
+}
+
+/*
+ * CookieYes banner, preferences and revisit button (src/components/ui/CookieConsent.tsx loads them), restyled to the
+ * design: Onest, the brand accent, our button shape. Accept and Reject look the same, so rejecting is as easy as
+ * accepting. CookieYes sets its dashboard colours as inline styles, hence !important on colours.
+ */
+:where(.cky-consent-container, .cky-modal, .cky-btn-revisit-wrapper) {
+  font-family: var(--font-sans);
+}
+
+.cky-consent-bar,
+.cky-preference-center {
+  border-color: var(--color-border) !important;
+  border-radius: 0.25rem !important;
+}
+
+.cky-title,
+.cky-notice-des,
+.cky-preference-center,
+.cky-preference-title,
+.cky-preference-content-wrapper,
+.cky-accordion-btn,
+.cky-accordion-header-des {
+  color: var(--color-foreground) !important;
+}
+
+.cky-btn {
+  border-radius: 0.25rem !important;
+  font-weight: 400 !important;
+  transition: background-color 150ms, color 150ms;
+}
+
+.cky-btn:focus-visible,
+.cky-btn-revisit:focus-visible,
+.cky-accordion-btn:focus-visible,
+.cky-btn-close:focus-visible {
+  outline: 2px solid var(--focus) !important;
+  outline-offset: 2px;
+}
+
+.cky-btn-accept,
+.cky-btn-reject {
+  color: #fff !important;
+  border-color: var(--accent) !important;
+  background-color: var(--accent) !important;
+}
+
+.cky-btn-accept:hover,
+.cky-btn-reject:hover {
+  border-color: var(--accent-hover) !important;
+  background-color: var(--accent-hover) !important;
+}
+
+.cky-btn-customize,
+.cky-btn-preferences {
+  color: var(--accent) !important;
+  border-color: var(--accent) !important;
+  background-color: transparent !important;
+}
+
+.cky-btn-customize:hover,
+.cky-btn-preferences:hover {
+  color: #fff !important;
+  background-color: var(--accent) !important;
+}
+
+.cky-show-desc-btn {
+  color: var(--accent) !important;
+}
+
+.cky-switch input[type='checkbox']:checked {
+  background-color: var(--accent) !important;
+}
+
+.cky-btn-revisit-wrapper {
+  background-color: var(--accent) !important;
 }

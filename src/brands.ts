@@ -81,6 +81,8 @@ interface BrandDefaults {
   region: 'uk' | 'asia' | 'us' | 'global'
   colors: BrandColors
   stagingHost: string
+  /** The brand's site id in CookieYes, from the script address in CookieYes → Installation. */
+  cookieYesId: string
   /** Schema type of this brand's header document. */
   headerType: HeaderType
   /** Schema type of this brand's footer document. */
@@ -113,6 +115,7 @@ export const BRANDS: Record<BrandKey, BrandDefaults> = {
       surfaceHover: '#F6F9FE',
     },
     stagingHost: 'wealthbriefing.vercel.app',
+    cookieYesId: 'e545f25d435d3b4467bbf46d',
     headerType: 'publicationHeader',
     footerType: 'publicationFooter',
   },
@@ -128,6 +131,7 @@ export const BRANDS: Record<BrandKey, BrandDefaults> = {
       surfaceHover: '#FEF6F6',
     },
     stagingHost: 'wealthbriefingasia.vercel.app',
+    cookieYesId: '03381813954b133e7cdf2450',
     headerType: 'publicationHeader',
     footerType: 'publicationFooter',
   },
@@ -143,6 +147,7 @@ export const BRANDS: Record<BrandKey, BrandDefaults> = {
       surfaceHover: '#F3F8F5',
     },
     stagingHost: 'familywealthreport.vercel.app',
+    cookieYesId: '78deb00b8c3da427e1870c0c',
     headerType: 'publicationHeader',
     footerType: 'publicationFooter',
     // Forums and Summits (events) keep their "date | place" line.
@@ -160,6 +165,7 @@ export const BRANDS: Record<BrandKey, BrandDefaults> = {
       surfaceHover: '#F7F7F7',
     },
     stagingHost: 'clear-view-financial-media.vercel.app',
+    cookieYesId: '5dc9e72922a775e9ef2c609f',
     headerType: 'clearviewHeader',
     footerType: 'clearviewFooter',
   },

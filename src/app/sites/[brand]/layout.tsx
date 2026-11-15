@@ -10,6 +10,7 @@ import { Footer } from '@/components/blocks/Footer'
 import { Header } from '@/components/blocks/Header'
 import { toSubscribeModal } from '@/components/blocks/subscribe-modal'
 import { SubscribeModalProvider } from '@/components/sections/subscribe/SubscribeModalProvider.client'
+import { CookieConsent } from '@/components/ui/CookieConsent'
 import { InPageDialogs } from '@/components/ui/Dialog.client'
 import { GptLoader } from '@/components/ui/Gpt.client'
 import type { SubscribeModalData } from '@/components/sections/subscribe/types'
@@ -73,6 +74,8 @@ export default async function BrandLayout({
 
   return (
     <>
+      {/* Before the shell, so consent defaults and the banner come ahead of everything that could set a cookie. */}
+      <CookieConsent brand={brand} />
       <CachedBrandShell brand={brand} perspective="published" stega={false}>
         {children}
       </CachedBrandShell>

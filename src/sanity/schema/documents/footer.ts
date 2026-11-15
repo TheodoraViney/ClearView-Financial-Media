@@ -66,6 +66,15 @@ const copyrightField = defineField({
   validation: (Rule) => Rule.required(),
 })
 
+const cookieSettingsField = defineField({
+  name: 'cookieSettingsLabel',
+  title: 'Cookie settings link',
+  type: 'string',
+  description: 'Link under the copyright that reopens the cookie banner, so readers can change their choice.',
+  initialValue: 'Cookie settings',
+  validation: (Rule) => Rule.required(),
+})
+
 const footerPreview = {
   select: { id: '_id', columns: 'columns' },
   prepare({ id, columns }: { id?: string; columns?: unknown }) {
@@ -85,7 +94,7 @@ export const clearviewFooter = defineType({
   title: 'ClearView footer',
   type: 'document',
   icon: InsertBelowIcon,
-  fields: [descriptionField, columnsField(5), socialHeadingField, socialField, copyrightField],
+  fields: [descriptionField, columnsField(5), socialHeadingField, socialField, copyrightField, cookieSettingsField],
   preview: footerPreview,
 })
 
@@ -107,6 +116,7 @@ export const publicationFooter = defineType({
     socialHeadingField,
     socialField,
     copyrightField,
+    cookieSettingsField,
   ],
   preview: footerPreview,
 })

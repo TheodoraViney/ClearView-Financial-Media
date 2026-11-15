@@ -1,6 +1,7 @@
 import { PortableText, stegaClean, type PortableTextComponents, type PortableTextProps } from 'next-sanity'
 
 import { AD_SLOT_FITS, AD_SLOT_UNSET, AdSlot } from '@/components/ui/AdSlot'
+import { ConsentEmbed, type EmbedConsentCopy } from '@/components/ui/ConsentEmbed.client'
 import { DefinitionList } from '@/components/ui/DefinitionList'
 import { Figure } from '@/components/ui/Figure'
 import { Media } from '@/components/ui/Media'
@@ -111,21 +112,6 @@ const components: PortableTextComponents = {
         <video controls preload="metadata" src={src} aria-label={value.title} className="aspect-video w-full rounded-sm bg-dark" />
       ) : null
     },
-    embed: ({ value }: { value: { provider?: string; id?: string; hash?: string; caption?: string } }) => {
-      const src = embedSrc(value.provider, value.id, value.hash)
-
-      return src ? (
-        <Figure caption={value.caption}>
-          <iframe
-            src={src}
-            title={value.caption || (stegaClean(value.provider) === 'issuu' ? 'Issuu publication' : 'Vimeo video')}
-            loading="lazy"
-            allow="fullscreen; picture-in-picture"
-            className="aspect-video w-full rounded-sm border-0"
-          />
-        </Figure>
-      ) : null
-    },
     pullQuote: ({ value }: { value: { quote?: string; cite?: string } }) =>
       value.quote ? (
         <div data-flow="block">
@@ -179,6 +165,32 @@ const components: PortableTextComponents = {
   },
 }
 
+type Embed = { provider?: string; id?: string; hash?: string; caption?: string }
+
+/** The body components, with the Vimeo and Issuu players held until the reader allows functional cookies. */
+function bodyComponents(embedCopy: EmbedConsentCopy): PortableTextComponents {
+  return {
+    ...components,
+    types: {
+      ...components.types,
+      embed: ({ value }: { value: Embed }) => {
+        const src = embedSrc(value.provider, value.id, value.hash)
+
+        return src ? (
+          <Figure caption={value.caption}>
+            <ConsentEmbed
+              src={src}
+              title={value.caption || (stegaClean(value.provider) === 'issuu' ? 'Issuu publication' : 'Vimeo video')}
+              copy={embedCopy}
+              className="aspect-video w-full rounded-sm"
+            />
+          </Figure>
+        ) : null
+      },
+    },
+  }
+}
+
 /**
  * The article banner (728 × 90, 468 × 60 in a narrower column) in the text column, a block member of `.article-flow`.
  * Hidden where the column is too narrow even for 468 × 60 (`AD_SLOT_FITS`, inside an `@container`), and on the live
@@ -205,18 +217,23 @@ export function ArticleBody({
   value,
   after,
   banner,
+  embedCopy,
 }: {
   value: PortableTextProps['value'] | null | undefined
   after: PortableTextProps['value'] | null | undefined
   /** The brand's article banner unit; null hides the banner on the live site. */
   banner: AdUnitView | null
+  /** Shown instead of an embedded player until the reader allows it. */
+  embedCopy: EmbedConsentCopy
 }) {
+  const bodyMembers = bodyComponents(embedCopy)
+
   return (
     // A container for the article banner, which hides where the column is narrower than 728.
     <div className="article-flow @container min-w-0">
-      {value && <PortableText value={value} components={components} />}
+      {value && <PortableText value={value} components={bodyMembers} />}
       <ArticleBanner unit={banner} />
-      {after && <PortableText value={after} components={components} />}
+      {after && <PortableText value={after} components={bodyMembers} />}
     </div>
   )
 }

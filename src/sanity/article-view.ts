@@ -2,6 +2,7 @@ import { stegaClean, type StegaBranded } from 'next-sanity'
 import { type ReactNode } from 'react'
 
 import { isBrandKey, type EditorialBrandKey } from '@/brands'
+import type { EmbedConsentCopy } from '@/components/ui/ConsentEmbed.client'
 import {
   ARTICLE_PAGE_COPY_DEFAULTS,
   MOST_READ_COUNT,
@@ -114,6 +115,13 @@ function toCopy(copy: PageCopy): ArticlePageCopy {
   const keys = Object.keys(ARTICLE_PAGE_COPY_DEFAULTS) as (keyof ArticlePageCopy)[]
 
   return Object.fromEntries(keys.map((key) => [key, copy?.[key] || ARTICLE_PAGE_COPY_DEFAULTS[key]])) as ArticlePageCopy
+}
+
+/** The texts shown instead of an embedded player until the reader allows functional cookies. */
+export function toEmbedConsentCopy(copy: PageCopy): EmbedConsentCopy {
+  const { embedConsentText, embedConsentButton } = toCopy(copy)
+
+  return { text: embedConsentText, button: embedConsentButton }
 }
 
 // Icons are Sanity assets; anything else would land unchecked inside a CSS url().

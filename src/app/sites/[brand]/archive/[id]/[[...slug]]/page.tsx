@@ -16,7 +16,7 @@ import {
   parseArchiveId,
   type ArchiveRecord,
 } from '@/lib/archive'
-import { fromArchiveRecord } from '@/sanity/article-view'
+import { fromArchiveRecord, toEmbedConsentCopy } from '@/sanity/article-view'
 import { brandTitle, fetchAdUnits, fetchBrandTitle, fetchShell } from '@/sanity/brand-title'
 import { cachedSanity, type DynamicFetchOptions } from '@/sanity/live'
 import { mostReadAutoFill } from '@/sanity/most-read'
@@ -135,7 +135,13 @@ export default async function ArchiveArticlePage({ params }: { params: Params })
     brand,
     logo: toLogo(shell.brand?.logo, brandTitle(brand, shell.brand?.title)),
     body: (
-      <ArchiveBody html={record.bodyHtml ?? ''} videoId={record.media.videoId} title={record.title} banner={ads.article} />
+      <ArchiveBody
+        html={record.bodyHtml ?? ''}
+        videoId={record.media.videoId}
+        title={record.title}
+        banner={ads.article}
+        embedCopy={toEmbedConsentCopy(copy)}
+      />
     ),
   })
 

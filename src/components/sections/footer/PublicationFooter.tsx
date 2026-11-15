@@ -17,6 +17,7 @@ export function PublicationFooter({
   socialHeading,
   social,
   copyright,
+  cookieSettingsLabel,
 }: FooterProps & { publisherLine: string }) {
   return (
     <footer className="mt-auto border-t border-border bg-white">
@@ -27,6 +28,7 @@ export function PublicationFooter({
             description={description}
             publisherLine={publisherLine}
             copyright={copyright}
+            cookieSettingsLabel={cookieSettingsLabel}
             className="max-w-90 gap-2"
           />
         </div>

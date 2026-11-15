@@ -16,4 +16,6 @@ export type FooterProps = {
   socialHeading: string
   social: FooterSocialLink[]
   copyright: string
+  /** Reopens the cookie banner. */
+  cookieSettingsLabel: string
 }
