@@ -1157,6 +1157,139 @@ export type InfographicSettings = {
   instructions?: string;
 };
 
+export type AwardsProgrammePage = {
+  _id: string;
+  _type: "awardsProgrammePage";
+  _createdAt: string;
+  _updatedAt: string;
+  _rev: string;
+  breadcrumbHomeLabel?: string;
+  breadcrumbAwardsLabel?: string;
+  registerLabel?: string;
+  previousYearLabel?: string;
+  previousYearWinnersLabel?: string;
+  overviewHeading?: Array<{
+    children?: Array<{
+      marks?: Array<string>;
+      text?: string;
+      _type: "span";
+      _key: string;
+    }>;
+    style?: "normal" | "h1" | "h2" | "h3" | "h4" | "h5" | "h6";
+    listItem?: never;
+    markDefs?: null;
+    level?: number;
+    _type: "block";
+    _key: string;
+  }>;
+  videoHeading?: Array<{
+    children?: Array<{
+      marks?: Array<string>;
+      text?: string;
+      _type: "span";
+      _key: string;
+    }>;
+    style?: "normal" | "h1" | "h2" | "h3" | "h4" | "h5" | "h6";
+    listItem?: never;
+    markDefs?: null;
+    level?: number;
+    _type: "block";
+    _key: string;
+  }>;
+  judgesHeading?: Array<{
+    children?: Array<{
+      marks?: Array<string>;
+      text?: string;
+      _type: "span";
+      _key: string;
+    }>;
+    style?: "normal" | "h1" | "h2" | "h3" | "h4" | "h5" | "h6";
+    listItem?: never;
+    markDefs?: null;
+    level?: number;
+    _type: "block";
+    _key: string;
+  }>;
+  viewBiographyLabel?: string;
+  hideBiographyLabel?: string;
+  winnersHeading?: Array<{
+    children?: Array<{
+      marks?: Array<string>;
+      text?: string;
+      _type: "span";
+      _key: string;
+    }>;
+    style?: "normal" | "h1" | "h2" | "h3" | "h4" | "h5" | "h6";
+    listItem?: never;
+    markDefs?: null;
+    level?: number;
+    _type: "block";
+    _key: string;
+  }>;
+  allCategoriesLabel?: string;
+  categoriesHeading?: Array<{
+    children?: Array<{
+      marks?: Array<string>;
+      text?: string;
+      _type: "span";
+      _key: string;
+    }>;
+    style?: "normal" | "h1" | "h2" | "h3" | "h4" | "h5" | "h6";
+    listItem?: never;
+    markDefs?: null;
+    level?: number;
+    _type: "block";
+    _key: string;
+  }>;
+  marketingKitHeading?: Array<{
+    children?: Array<{
+      marks?: Array<string>;
+      text?: string;
+      _type: "span";
+      _key: string;
+    }>;
+    style?: "normal" | "h1" | "h2" | "h3" | "h4" | "h5" | "h6";
+    listItem?: never;
+    markDefs?: null;
+    level?: number;
+    _type: "block";
+    _key: string;
+  }>;
+  marketingKitText?: string;
+  acclaimLinkLabel?: string;
+  videoConsentText?: string;
+  videoConsentButton?: string;
+  navOverviewLabel?: string;
+  navJudgesLabel?: string;
+  navWinnersLabel?: string;
+  navCategoriesLabel?: string;
+  navMarketingKitLabel?: string;
+  otherProgrammesHeading?: Array<{
+    children?: Array<{
+      marks?: Array<string>;
+      text?: string;
+      _type: "span";
+      _key: string;
+    }>;
+    style?: "normal" | "h1" | "h2" | "h3" | "h4" | "h5" | "h6";
+    listItem?: never;
+    markDefs?: null;
+    level?: number;
+    _type: "block";
+    _key: string;
+  }>;
+  otherProgrammes?: Array<{
+    edition?: AwardsProgrammeReference;
+    title?: string;
+    _type: "otherProgrammePick";
+    _key: string;
+  }>;
+  launchingSoonLabel?: string;
+  submissionsOpenLabel?: string;
+  ceremonyDueLabel?: string;
+  winnersAnnouncedLabel?: string;
+};
+
 export type AwardCategoryPage = {
   _id: string;
   _type: "awardCategoryPage";
@@ -1191,9 +1324,6 @@ export type AwardCategoryPage = {
     _type: "otherProgrammePick";
     _key: string;
   }>;
-  launchingSoonLabel?: string;
-  submissionsOpenLabel?: string;
-  ceremonyDueLabel?: string;
 };
 
 export type SearchPage = {
@@ -1634,6 +1764,7 @@ export type AwardsProgramme = {
   title?: string;
   slug?: Slug;
   programme?: AwardsProgrammeGroupReference;
+  standfirst?: string;
   body?: RichText;
   logo?: {
     asset?: SanityImageAssetReference;
@@ -1911,6 +2042,7 @@ export type AwardsProgramme = {
   nominationsClosingDate?: string;
   winnersAnnouncementDate?: string;
   categoriesContent?: RichText;
+  entryCategories?: Array<string>;
   winners?: Array<
     {
       _key: string;
@@ -1942,6 +2074,7 @@ export type AwardsProgramme = {
     alt?: string;
     _type: "image";
   };
+  highlightVideoDescription?: string;
   hidePreviousYearsHighlightVideo?: boolean;
   photographs?: Array<{
     asset?: SanityImageAssetReference;
@@ -2751,6 +2884,7 @@ export type AllSanitySchemaTypes =
   | SubscribeModal
   | BriefSettings
   | InfographicSettings
+  | AwardsProgrammePage
   | AwardCategoryPage
   | SearchPage
   | ArticlePage
@@ -25075,7 +25209,7 @@ export type OTHER_AWARDS_QUERY_RESULT = Array<{
 
 // Source: src/sanity/queries.ts
 // Variable: AWARD_CATEGORY_PAGE_QUERY
-// Query: *[_id == $id && _type == "awardCategoryPage"][0]{    breadcrumbHomeLabel,    breadcrumbAwardsLabel,    detailsHeading,    eligibilityLabel,    recognisesLabel,    judgingLabel,    winnersHeading,    winnerLabel,    otherProgrammesHeading[]{ _key, style, children[]{ _key, text } },    "otherProgrammes": otherProgrammes[]{ _key, title, "edition": edition->{   _id, title, "slug": slug.current, "programmeId": programme._ref,  startDate, endDate, country, nominationsOpeningDate, nominationsClosingDate } },    launchingSoonLabel,    submissionsOpenLabel,    ceremonyDueLabel  }
+// Query: *[_id == $id && _type == "awardCategoryPage"][0]{    breadcrumbHomeLabel,    breadcrumbAwardsLabel,    detailsHeading,    eligibilityLabel,    recognisesLabel,    judgingLabel,    winnersHeading,    winnerLabel,    otherProgrammesHeading[]{ _key, style, children[]{ _key, text } },    "otherProgrammes": otherProgrammes[]{ _key, title, "edition": edition->{   _id, title, "slug": slug.current, "programmeId": programme._ref,  startDate, endDate, country, nominationsOpeningDate, nominationsClosingDate } },    "statuses": *[_id == $statusesId && _type == "awardsProgrammePage"][0]{      launchingSoonLabel,      submissionsOpenLabel,      ceremonyDueLabel,      winnersAnnouncedLabel    }  }
 export type AWARD_CATEGORY_PAGE_QUERY_RESULT = {
   breadcrumbHomeLabel: string | null;
   breadcrumbAwardsLabel: string | null;
@@ -25358,9 +25492,831 @@ export type AWARD_CATEGORY_PAGE_QUERY_RESULT = {
       nominationsClosingDate: string | null;
     } | null;
   }> | null;
+  statuses: {
+    launchingSoonLabel: string | null;
+    submissionsOpenLabel: string | null;
+    ceremonyDueLabel: string | null;
+    winnersAnnouncedLabel: string | null;
+  } | null;
+} | null;
+
+// Source: src/sanity/queries.ts
+// Variable: AWARDS_PROGRAMME_QUERY
+// Query: *[_type in ["awardsProgramme", "conferenceEvent"] && slug.current == $slug][0]{    _type,    _type == "awardsProgramme" => {      _id,      title,      "slug": slug.current,      standfirst,      body[]{   _type != "infographic" => { ... },  _type == "infographic" => { _key, _type, eyebrow, title, description, wide, narrow },  _type == "image" => { "alt": coalesce(alt, asset->altText) },  _type == "videoFile" => { "url": asset->url, "mimeType": asset->mimeType } },      "logo": logo{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },      "programme": programme->{ _id, "slug": slug.current },      startDate,      endDate,      hideDateTime,      nominationsOpeningDate,      nominationsClosingDate,      country,      "venue": venue->title,      registerButtonLink,      highlightsVideoId,      "highlightVideoThumbnail": highlightVideoThumbnail{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },      highlightVideoDescription,      judgesIntro[]{   _type != "infographic" => { ... },  _type == "infographic" => { _key, _type, eyebrow, title, description, wide, narrow },  _type == "image" => { "alt": coalesce(alt, asset->altText) },  _type == "videoFile" => { "url": asset->url, "mimeType": asset->mimeType } },      judgesPanels[]{        _key,        name,        "people": people[]->{          _id,          title,          jobTitle,          "company": companies[0]->title,          "photo": photo{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },          bio[]{   _type != "infographic" => { ... },  _type == "infographic" => { _key, _type, eyebrow, title, description, wide, narrow },  _type == "image" => { "alt": coalesce(alt, asset->altText) },  _type == "videoFile" => { "url": asset->url, "mimeType": asset->mimeType } }        }      },      winners[]{        _key,        categoryGroup,        "category": category->{ title, "slug": slug.current },        "company": company->{ title, "logo": logo{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) } }      },      entryCategories,      "acclaimSlug": acclaim->slug.current,      "previous": *[        _type == "awardsProgramme"        && defined(^.programme._ref)        && programme._ref == ^.programme._ref        && startDate < ^.startDate      ] | order(startDate desc)[0]{ "slug": slug.current }    }  }
+export type AWARDS_PROGRAMME_QUERY_RESULT =
+  | {
+      _type: "awardsProgramme";
+      _id: string;
+      title: string | null;
+      slug: string | null;
+      standfirst: string | null;
+      body: Array<
+        | {
+            children?: Array<{
+              marks?: Array<string>;
+              text?: string;
+              _type: "span";
+              _key: string;
+            }>;
+            style?: "blockquote" | "h2" | "h3" | "h4" | "normal";
+            listItem?: "bullet" | "number";
+            markDefs?: Array<{
+              href?: string;
+              openInNewTab?: boolean;
+              _type: "link";
+              _key: string;
+            }>;
+            level?: number;
+            _type: "block";
+            _key: string;
+          }
+        | {
+            provider?: "issuu" | "vimeo";
+            id?: string;
+            hash?: string;
+            caption?: string;
+            _type: "embed";
+            _key: string;
+          }
+        | {
+            asset?: SanityImageAssetReference;
+            media?: unknown;
+            hotspot?: SanityImageHotspot;
+            crop?: SanityImageCrop;
+            alt: string | null;
+            _type: "image";
+            _key: string;
+          }
+        | {
+            asset?: SanityFileAssetReference;
+            media?: unknown;
+            title?: string;
+            _type: "videoFile";
+            _key: string;
+            url: string | null;
+            mimeType: string | null;
+          }
+      > | null;
+      logo: {
+        asset: SanityImageAssetReference | null;
+        hotspot: SanityImageHotspot | null;
+        crop: SanityImageCrop | null;
+        alt: string | null;
+      } | null;
+      programme: {
+        _id: string;
+        slug: string | null;
+      } | null;
+      startDate: string | null;
+      endDate: string | null;
+      hideDateTime: boolean | null;
+      nominationsOpeningDate: string | null;
+      nominationsClosingDate: string | null;
+      country:
+        | "AD"
+        | "AE"
+        | "AF"
+        | "AG"
+        | "AI"
+        | "AL"
+        | "AM"
+        | "AO"
+        | "AQ"
+        | "AR"
+        | "AS"
+        | "AT"
+        | "AU"
+        | "AW"
+        | "AX"
+        | "AZ"
+        | "BA"
+        | "BB"
+        | "BD"
+        | "BE"
+        | "BF"
+        | "BG"
+        | "BH"
+        | "BI"
+        | "BJ"
+        | "BL"
+        | "BM"
+        | "BN"
+        | "BO"
+        | "BQ"
+        | "BR"
+        | "BS"
+        | "BT"
+        | "BV"
+        | "BW"
+        | "BY"
+        | "BZ"
+        | "CA"
+        | "CC"
+        | "CD"
+        | "CF"
+        | "CG"
+        | "CH"
+        | "CI"
+        | "CK"
+        | "CL"
+        | "CM"
+        | "CN"
+        | "CO"
+        | "CR"
+        | "CU"
+        | "CV"
+        | "CW"
+        | "CX"
+        | "CY"
+        | "CZ"
+        | "DE"
+        | "DJ"
+        | "DK"
+        | "DM"
+        | "DO"
+        | "DZ"
+        | "EC"
+        | "EE"
+        | "EG"
+        | "EH"
+        | "ER"
+        | "ES"
+        | "ET"
+        | "FI"
+        | "FJ"
+        | "FK"
+        | "FM"
+        | "FO"
+        | "FR"
+        | "GA"
+        | "GB"
+        | "GD"
+        | "GE"
+        | "GF"
+        | "GG"
+        | "GH"
+        | "GI"
+        | "GL"
+        | "GM"
+        | "GN"
+        | "GP"
+        | "GQ"
+        | "GR"
+        | "GS"
+        | "GT"
+        | "GU"
+        | "GW"
+        | "GY"
+        | "HK"
+        | "HM"
+        | "HN"
+        | "HR"
+        | "HT"
+        | "HU"
+        | "ID"
+        | "IE"
+        | "IL"
+        | "IM"
+        | "IN"
+        | "IO"
+        | "IQ"
+        | "IR"
+        | "IS"
+        | "IT"
+        | "JE"
+        | "JM"
+        | "JO"
+        | "JP"
+        | "KE"
+        | "KG"
+        | "KH"
+        | "KI"
+        | "KM"
+        | "KN"
+        | "KP"
+        | "KR"
+        | "KW"
+        | "KY"
+        | "KZ"
+        | "LA"
+        | "LB"
+        | "LC"
+        | "LI"
+        | "LK"
+        | "LR"
+        | "LS"
+        | "LT"
+        | "LU"
+        | "LV"
+        | "LY"
+        | "MA"
+        | "MC"
+        | "MD"
+        | "ME"
+        | "MF"
+        | "MG"
+        | "MH"
+        | "MK"
+        | "ML"
+        | "MM"
+        | "MN"
+        | "MO"
+        | "MP"
+        | "MQ"
+        | "MR"
+        | "MS"
+        | "MT"
+        | "MU"
+        | "MV"
+        | "MW"
+        | "MX"
+        | "MY"
+        | "MZ"
+        | "NA"
+        | "NC"
+        | "NE"
+        | "NF"
+        | "NG"
+        | "NI"
+        | "NL"
+        | "NO"
+        | "NP"
+        | "NR"
+        | "NU"
+        | "NZ"
+        | "OM"
+        | "PA"
+        | "PE"
+        | "PF"
+        | "PG"
+        | "PH"
+        | "PK"
+        | "PL"
+        | "PM"
+        | "PN"
+        | "PR"
+        | "PS"
+        | "PT"
+        | "PW"
+        | "PY"
+        | "QA"
+        | "RE"
+        | "RO"
+        | "RS"
+        | "RU"
+        | "RW"
+        | "SA"
+        | "SB"
+        | "SC"
+        | "SD"
+        | "SE"
+        | "SG"
+        | "SH"
+        | "SI"
+        | "SJ"
+        | "SK"
+        | "SL"
+        | "SM"
+        | "SN"
+        | "SO"
+        | "SR"
+        | "SS"
+        | "ST"
+        | "SV"
+        | "SX"
+        | "SY"
+        | "SZ"
+        | "TC"
+        | "TD"
+        | "TF"
+        | "TG"
+        | "TH"
+        | "TJ"
+        | "TK"
+        | "TL"
+        | "TM"
+        | "TN"
+        | "TO"
+        | "TR"
+        | "TT"
+        | "TV"
+        | "TW"
+        | "TZ"
+        | "UA"
+        | "UG"
+        | "UM"
+        | "US"
+        | "UY"
+        | "UZ"
+        | "VA"
+        | "VC"
+        | "VE"
+        | "VG"
+        | "VI"
+        | "VN"
+        | "VU"
+        | "WF"
+        | "WS"
+        | "YE"
+        | "YT"
+        | "ZA"
+        | "ZM"
+        | "ZW"
+        | null;
+      venue: string | null;
+      registerButtonLink: string | null;
+      highlightsVideoId: string | null;
+      highlightVideoThumbnail: {
+        asset: SanityImageAssetReference | null;
+        hotspot: SanityImageHotspot | null;
+        crop: SanityImageCrop | null;
+        alt: string | null;
+      } | null;
+      highlightVideoDescription: string | null;
+      judgesIntro: Array<
+        | {
+            children?: Array<{
+              marks?: Array<string>;
+              text?: string;
+              _type: "span";
+              _key: string;
+            }>;
+            style?: "blockquote" | "h2" | "h3" | "h4" | "normal";
+            listItem?: "bullet" | "number";
+            markDefs?: Array<{
+              href?: string;
+              openInNewTab?: boolean;
+              _type: "link";
+              _key: string;
+            }>;
+            level?: number;
+            _type: "block";
+            _key: string;
+          }
+        | {
+            provider?: "issuu" | "vimeo";
+            id?: string;
+            hash?: string;
+            caption?: string;
+            _type: "embed";
+            _key: string;
+          }
+        | {
+            asset?: SanityImageAssetReference;
+            media?: unknown;
+            hotspot?: SanityImageHotspot;
+            crop?: SanityImageCrop;
+            alt: string | null;
+            _type: "image";
+            _key: string;
+          }
+        | {
+            asset?: SanityFileAssetReference;
+            media?: unknown;
+            title?: string;
+            _type: "videoFile";
+            _key: string;
+            url: string | null;
+            mimeType: string | null;
+          }
+      > | null;
+      judgesPanels: Array<{
+        _key: string;
+        name: string | null;
+        people: Array<{
+          _id: string;
+          title: string | null;
+          jobTitle: string | null;
+          company: string | null;
+          photo: {
+            asset: SanityImageAssetReference | null;
+            hotspot: SanityImageHotspot | null;
+            crop: SanityImageCrop | null;
+            alt: string | null;
+          } | null;
+          bio: Array<
+            | {
+                children?: Array<{
+                  marks?: Array<string>;
+                  text?: string;
+                  _type: "span";
+                  _key: string;
+                }>;
+                style?: "blockquote" | "h2" | "h3" | "h4" | "normal";
+                listItem?: "bullet" | "number";
+                markDefs?: Array<{
+                  href?: string;
+                  openInNewTab?: boolean;
+                  _type: "link";
+                  _key: string;
+                }>;
+                level?: number;
+                _type: "block";
+                _key: string;
+              }
+            | {
+                provider?: "issuu" | "vimeo";
+                id?: string;
+                hash?: string;
+                caption?: string;
+                _type: "embed";
+                _key: string;
+              }
+            | {
+                asset?: SanityImageAssetReference;
+                media?: unknown;
+                hotspot?: SanityImageHotspot;
+                crop?: SanityImageCrop;
+                alt: string | null;
+                _type: "image";
+                _key: string;
+              }
+            | {
+                asset?: SanityFileAssetReference;
+                media?: unknown;
+                title?: string;
+                _type: "videoFile";
+                _key: string;
+                url: string | null;
+                mimeType: string | null;
+              }
+          > | null;
+        }> | null;
+      }> | null;
+      winners: Array<{
+        _key: string;
+        categoryGroup: string | null;
+        category: {
+          title: string | null;
+          slug: string | null;
+        } | null;
+        company: {
+          title: string | null;
+          logo: {
+            asset: SanityImageAssetReference | null;
+            hotspot: SanityImageHotspot | null;
+            crop: SanityImageCrop | null;
+            alt: string | null;
+          } | null;
+        } | null;
+      }> | null;
+      entryCategories: Array<string> | null;
+      acclaimSlug: string | null;
+      previous: {
+        slug: string | null;
+      } | null;
+    }
+  | {
+      _type: "conferenceEvent";
+    }
+  | null;
+
+// Source: src/sanity/queries.ts
+// Variable: AWARDS_PROGRAMME_PAGE_QUERY
+// Query: *[_id == $id && _type == "awardsProgrammePage"][0]{    breadcrumbHomeLabel,    breadcrumbAwardsLabel,    registerLabel,    previousYearLabel,    previousYearWinnersLabel,    allCategoriesLabel,    viewBiographyLabel,    hideBiographyLabel,    marketingKitText,    acclaimLinkLabel,    videoConsentText,    videoConsentButton,    navOverviewLabel,    navJudgesLabel,    navWinnersLabel,    navCategoriesLabel,    navMarketingKitLabel,    launchingSoonLabel,    submissionsOpenLabel,    ceremonyDueLabel,    winnersAnnouncedLabel,    overviewHeading[]{ _key, style, children[]{ _key, text } },    videoHeading[]{ _key, style, children[]{ _key, text } },    judgesHeading[]{ _key, style, children[]{ _key, text } },    winnersHeading[]{ _key, style, children[]{ _key, text } },    categoriesHeading[]{ _key, style, children[]{ _key, text } },    marketingKitHeading[]{ _key, style, children[]{ _key, text } },    otherProgrammesHeading[]{ _key, style, children[]{ _key, text } },    "otherProgrammes": otherProgrammes[]{ _key, title, "edition": edition->{   _id, title, "slug": slug.current, "programmeId": programme._ref,  startDate, endDate, country, nominationsOpeningDate, nominationsClosingDate } }  }
+export type AWARDS_PROGRAMME_PAGE_QUERY_RESULT = {
+  breadcrumbHomeLabel: string | null;
+  breadcrumbAwardsLabel: string | null;
+  registerLabel: string | null;
+  previousYearLabel: string | null;
+  previousYearWinnersLabel: string | null;
+  allCategoriesLabel: string | null;
+  viewBiographyLabel: string | null;
+  hideBiographyLabel: string | null;
+  marketingKitText: string | null;
+  acclaimLinkLabel: string | null;
+  videoConsentText: string | null;
+  videoConsentButton: string | null;
+  navOverviewLabel: string | null;
+  navJudgesLabel: string | null;
+  navWinnersLabel: string | null;
+  navCategoriesLabel: string | null;
+  navMarketingKitLabel: string | null;
   launchingSoonLabel: string | null;
   submissionsOpenLabel: string | null;
   ceremonyDueLabel: string | null;
+  winnersAnnouncedLabel: string | null;
+  overviewHeading: Array<{
+    _key: string;
+    style: "h1" | "h2" | "h3" | "h4" | "h5" | "h6" | "normal" | null;
+    children: Array<{
+      _key: string;
+      text: string | null;
+    }> | null;
+  }> | null;
+  videoHeading: Array<{
+    _key: string;
+    style: "h1" | "h2" | "h3" | "h4" | "h5" | "h6" | "normal" | null;
+    children: Array<{
+      _key: string;
+      text: string | null;
+    }> | null;
+  }> | null;
+  judgesHeading: Array<{
+    _key: string;
+    style: "h1" | "h2" | "h3" | "h4" | "h5" | "h6" | "normal" | null;
+    children: Array<{
+      _key: string;
+      text: string | null;
+    }> | null;
+  }> | null;
+  winnersHeading: Array<{
+    _key: string;
+    style: "h1" | "h2" | "h3" | "h4" | "h5" | "h6" | "normal" | null;
+    children: Array<{
+      _key: string;
+      text: string | null;
+    }> | null;
+  }> | null;
+  categoriesHeading: Array<{
+    _key: string;
+    style: "h1" | "h2" | "h3" | "h4" | "h5" | "h6" | "normal" | null;
+    children: Array<{
+      _key: string;
+      text: string | null;
+    }> | null;
+  }> | null;
+  marketingKitHeading: Array<{
+    _key: string;
+    style: "h1" | "h2" | "h3" | "h4" | "h5" | "h6" | "normal" | null;
+    children: Array<{
+      _key: string;
+      text: string | null;
+    }> | null;
+  }> | null;
+  otherProgrammesHeading: Array<{
+    _key: string;
+    style: "h1" | "h2" | "h3" | "h4" | "h5" | "h6" | "normal" | null;
+    children: Array<{
+      _key: string;
+      text: string | null;
+    }> | null;
+  }> | null;
+  otherProgrammes: Array<{
+    _key: string;
+    title: string | null;
+    edition: {
+      _id: string;
+      title: string | null;
+      slug: string | null;
+      programmeId: string | null;
+      startDate: string | null;
+      endDate: string | null;
+      country:
+        | "AD"
+        | "AE"
+        | "AF"
+        | "AG"
+        | "AI"
+        | "AL"
+        | "AM"
+        | "AO"
+        | "AQ"
+        | "AR"
+        | "AS"
+        | "AT"
+        | "AU"
+        | "AW"
+        | "AX"
+        | "AZ"
+        | "BA"
+        | "BB"
+        | "BD"
+        | "BE"
+        | "BF"
+        | "BG"
+        | "BH"
+        | "BI"
+        | "BJ"
+        | "BL"
+        | "BM"
+        | "BN"
+        | "BO"
+        | "BQ"
+        | "BR"
+        | "BS"
+        | "BT"
+        | "BV"
+        | "BW"
+        | "BY"
+        | "BZ"
+        | "CA"
+        | "CC"
+        | "CD"
+        | "CF"
+        | "CG"
+        | "CH"
+        | "CI"
+        | "CK"
+        | "CL"
+        | "CM"
+        | "CN"
+        | "CO"
+        | "CR"
+        | "CU"
+        | "CV"
+        | "CW"
+        | "CX"
+        | "CY"
+        | "CZ"
+        | "DE"
+        | "DJ"
+        | "DK"
+        | "DM"
+        | "DO"
+        | "DZ"
+        | "EC"
+        | "EE"
+        | "EG"
+        | "EH"
+        | "ER"
+        | "ES"
+        | "ET"
+        | "FI"
+        | "FJ"
+        | "FK"
+        | "FM"
+        | "FO"
+        | "FR"
+        | "GA"
+        | "GB"
+        | "GD"
+        | "GE"
+        | "GF"
+        | "GG"
+        | "GH"
+        | "GI"
+        | "GL"
+        | "GM"
+        | "GN"
+        | "GP"
+        | "GQ"
+        | "GR"
+        | "GS"
+        | "GT"
+        | "GU"
+        | "GW"
+        | "GY"
+        | "HK"
+        | "HM"
+        | "HN"
+        | "HR"
+        | "HT"
+        | "HU"
+        | "ID"
+        | "IE"
+        | "IL"
+        | "IM"
+        | "IN"
+        | "IO"
+        | "IQ"
+        | "IR"
+        | "IS"
+        | "IT"
+        | "JE"
+        | "JM"
+        | "JO"
+        | "JP"
+        | "KE"
+        | "KG"
+        | "KH"
+        | "KI"
+        | "KM"
+        | "KN"
+        | "KP"
+        | "KR"
+        | "KW"
+        | "KY"
+        | "KZ"
+        | "LA"
+        | "LB"
+        | "LC"
+        | "LI"
+        | "LK"
+        | "LR"
+        | "LS"
+        | "LT"
+        | "LU"
+        | "LV"
+        | "LY"
+        | "MA"
+        | "MC"
+        | "MD"
+        | "ME"
+        | "MF"
+        | "MG"
+        | "MH"
+        | "MK"
+        | "ML"
+        | "MM"
+        | "MN"
+        | "MO"
+        | "MP"
+        | "MQ"
+        | "MR"
+        | "MS"
+        | "MT"
+        | "MU"
+        | "MV"
+        | "MW"
+        | "MX"
+        | "MY"
+        | "MZ"
+        | "NA"
+        | "NC"
+        | "NE"
+        | "NF"
+        | "NG"
+        | "NI"
+        | "NL"
+        | "NO"
+        | "NP"
+        | "NR"
+        | "NU"
+        | "NZ"
+        | "OM"
+        | "PA"
+        | "PE"
+        | "PF"
+        | "PG"
+        | "PH"
+        | "PK"
+        | "PL"
+        | "PM"
+        | "PN"
+        | "PR"
+        | "PS"
+        | "PT"
+        | "PW"
+        | "PY"
+        | "QA"
+        | "RE"
+        | "RO"
+        | "RS"
+        | "RU"
+        | "RW"
+        | "SA"
+        | "SB"
+        | "SC"
+        | "SD"
+        | "SE"
+        | "SG"
+        | "SH"
+        | "SI"
+        | "SJ"
+        | "SK"
+        | "SL"
+        | "SM"
+        | "SN"
+        | "SO"
+        | "SR"
+        | "SS"
+        | "ST"
+        | "SV"
+        | "SX"
+        | "SY"
+        | "SZ"
+        | "TC"
+        | "TD"
+        | "TF"
+        | "TG"
+        | "TH"
+        | "TJ"
+        | "TK"
+        | "TL"
+        | "TM"
+        | "TN"
+        | "TO"
+        | "TR"
+        | "TT"
+        | "TV"
+        | "TW"
+        | "TZ"
+        | "UA"
+        | "UG"
+        | "UM"
+        | "US"
+        | "UY"
+        | "UZ"
+        | "VA"
+        | "VC"
+        | "VE"
+        | "VG"
+        | "VI"
+        | "VN"
+        | "VU"
+        | "WF"
+        | "WS"
+        | "YE"
+        | "YT"
+        | "ZA"
+        | "ZM"
+        | "ZW"
+        | null;
+      nominationsOpeningDate: string | null;
+      nominationsClosingDate: string | null;
+    } | null;
+  }> | null;
 } | null;
 
 // Query TypeMap
@@ -25393,7 +26349,9 @@ declare global {
     '\n  *[_type == "subscribeModal" && _id in $ids]{\n    _id,\n    interests[]{ label, "attribute": attribute.name }\n  }\n': SIGNUP_INTEREST_LABELS_QUERY_RESULT;
     '\n  *[_type == "awardCategory" && slug.current == $category][0]{\n    _id,\n    title,\n    "slug": slug.current,\n    categoryGroup,\n    description,\n    eligibility,\n    recognises,\n    judging,\n    "programme": *[_type == "awardsProgrammeGroup" && slug.current == $programme][0]{ _id, title, "slug": slug.current },\n    "editions": *[\n      _type == "awardsProgramme"\n      && programme->slug.current == $programme\n      && ^._id in winners[].category._ref\n    ] | order(startDate desc){\n      _id,\n      title,\n      "slug": slug.current,\n      startDate,\n      "winners": winners[category._ref == ^.^._id]{\n        _key,\n        categoryGroup,\n        "company": company->{ title, "slug": slug.current, "logo": logo{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n } }\n      }\n    }\n  }\n': AWARD_CATEGORY_QUERY_RESULT;
     '\n  [\n    ...*[\n      _type == "awardsProgramme"\n      && nominationsClosingDate >= $today\n      && coalesce(programme->slug.current, "") != $programme\n    ] | order(nominationsClosingDate asc)[0...12]{ \n  _id, title, "slug": slug.current, "programmeId": programme._ref,\n  startDate, endDate, country, nominationsOpeningDate, nominationsClosingDate\n },\n    ...*[\n      _type == "awardsProgramme"\n      && !(defined(nominationsClosingDate) && nominationsClosingDate >= $today)\n      && startDate >= $today\n      && coalesce(programme->slug.current, "") != $programme\n    ] | order(startDate asc)[0...12]{ \n  _id, title, "slug": slug.current, "programmeId": programme._ref,\n  startDate, endDate, country, nominationsOpeningDate, nominationsClosingDate\n }\n  ]\n': OTHER_AWARDS_QUERY_RESULT;
-    '\n  *[_id == $id && _type == "awardCategoryPage"][0]{\n    breadcrumbHomeLabel,\n    breadcrumbAwardsLabel,\n    detailsHeading,\n    eligibilityLabel,\n    recognisesLabel,\n    judgingLabel,\n    winnersHeading,\n    winnerLabel,\n    otherProgrammesHeading[]{ _key, style, children[]{ _key, text } },\n    "otherProgrammes": otherProgrammes[]{ _key, title, "edition": edition->{ \n  _id, title, "slug": slug.current, "programmeId": programme._ref,\n  startDate, endDate, country, nominationsOpeningDate, nominationsClosingDate\n } },\n    launchingSoonLabel,\n    submissionsOpenLabel,\n    ceremonyDueLabel\n  }\n': AWARD_CATEGORY_PAGE_QUERY_RESULT;
+    '\n  *[_id == $id && _type == "awardCategoryPage"][0]{\n    breadcrumbHomeLabel,\n    breadcrumbAwardsLabel,\n    detailsHeading,\n    eligibilityLabel,\n    recognisesLabel,\n    judgingLabel,\n    winnersHeading,\n    winnerLabel,\n    otherProgrammesHeading[]{ _key, style, children[]{ _key, text } },\n    "otherProgrammes": otherProgrammes[]{ _key, title, "edition": edition->{ \n  _id, title, "slug": slug.current, "programmeId": programme._ref,\n  startDate, endDate, country, nominationsOpeningDate, nominationsClosingDate\n } },\n    "statuses": *[_id == $statusesId && _type == "awardsProgrammePage"][0]{\n      launchingSoonLabel,\n      submissionsOpenLabel,\n      ceremonyDueLabel,\n      winnersAnnouncedLabel\n    }\n  }\n': AWARD_CATEGORY_PAGE_QUERY_RESULT;
+    '\n  *[_type in ["awardsProgramme", "conferenceEvent"] && slug.current == $slug][0]{\n    _type,\n    _type == "awardsProgramme" => {\n      _id,\n      title,\n      "slug": slug.current,\n      standfirst,\n      body[]{ \n  _type != "infographic" => { ... },\n  _type == "infographic" => { _key, _type, eyebrow, title, description, wide, narrow },\n  _type == "image" => { "alt": coalesce(alt, asset->altText) },\n  _type == "videoFile" => { "url": asset->url, "mimeType": asset->mimeType }\n },\n      "logo": logo{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n      "programme": programme->{ _id, "slug": slug.current },\n      startDate,\n      endDate,\n      hideDateTime,\n      nominationsOpeningDate,\n      nominationsClosingDate,\n      country,\n      "venue": venue->title,\n      registerButtonLink,\n      highlightsVideoId,\n      "highlightVideoThumbnail": highlightVideoThumbnail{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n      highlightVideoDescription,\n      judgesIntro[]{ \n  _type != "infographic" => { ... },\n  _type == "infographic" => { _key, _type, eyebrow, title, description, wide, narrow },\n  _type == "image" => { "alt": coalesce(alt, asset->altText) },\n  _type == "videoFile" => { "url": asset->url, "mimeType": asset->mimeType }\n },\n      judgesPanels[]{\n        _key,\n        name,\n        "people": people[]->{\n          _id,\n          title,\n          jobTitle,\n          "company": companies[0]->title,\n          "photo": photo{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n          bio[]{ \n  _type != "infographic" => { ... },\n  _type == "infographic" => { _key, _type, eyebrow, title, description, wide, narrow },\n  _type == "image" => { "alt": coalesce(alt, asset->altText) },\n  _type == "videoFile" => { "url": asset->url, "mimeType": asset->mimeType }\n }\n        }\n      },\n      winners[]{\n        _key,\n        categoryGroup,\n        "category": category->{ title, "slug": slug.current },\n        "company": company->{ title, "logo": logo{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n } }\n      },\n      entryCategories,\n      "acclaimSlug": acclaim->slug.current,\n      "previous": *[\n        _type == "awardsProgramme"\n        && defined(^.programme._ref)\n        && programme._ref == ^.programme._ref\n        && startDate < ^.startDate\n      ] | order(startDate desc)[0]{ "slug": slug.current }\n    }\n  }\n': AWARDS_PROGRAMME_QUERY_RESULT;
+    '\n  *[_id == $id && _type == "awardsProgrammePage"][0]{\n    breadcrumbHomeLabel,\n    breadcrumbAwardsLabel,\n    registerLabel,\n    previousYearLabel,\n    previousYearWinnersLabel,\n    allCategoriesLabel,\n    viewBiographyLabel,\n    hideBiographyLabel,\n    marketingKitText,\n    acclaimLinkLabel,\n    videoConsentText,\n    videoConsentButton,\n    navOverviewLabel,\n    navJudgesLabel,\n    navWinnersLabel,\n    navCategoriesLabel,\n    navMarketingKitLabel,\n    launchingSoonLabel,\n    submissionsOpenLabel,\n    ceremonyDueLabel,\n    winnersAnnouncedLabel,\n    overviewHeading[]{ _key, style, children[]{ _key, text } },\n    videoHeading[]{ _key, style, children[]{ _key, text } },\n    judgesHeading[]{ _key, style, children[]{ _key, text } },\n    winnersHeading[]{ _key, style, children[]{ _key, text } },\n    categoriesHeading[]{ _key, style, children[]{ _key, text } },\n    marketingKitHeading[]{ _key, style, children[]{ _key, text } },\n    otherProgrammesHeading[]{ _key, style, children[]{ _key, text } },\n    "otherProgrammes": otherProgrammes[]{ _key, title, "edition": edition->{ \n  _id, title, "slug": slug.current, "programmeId": programme._ref,\n  startDate, endDate, country, nominationsOpeningDate, nominationsClosingDate\n } }\n  }\n': AWARDS_PROGRAMME_PAGE_QUERY_RESULT;
   }
 }
 // Lets @sanity/client releases that predate the global registry read it too

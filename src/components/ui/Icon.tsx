@@ -17,7 +17,9 @@ import { LinkIcon } from './icons/link'
 import { MenuIcon } from './icons/menu'
 import { MenuCloseIcon } from './icons/menu-close'
 import { PeopleMovesIcon } from './icons/people-moves'
+import { PlayIcon } from './icons/play'
 import { PublicIcon } from './icons/public'
+import { RowChevronIcon } from './icons/row-chevron'
 import { SearchIcon } from './icons/search'
 import { SelectChevronIcon } from './icons/select-chevron'
 import { ShareIcon } from './icons/share'
@@ -35,6 +37,8 @@ export const iconMap = {
   'chevron-left': ChevronLeftIcon,
   'chevron-down': ChevronDownIcon,
   'card-chevron': CardChevronIcon,
+  'row-chevron': RowChevronIcon,
+  play: PlayIcon,
   search: SearchIcon,
   close: CloseIcon,
   menu: MenuIcon,

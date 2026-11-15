@@ -4,6 +4,13 @@ import { defineDocuments, defineLocations, presentationTool } from 'sanity/prese
 import { BRAND_KEYS, BRANDS, brandOrigin } from '@/brands'
 import { HOME_PAGE_SLUG } from '@/lib/links'
 
+// An awards edition or a conference event: both are served at /events/{slug} on ClearView.
+const eventLocations = defineLocations({
+  select: { title: 'title', slug: 'slug.current' },
+  resolve: (doc) =>
+    doc?.slug ? { locations: [{ title: doc.title ?? 'Untitled', href: `/events/${doc.slug}` }] } : null,
+})
+
 export const presentationTools: PluginOptions[] = BRAND_KEYS.map((key) =>
   presentationTool({
     name: `preview-${key}`,
@@ -35,6 +42,11 @@ export const presentationTools: PluginOptions[] = BRAND_KEYS.map((key) =>
                 route: '/awards/:programme/:category',
                 filter: '_type == "awardCategory" && slug.current == $category',
               },
+              // Awards editions and conference events share /events/{slug}; the slug is unique across both types.
+              {
+                route: '/events/:slug',
+                filter: '_type in ["awardsProgramme", "conferenceEvent"] && slug.current == $slug',
+              },
             ]
           : []),
         {
@@ -44,6 +56,8 @@ export const presentationTools: PluginOptions[] = BRAND_KEYS.map((key) =>
         },
       ]),
       locations: {
+        // Awards editions and conference events are shared records, served on ClearView only.
+        ...(key === 'clearview' ? { awardsProgramme: eventLocations, conferenceEvent: eventLocations } : {}),
         page: defineLocations({
           select: {
             title: 'title',

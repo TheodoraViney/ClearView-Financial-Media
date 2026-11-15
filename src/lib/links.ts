@@ -211,3 +211,20 @@ export function awardCategoryHref(
 
   return currentBrand === 'clearview' ? path : `${brandOrigin('clearview')}${path}`
 }
+
+/**
+ * Href of an Acclaim magazine: `/acclaim/{slug}`, the clearviewpublishing.com path without its trailing slash. Shared
+ * record rules as `sharedRecordHref`. The Acclaim page is not built yet: the link points at the final URL and 404s
+ * until it exists. Null without a slug.
+ */
+export function acclaimHref(slug: string | null | undefined, currentBrand: BrandKey): string | null {
+  const clean = stegaClean(slug)?.trim()
+
+  if (!clean) {
+    return null
+  }
+
+  const path = pathFor(clean, '/acclaim')
+
+  return currentBrand === 'clearview' ? path : `${brandOrigin('clearview')}${path}`
+}

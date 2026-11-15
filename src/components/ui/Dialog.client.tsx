@@ -60,6 +60,10 @@ function handleInPageKeys(event: KeyboardEvent<HTMLDialogElement>, onClose: () =
  * viewport. Closes with ×, Escape and a press on the overlay. On open it focuses the element marked `data-autofocus`
  * (else the first focusable one) and locks the page scroll; on close it returns focus to `returnFocus`, else to the
  * element focused before. No animation, as in the design. Inside `InPageDialogs` (draft mode) it opens with `show()`.
+ *
+ * `variant="media"` is a lightbox (awards programme highlight video): a darker overlay (foreground/72, padding 16 / 40
+ * from md), no card; a column up to 960 wide, centred, with a row of `title` (white text, the caller gives it the
+ * `labelledBy` id) and a white round × above the children (the player). Same behaviour otherwise.
  */
 export function Dialog({
   open,
@@ -68,6 +72,8 @@ export function Dialog({
   describedBy,
   closeLabel,
   returnFocus,
+  variant = 'card',
+  title,
   children,
 }: {
   open: boolean
@@ -78,6 +84,9 @@ export function Dialog({
   // Accessible name of the × button.
   closeLabel: string
   returnFocus?: HTMLElement | null
+  variant?: 'card' | 'media'
+  /** `media` only: the text beside the × button. */
+  title?: ReactNode
   children: ReactNode
 }) {
   const inPage = use(InPageDialogsContext)
@@ -170,20 +179,38 @@ export function Dialog({
         pressStartedOnOverlay.current = false
       }}
       className={cx(
-        'fixed inset-0 m-0 size-full max-h-none max-w-none items-start overflow-y-auto overscroll-contain border-0 bg-foreground/48 p-4 text-foreground outline-none backdrop:bg-transparent open:flex md:p-8',
+        'fixed inset-0 m-0 size-full max-h-none max-w-none items-start overflow-y-auto overscroll-contain border-0 p-4 text-foreground outline-none backdrop:bg-transparent open:flex',
+        variant === 'media' ? 'bg-foreground/72 md:p-10' : 'bg-foreground/48 md:p-8',
         inPage && 'z-50',
       )}
     >
-      <div className="relative m-auto flex w-full max-w-130 flex-col gap-6 rounded-sm border border-border bg-white p-6 md:p-8">
-        <IconButton
-          icon="close"
-          label={closeLabel}
-          motion="out"
-          onClick={onClose}
-          className="absolute top-3 right-3"
-        />
-        {children}
-      </div>
+      {variant === 'media' ? (
+        <div className="m-auto flex w-full max-w-240 flex-col gap-3">
+          <div className="flex items-center justify-between gap-4">
+            {title}
+            <IconButton
+              icon="close"
+              label={closeLabel}
+              variant="inverse"
+              motion="out"
+              onClick={onClose}
+              className="-my-1.5 -mr-2.5"
+            />
+          </div>
+          {children}
+        </div>
+      ) : (
+        <div className="relative m-auto flex w-full max-w-130 flex-col gap-6 rounded-sm border border-border bg-white p-6 md:p-8">
+          <IconButton
+            icon="close"
+            label={closeLabel}
+            motion="out"
+            onClick={onClose}
+            className="absolute top-3 right-3"
+          />
+          {children}
+        </div>
+      )}
     </dialog>
   )
 }

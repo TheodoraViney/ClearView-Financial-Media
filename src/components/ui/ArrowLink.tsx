@@ -17,10 +17,13 @@ const VARIANTS = {
 // row it sits in keeps the text height (sponsored content header and company profile link).
 // `static`: no hover of its own and no touch target, for the label inside a whole-card link (the card is the target
 // and carries the hover); use it without `href`.
+// `fade-tall`: `fade` without the negative margins, for a row that is 44px high anyway.
 const HOVERS = {
   shift: 'min-h-11 lg:min-h-0',
   fade: 'min-h-11 -my-3.75 transition-opacity duration-180 ease-out hover:opacity-60',
   static: '',
+  // `fade` that keeps its full 44px height in the layout (awards programme "View previous year" beside the button).
+  'fade-tall': 'min-h-11 transition-opacity duration-180 ease-out hover:opacity-60',
 }
 
 // Renders as a span when the whole card is already the link.
@@ -32,6 +35,8 @@ export function ArrowLink({
   motion = 'smooth',
   // `false` keeps the colour on hover, where the design moves only the chevron. Ignored with `hover="fade"`.
   hoverColor = true,
+  // `center` for a row that centres its items, e.g. beside a heading; `self-start` would lift the link.
+  align = 'start',
   className,
   children,
 }: {
@@ -40,12 +45,14 @@ export function ArrowLink({
   hover?: keyof typeof HOVERS
   motion?: Motion
   hoverColor?: boolean
+  align?: 'start' | 'center'
   className?: string
   children: ReactNode
 }) {
   const shift = hover === 'shift'
   const classes = cx(
-    'group inline-flex items-center gap-2 self-start text-sm leading-none whitespace-nowrap',
+    'group inline-flex items-center gap-2 text-sm leading-none whitespace-nowrap',
+    align === 'center' ? 'self-center' : 'self-start',
     HOVERS[hover],
     VARIANTS[variant].base,
     shift && hoverColor && VARIANTS[variant].hover,

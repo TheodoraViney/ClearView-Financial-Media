@@ -499,7 +499,8 @@ export const OTHER_AWARDS_QUERY = defineQuery(`${OTHER_AWARDS_FILL}`)
 
 // The award category page labels and the editor's sidebar picks (`$id` is AWARD_CATEGORY_PAGE_ID), one cached result
 // for every category page. A pick whose edition is unpublished or deleted dereferences to a null edition and is dropped
-// by the adapter. The page 404s until this document is published.
+// by the adapter. The sidebar's status labels are shared with the awards programme page and come from its document
+// (`$statusesId` is AWARDS_PROGRAMME_PAGE_ID). The page 404s until both documents are published.
 export const AWARD_CATEGORY_PAGE_QUERY = defineQuery(`
   *[_id == $id && _type == "awardCategoryPage"][0]{
     breadcrumbHomeLabel,
@@ -512,8 +513,107 @@ export const AWARD_CATEGORY_PAGE_QUERY = defineQuery(`
     winnerLabel,
     otherProgrammesHeading[]{ _key, style, children[]{ _key, text } },
     "otherProgrammes": otherProgrammes[]{ _key, title, "edition": edition->{ ${OTHER_AWARDS_EDITION} } },
+    "statuses": *[_id == $statusesId && _type == "awardsProgrammePage"][0]{
+      launchingSoonLabel,
+      submissionsOpenLabel,
+      ceremonyDueLabel,
+      winnersAnnouncedLabel
+    }
+  }
+`)
+
+// The /events/{slug} record: an awards edition or a conference event, whose slugs are unique across both types.
+// `_type` tells the route which page to render; only the awards edition is projected so far. Shared records carry no
+// brand: the page is served on ClearView only, which the route checks.
+// Bodies are richText and use the article body projection for image alt text and video file URLs (ARTICLE_BODY).
+// `previous`: the programme's latest edition before this one, for the "View previous year" links; null without a
+// programme. Winner rows keep the array order, which groups them by category group.
+export const AWARDS_PROGRAMME_QUERY = defineQuery(`
+  *[_type in ["awardsProgramme", "conferenceEvent"] && slug.current == $slug][0]{
+    _type,
+    _type == "awardsProgramme" => {
+      _id,
+      title,
+      "slug": slug.current,
+      standfirst,
+      body[]{ ${ARTICLE_BODY} },
+      "logo": logo{ ${IMAGE} },
+      "programme": programme->{ _id, "slug": slug.current },
+      startDate,
+      endDate,
+      hideDateTime,
+      nominationsOpeningDate,
+      nominationsClosingDate,
+      country,
+      "venue": venue->title,
+      registerButtonLink,
+      highlightsVideoId,
+      "highlightVideoThumbnail": highlightVideoThumbnail{ ${IMAGE} },
+      highlightVideoDescription,
+      judgesIntro[]{ ${ARTICLE_BODY} },
+      judgesPanels[]{
+        _key,
+        name,
+        "people": people[]->{
+          _id,
+          title,
+          jobTitle,
+          "company": companies[0]->title,
+          "photo": photo{ ${IMAGE} },
+          bio[]{ ${ARTICLE_BODY} }
+        }
+      },
+      winners[]{
+        _key,
+        categoryGroup,
+        "category": category->{ title, "slug": slug.current },
+        "company": company->{ title, "logo": logo{ ${IMAGE} } }
+      },
+      entryCategories,
+      "acclaimSlug": acclaim->slug.current,
+      "previous": *[
+        _type == "awardsProgramme"
+        && defined(^.programme._ref)
+        && programme._ref == ^.programme._ref
+        && startDate < ^.startDate
+      ] | order(startDate desc)[0]{ "slug": slug.current }
+    }
+  }
+`)
+
+// The awards programme page labels, headings and the editor's sidebar picks (`$id` is AWARDS_PROGRAMME_PAGE_ID), one
+// cached result for every edition page. Picks as on the award category page (AWARD_CATEGORY_PAGE_QUERY). The page
+// 404s until the document is published.
+export const AWARDS_PROGRAMME_PAGE_QUERY = defineQuery(`
+  *[_id == $id && _type == "awardsProgrammePage"][0]{
+    breadcrumbHomeLabel,
+    breadcrumbAwardsLabel,
+    registerLabel,
+    previousYearLabel,
+    previousYearWinnersLabel,
+    allCategoriesLabel,
+    viewBiographyLabel,
+    hideBiographyLabel,
+    marketingKitText,
+    acclaimLinkLabel,
+    videoConsentText,
+    videoConsentButton,
+    navOverviewLabel,
+    navJudgesLabel,
+    navWinnersLabel,
+    navCategoriesLabel,
+    navMarketingKitLabel,
     launchingSoonLabel,
     submissionsOpenLabel,
-    ceremonyDueLabel
+    ceremonyDueLabel,
+    winnersAnnouncedLabel,
+    overviewHeading[]{ _key, style, children[]{ _key, text } },
+    videoHeading[]{ _key, style, children[]{ _key, text } },
+    judgesHeading[]{ _key, style, children[]{ _key, text } },
+    winnersHeading[]{ _key, style, children[]{ _key, text } },
+    categoriesHeading[]{ _key, style, children[]{ _key, text } },
+    marketingKitHeading[]{ _key, style, children[]{ _key, text } },
+    otherProgrammesHeading[]{ _key, style, children[]{ _key, text } },
+    "otherProgrammes": otherProgrammes[]{ _key, title, "edition": edition->{ ${OTHER_AWARDS_EDITION} } }
   }
 `)

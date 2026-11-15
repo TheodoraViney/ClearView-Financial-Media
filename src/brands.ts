@@ -45,6 +45,12 @@ export const subscribeModalDocumentId = (key: BrandKey): string => `subscribe-mo
 /** Id of the one "Award category page" document: the award category template's labels. ClearView only. */
 export const AWARD_CATEGORY_PAGE_ID = 'award-category-page'
 
+/**
+ * Id of the one "Awards programme page" document: the awards programme template's labels, and the edition status
+ * labels the award category page sidebar shares. ClearView only.
+ */
+export const AWARDS_PROGRAMME_PAGE_ID = 'awards-programme-page'
+
 /** Id of the one subscribe form settings document, shared by every brand: the Brevo list and confirmation email. */
 export const SUBSCRIBE_FORM_SETTINGS_ID = 'subscribe-form-settings'
 

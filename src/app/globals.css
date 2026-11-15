@@ -172,6 +172,19 @@ main :where(*) {
   scroll-margin-top: var(--header-h);
 }
 
+/* Awards programme section nav (ui/SectionNav): 48px items + the 1px rule under them */
+:root {
+  --section-nav-h: 3.0625rem;
+}
+
+/*
+ * Sections the sticky section nav links to land 24px below it (header + nav + 24, the design's goTo offset).
+ * Unlayered like the rule above, which a Tailwind utility could not override; the attribute makes it more specific.
+ */
+main [data-section-anchor] {
+  scroll-margin-top: calc(var(--header-h) + var(--section-nav-h) + 1.5rem);
+}
+
 /*
  * Shared neutrals, names from the ClearView Figma variables. `static`: always emitted, whether or not a utility uses
  * them, because AI-generated infographic SVGs paint with them by name (SVG_COLOR_TOKENS in src/lib/svg-sanitize.ts).
@@ -245,6 +258,13 @@ main :where(*) {
 
   /* Dropdown panel (Categories filters, shared-shell select-dropdown) */
   --shadow-dropdown: 0 12px 24px -12px rgb(31 43 50 / 0.18), 0 2px 4px rgb(31 43 50 / 0.04);
+
+  /* Awards programme highlight video: play circle on the thumbnail, and the player inside the lightbox */
+  --shadow-play: 0 6px 16px rgb(31 43 50 / 0.24);
+  --shadow-lightbox: 0 16px 48px rgb(0 0 0 / 0.32);
+
+  /* Award winner gallery card: the company name set as a wordmark when there is no logo */
+  --tracking-wordmark: -0.01em;
 
   /* Report cover or logo contained in a search result thumbnail: the shadow follows the painted image, not its box */
   --drop-shadow-cover: 0 4px 10px rgb(31 43 50 / 0.16);

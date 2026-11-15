@@ -4,7 +4,7 @@ import { notFound } from 'next/navigation'
 import { stegaClean } from 'next-sanity'
 import { Suspense } from 'react'
 
-import { AWARD_CATEGORY_PAGE_ID, brandOrigin } from '@/brands'
+import { AWARD_CATEGORY_PAGE_ID, AWARDS_PROGRAMME_PAGE_ID, brandOrigin } from '@/brands'
 import { AwardCategoryPage } from '@/components/sections/awards/AwardCategoryPage'
 import { awardCategoryHref } from '@/lib/links'
 import { isAwardedCategory, toAwardCategoryView } from '@/sanity/award-category-view'
@@ -102,14 +102,19 @@ async function CachedAwardCategory({
   const [{ data }, { data: others }, { data: copy }, ads] = await Promise.all([
     fetchCategory(programme, category, options),
     cachedSanity({ query: OTHER_AWARDS_QUERY, params: { programme, today }, ...options }),
-    cachedSanity({ query: AWARD_CATEGORY_PAGE_QUERY, params: { id: AWARD_CATEGORY_PAGE_ID }, ...options }),
+    cachedSanity({
+      query: AWARD_CATEGORY_PAGE_QUERY,
+      params: { id: AWARD_CATEGORY_PAGE_ID, statusesId: AWARDS_PROGRAMME_PAGE_ID },
+      ...options,
+    }),
     fetchAdUnits('clearview', 'other', options),
   ])
 
-  // The labels document is required, like the Categories page's: no copy defaults in code.
-  if (!isAwardedCategory(data) || !copy) {
+  // The labels documents are required, like the Categories page's: no copy defaults in code. The status labels come
+  // from the awards programme page document.
+  if (!isAwardedCategory(data) || !copy?.statuses) {
     notFound()
   }
 
-  return <AwardCategoryPage view={toAwardCategoryView({ category: data, others, copy, ads, today })} />
+  return <AwardCategoryPage view={toAwardCategoryView({ category: data, others, copy, statuses: copy.statuses, ads, today })} />
 }

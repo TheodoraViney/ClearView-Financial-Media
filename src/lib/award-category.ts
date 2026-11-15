@@ -2,47 +2,13 @@ import type { BreadcrumbItem } from '@/components/ui/Breadcrumb'
 import type { Definition } from '@/components/ui/DefinitionList'
 import type { MediaImage } from '@/components/ui/Media'
 
-import type { AwardCategoryPageCopy, AwardCategoryPageCopyKey } from './award-category-copy'
+import type { AwardCategoryPageCopy } from './award-category-copy'
+import { editionStatus } from './awards-status'
 import type { AdUnits } from './gam'
 import type { HeadingLevel } from './headings'
 
 /** Editions in the "Other awards programmes" list: the editor's picks, then the next edition of other programmes. */
 export const OTHER_PROGRAMMES_COUNT = 2
-
-/** Where an upcoming edition stands today, from its dates. */
-export type EditionStatus = 'launchingSoon' | 'submissionsOpen' | 'ceremonyDue'
-
-/**
- * The status of an edition in the sidebar, from its calendar dates and the UK date the query ran with. ISO dates
- * compare as strings, as `nominationsClosingDate >= $today` does in GROQ.
- * - nominations open after today → launching soon;
- * - nominations close today or later → submissions open;
- * - otherwise, a ceremony today or later → ceremony due.
- * Null for a past edition (the query leaves them out).
- */
-export function editionStatus(
-  edition: {
-    nominationsOpeningDate?: string | null
-    nominationsClosingDate?: string | null
-    startDate?: string | null
-  },
-  today: string,
-): EditionStatus | null {
-  const { nominationsOpeningDate: opening, nominationsClosingDate: closing, startDate } = edition
-
-  if (closing && closing >= today) {
-    return opening && opening > today ? 'launchingSoon' : 'submissionsOpen'
-  }
-
-  return startDate && startDate >= today ? 'ceremonyDue' : null
-}
-
-/** The page-copy label of each status. */
-export const EDITION_STATUS_LABELS: Record<EditionStatus, AwardCategoryPageCopyKey> = {
-  launchingSoon: 'launchingSoonLabel',
-  submissionsOpen: 'submissionsOpenLabel',
-  ceremonyDue: 'ceremonyDueLabel',
-}
 
 /** The edition fields the sidebar selection reads (OTHER_AWARDS_EDITION in queries.ts). */
 export type SidebarEditionFields = {
@@ -110,6 +76,8 @@ export function otherProgrammeEditions<E extends SidebarEditionFields>(
         nominationsOpeningDate: cleaned(edition.nominationsOpeningDate),
         nominationsClosingDate: cleaned(edition.nominationsClosingDate),
         startDate: cleaned(edition.startDate),
+        // Only whether the edition is still ahead matters here: a past one is never filled in.
+        hasWinners: false,
       },
       today,
     )

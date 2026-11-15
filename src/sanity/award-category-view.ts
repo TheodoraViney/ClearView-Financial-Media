@@ -3,8 +3,6 @@ import { stegaClean, type StegaBranded } from 'next-sanity'
 import type { Definition } from '@/components/ui/DefinitionList'
 import {
   categoryGroupLabel,
-  EDITION_STATUS_LABELS,
-  editionStatus,
   otherProgrammeEditions,
   type AwardCategoryView,
   type AwardYearView,
@@ -16,6 +14,8 @@ import {
   type AwardCategoryPageCopy,
   type AwardCategoryPageCopyKey,
 } from '@/lib/award-category-copy'
+import { EDITION_STATUS_COPY_KEYS, type EditionStatusCopy } from '@/lib/awards-programme-copy'
+import { EDITION_STATUS_LABELS, editionStatus } from '@/lib/awards-status'
 import { countryName } from '@/lib/countries'
 import { formatDateRange } from '@/lib/dates'
 import type { AdUnits } from '@/lib/gam'
@@ -36,12 +36,21 @@ type Category = NonNullable<CategoryData>
 type Edition = Category['editions'][number]
 type SidebarEdition = OthersData[number]
 type Pick = NonNullable<NonNullable<CopyData>['otherProgrammes']>[number]
+type StatusesData = NonNullable<NonNullable<CopyData>['statuses']>
 
 const filled = <T extends string>(value: T | null | undefined): value is T => Boolean(stegaClean(value)?.trim())
 
 /** The labels as the CMS holds them, stega kept for click-to-edit. Every label is required in the Studio. */
 function toCopy(copy: NonNullable<CopyData>): AwardCategoryPageCopy {
   return Object.fromEntries(AWARD_CATEGORY_PAGE_COPY_KEYS.map((key) => [key, copy[key] ?? ''])) as AwardCategoryPageCopy
+}
+
+/**
+ * The sidebar's status labels, from the awards programme page document. Every label is required in the Studio. Also
+ * used by the awards programme page.
+ */
+export function toStatuses(statuses: StatusesData): EditionStatusCopy {
+  return Object.fromEntries(EDITION_STATUS_COPY_KEYS.map((key) => [key, statuses[key] ?? ''])) as EditionStatusCopy
 }
 
 /**
@@ -103,12 +112,14 @@ function toDetails(category: Category, copy: AwardCategoryPageCopy): Definition[
   })
 }
 
-function toOtherProgramme(edition: SidebarEdition, title: string, copy: AwardCategoryPageCopy, today: string): OtherProgrammeView {
+function toOtherProgramme(edition: SidebarEdition, title: string, statuses: EditionStatusCopy, today: string): OtherProgrammeView {
   const status = editionStatus(
     {
       nominationsOpeningDate: stegaClean(edition.nominationsOpeningDate),
       nominationsClosingDate: stegaClean(edition.nominationsClosingDate),
       startDate: stegaClean(edition.startDate),
+      // The sidebar keeps a past pick without a status, so winners are not looked at here.
+      hasWinners: false,
     },
     today,
   )
@@ -119,36 +130,44 @@ function toOtherProgramme(edition: SidebarEdition, title: string, copy: AwardCat
     key: edition._id,
     title,
     href: sharedRecordHref('awardsProgramme', edition.slug, 'clearview'),
-    status: status ? copy[EDITION_STATUS_LABELS[status]] : null,
+    status: status ? statuses[EDITION_STATUS_LABELS[status]] : null,
     highlight: status === 'submissionsOpen',
     meta: [place, dates].filter((part): part is string => Boolean(part)),
   }
 }
 
-/** Other awards programmes: the shared selection (otherProgrammeEditions), without the page's own programme. */
-function toOtherProgrammes(
+/**
+ * Other awards programmes: the shared selection (otherProgrammeEditions), without the page's own programme. Also used
+ * by the awards programme page.
+ */
+export function toOtherProgrammes(
   picks: Pick[] | null | undefined,
   others: OthersData,
   pageProgrammeId: string,
-  copy: AwardCategoryPageCopy,
+  statuses: EditionStatusCopy,
   today: string,
 ): OtherProgrammeView[] {
   return otherProgrammeEditions(picks, others, { today, excludeProgramme: pageProgrammeId, clean: stegaClean }).map(
-    ({ edition, title }) => toOtherProgramme(edition, title, copy, today),
+    ({ edition, title }) => toOtherProgramme(edition, title, statuses, today),
   )
 }
 
-/** The award category page as plain props. `category` must have passed `isAwardedCategory`. */
+/**
+ * The award category page as plain props. `category` must have passed `isAwardedCategory`; `statuses` are the status
+ * labels from the awards programme page document.
+ */
 export function toAwardCategoryView({
   category,
   others,
   copy: rawCopy,
+  statuses,
   ads,
   today,
 }: {
   category: Category & { programme: NonNullable<Category['programme']> }
   others: OthersData
   copy: NonNullable<CopyData>
+  statuses: StatusesData
   ads: AdUnits
   today: string
 }): AwardCategoryView {
@@ -181,7 +200,7 @@ export function toAwardCategoryView({
     years: toYears(category.editions, copy.winnerLabel),
     otherProgrammes: {
       heading: toHeading(rawCopy.otherProgrammesHeading),
-      items: toOtherProgrammes(rawCopy.otherProgrammes, others, category.programme._id, copy, today),
+      items: toOtherProgrammes(rawCopy.otherProgrammes, others, category.programme._id, toStatuses(statuses), today),
     },
     copy,
     ads: { top: ads.top, side: ads.side },

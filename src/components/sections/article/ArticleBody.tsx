@@ -57,16 +57,18 @@ function embedSrc(provider: string | undefined, id: string | undefined, hash: st
   return null
 }
 
+const blocks = {
+  normal: ({ children }) => <p className="text-base leading-copy text-pretty">{children}</p>,
+  h2: ({ children }) => <h2 className="text-title-lg font-medium">{children}</h2>,
+  h3: ({ children }) => <h3 className="text-title-md font-medium text-balance">{children}</h3>,
+  h4: ({ children }) => <h4 className="text-base leading-title font-medium">{children}</h4>,
+  blockquote: ({ children }) => (
+    <blockquote className="m-0 border-l-2 border-border pl-4 text-base leading-copy text-grey">{children}</blockquote>
+  ),
+} satisfies PortableTextComponents['block']
+
 const components: PortableTextComponents = {
-  block: {
-    normal: ({ children }) => <p className="text-base leading-copy text-pretty">{children}</p>,
-    h2: ({ children }) => <h2 className="text-title-lg font-medium">{children}</h2>,
-    h3: ({ children }) => <h3 className="text-title-md font-medium text-balance">{children}</h3>,
-    h4: ({ children }) => <h4 className="text-base leading-title font-medium">{children}</h4>,
-    blockquote: ({ children }) => (
-      <blockquote className="m-0 border-l-2 border-border pl-4 text-base leading-copy text-grey">{children}</blockquote>
-    ),
-  },
+  block: blocks,
   list: {
     bullet: ({ children }) => <ul className="flex list-disc flex-col gap-2 pl-6 text-base leading-copy">{children}</ul>,
     number: ({ children }) => <ol className="flex list-decimal flex-col gap-2 pl-6 text-base leading-copy">{children}</ol>,
@@ -234,6 +236,39 @@ export function ArticleBody({
       {value && <PortableText value={value} components={bodyMembers} />}
       <ArticleBanner unit={banner} />
       {after && <PortableText value={after} components={bodyMembers} />}
+    </div>
+  )
+}
+
+// Outside an article an embed renders nothing: its player waits for consent copy, which the article page document holds.
+const richTextComponents: PortableTextComponents = { ...components, types: { ...components.types, embed: () => null } }
+
+// `sm`: paragraphs 14/20 (shared-shell speaker-card biography); the rest as the article body.
+const smallRichTextComponents: PortableTextComponents = {
+  ...richTextComponents,
+  block: {
+    ...blocks,
+    normal: ({ children }) => <p className="text-sm leading-5 text-pretty">{children}</p>,
+  },
+}
+
+/**
+ * A `richText` field outside an article (a shared record's introduction, a judge's biography): the body members
+ * without the article banner. Spacing between members comes from `.article-flow`. Paragraphs take the text colour
+ * of the container.
+ */
+export function RichText({
+  value,
+  size = 'base',
+  className,
+}: {
+  value: PortableTextProps['value']
+  size?: 'base' | 'sm'
+  className?: string
+}) {
+  return (
+    <div className={cx('article-flow min-w-0', className)}>
+      <PortableText value={value} components={size === 'sm' ? smallRichTextComponents : richTextComponents} />
     </div>
   )
 }

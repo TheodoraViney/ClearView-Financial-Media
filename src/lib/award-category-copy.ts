@@ -1,6 +1,7 @@
 /*
  * Visible labels of the award category page, edited in the "Award category page" document (ClearView folder in the
  * Studio). The design texts live only as the fields' initial values in the schema; the page renders the stored values.
+ * The sidebar's edition status labels live in the "Awards programme page" document (src/lib/awards-programme-copy.ts).
  * Pure: no Sanity or Next imports, so the Studio validation and the page share the template rule.
  */
 export const AWARD_CATEGORY_PAGE_COPY_KEYS = [
@@ -12,9 +13,6 @@ export const AWARD_CATEGORY_PAGE_COPY_KEYS = [
   'judgingLabel',
   'winnersHeading',
   'winnerLabel',
-  'launchingSoonLabel',
-  'submissionsOpenLabel',
-  'ceremonyDueLabel',
 ] as const
 
 export type AwardCategoryPageCopyKey = (typeof AWARD_CATEGORY_PAGE_COPY_KEYS)[number]

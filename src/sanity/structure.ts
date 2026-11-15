@@ -23,6 +23,7 @@ import type { StructureResolver } from 'sanity/structure'
 
 import {
   AWARD_CATEGORY_PAGE_ID,
+  AWARDS_PROGRAMME_PAGE_ID,
   BRAND_KEYS,
   BRANDS,
   SIGNUP_NOTIFICATION_SETTINGS_ID,
@@ -113,9 +114,14 @@ export const structure: StructureResolver = (S) =>
                         .child(S.document().schemaType('articlePage').documentId(articlePageDocumentId(key))),
                     ]
                   : []),
-                // The award category pages live on ClearView Publishing only, like the other shared records.
+                // The awards programme and award category pages live on ClearView Publishing only, like the other
+                // shared records.
                 ...(key === 'clearview'
                   ? [
+                      S.listItem()
+                        .title('Awards programme page')
+                        .icon(StarIcon)
+                        .child(S.document().schemaType('awardsProgrammePage').documentId(AWARDS_PROGRAMME_PAGE_ID)),
                       S.listItem()
                         .title('Award category page')
                         .icon(TagIcon)

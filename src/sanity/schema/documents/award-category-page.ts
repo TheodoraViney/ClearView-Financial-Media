@@ -13,7 +13,8 @@ import { headingField } from '../fields'
  * opened from the ClearView folder in the Studio, because the page lives on ClearView Publishing only. The category's
  * own copy (description, eligibility, recognition, judging) lives on the award category document.
  * The design texts are the fields' initial values only: the page renders what is stored, and 404s until this
- * document is published. Screen-reader-only text stays in code.
+ * document is published. Screen-reader-only text stays in code. The sidebar's edition status labels are shared with the
+ * awards programme page and live in the "Awards programme page" document (awards-programme-page.ts).
  */
 
 const label = (
@@ -117,27 +118,6 @@ export const awardCategoryPage = defineType({
           return new Set(refs).size === refs.length ? true : 'Each edition can be picked once'
         }),
     }),
-    label(
-      'launchingSoonLabel',
-      'Launching soon status',
-      'Status of an edition whose nominations open after today.',
-      'sidebar',
-      'Launching soon',
-    ),
-    label(
-      'submissionsOpenLabel',
-      'Submissions open status',
-      'Status of an edition whose nominations are open today. Shown in the brand colour.',
-      'sidebar',
-      'Submissions open',
-    ),
-    label(
-      'ceremonyDueLabel',
-      'Ceremony due status',
-      'Status of an edition whose nominations have closed and whose ceremony is still ahead.',
-      'sidebar',
-      'Ceremony due',
-    ),
   ],
   preview: {
     prepare() {
