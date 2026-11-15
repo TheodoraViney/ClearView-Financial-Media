@@ -9,7 +9,7 @@ import type { FooterProps } from './types'
  * ClearView group footer, as the clearview-footer master. Stacked below the `header` breakpoint;
  * from it the brand column (logo top, copy bottom) sits beside the auto-fit link grid, pushed right.
  */
-export function GroupFooter({ logo, description, columns, socialHeading, social, copyright }: FooterProps) {
+export function GroupFooter({ logo, description, columns, socialHeading, social, copyright, cookieSettingsLabel }: FooterProps) {
   return (
     <footer className="mt-auto bg-white">
       <Container className="flex flex-col gap-10 py-12 md:gap-12 md:py-16 header:flex-row header:flex-wrap header:gap-6 header:px-16 header:py-20">
@@ -18,6 +18,7 @@ export function GroupFooter({ logo, description, columns, socialHeading, social,
           <FooterCopy
             description={description}
             copyright={copyright}
+            cookieSettingsLabel={cookieSettingsLabel}
             className="max-w-130 gap-2 header:max-w-none header:gap-3"
           />
         </div>

@@ -51,6 +51,7 @@ export async function Footer({ data, brand }: { data: ShellData; brand: BrandKey
     socialHeading: footer.socialHeading ?? '',
     social,
     copyright: (footer.copyright ?? '').replaceAll('{year}', year),
+    cookieSettingsLabel: footer.cookieSettingsLabel ?? '',
   }
 
   if (stegaClean(footer._type) === 'publicationFooter') {

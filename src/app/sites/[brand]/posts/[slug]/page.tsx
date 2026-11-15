@@ -11,7 +11,7 @@ import {
 } from '@/brands'
 import { ArticleBody } from '@/components/sections/article/ArticleBody'
 import { ArticlePage } from '@/components/sections/article/ArticlePage'
-import { fromPost } from '@/sanity/article-view'
+import { fromPost, toEmbedConsentCopy } from '@/sanity/article-view'
 import { fetchAdUnits } from '@/sanity/brand-title'
 import {
   cachedSanity,
@@ -141,7 +141,14 @@ async function CachedPost({
     copy,
     ads,
     brand,
-    body: <ArticleBody value={post.content} after={post.contentAfter} banner={ads.article} />,
+    body: (
+      <ArticleBody
+        value={post.content}
+        after={post.contentAfter}
+        banner={ads.article}
+        embedCopy={toEmbedConsentCopy(copy)}
+      />
+    ),
   })
 
   return <ArticlePage article={article} />

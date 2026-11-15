@@ -12,6 +12,8 @@ export const ARTICLE_PAGE_COPY_DEFAULTS = {
   readTimeSuffix: 'min read',
   imageCreditPrefix: 'Image:',
   shareRailLabel: 'Share',
+  embedConsentText: 'This content is hosted by a third party and sets cookies. Allow functional cookies to view it.',
+  embedConsentButton: 'Cookie settings',
 } as const
 
 export type ArticlePageCopy = { [K in keyof typeof ARTICLE_PAGE_COPY_DEFAULTS]: string }

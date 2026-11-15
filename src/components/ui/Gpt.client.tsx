@@ -4,6 +4,7 @@ import { usePathname } from 'next/navigation'
 import Script from 'next/script'
 import { useEffect, useId, useRef, useState, useSyncExternalStore } from 'react'
 
+import { useConsent } from '@/lib/consent'
 import { adUnitPath, type AdUnitView } from '@/lib/gam'
 
 import { cx } from './cx'
@@ -33,9 +34,6 @@ type GoogleTag = {
 }
 type GptWindow = Window & { googletag?: { cmd: { push(callback: () => void): void } } }
 
-// CookieYes, which the Publisher runs on every domain. Absent until its script is on the page.
-type CookieYesWindow = Window & { getCkyConsent?: () => { categories?: { advertisement?: boolean } } }
-
 /** Runs a GPT command now if GPT is loaded, or once it loads. */
 function gpt(command: (googletag: GoogleTag) => void) {
   const w = window as GptWindow
@@ -59,27 +57,9 @@ const subscribe = (listener: () => void) => {
   return () => listeners.delete(listener)
 }
 
-// Loads ads without waiting for consent, while CookieYes is not on the site yet. Remove the variable once it is:
-// without consent handling, ads must never run on the live domains.
-const SKIP_CONSENT = process.env.NEXT_PUBLIC_ADS_SKIP_CONSENT === 'true'
-
-const advertisingConsent = () =>
-  SKIP_CONSENT || (window as CookieYesWindow).getCkyConsent?.().categories?.advertisement === true
-
-// CookieYes fires these on the document when its banner loads with a stored choice and when the visitor changes it.
-const subscribeConsent = (listener: () => void) => {
-  document.addEventListener('cookieyes_banner_load', listener)
-  document.addEventListener('cookieyes_consent_update', listener)
-
-  return () => {
-    document.removeEventListener('cookieyes_banner_load', listener)
-    document.removeEventListener('cookieyes_consent_update', listener)
-  }
-}
-
 /** Loads GPT for the page once advertising consent is given. Renders nothing before that. */
 export function GptLoader({ publication }: { publication: string }) {
-  const granted = useSyncExternalStore(subscribeConsent, advertisingConsent, () => false)
+  const granted = useConsent('advertisement')
 
   useEffect(() => {
     if (!granted) {

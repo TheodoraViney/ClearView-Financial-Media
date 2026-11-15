@@ -41,7 +41,7 @@ import { ArchiveBody } from '@/components/sections/article/ArchiveBody'
 import { ArticlePage } from '@/components/sections/article/ArticlePage'
 import type { ArchiveRecord } from '@/lib/archive'
 import { toAdUnits } from '@/lib/gam'
-import { fromArchiveRecord } from '@/sanity/article-view'
+import { fromArchiveRecord, toEmbedConsentCopy } from '@/sanity/article-view'
 
 const args = process.argv.slice(2)
 const option = (name: string, fallback: string) => {
@@ -176,7 +176,15 @@ for (const [index, id] of ids.entries()) {
         ads: ADS,
         brand: isEditorialBrandKey(record.publications[0] ?? '') ? (record.publications[0] as 'wealthbriefing') : 'wealthbriefing',
         logo: LOGO,
-        body: <ArchiveBody html={body} videoId={record.media.videoId} title={record.title} banner={ADS.article} />,
+        body: (
+          <ArchiveBody
+            html={body}
+            videoId={record.media.videoId}
+            title={record.title}
+            banner={ADS.article}
+            embedCopy={toEmbedConsentCopy(COPY)}
+          />
+        ),
       })
       const html = renderToString(<ArticlePage article={article} />)
       const h1 = /<h1[^>]*>([\s\S]*?)<\/h1>/.exec(html)?.[1] ?? ''

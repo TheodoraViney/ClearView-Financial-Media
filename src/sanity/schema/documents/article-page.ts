@@ -39,6 +39,12 @@ export const articlePage = defineType({
     label('readTimeSuffix', 'Reading time suffix', 'Follows the minutes in the byline, for example "3 min read".'),
     label('imageCreditPrefix', 'Image credit prefix', 'Precedes the credit under the main image, for example "Image: WealthBriefing".'),
     label('shareRailLabel', 'Share rail label', 'Above the share icons beside the text.'),
+    label(
+      'embedConsentText',
+      'Embed consent text',
+      'Shown instead of a video, podcast or Issuu player until the reader allows functional cookies.',
+    ),
+    label('embedConsentButton', 'Embed consent button', 'Button under that text, which opens the cookie settings.'),
     defineField({
       name: 'shareLinks',
       title: 'Share rail networks',

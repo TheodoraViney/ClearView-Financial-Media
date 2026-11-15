@@ -44,7 +44,8 @@ export const SHELL_QUERY = defineQuery(`
       },
       socialHeading,
       social[]{ _key, name, url, icon{ asset->{ url } } },
-      copyright
+      copyright,
+      cookieSettingsLabel
     },
     "brand": *[_type == "brand" && _id == $brandId && key.current == $brand][0]{
       title,
@@ -145,6 +146,8 @@ export const ARTICLE_PAGE_QUERY = defineQuery(`
     readTimeSuffix,
     imageCreditPrefix,
     shareRailLabel,
+    embedConsentText,
+    embedConsentButton,
     "shareLinks": coalesce(shareLinks[]{ _key, label, url, icon{ asset->{ url } } }, [])
   }
 `)
