@@ -105,7 +105,8 @@ async function CachedEvent({ slug, perspective, variant, stega }: { slug: string
   }
 
   const today = await cachedUkToday()
-  // The sidebar fill skips the edition's own programme; an edition without one excludes only editions without one.
+  // The sidebar lists upcoming editions of other programmes, so it leaves out editions of this edition's programme.
+  // An edition without a programme passes '', which leaves out the other editions that have no programme either.
   const programme = stegaClean(data.programme?.slug) ?? ''
   const [{ data: others }, { data: copy }, ads] = await Promise.all([
     cachedSanity({ query: OTHER_AWARDS_QUERY, params: { programme, today }, ...options }),
