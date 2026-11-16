@@ -187,6 +187,7 @@ export function toAwardsProgrammeView({
     breadcrumb: [
       { label: copy.breadcrumbHomeLabel, href: '/' },
       { label: copy.breadcrumbAwardsLabel, href: AWARDS_LISTING_PATH },
+      { label: edition.title ?? '' },
     ],
     standfirst: filled(edition.standfirst) ? edition.standfirst : null,
     status: status ? { label: statuses[EDITION_STATUS_LABELS[status]], highlight: status === 'submissionsOpen' } : null,
