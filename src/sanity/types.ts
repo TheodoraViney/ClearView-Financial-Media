@@ -750,13 +750,36 @@ export type VideoGallery = {
   }>;
 };
 
+export type PersonReference = {
+  _ref: string;
+  _type: "reference";
+  _weak?: boolean;
+  [internalGroqTypeReferenceTo]?: "person";
+};
+
 export type Agenda = {
   _type: "agenda";
   title?: string;
   items?: Array<{
     time?: string;
+    endTime?: string;
+    sessionType?:
+      | "Keynote speech"
+      | "Panel Session"
+      | "Presentation"
+      | "Fireside chat"
+      | "Tech demo"
+      | "Case study"
+      | "Interview"
+      | "Interactive session";
     title?: string;
     text?: RichText;
+    speakers?: Array<{
+      person?: PersonReference;
+      chair?: boolean;
+      _type: "agendaSpeaker";
+      _key: string;
+    }>;
     _type: "agendaItem";
     _key: string;
   }>;
@@ -797,13 +820,6 @@ export type CompanyGroup = {
       _key: string;
     } & CompanyReference
   >;
-};
-
-export type PersonReference = {
-  _ref: string;
-  _type: "reference";
-  _weak?: boolean;
-  [internalGroqTypeReferenceTo]?: "person";
 };
 
 export type PersonGroup = {
@@ -953,57 +969,6 @@ export type RichText = Array<
     }
 >;
 
-export type Person = {
-  _id: string;
-  _type: "person";
-  _createdAt: string;
-  _updatedAt: string;
-  _rev: string;
-  title?: string;
-  firstName?: string;
-  lastName?: string;
-  slug?: Slug;
-  jobTitle?: string;
-  companies?: Array<
-    {
-      _key: string;
-    } & CompanyReference
-  >;
-  photo?: {
-    asset?: SanityImageAssetReference;
-    media?: unknown;
-    hotspot?: SanityImageHotspot;
-    crop?: SanityImageCrop;
-    alt?: string;
-    _type: "image";
-  };
-  bio?: RichText;
-  categories?: Array<string>;
-  legacyWpId?: number;
-};
-
-export type SanityImageCrop = {
-  _type: "sanity.imageCrop";
-  top?: number;
-  bottom?: number;
-  left?: number;
-  right?: number;
-};
-
-export type SanityImageHotspot = {
-  _type: "sanity.imageHotspot";
-  x?: number;
-  y?: number;
-  height?: number;
-  width?: number;
-};
-
-export type Slug = {
-  _type: "slug";
-  current?: string;
-  source?: string;
-};
-
 export type AwardCategory = {
   _id: string;
   _type: "awardCategory";
@@ -1017,6 +982,12 @@ export type AwardCategory = {
   eligibility?: string;
   recognises?: string;
   judging?: string;
+};
+
+export type Slug = {
+  _type: "slug";
+  current?: string;
+  source?: string;
 };
 
 export type NewsletterIssue = {
@@ -1063,6 +1034,22 @@ export type NewsletterIssue = {
   brevoCampaignId?: number;
   sendingStartedAt?: string;
   sendRequestedAt?: string;
+};
+
+export type SanityImageCrop = {
+  _type: "sanity.imageCrop";
+  top?: number;
+  bottom?: number;
+  left?: number;
+  right?: number;
+};
+
+export type SanityImageHotspot = {
+  _type: "sanity.imageHotspot";
+  x?: number;
+  y?: number;
+  height?: number;
+  width?: number;
 };
 
 export type SignupNotificationSettings = {
@@ -2463,6 +2450,35 @@ export type ConferenceEvent = {
   legacyWpId?: number;
 };
 
+export type Person = {
+  _id: string;
+  _type: "person";
+  _createdAt: string;
+  _updatedAt: string;
+  _rev: string;
+  title?: string;
+  firstName?: string;
+  lastName?: string;
+  slug?: Slug;
+  jobTitle?: string;
+  companies?: Array<
+    {
+      _key: string;
+    } & CompanyReference
+  >;
+  photo?: {
+    asset?: SanityImageAssetReference;
+    media?: unknown;
+    hotspot?: SanityImageHotspot;
+    crop?: SanityImageCrop;
+    alt?: string;
+    _type: "image";
+  };
+  bio?: RichText;
+  categories?: Array<string>;
+  legacyWpId?: number;
+};
+
 export type RegionReference = {
   _ref: string;
   _type: "reference";
@@ -2859,13 +2875,13 @@ export type AllSanitySchemaTypes =
   | NavGroup
   | NavLink
   | VideoGallery
+  | PersonReference
   | Agenda
   | CustomTab
   | AwardCategoryReference
   | CompanyReference
   | Winner
   | CompanyGroup
-  | PersonReference
   | PersonGroup
   | Infographic
   | FactBox
@@ -2873,12 +2889,11 @@ export type AllSanitySchemaTypes =
   | SanityFileAssetReference
   | ArticleBody
   | RichText
-  | Person
+  | AwardCategory
+  | Slug
+  | NewsletterIssue
   | SanityImageCrop
   | SanityImageHotspot
-  | Slug
-  | AwardCategory
-  | NewsletterIssue
   | SignupNotificationSettings
   | SubscribeFormSettings
   | SubscribeModal
@@ -2902,6 +2917,7 @@ export type AllSanitySchemaTypes =
   | Acclaim
   | AwardsProgrammeGroup
   | ConferenceEvent
+  | Person
   | RegionReference
   | AuthorReference
   | Post
