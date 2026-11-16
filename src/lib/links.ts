@@ -191,6 +191,22 @@ export function sharedRecordHref(
 export const AWARDS_LISTING_PATH = '/events-category/awards'
 
 /**
+ * The ClearView conference event listings by event type, legacy clearviewpublishing.com paths kept as they are
+ * (`/events-category/{summits,briefings,webinar}`). The event page's breadcrumb links to its type's listing. The
+ * listing pages are not built yet: the links point at the final URLs and 404 until they exist.
+ */
+export const EVENT_LISTING_PATHS = {
+  summit: '/events-category/summits',
+  briefing: '/events-category/briefings',
+  webinar: '/events-category/webinar',
+} as const
+
+export type EventType = keyof typeof EVENT_LISTING_PATHS
+
+export const isEventType = (value: unknown): value is EventType =>
+  typeof value === 'string' && Object.hasOwn(EVENT_LISTING_PATHS, value)
+
+/**
  * Href of an award category page: `/awards/{programme}/{category}`, the category as awarded by one evergreen
  * programme (awardsProgrammeGroup). Shared record rules as `sharedRecordHref`: relative on the ClearView host,
  * absolute to the ClearView origin on every other brand host, no trailing slash. Null without both slugs.

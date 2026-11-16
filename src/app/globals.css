@@ -404,6 +404,16 @@ main [data-section-anchor] {
   grid-template-columns: minmax(0, 4fr) minmax(0, 8fr);
 }
 
+/* Event page overview from the header breakpoint: the introduction and the event format on a 7 / 5 split. */
+@utility grid-cols-overview {
+  grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
+}
+
+/* AgendaList from md: the 112px time column beside the session. */
+@utility grid-cols-agenda {
+  grid-template-columns: 7rem minmax(0, 1fr);
+}
+
 /*
  * Height of the article's share rail, reserved beside the text so a short body never lets the rail hang over what
  * follows: its label plus one 44px button per item in `--share-items` (the CMS networks and copy link), 4px apart.
@@ -493,6 +503,10 @@ main [data-section-anchor] {
 
 /* The page runs without JavaScript: progressive-enhancement fallbacks (Categories filters show their panels and a submit button) */
 @custom-variant noscript (@media (scripting: none));
+
+/* A device that hovers with a fine pointer (mouse, trackpad): PartnerCard swaps its logo for the details on hover there,
+   and shows both at once on touch screens. */
+@custom-variant can-hover (@media (hover: hover) and (pointer: fine));
 
 /* The current page's nav link (aria-current="page") */
 @custom-variant current (&[aria-current='page']);

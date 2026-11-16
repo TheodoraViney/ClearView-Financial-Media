@@ -46,13 +46,33 @@ function toCopy(copy: NonNullable<CopyData>): AwardsProgrammePageCopy {
 /** A Portable Text field with at least one member, else null. */
 const richText = (value: Body | null | undefined) => (value && value.length > 0 ? value : null)
 
-/** The text blocks of a Portable Text field as one line of plain text. */
-function plainText(value: Body | null | undefined): string {
+type TextBlocks = readonly { _type: string; children?: readonly { text?: string | null }[] | null }[]
+
+/** The text blocks of a Portable Text field as one line of plain text. Also used by the event page. */
+export function plainText(value: TextBlocks | null | undefined): string {
   return (value ?? [])
     .flatMap((block) => (block._type === 'block' ? [(block.children ?? []).map((child) => child.text ?? '').join('')] : []))
     .join(' ')
     .replace(/\s+/g, ' ')
     .trim()
+}
+
+/**
+ * A metadata description from plain text: the text, cut at a word boundary near DESCRIPTION_LENGTH. Null when empty.
+ * Also used by the event page.
+ */
+export function clipDescription(text: string): string | null {
+  if (!text) {
+    return null
+  }
+
+  if (text.length <= DESCRIPTION_LENGTH) {
+    return text
+  }
+
+  const end = text.lastIndexOf(' ', DESCRIPTION_LENGTH)
+
+  return `${text.slice(0, end > DESCRIPTION_LENGTH / 2 ? end : DESCRIPTION_LENGTH).replace(/[\s,.;:]+$/, '')}…`
 }
 
 /**
@@ -66,19 +86,7 @@ export function editionDescription(edition: EditionData): string | null {
     return standfirst
   }
 
-  const text = stegaClean(plainText(edition.body))
-
-  if (!text) {
-    return null
-  }
-
-  if (text.length <= DESCRIPTION_LENGTH) {
-    return text
-  }
-
-  const end = text.lastIndexOf(' ', DESCRIPTION_LENGTH)
-
-  return `${text.slice(0, end > DESCRIPTION_LENGTH / 2 ? end : DESCRIPTION_LENGTH).replace(/[\s,.;:]+$/, '')}…`
+  return clipDescription(stegaClean(plainText(edition.body)))
 }
 
 function toPanels(edition: EditionData): JudgesPanelView[] {

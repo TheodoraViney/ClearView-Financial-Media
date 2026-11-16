@@ -522,3 +522,30 @@ export const OTHER_AWARDS_FILL = /* groq */ `
     ] | order(startDate asc)[0...12]{ ${OTHER_AWARDS_EDITION} }
   ]
 `
+
+// One event in the event page's "Related events" sidebar: what its row shows (title, date unless hidden, venue).
+export const RELATED_EVENT = /* groq */ `
+  _id, title, "slug": slug.current, startDate, endDate, hideDateTime, "venue": venue->title
+`
+
+// The event page's "Related events" fill: other conference events, upcoming ones first by start date (an event is
+// upcoming until its last day passes, as on the page), then past ones, latest first. `$eventId` is the page's event.
+// Each tier fetches the list's size plus the most picks it can skip (RELATED_EVENTS_COUNT twice); the adapter skips
+// the picked events and keeps the first ones. `$today` is the UK date (cachedUkToday), so the list changes once a day.
+// The Studio panel "Shown automatically now" runs it too (src/sanity/auto-fill.ts).
+export const RELATED_EVENTS_FILL = /* groq */ `
+  [
+    ...*[
+      _type == "conferenceEvent"
+      && defined(slug.current)
+      && _id != $eventId
+      && coalesce(endDate, startDate) >= $today
+    ] | order(startDate asc)[0...6]{ ${RELATED_EVENT} },
+    ...*[
+      _type == "conferenceEvent"
+      && defined(slug.current)
+      && _id != $eventId
+      && !(coalesce(endDate, startDate) >= $today)
+    ] | order(startDate desc)[0...6]{ ${RELATED_EVENT} }
+  ]
+`

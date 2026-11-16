@@ -4,6 +4,30 @@ import { defineArrayMember, defineField, defineType } from 'sanity'
 
 import { altField } from '../fields'
 
+/** A link on selected text: http(s), mailto or tel. */
+export const richTextLink = defineArrayMember({
+  name: 'link',
+  title: 'Link',
+  type: 'object',
+  fields: [
+    defineField({
+      name: 'href',
+      title: 'URL',
+      type: 'url',
+      validation: (Rule) =>
+        Rule.required().uri({
+          scheme: ['http', 'https', 'mailto', 'tel'],
+        }),
+    }),
+    defineField({
+      name: 'openInNewTab',
+      title: 'Open in a new tab',
+      type: 'boolean',
+      initialValue: false,
+    }),
+  ],
+})
+
 /** Paragraphs, H2–H4 and quotes; default lists and decorators; links with an allowlisted scheme. */
 export const richTextBlock = defineArrayMember({
   type: 'block',
@@ -15,30 +39,24 @@ export const richTextBlock = defineArrayMember({
     { title: 'Quote', value: 'blockquote' },
   ],
   marks: {
-    annotations: [
-      defineArrayMember({
-        name: 'link',
-        title: 'Link',
-        type: 'object',
-        fields: [
-          defineField({
-            name: 'href',
-            title: 'URL',
-            type: 'url',
-            validation: (Rule) =>
-              Rule.required().uri({
-                scheme: ['http', 'https', 'mailto', 'tel'],
-              }),
-          }),
-          defineField({
-            name: 'openInNewTab',
-            title: 'Open in a new tab',
-            type: 'boolean',
-            initialValue: false,
-          }),
-        ],
-      }),
+    annotations: [richTextLink],
+  },
+})
+
+/**
+ * Short copy beside other content: paragraphs with bold, italic and links only. No headings, lists, quotes or media,
+ * which would break the layout around it.
+ */
+export const paragraphsBlock = defineArrayMember({
+  type: 'block',
+  styles: [{ title: 'Normal', value: 'normal' }],
+  lists: [],
+  marks: {
+    decorators: [
+      { title: 'Bold', value: 'strong' },
+      { title: 'Italic', value: 'em' },
     ],
+    annotations: [richTextLink],
   },
 })
 

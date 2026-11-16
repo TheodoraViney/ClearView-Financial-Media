@@ -94,6 +94,7 @@ const SINGLETON_TYPES = new Set([
   'articlePage',
   'awardCategoryPage',
   'awardsProgrammePage',
+  'eventPage',
   'infographicSettings',
   'briefSettings',
   'subscribeModal',

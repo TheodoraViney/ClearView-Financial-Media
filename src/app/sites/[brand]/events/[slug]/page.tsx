@@ -4,15 +4,23 @@ import { notFound } from 'next/navigation'
 import { stegaClean } from 'next-sanity'
 import { Suspense } from 'react'
 
-import { AWARDS_PROGRAMME_PAGE_ID, brandOrigin } from '@/brands'
+import { AWARDS_PROGRAMME_PAGE_ID, brandOrigin, EVENT_PAGE_ID } from '@/brands'
 import { AwardsProgrammePage } from '@/components/sections/awards/AwardsProgrammePage'
+import { EventPage } from '@/components/sections/events/EventPage'
 import { isSvg } from '@/components/ui/Media'
 import { sharedRecordHref } from '@/lib/links'
 import { editionDescription, toAwardsProgrammeView } from '@/sanity/awards-programme-view'
 import { fetchAdUnits } from '@/sanity/brand-title'
+import { eventDescription, toEventPageView, type ConferenceEventData } from '@/sanity/event-page-view'
 import { toImage } from '@/sanity/image'
 import { cachedSanity, cachedUkToday, getDynamicFetchOptions, type DynamicFetchOptions } from '@/sanity/live'
-import { AWARDS_PROGRAMME_PAGE_QUERY, AWARDS_PROGRAMME_QUERY, OTHER_AWARDS_QUERY } from '@/sanity/queries'
+import {
+  AWARDS_PROGRAMME_PAGE_QUERY,
+  AWARDS_PROGRAMME_QUERY,
+  EVENT_PAGE_QUERY,
+  OTHER_AWARDS_QUERY,
+  RELATED_EVENTS_QUERY,
+} from '@/sanity/queries'
 import { PLACEHOLDER_SLUG } from '@/sanity/static-params'
 
 // An awards edition or a conference event at /events/{slug} (sharedRecordHref), the WordPress path without its
@@ -44,20 +52,20 @@ export async function generateMetadata({ params }: { params: Promise<Params> }):
 
   const { data } = await fetchRecord(slug, PUBLISHED)
 
-  if (data?._type !== 'awardsProgramme') {
+  if (data?._type !== 'awardsProgramme' && data?._type !== 'conferenceEvent') {
     return {}
   }
 
-  const description = editionDescription(data)
+  const description = data._type === 'awardsProgramme' ? editionDescription(data) : eventDescription(data)
   const logo = toImage(data.logo)
-  const path = sharedRecordHref('awardsProgramme', data.slug, 'clearview')
+  const path = sharedRecordHref(data._type, data.slug, 'clearview')
   const canonical = path ? `${brandOrigin('clearview')}${path}` : undefined
 
   return {
     title: stegaClean(data.title),
     ...(description ? { description } : {}),
     ...(canonical ? { alternates: { canonical } } : {}),
-    // Most edition logos are SVG, which link previews do not show: the Sanity CDN renders those as PNG.
+    // Most edition and event logos are SVG, which link previews do not show: the Sanity CDN renders those as PNG.
     ...(logo
       ? {
           openGraph: {
@@ -99,7 +107,10 @@ async function CachedEvent({ slug, perspective, variant, stega }: { slug: string
   const options = { perspective, variant, stega }
   const { data } = await fetchRecord(slug, options)
 
-  // A conference event 404s until the event page is built; it shares the path and the query.
+  if (data?._type === 'conferenceEvent') {
+    return <ConferenceEvent event={data} options={options} />
+  }
+
   if (data?._type !== 'awardsProgramme') {
     notFound()
   }
@@ -122,4 +133,20 @@ async function CachedEvent({ slug, perspective, variant, stega }: { slug: string
   const embedConsent = { text: copy.videoConsentText ?? '', button: copy.videoConsentButton ?? '' }
 
   return <AwardsProgrammePage view={toAwardsProgrammeView({ edition: data, others, copy, ads, today, embedConsent })} />
+}
+
+async function ConferenceEvent({ event, options }: { event: ConferenceEventData; options: DynamicFetchOptions }) {
+  const today = await cachedUkToday()
+  const [{ data: others }, { data: copy }, ads] = await Promise.all([
+    cachedSanity({ query: RELATED_EVENTS_QUERY, params: { eventId: event._id, today }, ...options }),
+    cachedSanity({ query: EVENT_PAGE_QUERY, params: { id: EVENT_PAGE_ID }, ...options }),
+    fetchAdUnits('clearview', 'other', options),
+  ])
+
+  // The labels document is required, like the awards programme page's: no copy defaults in code.
+  if (!copy) {
+    notFound()
+  }
+
+  return <EventPage view={toEventPageView({ event, others, copy, ads, today })} />
 }

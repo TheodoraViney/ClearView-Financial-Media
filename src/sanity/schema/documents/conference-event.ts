@@ -2,6 +2,7 @@ import { CalendarIcon } from '@sanity/icons/Calendar'
 import { defineArrayMember, defineField, defineType } from 'sanity'
 
 import { EVENT_COUNTRIES, altField, isUniqueEventSlug, legacyWpIdField, timeField } from '../fields'
+import { paragraphsBlock } from '../objects/rich-text'
 
 /**
  * A summit, briefing or webinar. 195 records.
@@ -23,6 +24,7 @@ export const conferenceEvent = defineType({
   icon: CalendarIcon,
   groups: [
     { name: 'details', title: 'Details', default: true },
+    { name: 'page', title: 'Page content' },
     { name: 'schedule', title: 'Date and time' },
     { name: 'speakers', title: 'Speakers' },
     { name: 'agenda', title: 'Agenda' },
@@ -93,6 +95,52 @@ export const conferenceEvent = defineType({
       type: 'string',
       group: 'details',
       options: { list: EVENT_COUNTRIES },
+    }),
+
+    defineField({
+      name: 'eventFormat',
+      title: 'Event format',
+      type: 'array',
+      group: 'page',
+      of: [defineArrayMember({ type: 'string', validation: (Rule) => Rule.required() })],
+      description: 'Optional. Short points shown beside the overview, for example "Specialist panels". Hidden when empty.',
+    }),
+    defineField({
+      name: 'whyAttend',
+      title: 'Why attend',
+      type: 'object',
+      group: 'page',
+      description: 'Optional. Hidden on the page when it has no points.',
+      options: { collapsible: false },
+      validation: (Rule) =>
+        Rule.custom((value: { intro?: unknown[]; points?: unknown[] } | undefined) =>
+          value?.intro?.length && !value.points?.length ? 'The section is hidden until it has at least one point.' : true,
+        ).warning(),
+      fields: [
+        defineField({
+          name: 'intro',
+          title: 'Introduction',
+          type: 'array',
+          description: 'A short paragraph. Bold, italic and links only.',
+          of: [paragraphsBlock],
+        }),
+        defineField({
+          name: 'points',
+          title: 'Points',
+          type: 'array',
+          description: 'Short reasons to attend, shown as a plain list beside the introduction.',
+          of: [defineArrayMember({ type: 'string', validation: (Rule) => Rule.required() })],
+        }),
+      ],
+    }),
+    defineField({
+      name: 'relatedCoverage',
+      title: 'Related coverage',
+      type: 'array',
+      group: 'page',
+      description: 'Optional. Articles about the event, each linked by its headline. Hidden when empty.',
+      of: [defineArrayMember({ type: 'reference', to: [{ type: 'post' }], options: { disableNew: true } })],
+      validation: (Rule) => Rule.unique(),
     }),
 
     defineField({

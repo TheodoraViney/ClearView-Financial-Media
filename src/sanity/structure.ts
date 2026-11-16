@@ -26,6 +26,7 @@ import {
   AWARDS_PROGRAMME_PAGE_ID,
   BRAND_KEYS,
   BRANDS,
+  EVENT_PAGE_ID,
   SIGNUP_NOTIFICATION_SETTINGS_ID,
   SUBSCRIBE_FORM_SETTINGS_ID,
   articlePageDocumentId,
@@ -114,7 +115,7 @@ export const structure: StructureResolver = (S) =>
                         .child(S.document().schemaType('articlePage').documentId(articlePageDocumentId(key))),
                     ]
                   : []),
-                // The awards programme and award category pages live on ClearView Publishing only, like the other
+                // The awards programme, event and award category pages live on ClearView Publishing only, like the other
                 // shared records.
                 ...(key === 'clearview'
                   ? [
@@ -122,6 +123,10 @@ export const structure: StructureResolver = (S) =>
                         .title('Awards programme page')
                         .icon(StarIcon)
                         .child(S.document().schemaType('awardsProgrammePage').documentId(AWARDS_PROGRAMME_PAGE_ID)),
+                      S.listItem()
+                        .title('Event page')
+                        .icon(CalendarIcon)
+                        .child(S.document().schemaType('eventPage').documentId(EVENT_PAGE_ID)),
                       S.listItem()
                         .title('Award category page')
                         .icon(TagIcon)
