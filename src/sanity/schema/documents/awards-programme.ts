@@ -1,7 +1,7 @@
 import { StarIcon } from '@sanity/icons/Star'
 import { defineArrayMember, defineField, defineType } from 'sanity'
 
-import { EVENT_COUNTRIES, altField, legacyWpIdField, timeField } from '../fields'
+import { EVENT_COUNTRIES, altField, isUniqueEventSlug, legacyWpIdField, timeField } from '../fields'
 
 /**
  * One yearly edition of an awards programme, for example "The Twelfth
@@ -48,7 +48,7 @@ export const awardsProgramme = defineType({
       title: 'Slug',
       type: 'slug',
       group: 'details',
-      options: { source: 'title', maxLength: 96 },
+      options: { source: 'title', maxLength: 96, isUnique: isUniqueEventSlug },
       description: 'Published at /events/{slug}/. Migrated from WordPress, changing it breaks a live URL.',
       validation: (Rule) => Rule.required(),
     }),
@@ -59,6 +59,15 @@ export const awardsProgramme = defineType({
       to: [{ type: 'awardsProgrammeGroup' }],
       group: 'details',
       description: 'The evergreen programme this edition belongs to.',
+    }),
+    defineField({
+      name: 'standfirst',
+      title: 'Standfirst',
+      type: 'text',
+      rows: 2,
+      group: 'details',
+      description: 'Optional. One or two sentences under the page title. Hidden on the page when empty.',
+      validation: (Rule) => Rule.max(200).warning('Longer than 200 characters; keep it to a sentence or two'),
     }),
     defineField({
       name: 'body',
@@ -188,6 +197,24 @@ export const awardsProgramme = defineType({
         'The prose "Categories" tab from the source. The typed categories are the Winners rows below.',
     }),
     defineField({
+      name: 'entryCategories',
+      title: 'Categories',
+      type: 'array',
+      group: 'nominations',
+      description:
+        'Optional. Entry areas shown as tags in the Categories section of the page, in this order, for example Private Banking, Technology. Any number. The section is hidden when empty.',
+      of: [
+        defineArrayMember({
+          type: 'string',
+          validation: (Rule) =>
+            Rule.required().custom((value: string | undefined) =>
+              value === undefined || value.trim() !== '' ? true : 'Type a category or remove the empty one',
+            ),
+        }),
+      ],
+      validation: (Rule) => Rule.unique(),
+    }),
+    defineField({
       name: 'winners',
       title: 'Winners',
       type: 'array',
@@ -282,6 +309,14 @@ export const awardsProgramme = defineType({
 
           return true
         }).warning(),
+    }),
+    defineField({
+      name: 'highlightVideoDescription',
+      title: 'Highlights video description',
+      type: 'text',
+      rows: 3,
+      group: 'media',
+      description: 'Optional. Short text next to the highlights video. Hidden on the page when empty.',
     }),
     defineField({
       name: 'hidePreviousYearsHighlightVideo',

@@ -10,13 +10,10 @@
  *   not published, or no longer on the page brand, frees its place;
  * - counts and the picks-then-fill merge are the site's (schema constants, src/lib/picks.ts).
  */
-import {
-  EDITION_STATUS_LABELS,
-  editionStatus,
-  OTHER_PROGRAMMES_COUNT,
-  otherProgrammeEditions,
-  type SidebarEditionFields,
-} from '@/lib/award-category'
+import { AWARDS_PROGRAMME_PAGE_ID } from '@/brands'
+import { OTHER_PROGRAMMES_COUNT, otherProgrammeEditions, type SidebarEditionFields } from '@/lib/award-category'
+import { EDITION_STATUS_COPY_KEYS, type EditionStatusCopyKey } from '@/lib/awards-programme-copy'
+import { EDITION_STATUS_LABELS, editionStatus } from '@/lib/awards-status'
 import { countryName } from '@/lib/countries'
 import { formatDateRange } from '@/lib/dates'
 import { countOr, picksThenFill, present, topStoriesSplit } from '@/lib/picks'
@@ -119,13 +116,53 @@ type SidebarEdition = SidebarEditionFields & { endDate: string | null; country: 
 type OtherProgrammesResult = {
   picks: { title: string | null; edition: SidebarEdition | null }[] | null
   fill: SidebarEdition[] | null
+  statuses: Partial<Record<EditionStatusCopyKey, string | null>> | null
 }
 
 /**
- * The award category page's sidebar fill matches no page programme here (the Studio has no category page): GROQ
- * compares it with each programme's slug, and a slug never holds a NUL character.
+ * The awards pages' sidebar fill matches no page programme here (the Studio has no awards page): GROQ compares it
+ * with each programme's slug, and a slug never holds a NUL character.
  */
 const NO_PROGRAMME = '\u0000'
+
+/**
+ * The "Other awards programmes" sidebar of an awards page document (award category page, awards programme page). The
+ * status labels come from the published awards programme page document, the one source for both pages.
+ */
+const otherProgrammesSpec = (hint: string): AutoFillSpec => ({
+  query: /* groq */ `$block{
+    "picks": otherProgrammes[]{ title, "edition": edition->{ ${OTHER_AWARDS_EDITION} } },
+    "fill": ${OTHER_AWARDS_FILL},
+    "statuses": *[_id == $statusesId][0]{ ${EDITION_STATUS_COPY_KEYS.join(', ')} }
+  }`,
+  params: { programme: NO_PROGRAMME, statusesId: AWARDS_PROGRAMME_PAGE_ID },
+  brand: 'clearview',
+  pin: { type: 'otherProgrammePick', field: 'edition' },
+  hint,
+  select: (result, _block, _brand, today) => {
+    const { picks, fill, statuses } = result as unknown as OtherProgrammesResult
+
+    return otherProgrammeEditions(picks, fill ?? [], { today, excludeProgramme: null })
+      .filter((item) => !item.picked)
+      .map(({ edition, title }) => {
+        // The fill holds upcoming editions only, so winners never decide the status here.
+        const status = editionStatus({ ...edition, hasWinners: false }, today)
+        const label = status ? statuses?.[EDITION_STATUS_LABELS[status]] : null
+
+        return {
+          _id: edition._id,
+          _type: 'awardsProgramme',
+          title,
+          startDate: edition.startDate,
+          endDate: edition.endDate,
+          subtitle: [label || null, countryName(edition.country), formatDateRange(edition.startDate, edition.endDate)]
+            .filter(Boolean)
+            .join(' · '),
+        }
+      })
+  },
+  max: () => OTHER_PROGRAMMES_COUNT,
+})
 
 const SPECS: Record<string, AutoFillSpec> = {
   'topStories.slides': {
@@ -221,42 +258,12 @@ const SPECS: Record<string, AutoFillSpec> = {
     },
     max: (block) => countOr(block.count, EXPLORE_CARD_ITEM_MAX, EXPLORE_CARD_ITEM_MAX),
   },
-  'awardCategoryPage.otherProgrammes': {
-    query: /* groq */ `$block{
-      "picks": otherProgrammes[]{ title, "edition": edition->{ ${OTHER_AWARDS_EDITION} } },
-      "fill": ${OTHER_AWARDS_FILL}
-    }`,
-    params: { programme: NO_PROGRAMME },
-    brand: 'clearview',
-    pin: { type: 'otherProgrammePick', field: 'edition' },
-    hint: "Fills the empty places on the site. Published editions only. On a programme's own category pages, its edition is replaced by the next one.",
-    select: (result, block, _brand, today) => {
-      const { picks, fill } = result as unknown as OtherProgrammesResult
-
-      return otherProgrammeEditions(picks, fill ?? [], { today, excludeProgramme: null })
-        .filter((item) => !item.picked)
-        .map(({ edition, title }) => {
-          const status = editionStatus(edition, today)
-          const label = status ? block[EDITION_STATUS_LABELS[status]] : null
-
-          return {
-            _id: edition._id,
-            _type: 'awardsProgramme',
-            title,
-            startDate: edition.startDate,
-            endDate: edition.endDate,
-            subtitle: [
-              typeof label === 'string' ? label : null,
-              countryName(edition.country),
-              formatDateRange(edition.startDate, edition.endDate),
-            ]
-              .filter(Boolean)
-              .join(' · '),
-          }
-        })
-    },
-    max: () => OTHER_PROGRAMMES_COUNT,
-  },
+  'awardCategoryPage.otherProgrammes': otherProgrammesSpec(
+    "Fills the empty places on the site. Published editions only. On a programme's own category pages, its edition is replaced by the next one.",
+  ),
+  'awardsProgrammePage.otherProgrammes': otherProgrammesSpec(
+    "Fills the empty places on the site. Published editions only. On a programme's own edition pages, its edition is replaced by the next one.",
+  ),
 }
 
 /** The spec for a picks field (`blockType.fieldName`), or null when the field has no automatic fill. */

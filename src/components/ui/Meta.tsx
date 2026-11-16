@@ -17,6 +17,8 @@ export function Meta({
   strongFirst = false,
   nowrap = false,
   wrapItems = false,
+  tag,
+  tagLabel,
   className,
 }: {
   items: ReactNode[]
@@ -30,15 +32,27 @@ export function Meta({
    * wider than a phone never runs out of the box. The divider then spans the item's full line height, as the design.
    */
   wrapItems?: boolean
+  /**
+   * A grey 24px tag before the items, with no divider after it (shared-shell metadata-row status tag: the awards
+   * programme status). The tag and the items wrap as one row, 8px apart vertically.
+   */
+  tag?: ReactNode
+  /** Screen-reader prefix of the tag, e.g. "Status: ". */
+  tagLabel?: string
   className?: string
 }) {
   // Every item carries the divider. The row is shifted left by one gap plus the divider (9px) inside a box clipped horizontally only (descenders stay visible),
   // so the divider of whichever item starts a line, the first or one wrapped onto a new line, falls outside and is hidden.
   // The clip box reaches 4px past each side (padding cancelled by a negative margin, so nothing moves): a link inside
   // keeps its whole 2px focus ring at offset 2, and the hidden divider (9px to the left) still falls outside.
-  return (
-    <span className={cx('-mx-1 flex overflow-x-clip px-1 text-caption', VARIANTS[variant], className)}>
-      <span className={cx('-ml-2.25 flex min-w-0 items-center gap-x-2', nowrap ? 'flex-nowrap' : 'flex-wrap gap-y-1')}>
+  const row = (
+    <span className={cx('-mx-1 flex overflow-x-clip px-1 text-caption', VARIANTS[variant], !tag && className)}>
+      <span
+        className={cx(
+          '-ml-2.25 flex min-w-0 items-center gap-x-2',
+          nowrap ? 'flex-nowrap' : cx('flex-wrap', tag ? 'gap-y-2' : 'gap-y-1'),
+        )}
+      >
         {items.map((item, index) => (
           <span
             key={index}
@@ -57,6 +71,20 @@ export function Meta({
           </span>
         ))}
       </span>
+    </span>
+  )
+
+  if (!tag) {
+    return row
+  }
+
+  return (
+    <span className={cx('flex flex-wrap items-center gap-y-2 text-caption', VARIANTS[variant], className)}>
+      <span className="mr-2 inline-flex h-6 items-center rounded-sm bg-surface-thumb px-2 leading-none whitespace-nowrap text-foreground">
+        {tagLabel && <span className="sr-only">{tagLabel}</span>}
+        {tag}
+      </span>
+      {items.length > 0 && row}
     </span>
   )
 }

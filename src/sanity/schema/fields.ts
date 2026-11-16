@@ -2,6 +2,7 @@ import {
   type ConditionalProperty,
   type FieldDefinition,
   type Path,
+  type SlugIsUniqueValidator,
   type ValidationContext,
   defineArrayMember,
   defineField,
@@ -53,6 +54,29 @@ export const timeField = (name: string, title: string, group?: string) =>
         invert: false,
       }),
   })
+
+/** Document types published at /events/{slug}: one slug space, so a slug is unique across both. */
+const EVENT_PAGE_TYPES = ['awardsProgramme', 'conferenceEvent']
+
+/**
+ * Slug check for the /events/{slug} records. Sanity's default check is per type, but an awards edition and a
+ * conference event share the URL space, so a slug taken by either type is taken. The document's own draft and
+ * published versions do not count.
+ */
+export const isUniqueEventSlug: SlugIsUniqueValidator = async (slug, context) => {
+  const { document, getClient } = context
+  const id = document?._id.replace(/^drafts\./, '')
+
+  if (!id) {
+    return true
+  }
+
+  const client = getClient({ apiVersion: '2026-09-01' })
+  const params = { slug, types: EVENT_PAGE_TYPES, draft: `drafts.${id}`, published: id }
+  const query = `!defined(*[_type in $types && slug.current == $slug && !(_id in [$draft, $published])][0]._id)`
+
+  return client.fetch(query, params)
+}
 
 /** WordPress post id the document was migrated from. Idempotency handle for the loader. */
 export const legacyWpIdField = defineField({

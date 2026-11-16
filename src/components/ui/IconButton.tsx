@@ -18,6 +18,8 @@ const VARIANTS = {
   // No hover below the header breakpoint, fade from it (ClearView close-search).
   'fade-header': 'header:hover:opacity-60',
   none: '',
+  // White round icon on a dark overlay, white/12 tint on hover (awards programme video lightbox close).
+  inverse: 'rounded-full text-white hover:bg-white/12',
 }
 
 export function IconButton({
@@ -61,7 +63,8 @@ export function IconButton({
       tabIndex={tabIndex}
       onClick={onClick}
       className={cx(
-        'inline-flex shrink-0 cursor-pointer items-center justify-center rounded-sm text-foreground transition',
+        'inline-flex shrink-0 cursor-pointer items-center justify-center transition',
+        variant === 'inverse' ? '' : 'rounded-sm text-foreground',
         motion === 'header' ? HEADER_EASE : EASE[motion],
         SIZES[size],
         VARIANTS[variant],

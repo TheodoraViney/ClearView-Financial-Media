@@ -17,11 +17,14 @@ export function ConsentEmbed({
   src,
   title,
   copy,
+  onOpenSettings,
   className,
 }: {
   src: string
   title: string
   copy: EmbedConsentCopy
+  /** Runs before the cookie settings open, e.g. to close a modal dialog that would leave the settings panel inert. */
+  onOpenSettings?: () => void
   /** Size and shape, shared by the player and the box. */
   className?: string
 }) {
@@ -48,7 +51,13 @@ export function ConsentEmbed({
       )}
     >
       <p className="max-w-100 text-sm leading-normal text-pretty text-grey">{copy.text}</p>
-      <ActionButton variant="outline-accent" onClick={openCookieSettings}>
+      <ActionButton
+        variant="outline-accent"
+        onClick={() => {
+          onOpenSettings?.()
+          openCookieSettings()
+        }}
+      >
         {copy.button}
       </ActionButton>
     </div>

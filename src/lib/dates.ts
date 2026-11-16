@@ -75,6 +75,28 @@ function parseCalendarDate(value: string | null | undefined): CalendarDate | nul
       }
 }
 
+const CALENDAR_WEEKDAY = new Intl.DateTimeFormat('en-GB', { weekday: 'long', timeZone: 'UTC' })
+
+/**
+ * "Wednesday, 3 December 2025" from "2025-12-03" (awards programme page). A range ending on another day falls back to
+ * `formatDateRange`: "15–16 May 2026".
+ */
+export function formatWeekdayDate(start: string | null | undefined, end?: string | null): string | null {
+  const from = parseCalendarDate(start)
+
+  if (!from || !start) {
+    return null
+  }
+
+  if (end && end !== start && parseCalendarDate(end)) {
+    return formatDateRange(start, end)
+  }
+
+  const [year, month, day] = start.split('-').map(Number)
+
+  return `${CALENDAR_WEEKDAY.format(new Date(Date.UTC(year ?? 0, (month ?? 1) - 1, day ?? 1)))}, ${dayOf(from, 'long')}`
+}
+
 /** "30 Apr 2026" from "2026-04-30". */
 export function formatDay(value: string | null | undefined): string | null {
   const date = parseCalendarDate(value)

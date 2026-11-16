@@ -1,7 +1,7 @@
 import { CalendarIcon } from '@sanity/icons/Calendar'
 import { defineArrayMember, defineField, defineType } from 'sanity'
 
-import { EVENT_COUNTRIES, altField, legacyWpIdField, timeField } from '../fields'
+import { EVENT_COUNTRIES, altField, isUniqueEventSlug, legacyWpIdField, timeField } from '../fields'
 
 /**
  * A summit, briefing or webinar. 195 records.
@@ -44,7 +44,7 @@ export const conferenceEvent = defineType({
       title: 'Slug',
       type: 'slug',
       group: 'details',
-      options: { source: 'title', maxLength: 96 },
+      options: { source: 'title', maxLength: 96, isUnique: isUniqueEventSlug },
       description: 'Published at /events/{slug}/. Migrated from WordPress, changing it breaks a live URL.',
       validation: (Rule) => Rule.required(),
     }),

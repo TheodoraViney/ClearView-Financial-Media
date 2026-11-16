@@ -6,6 +6,7 @@ import { author } from './documents/author'
 import { awardCategory } from './documents/award-category'
 import { awardCategoryPage } from './documents/award-category-page'
 import { awardsProgramme } from './documents/awards-programme'
+import { awardsProgrammePage } from './documents/awards-programme-page'
 import { awardsProgrammeGroup } from './documents/awards-programme-group'
 import { brand } from './documents/brand'
 import { briefSettings } from './documents/brief-settings'
@@ -42,6 +43,7 @@ export const documentTypes = [
   articlePage,
   searchPage,
   awardCategoryPage,
+  awardsProgrammePage,
   infographicSettings,
   briefSettings,
   subscribeModal,

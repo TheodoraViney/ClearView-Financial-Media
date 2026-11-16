@@ -27,6 +27,8 @@ const THUMBS = {
   xs: 'size-9',
   sm: 'size-10',
   md: 'size-16 md:size-20',
+  // 56px round portrait (Avatar size="lg": speaker card)
+  lg: 'size-14',
   report: 'h-10 w-7',
 }
 
@@ -43,6 +45,8 @@ const ZOOM = {
 const FITS = {
   cover: { box: 'bg-light', image: 'object-cover' },
   contain: { box: '', image: 'object-contain object-left' },
+  // Centred in the box (award winner logos, awards programme logo).
+  'contain-center': { box: '', image: 'object-contain' },
 }
 
 /** SVGs bypass the loader (`unoptimized`). */
@@ -63,6 +67,7 @@ export function Media({
   zoom = false,
   fit = 'cover',
   priority = false,
+  round = false,
   className,
   children,
 }: {
@@ -74,6 +79,8 @@ export function Media({
   zoom?: boolean | 'lg' | 'slow'
   fit?: keyof typeof FITS
   priority?: boolean
+  /** A circle instead of the small radius, e.g. avatars. A `rounded-full` class would lose to `rounded-sm`. */
+  round?: boolean
   className?: string
   children?: ReactNode
 }) {
@@ -91,7 +98,8 @@ export function Media({
   return (
     <div
       className={cx(
-        'relative shrink-0 overflow-hidden rounded-sm',
+        'relative shrink-0 overflow-hidden',
+        round ? 'rounded-full' : 'rounded-sm',
         FITS[fit].box,
         ratio && RATIOS[ratio],
         thumb && THUMBS[thumb],

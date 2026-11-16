@@ -5,12 +5,11 @@ import { AwardWinnerCard } from '@/components/ui/AwardWinnerCard'
 import { Breadcrumb } from '@/components/ui/Breadcrumb'
 import { cx } from '@/components/ui/cx'
 import { DefinitionList } from '@/components/ui/DefinitionList'
-import { Heading } from '@/components/ui/Heading'
-import { ListLink } from '@/components/ui/ListLink'
 import { Meta } from '@/components/ui/Meta'
 import type { AwardCategoryView, AwardYearView } from '@/lib/award-category'
 import { adPositionLabel } from '@/lib/gam'
 
+import { OtherProgrammes } from './OtherProgrammes'
 import { WinnersByYear } from './WinnersByYear.client'
 
 // Side padding of the main column: 16 / 32, and 64 from the header breakpoint (the design's desktop starts at 1200).
@@ -112,6 +111,7 @@ export function AwardCategoryPage({ view }: { view: AwardCategoryView }) {
         {view.otherProgrammes.items.length > 0 && (
           <OtherProgrammes
             {...view.otherProgrammes}
+            spacing="relaxed"
             className="w-full header:sticky header:top-rail header:w-75"
           />
         )}
@@ -130,51 +130,5 @@ function YearWinners({ year }: { year: AwardYearView }) {
         </li>
       ))}
     </ul>
-  )
-}
-
-/**
- * Other awards programmes (shared-shell other-awards-programme-card, `relaxed`): title, then status | place | date.
- * A picked past edition has no status. The heading's tag comes from the CMS; the list shows without it when it is empty.
- */
-function OtherProgrammes({
-  heading,
-  items,
-  className,
-}: AwardCategoryView['otherProgrammes'] & { className?: string }) {
-  return (
-    <section
-      aria-labelledby={heading ? 'other-programmes-heading' : undefined}
-      className={cx('flex flex-col gap-6', className)}
-    >
-      {heading && (
-        <Heading as={heading.as} id="other-programmes-heading" className="text-title-lg leading-tight font-medium">
-          {heading.text}
-        </Heading>
-      )}
-      <ul className="flex flex-col border-t border-border">
-        {items.map((item) => (
-          <li key={item.key} className="border-b border-border last:border-b-0">
-            <ListLink
-              variant="accent"
-              relaxed
-              href={item.href}
-              title={item.title}
-              meta={[
-                ...(item.status
-                  ? [
-                      <span key="status" className={item.highlight ? 'text-accent' : undefined}>
-                        {item.status}
-                      </span>,
-                    ]
-                  : []),
-                ...item.meta,
-              ]}
-              className="pt-4 pb-6"
-            />
-          </li>
-        ))}
-      </ul>
-    </section>
   )
 }
