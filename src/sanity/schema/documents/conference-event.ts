@@ -158,7 +158,7 @@ export const conferenceEvent = defineType({
       type: 'array',
       group: 'agenda',
       of: [defineArrayMember({ type: 'agenda' })],
-      description: 'The structured agenda, from the 2025 repeater. Prefer this over the legacy text below.',
+      description: 'The event programme. Use one track, or one per day or parallel room.',
     }),
     defineField({
       name: 'agendaText',
@@ -166,7 +166,7 @@ export const conferenceEvent = defineType({
       type: 'richText',
       group: 'agenda',
       description:
-        'The 2022 wysiwyg agenda field, which was never removed from the source. Hidden once a structured agenda exists. Move the content up and clear this.',
+        'An old agenda kept as text because its lines could not be read as items. Shown on the page as text. Hidden once the agenda above has items: move the content up and clear this.',
       hidden: ({ document }) => {
         const structured = (document as { agenda?: unknown[] } | undefined)?.agenda
 
