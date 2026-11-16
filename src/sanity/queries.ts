@@ -11,6 +11,8 @@ import {
   LISTING_CARD,
   OTHER_AWARDS_EDITION,
   OTHER_AWARDS_FILL,
+  RELATED_EVENT,
+  RELATED_EVENTS_FILL,
   SUBSCRIBE_MODAL,
 } from './fragments'
 
@@ -523,7 +525,7 @@ export const AWARD_CATEGORY_PAGE_QUERY = defineQuery(`
 `)
 
 // The /events/{slug} record: an awards edition or a conference event, whose slugs are unique across both types.
-// `_type` tells the route which page to render; only the awards edition is projected so far. Shared records carry no
+// `_type` tells the route which page to render, and each type projects its own fields. Shared records carry no
 // brand: the page is served on ClearView only, which the route checks.
 // Bodies are richText and use the article body projection for image alt text and video file URLs (ARTICLE_BODY).
 // `previous`: the programme's latest edition before this one, for the "View previous year" links; null without a
@@ -577,6 +579,56 @@ export const AWARDS_PROGRAMME_QUERY = defineQuery(`
         && programme._ref == ^.programme._ref
         && startDate < ^.startDate
       ] | order(startDate desc)[0]{ "slug": slug.current }
+    },
+    _type == "conferenceEvent" => {
+      _id,
+      title,
+      "slug": slug.current,
+      eventType,
+      body[]{ ${ARTICLE_BODY} },
+      "logo": logo{ ${IMAGE} },
+      startDate,
+      endDate,
+      startTime,
+      endTime,
+      timezoneCode,
+      hideDateTime,
+      country,
+      "venue": venue->{ title, address },
+      eventFormat,
+      whyAttend{ intro[]{ ${ARTICLE_BODY} }, points },
+      speakerTypes[]{
+        _key,
+        name,
+        "people": people[]->{
+          _id,
+          title,
+          jobTitle,
+          "company": companies[0]->title,
+          "photo": photo{ ${IMAGE} }
+        }
+      },
+      "chairs": chairs[]->{ _id, title, jobTitle, "company": companies[0]->title, "photo": photo{ ${IMAGE} } },
+      agenda[]{
+        _key,
+        title,
+        items[]{
+          _key,
+          time,
+          endTime,
+          sessionType,
+          title,
+          text[]{ ${ARTICLE_BODY} },
+          speakers[]{ _key, chair, "person": person->{ _id, title, jobTitle, "company": companies[0]->title, "photo": photo{ ${IMAGE} } } }
+        }
+      },
+      agendaText[]{ ${ARTICLE_BODY} },
+      sponsorTypes[]{
+        _key,
+        name,
+        "companies": companies[]->{ _id, title, "logo": logo{ ${IMAGE} }, websiteUrl, "about": pt::text(about) }
+      },
+      "relatedCoverage": relatedCoverage[]->{ _id, title, "slug": slug.current, brands }
     }
   }
 `)
@@ -617,3 +669,45 @@ export const AWARDS_PROGRAMME_PAGE_QUERY = defineQuery(`
     "otherProgrammes": otherProgrammes[]{ _key, title, "edition": edition->{ ${OTHER_AWARDS_EDITION} } }
   }
 `)
+
+// The event page labels, headings and the editor's sidebar picks (`$id` is EVENT_PAGE_ID), one cached result for every
+// event page. A pick whose event is unpublished or deleted dereferences to a null event and is dropped by the adapter.
+// The page 404s until the document is published.
+export const EVENT_PAGE_QUERY = defineQuery(`
+  *[_id == $id && _type == "eventPage"][0]{
+    breadcrumbHomeLabel,
+    breadcrumbEventsLabel,
+    summitTypeLabel,
+    briefingTypeLabel,
+    webinarTypeLabel,
+    statusLabel,
+    upcomingLabel,
+    pastLabel,
+    eventFormatLabel,
+    chairLabel,
+    agendaChairLabel,
+    venueLabel,
+    addressLabel,
+    dateLabel,
+    timeLabel,
+    navOverviewLabel,
+    navSpeakersLabel,
+    navWhyAttendLabel,
+    navAgendaLabel,
+    navSponsorsLabel,
+    navVenueLabel,
+    navRelatedCoverageLabel,
+    overviewHeading[]{ _key, style, children[]{ _key, text } },
+    speakersHeading[]{ _key, style, children[]{ _key, text } },
+    whyAttendHeading[]{ _key, style, children[]{ _key, text } },
+    agendaHeading[]{ _key, style, children[]{ _key, text } },
+    sponsorsHeading[]{ _key, style, children[]{ _key, text } },
+    venueHeading[]{ _key, style, children[]{ _key, text } },
+    relatedCoverageHeading[]{ _key, style, children[]{ _key, text } },
+    relatedEventsHeading[]{ _key, style, children[]{ _key, text } },
+    "relatedEvents": relatedEvents[]{ _key, title, "event": event->{ ${RELATED_EVENT} } }
+  }
+`)
+
+// The event page's "Related events" fill: RELATED_EVENTS_FILL (fragments.ts), shared with the Studio panel.
+export const RELATED_EVENTS_QUERY = defineQuery(`${RELATED_EVENTS_FILL}`)

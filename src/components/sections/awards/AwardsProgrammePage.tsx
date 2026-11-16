@@ -35,8 +35,9 @@ const PAD = 'px-gutter header:px-16'
 // The same inset as a margin, for sections whose top rule spans the content width only.
 const INSET = 'mx-gutter header:mx-16'
 
-// A main column section after the overview: 64px below the previous one, a rule, then 40px above its heading.
-const SECTION = `${INSET} mt-16 border-t border-border pt-10`
+// A main column section after the overview: 64px below the previous one, a rule, then 40px above its heading. Without an
+// overview the first section takes the overview's place: 40px below the nav and no rule.
+const SECTION = `${INSET} mt-16 border-t border-border pt-10 first:mt-10 first:border-t-0 first:pt-0`
 
 // The overview and the video intro: stacked 24 apart below the header breakpoint; from it a 12-column grid (gap 32)
 // with the text in columns 1–7 and the media in 9–12. Below it the media is at most 360 wide.
@@ -119,128 +120,130 @@ export function AwardsProgrammePage({ view }: { view: AwardsProgrammeView }) {
           </div>
         )}
 
-        {view.overview && (
-          <section
-            id="overview"
-            data-section-anchor
-            aria-labelledby={view.overview.heading ? 'overview-heading' : undefined}
-            className={cx(INSET, 'mt-10', SPLIT)}
-          >
-            <div className={cx(SPLIT_TEXT, 'gap-6')}>
-              {view.overview.heading && (
-                <Heading as={view.overview.heading.as} id="overview-heading" className="text-title-2xl font-medium">
-                  {view.overview.heading.text}
-                </Heading>
-              )}
-              {view.overview.body && <RichText value={view.overview.body} className={COPY} />}
-            </div>
-            {view.overview.logo && (
-              // The design's 3:2 media box. The edition logos are wide wordmarks drawn in white for a dark ground
-              // (the design's image is such a logo on dark blue): contained on `foreground`, 24px inside, not cropped.
-              // 4 of 12 columns (~295) from the header breakpoint, at most 360 below it.
-              <div className={cx(SPLIT_MEDIA, 'aspect-3/2 overflow-hidden rounded-sm bg-foreground p-6')}>
-                <Media image={view.overview.logo} sizes="360px" fit="contain-center" className="size-full" />
-              </div>
-            )}
-          </section>
-        )}
-
-        {view.video && (
-          <section
-            id="highlight-video"
-            aria-labelledby={view.video.heading ? 'highlight-video-heading' : undefined}
-            className={SECTION}
-          >
-            <div className={SPLIT}>
-              <div className={cx(SPLIT_TEXT, 'gap-3')}>
-                {view.video.heading && (
-                  <Heading as={view.video.heading.as} id="highlight-video-heading" className={HEADING}>
-                    {view.video.heading.text}
+        <div>
+          {view.overview && (
+            <section
+              id="overview"
+              data-section-anchor
+              aria-labelledby={view.overview.heading ? 'overview-heading' : undefined}
+              className={cx(INSET, 'mt-10', SPLIT)}
+            >
+              <div className={cx(SPLIT_TEXT, 'gap-6')}>
+                {view.overview.heading && (
+                  <Heading as={view.overview.heading.as} id="overview-heading" className="text-title-2xl font-medium">
+                    {view.overview.heading.text}
                   </Heading>
                 )}
-                {view.video.description && <p className={cx(COPY, 'whitespace-pre-line')}>{view.video.description}</p>}
+                {view.overview.body && <RichText value={view.overview.body} className={COPY} />}
               </div>
-              <HighlightVideo
-                title={view.video.heading?.text ?? null}
-                name={view.video.heading?.text ?? VIDEO_TITLE}
-                thumbnail={view.video.thumbnail}
-                playerSrc={view.video.playerSrc}
-                consent={view.video.consent}
-                playLabel={playLabel(view.video.heading?.text ?? VIDEO_TITLE)}
-                closeLabel={CLOSE_VIDEO_LABEL}
-                className={SPLIT_MEDIA}
-              />
-            </div>
-          </section>
-        )}
-
-        {view.judges && <Judges judges={view.judges} />}
-
-        {winners && (
-          <Section id="winners" heading={winners.heading} className={cx(SECTION, 'flex flex-col gap-6')}>
-            {(heading) => (
-              <>
-                <div className="flex flex-wrap items-center justify-between gap-x-8 gap-y-2">
-                  {heading}
-                  {winners.previousYear && (
-                    <ArrowLink href={winners.previousYear.href} variant="accent" hover="fade" align="center">
-                      {winners.previousYear.label}
-                    </ArrowLink>
-                  )}
+              {view.overview.logo && (
+                // The design's 3:2 media box. The edition logos are wide wordmarks drawn in white for a dark ground
+                // (the design's image is such a logo on dark blue): contained on `foreground`, 24px inside, not cropped.
+                // 4 of 12 columns (~295) from the header breakpoint, at most 360 below it.
+                <div className={cx(SPLIT_MEDIA, 'aspect-3/2 overflow-hidden rounded-sm bg-foreground p-6')}>
+                  <Media image={view.overview.logo} sizes="360px" fit="contain-center" className="size-full" />
                 </div>
-                <WinnersFilter
-                  label={WINNERS_FILTER_LABEL}
-                  allLabel={winners.allLabel}
-                  total={winners.total}
-                  groups={winners.groups.map((group) => ({
-                    key: group.key,
-                    label: group.label,
-                    count: group.winners.length,
-                    content: <WinnersGroup group={group} />,
-                  }))}
-                />
-              </>
-            )}
-          </Section>
-        )}
+              )}
+            </section>
+          )}
 
-        {(categories || marketingKit) && (
-          <div
-            className={cx(SECTION, 'grid items-start gap-x-8 gap-y-16', categories && marketingKit && 'header:grid-cols-2')}
-          >
-            {categories && (
-              <Section id="categories" heading={categories.heading} className="flex min-w-0 flex-col gap-4">
-                {(heading) => (
-                  <>
+          {view.video && (
+            <section
+              id="highlight-video"
+              aria-labelledby={view.video.heading ? 'highlight-video-heading' : undefined}
+              className={SECTION}
+            >
+              <div className={SPLIT}>
+                <div className={cx(SPLIT_TEXT, 'gap-3')}>
+                  {view.video.heading && (
+                    <Heading as={view.video.heading.as} id="highlight-video-heading" className={HEADING}>
+                      {view.video.heading.text}
+                    </Heading>
+                  )}
+                  {view.video.description && <p className={cx(COPY, 'whitespace-pre-line')}>{view.video.description}</p>}
+                </div>
+                <HighlightVideo
+                  title={view.video.heading?.text ?? null}
+                  name={view.video.heading?.text ?? VIDEO_TITLE}
+                  thumbnail={view.video.thumbnail}
+                  playerSrc={view.video.playerSrc}
+                  consent={view.video.consent}
+                  playLabel={playLabel(view.video.heading?.text ?? VIDEO_TITLE)}
+                  closeLabel={CLOSE_VIDEO_LABEL}
+                  className={SPLIT_MEDIA}
+                />
+              </div>
+            </section>
+          )}
+
+          {view.judges && <Judges judges={view.judges} />}
+
+          {winners && (
+            <Section id="winners" heading={winners.heading} className={cx(SECTION, 'flex flex-col gap-6')}>
+              {(heading) => (
+                <>
+                  <div className="flex flex-wrap items-center justify-between gap-x-8 gap-y-2">
                     {heading}
-                    <ul className="flex flex-wrap gap-3">
-                      {categories.items.map((item, index) => (
-                        <li key={index} className="flex max-w-full">
-                          <CategoryTag label={item} />
+                    {winners.previousYear && (
+                      <ArrowLink href={winners.previousYear.href} variant="accent" hover="fade" align="center">
+                        {winners.previousYear.label}
+                      </ArrowLink>
+                    )}
+                  </div>
+                  <WinnersFilter
+                    label={WINNERS_FILTER_LABEL}
+                    allLabel={winners.allLabel}
+                    total={winners.total}
+                    groups={winners.groups.map((group) => ({
+                      key: group.key,
+                      label: group.label,
+                      count: group.winners.length,
+                      content: <WinnersGroup group={group} />,
+                    }))}
+                  />
+                </>
+              )}
+            </Section>
+          )}
+
+          {(categories || marketingKit) && (
+            <div
+              className={cx(SECTION, 'grid items-start gap-x-8 gap-y-16', categories && marketingKit && 'header:grid-cols-2')}
+            >
+              {categories && (
+                <Section id="categories" heading={categories.heading} className="flex min-w-0 flex-col gap-4">
+                  {(heading) => (
+                    <>
+                      {heading}
+                      <ul className="flex flex-wrap gap-3">
+                        {categories.items.map((item, index) => (
+                          <li key={index} className="flex max-w-full">
+                            <CategoryTag label={item} />
+                          </li>
+                        ))}
+                      </ul>
+                    </>
+                  )}
+                </Section>
+              )}
+              {marketingKit && (
+                <Section id="marketing-kit" heading={marketingKit.heading} className="flex min-w-0 flex-col gap-4">
+                  {(heading) => (
+                    <>
+                      {heading}
+                      <p className={cx(COPY, 'whitespace-pre-line')}>{marketingKit.text}</p>
+                      <ul className="flex flex-col pt-2">
+                        <li className="flex">
+                          <LinkRow href={marketingKit.link.href} label={marketingKit.link.label} />
                         </li>
-                      ))}
-                    </ul>
-                  </>
-                )}
-              </Section>
-            )}
-            {marketingKit && (
-              <Section id="marketing-kit" heading={marketingKit.heading} className="flex min-w-0 flex-col gap-4">
-                {(heading) => (
-                  <>
-                    {heading}
-                    <p className={cx(COPY, 'whitespace-pre-line')}>{marketingKit.text}</p>
-                    <ul className="flex flex-col pt-2">
-                      <li className="flex">
-                        <LinkRow href={marketingKit.link.href} label={marketingKit.link.label} />
-                      </li>
-                    </ul>
-                  </>
-                )}
-              </Section>
-            )}
-          </div>
-        )}
+                      </ul>
+                    </>
+                  )}
+                </Section>
+              )}
+            </div>
+          )}
+        </div>
       </div>
 
       <aside

@@ -16,6 +16,7 @@ import { EDITION_STATUS_COPY_KEYS, type EditionStatusCopyKey } from '@/lib/award
 import { EDITION_STATUS_LABELS, editionStatus } from '@/lib/awards-status'
 import { countryName } from '@/lib/countries'
 import { formatDateRange } from '@/lib/dates'
+import { RELATED_EVENTS_COUNT, relatedEventItems } from '@/lib/event-page'
 import { countOr, picksThenFill, present, topStoriesSplit } from '@/lib/picks'
 
 import {
@@ -28,6 +29,8 @@ import {
   POST_BRIEFS_FILL,
   POST_LIST_FILL,
   RECORD_FILL_BRANCHES,
+  RELATED_EVENT,
+  RELATED_EVENTS_FILL,
   TOP_PICKS_FILL_OLDER,
   TOP_PICKS_FILL_RECENT,
   TOP_STORIES_FILL,
@@ -164,6 +167,50 @@ const otherProgrammesSpec = (hint: string): AutoFillSpec => ({
   max: () => OTHER_PROGRAMMES_COUNT,
 })
 
+type RelatedEvent = {
+  _id: string
+  title: string | null
+  startDate: string | null
+  endDate: string | null
+  hideDateTime: boolean | null
+  venue: string | null
+}
+type RelatedEventsResult = { picks: { title: string | null; event: RelatedEvent | null }[] | null; fill: RelatedEvent[] | null }
+
+/**
+ * The event page's "Related events" sidebar. The Studio has no event page, so no event is left out: GROQ compares
+ * `$eventId` with each event's id, and an id never holds a NUL character.
+ */
+const NO_EVENT = '\u0000'
+
+const relatedEventsSpec: AutoFillSpec = {
+  query: /* groq */ `$block{
+    "picks": relatedEvents[]{ title, "event": event->{ ${RELATED_EVENT} } },
+    "fill": ${RELATED_EVENTS_FILL}
+  }`,
+  params: { eventId: NO_EVENT },
+  brand: 'clearview',
+  pin: { type: 'relatedEventPick', field: 'event' },
+  hint: "Fills the empty places on the site. Published events only. On an event's own page, that event is replaced by the next one.",
+  select: (result) => {
+    const { picks, fill } = result as unknown as RelatedEventsResult
+
+    return relatedEventItems(picks, fill ?? [], { excludeId: null })
+      .filter((item) => !item.picked)
+      .map(({ event, title }) => ({
+        _id: event._id,
+        _type: 'conferenceEvent',
+        title,
+        startDate: event.startDate,
+        endDate: event.endDate,
+        subtitle: [event.hideDateTime ? null : formatDateRange(event.startDate, event.endDate), event.venue]
+          .filter(Boolean)
+          .join(' · '),
+      }))
+  },
+  max: () => RELATED_EVENTS_COUNT,
+}
+
 const SPECS: Record<string, AutoFillSpec> = {
   'topStories.slides': {
     query: /* groq */ `$block{
@@ -261,6 +308,7 @@ const SPECS: Record<string, AutoFillSpec> = {
   'awardCategoryPage.otherProgrammes': otherProgrammesSpec(
     "Fills the empty places on the site. Published editions only. On a programme's own category pages, its edition is replaced by the next one.",
   ),
+  'eventPage.relatedEvents': relatedEventsSpec,
   'awardsProgrammePage.otherProgrammes': otherProgrammesSpec(
     "Fills the empty places on the site. Published editions only. On a programme's own edition pages, its edition is replaced by the next one.",
   ),

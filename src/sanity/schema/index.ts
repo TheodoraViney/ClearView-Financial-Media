@@ -12,6 +12,7 @@ import { brand } from './documents/brand'
 import { briefSettings } from './documents/brief-settings'
 import { company } from './documents/company'
 import { conferenceEvent } from './documents/conference-event'
+import { eventPage } from './documents/event-page'
 import { clearviewFooter, publicationFooter } from './documents/footer'
 import { clearviewHeader, publicationHeader } from './documents/header'
 import { infographicSettings } from './documents/infographic-settings'
@@ -44,6 +45,7 @@ export const documentTypes = [
   searchPage,
   awardCategoryPage,
   awardsProgrammePage,
+  eventPage,
   infographicSettings,
   briefSettings,
   subscribeModal,
