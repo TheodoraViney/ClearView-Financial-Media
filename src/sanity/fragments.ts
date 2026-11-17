@@ -496,6 +496,48 @@ const EXPLORE_GRID = /* groq */ `
   }
 ` as const
 
+// Landing page blocks (Sponsorship). Headings as the other blocks; every visible string is projected.
+const IMAGE_HERO = /* groq */ `
+  breadcrumbHomeLabel,
+  breadcrumbLabel,
+  eyebrow,
+  heading[]{ _key, style, children[]{ _key, text } },
+  standfirst,
+  button{ ${LINK} },
+  image{ ${IMAGE} }
+`
+
+const NUMBERED_LIST = /* groq */ `
+  heading[]{ _key, style, children[]{ _key, text } },
+  items[]{ _key, title, description }
+`
+
+// The background is decorative: no alt is projected, the section renders alt="".
+const BENEFIT_PANEL = /* groq */ `
+  heading[]{ _key, style, children[]{ _key, text } },
+  image{ asset, hotspot, crop },
+  items[]{ _key, title, description }
+`
+
+const OPPORTUNITY_CARDS = /* groq */ `
+  heading[]{ _key, style, children[]{ _key, text } },
+  cards[]{ _key, icon, label, heading, copy, benefits, link{ ${LINK} } }
+`
+
+const ENQUIRY_FORM = /* groq */ `
+  anchorId,
+  heading[]{ _key, style, children[]{ _key, text } },
+  firstNameLabel,
+  lastNameLabel,
+  emailLabel,
+  companyLabel,
+  jobTitleLabel,
+  messageLabel,
+  submitLabel,
+  requiredMessage,
+  invalidEmailMessage
+`
+
 const SUBSCRIBE_BANNER = /* groq */ `
   heading[]{ _key, style, children[]{ _key, text } },
   description,
@@ -556,6 +598,11 @@ export const BLOCKS_PROJECTION = /* groq */ `
   _type == "topPicks" => { ${TOP_PICKS} },
   _type == "exploreGrid" => { ${EXPLORE_GRID} },
   _type == "subscribeBanner" => { ${SUBSCRIBE_BANNER} },
+  _type == "imageHero" => { ${IMAGE_HERO} },
+  _type == "numberedList" => { ${NUMBERED_LIST} },
+  _type == "benefitPanel" => { ${BENEFIT_PANEL} },
+  _type == "opportunityCards" => { ${OPPORTUNITY_CARDS} },
+  _type == "enquiryForm" => { ${ENQUIRY_FORM} },
   _type == "splitLayout" => {
     "main": main[]{ _key, _type, ${MAIN_COLUMN_BLOCKS} },
     "aside": aside[]{ _key, _type, ${ASIDE_BLOCKS} }

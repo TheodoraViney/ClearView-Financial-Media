@@ -68,6 +68,7 @@ export function Media({
   fit = 'cover',
   priority = false,
   round = false,
+  placeholder = true,
   className,
   children,
 }: {
@@ -81,6 +82,8 @@ export function Media({
   priority?: boolean
   /** A circle instead of the small radius, e.g. avatars. A `rounded-full` class would lose to `rounded-sm`. */
   round?: boolean
+  /** `false` drops the cover placeholder (`bg-light`), so the parent's own background shows while the image loads or if it fails. */
+  placeholder?: boolean
   className?: string
   children?: ReactNode
 }) {
@@ -100,7 +103,7 @@ export function Media({
       className={cx(
         'relative shrink-0 overflow-hidden',
         round ? 'rounded-full' : 'rounded-sm',
-        FITS[fit].box,
+        placeholder && FITS[fit].box,
         ratio && RATIOS[ratio],
         thumb && THUMBS[thumb],
         className,

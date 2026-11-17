@@ -203,6 +203,8 @@ main [data-section-anchor] {
   --color-surface-thumb: #f5f5f5;
   /* Dismiss cross of the Categories "Select a topic" hint (topic-hint-close) */
   --color-icon-muted: #a3a3a3;
+  /* Field ring on hover (sponsorship enquiry form: Input `hover`, Textarea) */
+  --color-input-hover: #b8bdc3;
 }
 
 @theme {
@@ -250,6 +252,9 @@ main [data-section-anchor] {
 
   /* Publication ad slot label (uppercase) */
   --tracking-ad: 0.04em;
+
+  /* Hero with image below the header breakpoint: the image box is 752 / 400 */
+  --aspect-hero: 752 / 400;
 
   /* Active publication nav item: 2px bar drawn inside the bottom edge, in the text colour */
   --inset-shadow-bar: inset 0 -2px 0 currentColor;
@@ -416,6 +421,11 @@ main [data-section-anchor] {
 /* Weekly Roundup edition card from the header breakpoint: 5fr / 7fr */
 @utility grid-cols-roundup {
   grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+}
+
+/* Hero with image, desktop: the row is at least 400px high (text column stretches, image is 400) */
+@utility grid-rows-hero {
+  grid-template-rows: minmax(25rem, auto);
 }
 
 /* Numbered list row (Weekly Roundup "In this edition"): 24px number column */

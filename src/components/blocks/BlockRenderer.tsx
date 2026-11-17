@@ -6,12 +6,17 @@ import type { RecordListingContext } from '@/sanity/shared-listings-view'
 
 import { ArticleListing } from './ArticleListing'
 import { AwardsWinners } from './AwardsWinners'
+import { BenefitPanel } from './BenefitPanel'
 import { Cta } from './Cta'
+import { EnquiryForm } from './EnquiryForm'
 import { ExploreGrid } from './ExploreGrid'
 import { FeaturedStories } from './FeaturedStories'
 import { Highlights } from './Highlights'
 import { MostReadSidebar } from './MostReadSidebar'
+import { ImageHero } from './ImageHero'
 import { NewsletterSignup } from './NewsletterSignup'
+import { NumberedList } from './NumberedList'
+import { OpportunityCards } from './OpportunityCards'
 import { PageHero } from './PageHero'
 import { PostBriefs } from './PostBriefs'
 import { PostCards } from './PostCards'
@@ -160,6 +165,17 @@ function Block({
       return <AwardsWinners block={block} brand={brand} unit={ads.awardsWinners} />
     case 'mostReadSidebar':
       return <MostReadSidebar block={block} brand={brand} options={options} />
+    // Landing page blocks (Sponsorship).
+    case 'imageHero':
+      return <ImageHero block={block} brand={brand} />
+    case 'numberedList':
+      return <NumberedList block={block} brand={brand} />
+    case 'benefitPanel':
+      return <BenefitPanel block={block} brand={brand} />
+    case 'opportunityCards':
+      return <OpportunityCards block={block} brand={brand} />
+    case 'enquiryForm':
+      return <EnquiryForm block={block} brand={brand} />
     default:
       return unknownBlock(block)
   }

@@ -37,6 +37,8 @@ export function ArrowLink({
   hoverColor = true,
   // `center` for a row that centres its items, e.g. beside a heading; `self-start` would lift the link.
   align = 'start',
+  // Opt-in: the label wraps instead of staying on one line, the chevron stays to its right (sponsorship card links).
+  wrap = false,
   className,
   children,
 }: {
@@ -46,12 +48,14 @@ export function ArrowLink({
   motion?: Motion
   hoverColor?: boolean
   align?: 'start' | 'center'
+  wrap?: boolean
   className?: string
   children: ReactNode
 }) {
   const shift = hover === 'shift'
   const classes = cx(
-    'group inline-flex items-center gap-2 text-sm leading-none whitespace-nowrap',
+    'group inline-flex items-center gap-2 text-sm leading-none',
+    wrap ? 'min-w-0 text-pretty' : 'whitespace-nowrap',
     align === 'center' ? 'self-center' : 'self-start',
     HOVERS[hover],
     VARIANTS[variant].base,
