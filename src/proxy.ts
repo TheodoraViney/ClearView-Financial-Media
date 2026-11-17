@@ -2,6 +2,7 @@ import { NextResponse, type NextRequest } from 'next/server'
 
 import { fallbackBrand, isEditorialBrandKey, resolveBrandFromHost } from '@/brands'
 import { isLegacyArticlePath, LEGACY_URL_HEADER } from '@/lib/legacy-redirects'
+import { withoutEmptyListingParams } from '@/lib/shared-listings'
 
 export default function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl
@@ -15,6 +16,17 @@ export default function proxy(request: NextRequest) {
 
   if (!resolved) {
     return NextResponse.next()
+  }
+
+  // The shared listings filters submitted without JavaScript: empty parameters go, with a real redirect before any
+  // rendering (a redirect from the page would stream after the layout, as a 200).
+  const listingQuery = resolved === 'clearview' ? withoutEmptyListingParams(pathname, request.nextUrl.searchParams) : null
+
+  if (listingQuery !== null) {
+    const clean = request.nextUrl.clone()
+    clean.search = listingQuery
+
+    return NextResponse.redirect(clean)
   }
 
   const url = request.nextUrl.clone()

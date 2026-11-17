@@ -8,8 +8,10 @@ import { exploreGrid } from './explore-grid'
 import { featuredStories } from './featured-stories'
 import { highlights } from './highlights'
 import { newsletterSignup } from './newsletter-signup'
+import { pageHero } from './page-hero'
 import { postBriefs, postCards } from './post-list'
 import { publications } from './publications'
+import { recordListing } from './record-listing'
 import { splitLayout } from './split-layout'
 import { sponsoredContent } from './sponsored-content'
 import { statsBar } from './stats-bar'
@@ -18,7 +20,8 @@ import { topPicks } from './top-picks'
 import { topStories } from './top-stories'
 import { weeklyRoundup } from './weekly-roundup'
 
-// Every block type in the schema. Awards Winners goes in a Two columns sidebar only, so pages do not list it.
+// Every block type in the schema. Awards Winners goes in a Two columns sidebar only, and Page heading and the awards,
+// events and research list in its main column only (they bring the column's inset), so pages do not list them.
 export const blockTypes = [
   cta,
   splitLayout,
@@ -36,9 +39,13 @@ export const blockTypes = [
   exploreGrid,
   subscribeBanner,
   awardsWinners,
+  pageHero,
+  recordListing,
 ]
 
-const pageBlockTypes = blockTypes.filter((blockType) => blockType !== awardsWinners)
+const COLUMN_ONLY_BLOCK_TYPES: readonly (typeof blockTypes)[number][] = [awardsWinners, pageHero, recordListing]
+
+const pageBlockTypes = blockTypes.filter((blockType) => !COLUMN_ONLY_BLOCK_TYPES.includes(blockType))
 
 // The page's "Add item" menu, grouped; inside each group the blocks follow their usual order on a page.
 const INSERT_MENU_GROUPS = [

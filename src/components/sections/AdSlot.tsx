@@ -1,4 +1,4 @@
-import { AD_SLOT_FITS, AD_SLOT_UNSET, AdSlot as AdSlotBox, type AdSlotSize } from '@/components/ui/AdSlot'
+import { AD_SLOT_FITS, AD_SLOT_UNSET, AdSlot as AdSlotBox, type AdSlotAlign, type AdSlotSize } from '@/components/ui/AdSlot'
 import { Container } from '@/components/ui/Container'
 import { cx } from '@/components/ui/cx'
 import type { ShellVariant } from '@/components/ui/motion'
@@ -11,6 +11,9 @@ const SPACINGS = {
   belowSection: 'pb-section',
   // The sidebar has no page gutter, so this spacing is the slot's whole inset: 32 all round, 16 at the sides below md.
   aside: 'px-4 py-8 md:p-8',
+  // The shared listings sidebar (design wb-g-shared-listings): 40 above while it stacks under the main column, 32 from
+  // the header breakpoint; the MPU starts at the left inset below it.
+  asideListing: 'px-4 pt-10 pb-8 md:px-8 header:pt-8',
   // Publication Banner 1: space above only (24 / 32 / 40 from 1200), the lead stories bring their own.
   top: 'pt-6 md:pt-8 header:pt-10',
   // Publication Banner 3: a rule above, 24 above and below on every breakpoint.
@@ -31,6 +34,7 @@ const HIDDEN_GAPS = {
   below: '',
   belowSection: '',
   aside: '',
+  asideListing: '',
   top: '',
   divided: 'pt-6',
   none: '',
@@ -46,7 +50,7 @@ const GAP_WHEN_NARROW = 'hidden @max-leaderboard:block'
  * column the column is already narrower than max-w-page, so the max width is inert and only the gutter applies.
  * `publication`: the publication page padding instead: `top` (Banner 1, in the main column) takes the top part's
  * 16 / 32 / 64, every other spacing the lower part's 16 / 32 / 48 (Banners 3 and 4 run full width under the columns).
- * The `aside` spacing replaces the gutter with the sidebar's own inset.
+ * The `aside` and `asideListing` spacings replace the gutter with the sidebar's own inset.
  *
  * The gutter sits on an `@container`, the vertical spacing on the element inside it, so a 728 × 90 position too
  * narrow even for its 468 × 60 fallback hides together with its spacing (`AD_SLOT_FITS`). With no unit set the position is hidden on
@@ -65,10 +69,13 @@ export function AdSlot({
   spacing: AdSlotSpacing
   look?: ShellVariant
 }) {
-  if (spacing === 'aside') {
+  if (spacing === 'aside' || spacing === 'asideListing') {
+    const align: AdSlotAlign | undefined = spacing === 'asideListing' ? 'start' : undefined
+
+    // `data-side-banner` lets the block under it drop its own top inset while the banner shows (`after-side-banner`).
     return (
-      <div className={cx(SPACINGS.aside, !unit && AD_SLOT_UNSET)}>
-        <AdSlotBox size={size} label={label} unit={unit} look={look} />
+      <div className={cx(SPACINGS[spacing], !unit && AD_SLOT_UNSET)} data-side-banner={unit ? 'shown' : 'unset'}>
+        <AdSlotBox size={size} label={label} unit={unit} look={look} align={align} />
       </div>
     )
   }

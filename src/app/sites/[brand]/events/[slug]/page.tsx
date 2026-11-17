@@ -39,12 +39,23 @@ export function generateStaticParams() {
 
 const PUBLISHED: DynamicFetchOptions = { perspective: 'published', stega: false }
 
+// The segment arrives percent-encoded when the slug holds characters outside ASCII: two WordPress event slugs carry
+// zero-width spaces, and their legacy URLs (in the redirect baseline) keep them. Sanity holds the decoded slug.
+function decodeSlug(slug: string): string {
+  try {
+    return decodeURIComponent(slug)
+  } catch {
+    return slug
+  }
+}
+
 function fetchRecord(slug: string, options: DynamicFetchOptions) {
   return cachedSanity({ query: AWARDS_PROGRAMME_QUERY, params: { slug }, ...options })
 }
 
 export async function generateMetadata({ params }: { params: Promise<Params> }): Promise<Metadata> {
-  const { brand, slug } = await params
+  const { brand } = await params
+  const slug = decodeSlug((await params).slug)
 
   if (brand !== 'clearview') {
     return {}
@@ -78,7 +89,8 @@ export async function generateMetadata({ params }: { params: Promise<Params> }):
 }
 
 export default async function EventRoute({ params }: { params: Promise<Params> }) {
-  const { brand, slug } = await params
+  const { brand } = await params
+  const slug = decodeSlug((await params).slug)
 
   if (brand !== 'clearview' || slug === PLACEHOLDER_SLUG) {
     notFound()

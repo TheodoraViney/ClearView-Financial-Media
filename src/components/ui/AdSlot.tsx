@@ -35,7 +35,7 @@ export const AD_SLOT_UNSET = 'hidden in-data-preview:block'
  * `group` (ClearView, the default): dashed border, transparent surface, label 13 / 14 / 16 regular, MPU centred.
  * `publication` (WB / WBA / FWR, shared-shell `ad-slot`): solid brand border on the brand tint, label 500 uppercase
  * with 0.04em tracking, 12 on mobile and 14 from md (MPU 14 everywhere), MPU left-aligned below the header breakpoint
- * and centred from it. Colours come from the brand tokens either way.
+ * and centred from it. Colours come from the brand tokens either way. `align` overrides the look's MPU alignment.
  *
  * The placeholder label shows only in draft mode (Studio, Presentation, `[data-preview]`): on the live site an empty
  * slot is a plain box.
@@ -44,24 +44,34 @@ const LOOKS = {
   group: {
     box: 'border-dashed px-4 py-3 lg:px-6 lg:py-4',
     leaderboard: '',
-    mpu: 'mx-auto',
+    mpu: '',
     label: 'text-caption leading-title md:text-sm md:leading-title lg:text-base lg:leading-title',
     mpuLabel: 'text-caption leading-title md:text-sm md:leading-title lg:text-base lg:leading-title',
   },
   publication: {
     box: 'border-solid',
     leaderboard: 'px-4 py-3',
-    mpu: 'px-6 py-4 header:mx-auto',
+    mpu: 'px-6 py-4',
     label: 'text-xs leading-title font-medium tracking-ad text-balance md:text-sm md:leading-title',
     mpuLabel: 'text-sm leading-title font-medium tracking-ad text-balance',
   },
 }
+
+// The MPU's alignment in a wider column: `center` everywhere, or `start` (left) below the header breakpoint and centred
+// from it. Defaults: `group` centre, `publication` start.
+const MPU_ALIGN = {
+  center: 'mx-auto',
+  start: 'header:mx-auto',
+}
+
+export type AdSlotAlign = keyof typeof MPU_ALIGN
 
 export function AdSlot({
   size = 'leaderboard',
   label,
   unit,
   look = 'group',
+  align = look === 'group' ? 'center' : 'start',
   className,
 }: {
   size?: AdSlotSize
@@ -69,6 +79,8 @@ export function AdSlot({
   /** The Google Ad Manager unit the box shows; without one the box requests nothing (callers hide it, `AD_SLOT_UNSET`). */
   unit?: AdUnitView | null
   look?: ShellVariant
+  /** The MPU's alignment, see MPU_ALIGN. */
+  align?: AdSlotAlign
   className?: string
 }) {
   const styles = LOOKS[look]
@@ -80,7 +92,7 @@ export function AdSlot({
         'relative flex items-center justify-center rounded-sm border border-ad-border bg-ad-surface',
         styles.box,
         SIZES[size],
-        mpu ? styles.mpu : styles.leaderboard,
+        mpu ? cx(styles.mpu, MPU_ALIGN[align]) : styles.leaderboard,
         className,
       )}
     >

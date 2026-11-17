@@ -4,6 +4,7 @@ import { Suspense } from 'react'
 
 import { isBrandKey, type BrandKey } from '@/brands'
 import { PageBlocks } from '@/components/blocks/PageBlocks'
+import { SHARED_LISTINGS_PAGE_SLUG } from '@/lib/shared-listings'
 import { fetchAdUnits } from '@/sanity/brand-title'
 import {
   cachedNow,
@@ -45,7 +46,8 @@ export default async function BrandPage({
 }) {
   const { brand, slug } = await params
 
-  if (!isBrandKey(brand) || slug === PLACEHOLDER_SLUG) {
+  // The shared listings page is served only at its listing paths (/events-category/…, /resource-categories/research).
+  if (!isBrandKey(brand) || slug === PLACEHOLDER_SLUG || slug === SHARED_LISTINGS_PAGE_SLUG) {
     notFound()
   }
 

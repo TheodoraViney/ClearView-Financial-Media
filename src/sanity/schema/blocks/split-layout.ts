@@ -5,15 +5,27 @@ import { adminLabelField } from '../fields'
 import { awardsWinners } from './awards-winners'
 import { cta } from './cta'
 import { highlights } from './highlights'
+import { pageHero } from './page-hero'
 import { postBriefs, postCards } from './post-list'
 import { publications } from './publications'
+import { recordListing } from './record-listing'
 import { sponsoredContent } from './sponsored-content'
 import { topStories } from './top-stories'
 import { weeklyRoundup } from './weekly-roundup'
 
 // Blocks allowed in the main column.
 // splitLayout itself is never listed, so the layout cannot nest.
-const mainBlockTypes = [topStories, sponsoredContent, postCards, postBriefs, weeklyRoundup, publications, cta]
+const mainBlockTypes = [
+  pageHero,
+  topStories,
+  sponsoredContent,
+  postCards,
+  postBriefs,
+  weeklyRoundup,
+  publications,
+  recordListing,
+  cta,
+]
 
 // Blocks allowed in the sidebar.
 const asideBlockTypes = [highlights, awardsWinners]

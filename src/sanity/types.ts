@@ -239,6 +239,43 @@ export type PromoLink = {
   external?: string;
 };
 
+export type RecordListing = {
+  _type: "recordListing";
+  adminLabel?: string;
+  awardsTabLabel?: string;
+  eventsTabLabel?: string;
+  researchTabLabel?: string;
+  regionFilterLabel?: string;
+  regionEuropeLabel?: string;
+  regionMenaLabel?: string;
+  regionAsiaLabel?: string;
+  regionNorthAmericaLabel?: string;
+  yearFilterLabel?: string;
+  statusFilterLabel?: string;
+  allOptionLabel?: string;
+  clearFiltersLabel?: string;
+  upcomingEventLabel?: string;
+  pastEventLabel?: string;
+  publishedLabel?: string;
+  emptyHeading?: string;
+  emptyText?: string;
+  emptyAwardNoun?: string;
+  emptyEventNoun?: string;
+  emptyResearchNoun?: string;
+  emptyButtonLabel?: string;
+  previousLabel?: string;
+  nextLabel?: string;
+};
+
+export type PageHero = {
+  _type: "pageHero";
+  adminLabel?: string;
+  breadcrumbHomeLabel?: string;
+  breadcrumbLabel?: string;
+  title?: string;
+  intro?: string;
+};
+
 export type AwardsWinners = {
   _type: "awardsWinners";
   adminLabel?: string;
@@ -515,6 +552,7 @@ export type Highlights = {
   _type: "highlights";
   adminLabel?: string;
   source?: "awards" | "events" | "research";
+  layout?: "block" | "list";
   heading?: Array<{
     children?: Array<{
       marks?: Array<string>;
@@ -589,6 +627,9 @@ export type SplitLayout = {
   main?: Array<
     | ({
         _key: string;
+      } & PageHero)
+    | ({
+        _key: string;
       } & TopStories)
     | ({
         _key: string;
@@ -605,6 +646,9 @@ export type SplitLayout = {
     | ({
         _key: string;
       } & Publications)
+    | ({
+        _key: string;
+      } & RecordListing)
     | ({
         _key: string;
       } & Cta)
@@ -3023,6 +3067,8 @@ export type AllSanitySchemaTypes =
   | PublicationCardImage
   | PromoImage
   | PromoLink
+  | RecordListing
+  | PageHero
   | AwardsWinners
   | SubscribeBanner
   | ExploreGrid
@@ -3597,7 +3643,7 @@ export type SHELL_QUERY_RESULT = {
 
 // Source: src/sanity/queries.ts
 // Variable: HOME_PAGE_QUERY
-// Query: *[_type == "page" && brand == $brand && slug.current == "home"][0]{    _id,    title,    blocks[]{ _key, _type,   _type == "topStories" => {   linkLabel,  label,  "slides": slides[$brand == "clearview" || $brand in @->brands]->{   _id,  title,  "slug": slug.current,  brands,    "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title },  publishedAt,  excerpt,  "image": image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },  "category": category->{ title, "slug": slug.current } },  "articles": articles[$brand == "clearview" || $brand in @->brands]->{   _id,  title,  "slug": slug.current,  brands,    "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title },  publishedAt,  excerpt,  "image": image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },  "category": category->{ title, "slug": slug.current } },  "latest": *[    _type == "post"    && defined(slug.current)    && ($brand == "clearview" || $brand in brands)    && !(_id in coalesce(^.slides[]._ref, []))    && !(_id in coalesce(^.articles[]._ref, []))  ] | order(publishedAt desc)[0...6]{   _id,  title,  "slug": slug.current,  brands,    "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title },  publishedAt,  excerpt,  "image": image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },  "category": category->{ title, "slug": slug.current } } },  _type == "publications" => {   heading[]{ _key, style, children[]{ _key, text } },  body,  cards[]{    _key,    brand,    "brandTitle": *[_type == "brand" && key.current == ^.brand][0].title,    description,    image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },    linkLabel  } },  _type == "cta" => {   heading,  text,  link{ label, href } },  _type == "highlights" => {   source,  count,  heading[]{ _key, style, children[]{ _key, text } },  deadlineLabel,  "items": items[]->{   _id,  _type,  "slug": slug.current,  title,  category,  nominationsClosingDate,  startDate,  endDate,  country,  publishedAt },  "fill": select(  source == "awards" => [    ...*[      _type == "awardsProgramme"      && nominationsClosingDate >= $today      && !(_id in coalesce(^.items[]._ref, []))    ] | order(nominationsClosingDate asc)[0...5]{   _id,  _type,  "slug": slug.current,  title,  category,  nominationsClosingDate,  startDate,  endDate,  country,  publishedAt },    ...*[      _type == "awardsProgramme"      && !(defined(nominationsClosingDate) && nominationsClosingDate >= $today)      && startDate >= $today      && !(_id in coalesce(^.items[]._ref, []))    ] | order(startDate asc)[0...5]{   _id,  _type,  "slug": slug.current,  title,  category,  nominationsClosingDate,  startDate,  endDate,  country,  publishedAt },    ...*[      _type == "awardsProgramme"      && !(defined(nominationsClosingDate) && nominationsClosingDate >= $today)      && startDate < $today      && !(_id in coalesce(^.items[]._ref, []))    ] | order(startDate desc)[0...5]{   _id,  _type,  "slug": slug.current,  title,  category,  nominationsClosingDate,  startDate,  endDate,  country,  publishedAt }  ],  source == "events" => [    ...*[      _type == "conferenceEvent"      && coalesce(endDate, startDate) >= $today      && !(_id in coalesce(^.items[]._ref, []))    ] | order(startDate asc)[0...4]{   _id,  _type,  "slug": slug.current,  title,  category,  nominationsClosingDate,  startDate,  endDate,  country,  publishedAt },    ...*[      _type == "conferenceEvent"      && coalesce(endDate, startDate) < $today      && !(_id in coalesce(^.items[]._ref, []))    ] | order(startDate desc)[0...4]{   _id,  _type,  "slug": slug.current,  title,  category,  nominationsClosingDate,  startDate,  endDate,  country,  publishedAt }  ],  source == "research" => *[    _type == "resource"    && category == "research"    && !(_id in coalesce(^.items[]._ref, []))    && _id != coalesce(^.promo.resource._ref, "")  ] | order(defined(publishedAt) desc, publishedAt desc, legacyWpId desc)[0...3]{   _id,  _type,  "slug": slug.current,  title,  category,  nominationsClosingDate,  startDate,  endDate,  country,  publishedAt }),  button{   label,    kind,  external,  internal->{    _type,    "slug": slug.current,    brand,    brands  } },  promo{    resource->{      title,      "downloadThumbnail": downloadThumbnail{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },      "downloadFileUrl": downloadFile.asset->url,      "downloadFileName": downloadFile.asset->originalFilename,      downloadUrl    },    title,    description,    "image": image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },    link{   kind,  external,  internal->{    _type,    "slug": slug.current,    brand,    brands  } }  } },  _type == "featuredStories" => {   heading[]{ _key, style, children[]{ _key, text } },  link{   label,    kind,  external,  internal->{    _type,    "slug": slug.current,    brand,    brands  } },  "posts": posts[]->{   _id,  title,  "slug": slug.current,  brands,    "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title },  publishedAt,  excerpt,  "image": image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },  "category": category->{ title, "slug": slug.current } } },  _type == "statsBar" => {   heading[]{ _key, style, children[]{ _key, text } },  items[]{ _key, icon, value, label } },  _type == "newsletterSignup" => {   heading[]{ _key, style, children[]{ _key, text } },  body,  preferencesLabel,  options[]{    _key,    label,    defaultChecked,    "interestKey": *[_type == "subscribeModal" && _id == "subscribe-modal-" + $brand][0].interests[attribute.name == ^.attribute.name][0]._key  },  emailPlaceholder,  buttonLabel,  invalidEmailMessage,  noOptionMessage,  image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) } },  _type == "sponsoredContent" => {   label,  link{   label,    kind,  external,  internal->{    _type,    "slug": slug.current,    brand,    brands  } },  profileLabel,  "post": *[    _type == "post"    && _id == ^.post._ref    && defined(slug.current)    && defined(sponsor)    && ($brand == "clearview" || $brand in brands)  ][0]{      _id,  title,  "slug": slug.current,  brands,    "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title },  publishedAt,  excerpt,  "image": image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },  "category": category->{ title, "slug": slug.current },    "sponsor": sponsor->{      title,      "slug": slug.current,      "logo": logo{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) }    }  } },  _type == "postCards" => {     heading[]{ _key, style, children[]{ _key, text } },  link{   label,    kind,  external,  internal->{    _type,    "slug": slug.current,    brand,    brands  } },  "category": category->{ title, "slug": slug.current },  "posts": posts[$brand in @->brands]->{   _id,  title,  "slug": slug.current,  brands,    "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title },  publishedAt,  excerpt,  "image": image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },  "category": category->{ title, "slug": slug.current } },  "latest":   *[    _type == "post"    && defined(slug.current)    && $brand in brands    && defined(^.category._ref) && category._ref == ^.category._ref    && !(_id in coalesce(^.posts[]._ref, []))  ] | order(publishedAt desc)[0...6]{   _id,  title,  "slug": slug.current,  brands,    "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title },  publishedAt,  excerpt,  "image": image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },  "category": category->{ title, "slug": slug.current } } },  _type == "postBriefs" => {     heading[]{ _key, style, children[]{ _key, text } },  link{   label,    kind,  external,  internal->{    _type,    "slug": slug.current,    brand,    brands  } },  count,  "posts": posts[$brand in @->brands]->{     _id,  title,  "slug": slug.current,  brands,    "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title },  publishedAt,  excerpt,  "image": image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },  "category": category->{ title, "slug": slug.current },  "topic": primaryTopic->{ title },  briefText },  "latest":   *[    _type == "post"    && defined(slug.current)    && $brand in brands    && true    && !(_id in coalesce(^.posts[]._ref, []))  ] | order(publishedAt desc)[0...6]{     _id,  title,  "slug": slug.current,  brands,    "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title },  publishedAt,  excerpt,  "image": image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },  "category": category->{ title, "slug": slug.current },  "topic": primaryTopic->{ title },  briefText } },  _type == "weeklyRoundup" => {   heading[]{ _key, style, children[]{ _key, text } },  label,  title,  summary,  button{   label,    kind,  external,  internal->{    _type,    "slug": slug.current,    brand,    brands  } },  listLabel,  "posts": posts[$brand in @->brands]->{   _id,  title,  "slug": slug.current,  brands,    "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title },  publishedAt,  excerpt,  "image": image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },  "category": category->{ title, "slug": slug.current } },  "latest":   *[    _type == "post"    && defined(slug.current)    && $brand in brands    && true    && !(_id in coalesce(^.posts[]._ref, []))  ] | order(publishedAt desc)[0...8]{   _id,  title,  "slug": slug.current,  brands,    "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title },  publishedAt,  excerpt,  "image": image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },  "category": category->{ title, "slug": slug.current } } },  _type == "topPicks" => {   heading[]{ _key, style, children[]{ _key, text } },  link{   label,    kind,  external,  internal->{    _type,    "slug": slug.current,    brand,    brands  } },  "posts": posts[$brand in @->brands]->{   _id,  title,  "slug": slug.current,  brands,    "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title },  publishedAt,  excerpt,  "image": image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },  "category": category->{ title, "slug": slug.current }, "sponsored": defined(sponsor) },  "fill": [    ...  *[    _type == "post"    && defined(slug.current)    && $brand in brands    && !defined(sponsor) && dateTime(publishedAt) >= dateTime($today + "T00:00:00Z") - 60*60*24*7    && !(_id in coalesce(^.posts[]._ref, []))  ] | order(publishedAt desc)[0...6]{   _id,  title,  "slug": slug.current,  brands,    "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title },  publishedAt,  excerpt,  "image": image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },  "category": category->{ title, "slug": slug.current } },    ...  *[    _type == "post"    && defined(slug.current)    && $brand in brands    && !defined(sponsor) && dateTime(publishedAt) < dateTime($today + "T00:00:00Z") - 60*60*24*7    && !(_id in coalesce(^.posts[]._ref, []))  ] | order(publishedAt desc)[0...6]{   _id,  title,  "slug": slug.current,  brands,    "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title },  publishedAt,  excerpt,  "image": image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },  "category": category->{ title, "slug": slug.current } }  ] },  _type == "exploreGrid" => {   cards[]{    _key,    heading[]{ _key, style, children[]{ _key, text } },    icon,    source,    count,    deadlineLabel,    button{   label,    kind,  external,  internal->{    _type,    "slug": slug.current,    brand,    brands  } },    "items": items[@->_type != "post" || $brand in @->brands]->{   _type == "post" => { _type,   _id,  title,  "slug": slug.current,  brands,    "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title },  publishedAt,  excerpt,  "image": image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },  "category": category->{ title, "slug": slug.current } },  _type != "post" => {   _id,  _type,  "slug": slug.current,  title,  category,  nominationsClosingDate,  startDate,  endDate,  country,  publishedAt } },    "fill": select(      source == "posts" =>   *[    _type == "post"    && defined(slug.current)    && $brand in brands    && defined(^.category._ref) && category._ref == ^.category._ref    && !(_id in coalesce(^.items[]._ref, []))  ] | order(publishedAt desc)[0...6]{ _type,   _id,  title,  "slug": slug.current,  brands,    "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title },  publishedAt,  excerpt,  "image": image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },  "category": category->{ title, "slug": slug.current } },        source == "awards" => [    ...*[      _type == "awardsProgramme"      && nominationsClosingDate >= $today      && !(_id in coalesce(^.items[]._ref, []))    ] | order(nominationsClosingDate asc)[0...5]{   _id,  _type,  "slug": slug.current,  title,  category,  nominationsClosingDate,  startDate,  endDate,  country,  publishedAt },    ...*[      _type == "awardsProgramme"      && !(defined(nominationsClosingDate) && nominationsClosingDate >= $today)      && startDate >= $today      && !(_id in coalesce(^.items[]._ref, []))    ] | order(startDate asc)[0...5]{   _id,  _type,  "slug": slug.current,  title,  category,  nominationsClosingDate,  startDate,  endDate,  country,  publishedAt },    ...*[      _type == "awardsProgramme"      && !(defined(nominationsClosingDate) && nominationsClosingDate >= $today)      && startDate < $today      && !(_id in coalesce(^.items[]._ref, []))    ] | order(startDate desc)[0...5]{   _id,  _type,  "slug": slug.current,  title,  category,  nominationsClosingDate,  startDate,  endDate,  country,  publishedAt }  ],  source == "events" => [    ...*[      _type == "conferenceEvent"      && coalesce(endDate, startDate) >= $today      && !(_id in coalesce(^.items[]._ref, []))    ] | order(startDate asc)[0...4]{   _id,  _type,  "slug": slug.current,  title,  category,  nominationsClosingDate,  startDate,  endDate,  country,  publishedAt },    ...*[      _type == "conferenceEvent"      && coalesce(endDate, startDate) < $today      && !(_id in coalesce(^.items[]._ref, []))    ] | order(startDate desc)[0...4]{   _id,  _type,  "slug": slug.current,  title,  category,  nominationsClosingDate,  startDate,  endDate,  country,  publishedAt }  ],  source == "research" => *[    _type == "resource"    && category == "research"    && !(_id in coalesce(^.items[]._ref, []))    && _id != coalesce(^.promo.resource._ref, "")  ] | order(defined(publishedAt) desc, publishedAt desc, legacyWpId desc)[0...3]{   _id,  _type,  "slug": slug.current,  title,  category,  nominationsClosingDate,  startDate,  endDate,  country,  publishedAt }    )  } },  _type == "subscribeBanner" => {   heading[]{ _key, style, children[]{ _key, text } },  description,  buttonLabel,  cta{   label,    kind,  external,  internal->{    _type,    "slug": slug.current,    brand,    brands  } } },  _type == "splitLayout" => {    "main": main[]{ _key, _type,   _type == "topStories" => {   linkLabel,  label,  "slides": slides[$brand == "clearview" || $brand in @->brands]->{   _id,  title,  "slug": slug.current,  brands,    "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title },  publishedAt,  excerpt,  "image": image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },  "category": category->{ title, "slug": slug.current } },  "articles": articles[$brand == "clearview" || $brand in @->brands]->{   _id,  title,  "slug": slug.current,  brands,    "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title },  publishedAt,  excerpt,  "image": image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },  "category": category->{ title, "slug": slug.current } },  "latest": *[    _type == "post"    && defined(slug.current)    && ($brand == "clearview" || $brand in brands)    && !(_id in coalesce(^.slides[]._ref, []))    && !(_id in coalesce(^.articles[]._ref, []))  ] | order(publishedAt desc)[0...6]{   _id,  title,  "slug": slug.current,  brands,    "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title },  publishedAt,  excerpt,  "image": image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },  "category": category->{ title, "slug": slug.current } } },  _type == "sponsoredContent" => {   label,  link{   label,    kind,  external,  internal->{    _type,    "slug": slug.current,    brand,    brands  } },  profileLabel,  "post": *[    _type == "post"    && _id == ^.post._ref    && defined(slug.current)    && defined(sponsor)    && ($brand == "clearview" || $brand in brands)  ][0]{      _id,  title,  "slug": slug.current,  brands,    "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title },  publishedAt,  excerpt,  "image": image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },  "category": category->{ title, "slug": slug.current },    "sponsor": sponsor->{      title,      "slug": slug.current,      "logo": logo{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) }    }  } },  _type == "postCards" => {     heading[]{ _key, style, children[]{ _key, text } },  link{   label,    kind,  external,  internal->{    _type,    "slug": slug.current,    brand,    brands  } },  "category": category->{ title, "slug": slug.current },  "posts": posts[$brand in @->brands]->{   _id,  title,  "slug": slug.current,  brands,    "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title },  publishedAt,  excerpt,  "image": image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },  "category": category->{ title, "slug": slug.current } },  "latest":   *[    _type == "post"    && defined(slug.current)    && $brand in brands    && defined(^.category._ref) && category._ref == ^.category._ref    && !(_id in coalesce(^.posts[]._ref, []))  ] | order(publishedAt desc)[0...6]{   _id,  title,  "slug": slug.current,  brands,    "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title },  publishedAt,  excerpt,  "image": image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },  "category": category->{ title, "slug": slug.current } } },  _type == "postBriefs" => {     heading[]{ _key, style, children[]{ _key, text } },  link{   label,    kind,  external,  internal->{    _type,    "slug": slug.current,    brand,    brands  } },  count,  "posts": posts[$brand in @->brands]->{     _id,  title,  "slug": slug.current,  brands,    "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title },  publishedAt,  excerpt,  "image": image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },  "category": category->{ title, "slug": slug.current },  "topic": primaryTopic->{ title },  briefText },  "latest":   *[    _type == "post"    && defined(slug.current)    && $brand in brands    && true    && !(_id in coalesce(^.posts[]._ref, []))  ] | order(publishedAt desc)[0...6]{     _id,  title,  "slug": slug.current,  brands,    "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title },  publishedAt,  excerpt,  "image": image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },  "category": category->{ title, "slug": slug.current },  "topic": primaryTopic->{ title },  briefText } },  _type == "weeklyRoundup" => {   heading[]{ _key, style, children[]{ _key, text } },  label,  title,  summary,  button{   label,    kind,  external,  internal->{    _type,    "slug": slug.current,    brand,    brands  } },  listLabel,  "posts": posts[$brand in @->brands]->{   _id,  title,  "slug": slug.current,  brands,    "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title },  publishedAt,  excerpt,  "image": image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },  "category": category->{ title, "slug": slug.current } },  "latest":   *[    _type == "post"    && defined(slug.current)    && $brand in brands    && true    && !(_id in coalesce(^.posts[]._ref, []))  ] | order(publishedAt desc)[0...8]{   _id,  title,  "slug": slug.current,  brands,    "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title },  publishedAt,  excerpt,  "image": image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },  "category": category->{ title, "slug": slug.current } } },  _type == "publications" => {   heading[]{ _key, style, children[]{ _key, text } },  body,  cards[]{    _key,    brand,    "brandTitle": *[_type == "brand" && key.current == ^.brand][0].title,    description,    image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },    linkLabel  } },  _type == "cta" => {   heading,  text,  link{ label, href } } },    "aside": aside[]{ _key, _type,   _type == "highlights" => {   source,  count,  heading[]{ _key, style, children[]{ _key, text } },  deadlineLabel,  "items": items[]->{   _id,  _type,  "slug": slug.current,  title,  category,  nominationsClosingDate,  startDate,  endDate,  country,  publishedAt },  "fill": select(  source == "awards" => [    ...*[      _type == "awardsProgramme"      && nominationsClosingDate >= $today      && !(_id in coalesce(^.items[]._ref, []))    ] | order(nominationsClosingDate asc)[0...5]{   _id,  _type,  "slug": slug.current,  title,  category,  nominationsClosingDate,  startDate,  endDate,  country,  publishedAt },    ...*[      _type == "awardsProgramme"      && !(defined(nominationsClosingDate) && nominationsClosingDate >= $today)      && startDate >= $today      && !(_id in coalesce(^.items[]._ref, []))    ] | order(startDate asc)[0...5]{   _id,  _type,  "slug": slug.current,  title,  category,  nominationsClosingDate,  startDate,  endDate,  country,  publishedAt },    ...*[      _type == "awardsProgramme"      && !(defined(nominationsClosingDate) && nominationsClosingDate >= $today)      && startDate < $today      && !(_id in coalesce(^.items[]._ref, []))    ] | order(startDate desc)[0...5]{   _id,  _type,  "slug": slug.current,  title,  category,  nominationsClosingDate,  startDate,  endDate,  country,  publishedAt }  ],  source == "events" => [    ...*[      _type == "conferenceEvent"      && coalesce(endDate, startDate) >= $today      && !(_id in coalesce(^.items[]._ref, []))    ] | order(startDate asc)[0...4]{   _id,  _type,  "slug": slug.current,  title,  category,  nominationsClosingDate,  startDate,  endDate,  country,  publishedAt },    ...*[      _type == "conferenceEvent"      && coalesce(endDate, startDate) < $today      && !(_id in coalesce(^.items[]._ref, []))    ] | order(startDate desc)[0...4]{   _id,  _type,  "slug": slug.current,  title,  category,  nominationsClosingDate,  startDate,  endDate,  country,  publishedAt }  ],  source == "research" => *[    _type == "resource"    && category == "research"    && !(_id in coalesce(^.items[]._ref, []))    && _id != coalesce(^.promo.resource._ref, "")  ] | order(defined(publishedAt) desc, publishedAt desc, legacyWpId desc)[0...3]{   _id,  _type,  "slug": slug.current,  title,  category,  nominationsClosingDate,  startDate,  endDate,  country,  publishedAt }),  button{   label,    kind,  external,  internal->{    _type,    "slug": slug.current,    brand,    brands  } },  promo{    resource->{      title,      "downloadThumbnail": downloadThumbnail{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },      "downloadFileUrl": downloadFile.asset->url,      "downloadFileName": downloadFile.asset->originalFilename,      downloadUrl    },    title,    description,    "image": image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },    link{   kind,  external,  internal->{    _type,    "slug": slug.current,    brand,    brands  } }  } },  _type == "awardsWinners" => { heading[]{ _key, style, children[]{ _key, text } } } }  } },    blocksMiddle[]{ _key, _type,   _type == "topStories" => {   linkLabel,  label,  "slides": slides[$brand == "clearview" || $brand in @->brands]->{   _id,  title,  "slug": slug.current,  brands,    "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title },  publishedAt,  excerpt,  "image": image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },  "category": category->{ title, "slug": slug.current } },  "articles": articles[$brand == "clearview" || $brand in @->brands]->{   _id,  title,  "slug": slug.current,  brands,    "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title },  publishedAt,  excerpt,  "image": image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },  "category": category->{ title, "slug": slug.current } },  "latest": *[    _type == "post"    && defined(slug.current)    && ($brand == "clearview" || $brand in brands)    && !(_id in coalesce(^.slides[]._ref, []))    && !(_id in coalesce(^.articles[]._ref, []))  ] | order(publishedAt desc)[0...6]{   _id,  title,  "slug": slug.current,  brands,    "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title },  publishedAt,  excerpt,  "image": image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },  "category": category->{ title, "slug": slug.current } } },  _type == "publications" => {   heading[]{ _key, style, children[]{ _key, text } },  body,  cards[]{    _key,    brand,    "brandTitle": *[_type == "brand" && key.current == ^.brand][0].title,    description,    image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },    linkLabel  } },  _type == "cta" => {   heading,  text,  link{ label, href } },  _type == "highlights" => {   source,  count,  heading[]{ _key, style, children[]{ _key, text } },  deadlineLabel,  "items": items[]->{   _id,  _type,  "slug": slug.current,  title,  category,  nominationsClosingDate,  startDate,  endDate,  country,  publishedAt },  "fill": select(  source == "awards" => [    ...*[      _type == "awardsProgramme"      && nominationsClosingDate >= $today      && !(_id in coalesce(^.items[]._ref, []))    ] | order(nominationsClosingDate asc)[0...5]{   _id,  _type,  "slug": slug.current,  title,  category,  nominationsClosingDate,  startDate,  endDate,  country,  publishedAt },    ...*[      _type == "awardsProgramme"      && !(defined(nominationsClosingDate) && nominationsClosingDate >= $today)      && startDate >= $today      && !(_id in coalesce(^.items[]._ref, []))    ] | order(startDate asc)[0...5]{   _id,  _type,  "slug": slug.current,  title,  category,  nominationsClosingDate,  startDate,  endDate,  country,  publishedAt },    ...*[      _type == "awardsProgramme"      && !(defined(nominationsClosingDate) && nominationsClosingDate >= $today)      && startDate < $today      && !(_id in coalesce(^.items[]._ref, []))    ] | order(startDate desc)[0...5]{   _id,  _type,  "slug": slug.current,  title,  category,  nominationsClosingDate,  startDate,  endDate,  country,  publishedAt }  ],  source == "events" => [    ...*[      _type == "conferenceEvent"      && coalesce(endDate, startDate) >= $today      && !(_id in coalesce(^.items[]._ref, []))    ] | order(startDate asc)[0...4]{   _id,  _type,  "slug": slug.current,  title,  category,  nominationsClosingDate,  startDate,  endDate,  country,  publishedAt },    ...*[      _type == "conferenceEvent"      && coalesce(endDate, startDate) < $today      && !(_id in coalesce(^.items[]._ref, []))    ] | order(startDate desc)[0...4]{   _id,  _type,  "slug": slug.current,  title,  category,  nominationsClosingDate,  startDate,  endDate,  country,  publishedAt }  ],  source == "research" => *[    _type == "resource"    && category == "research"    && !(_id in coalesce(^.items[]._ref, []))    && _id != coalesce(^.promo.resource._ref, "")  ] | order(defined(publishedAt) desc, publishedAt desc, legacyWpId desc)[0...3]{   _id,  _type,  "slug": slug.current,  title,  category,  nominationsClosingDate,  startDate,  endDate,  country,  publishedAt }),  button{   label,    kind,  external,  internal->{    _type,    "slug": slug.current,    brand,    brands  } },  promo{    resource->{      title,      "downloadThumbnail": downloadThumbnail{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },      "downloadFileUrl": downloadFile.asset->url,      "downloadFileName": downloadFile.asset->originalFilename,      downloadUrl    },    title,    description,    "image": image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },    link{   kind,  external,  internal->{    _type,    "slug": slug.current,    brand,    brands  } }  } },  _type == "featuredStories" => {   heading[]{ _key, style, children[]{ _key, text } },  link{   label,    kind,  external,  internal->{    _type,    "slug": slug.current,    brand,    brands  } },  "posts": posts[]->{   _id,  title,  "slug": slug.current,  brands,    "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title },  publishedAt,  excerpt,  "image": image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },  "category": category->{ title, "slug": slug.current } } },  _type == "statsBar" => {   heading[]{ _key, style, children[]{ _key, text } },  items[]{ _key, icon, value, label } },  _type == "newsletterSignup" => {   heading[]{ _key, style, children[]{ _key, text } },  body,  preferencesLabel,  options[]{    _key,    label,    defaultChecked,    "interestKey": *[_type == "subscribeModal" && _id == "subscribe-modal-" + $brand][0].interests[attribute.name == ^.attribute.name][0]._key  },  emailPlaceholder,  buttonLabel,  invalidEmailMessage,  noOptionMessage,  image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) } },  _type == "sponsoredContent" => {   label,  link{   label,    kind,  external,  internal->{    _type,    "slug": slug.current,    brand,    brands  } },  profileLabel,  "post": *[    _type == "post"    && _id == ^.post._ref    && defined(slug.current)    && defined(sponsor)    && ($brand == "clearview" || $brand in brands)  ][0]{      _id,  title,  "slug": slug.current,  brands,    "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title },  publishedAt,  excerpt,  "image": image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },  "category": category->{ title, "slug": slug.current },    "sponsor": sponsor->{      title,      "slug": slug.current,      "logo": logo{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) }    }  } },  _type == "postCards" => {     heading[]{ _key, style, children[]{ _key, text } },  link{   label,    kind,  external,  internal->{    _type,    "slug": slug.current,    brand,    brands  } },  "category": category->{ title, "slug": slug.current },  "posts": posts[$brand in @->brands]->{   _id,  title,  "slug": slug.current,  brands,    "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title },  publishedAt,  excerpt,  "image": image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },  "category": category->{ title, "slug": slug.current } },  "latest":   *[    _type == "post"    && defined(slug.current)    && $brand in brands    && defined(^.category._ref) && category._ref == ^.category._ref    && !(_id in coalesce(^.posts[]._ref, []))  ] | order(publishedAt desc)[0...6]{   _id,  title,  "slug": slug.current,  brands,    "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title },  publishedAt,  excerpt,  "image": image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },  "category": category->{ title, "slug": slug.current } } },  _type == "postBriefs" => {     heading[]{ _key, style, children[]{ _key, text } },  link{   label,    kind,  external,  internal->{    _type,    "slug": slug.current,    brand,    brands  } },  count,  "posts": posts[$brand in @->brands]->{     _id,  title,  "slug": slug.current,  brands,    "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title },  publishedAt,  excerpt,  "image": image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },  "category": category->{ title, "slug": slug.current },  "topic": primaryTopic->{ title },  briefText },  "latest":   *[    _type == "post"    && defined(slug.current)    && $brand in brands    && true    && !(_id in coalesce(^.posts[]._ref, []))  ] | order(publishedAt desc)[0...6]{     _id,  title,  "slug": slug.current,  brands,    "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title },  publishedAt,  excerpt,  "image": image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },  "category": category->{ title, "slug": slug.current },  "topic": primaryTopic->{ title },  briefText } },  _type == "weeklyRoundup" => {   heading[]{ _key, style, children[]{ _key, text } },  label,  title,  summary,  button{   label,    kind,  external,  internal->{    _type,    "slug": slug.current,    brand,    brands  } },  listLabel,  "posts": posts[$brand in @->brands]->{   _id,  title,  "slug": slug.current,  brands,    "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title },  publishedAt,  excerpt,  "image": image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },  "category": category->{ title, "slug": slug.current } },  "latest":   *[    _type == "post"    && defined(slug.current)    && $brand in brands    && true    && !(_id in coalesce(^.posts[]._ref, []))  ] | order(publishedAt desc)[0...8]{   _id,  title,  "slug": slug.current,  brands,    "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title },  publishedAt,  excerpt,  "image": image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },  "category": category->{ title, "slug": slug.current } } },  _type == "topPicks" => {   heading[]{ _key, style, children[]{ _key, text } },  link{   label,    kind,  external,  internal->{    _type,    "slug": slug.current,    brand,    brands  } },  "posts": posts[$brand in @->brands]->{   _id,  title,  "slug": slug.current,  brands,    "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title },  publishedAt,  excerpt,  "image": image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },  "category": category->{ title, "slug": slug.current }, "sponsored": defined(sponsor) },  "fill": [    ...  *[    _type == "post"    && defined(slug.current)    && $brand in brands    && !defined(sponsor) && dateTime(publishedAt) >= dateTime($today + "T00:00:00Z") - 60*60*24*7    && !(_id in coalesce(^.posts[]._ref, []))  ] | order(publishedAt desc)[0...6]{   _id,  title,  "slug": slug.current,  brands,    "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title },  publishedAt,  excerpt,  "image": image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },  "category": category->{ title, "slug": slug.current } },    ...  *[    _type == "post"    && defined(slug.current)    && $brand in brands    && !defined(sponsor) && dateTime(publishedAt) < dateTime($today + "T00:00:00Z") - 60*60*24*7    && !(_id in coalesce(^.posts[]._ref, []))  ] | order(publishedAt desc)[0...6]{   _id,  title,  "slug": slug.current,  brands,    "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title },  publishedAt,  excerpt,  "image": image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },  "category": category->{ title, "slug": slug.current } }  ] },  _type == "exploreGrid" => {   cards[]{    _key,    heading[]{ _key, style, children[]{ _key, text } },    icon,    source,    count,    deadlineLabel,    button{   label,    kind,  external,  internal->{    _type,    "slug": slug.current,    brand,    brands  } },    "items": items[@->_type != "post" || $brand in @->brands]->{   _type == "post" => { _type,   _id,  title,  "slug": slug.current,  brands,    "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title },  publishedAt,  excerpt,  "image": image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },  "category": category->{ title, "slug": slug.current } },  _type != "post" => {   _id,  _type,  "slug": slug.current,  title,  category,  nominationsClosingDate,  startDate,  endDate,  country,  publishedAt } },    "fill": select(      source == "posts" =>   *[    _type == "post"    && defined(slug.current)    && $brand in brands    && defined(^.category._ref) && category._ref == ^.category._ref    && !(_id in coalesce(^.items[]._ref, []))  ] | order(publishedAt desc)[0...6]{ _type,   _id,  title,  "slug": slug.current,  brands,    "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title },  publishedAt,  excerpt,  "image": image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },  "category": category->{ title, "slug": slug.current } },        source == "awards" => [    ...*[      _type == "awardsProgramme"      && nominationsClosingDate >= $today      && !(_id in coalesce(^.items[]._ref, []))    ] | order(nominationsClosingDate asc)[0...5]{   _id,  _type,  "slug": slug.current,  title,  category,  nominationsClosingDate,  startDate,  endDate,  country,  publishedAt },    ...*[      _type == "awardsProgramme"      && !(defined(nominationsClosingDate) && nominationsClosingDate >= $today)      && startDate >= $today      && !(_id in coalesce(^.items[]._ref, []))    ] | order(startDate asc)[0...5]{   _id,  _type,  "slug": slug.current,  title,  category,  nominationsClosingDate,  startDate,  endDate,  country,  publishedAt },    ...*[      _type == "awardsProgramme"      && !(defined(nominationsClosingDate) && nominationsClosingDate >= $today)      && startDate < $today      && !(_id in coalesce(^.items[]._ref, []))    ] | order(startDate desc)[0...5]{   _id,  _type,  "slug": slug.current,  title,  category,  nominationsClosingDate,  startDate,  endDate,  country,  publishedAt }  ],  source == "events" => [    ...*[      _type == "conferenceEvent"      && coalesce(endDate, startDate) >= $today      && !(_id in coalesce(^.items[]._ref, []))    ] | order(startDate asc)[0...4]{   _id,  _type,  "slug": slug.current,  title,  category,  nominationsClosingDate,  startDate,  endDate,  country,  publishedAt },    ...*[      _type == "conferenceEvent"      && coalesce(endDate, startDate) < $today      && !(_id in coalesce(^.items[]._ref, []))    ] | order(startDate desc)[0...4]{   _id,  _type,  "slug": slug.current,  title,  category,  nominationsClosingDate,  startDate,  endDate,  country,  publishedAt }  ],  source == "research" => *[    _type == "resource"    && category == "research"    && !(_id in coalesce(^.items[]._ref, []))    && _id != coalesce(^.promo.resource._ref, "")  ] | order(defined(publishedAt) desc, publishedAt desc, legacyWpId desc)[0...3]{   _id,  _type,  "slug": slug.current,  title,  category,  nominationsClosingDate,  startDate,  endDate,  country,  publishedAt }    )  } },  _type == "subscribeBanner" => {   heading[]{ _key, style, children[]{ _key, text } },  description,  buttonLabel,  cta{   label,    kind,  external,  internal->{    _type,    "slug": slug.current,    brand,    brands  } } },  _type == "splitLayout" => {    "main": main[]{ _key, _type,   _type == "topStories" => {   linkLabel,  label,  "slides": slides[$brand == "clearview" || $brand in @->brands]->{   _id,  title,  "slug": slug.current,  brands,    "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title },  publishedAt,  excerpt,  "image": image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },  "category": category->{ title, "slug": slug.current } },  "articles": articles[$brand == "clearview" || $brand in @->brands]->{   _id,  title,  "slug": slug.current,  brands,    "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title },  publishedAt,  excerpt,  "image": image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },  "category": category->{ title, "slug": slug.current } },  "latest": *[    _type == "post"    && defined(slug.current)    && ($brand == "clearview" || $brand in brands)    && !(_id in coalesce(^.slides[]._ref, []))    && !(_id in coalesce(^.articles[]._ref, []))  ] | order(publishedAt desc)[0...6]{   _id,  title,  "slug": slug.current,  brands,    "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title },  publishedAt,  excerpt,  "image": image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },  "category": category->{ title, "slug": slug.current } } },  _type == "sponsoredContent" => {   label,  link{   label,    kind,  external,  internal->{    _type,    "slug": slug.current,    brand,    brands  } },  profileLabel,  "post": *[    _type == "post"    && _id == ^.post._ref    && defined(slug.current)    && defined(sponsor)    && ($brand == "clearview" || $brand in brands)  ][0]{      _id,  title,  "slug": slug.current,  brands,    "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title },  publishedAt,  excerpt,  "image": image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },  "category": category->{ title, "slug": slug.current },    "sponsor": sponsor->{      title,      "slug": slug.current,      "logo": logo{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) }    }  } },  _type == "postCards" => {     heading[]{ _key, style, children[]{ _key, text } },  link{   label,    kind,  external,  internal->{    _type,    "slug": slug.current,    brand,    brands  } },  "category": category->{ title, "slug": slug.current },  "posts": posts[$brand in @->brands]->{   _id,  title,  "slug": slug.current,  brands,    "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title },  publishedAt,  excerpt,  "image": image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },  "category": category->{ title, "slug": slug.current } },  "latest":   *[    _type == "post"    && defined(slug.current)    && $brand in brands    && defined(^.category._ref) && category._ref == ^.category._ref    && !(_id in coalesce(^.posts[]._ref, []))  ] | order(publishedAt desc)[0...6]{   _id,  title,  "slug": slug.current,  brands,    "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title },  publishedAt,  excerpt,  "image": image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },  "category": category->{ title, "slug": slug.current } } },  _type == "postBriefs" => {     heading[]{ _key, style, children[]{ _key, text } },  link{   label,    kind,  external,  internal->{    _type,    "slug": slug.current,    brand,    brands  } },  count,  "posts": posts[$brand in @->brands]->{     _id,  title,  "slug": slug.current,  brands,    "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title },  publishedAt,  excerpt,  "image": image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },  "category": category->{ title, "slug": slug.current },  "topic": primaryTopic->{ title },  briefText },  "latest":   *[    _type == "post"    && defined(slug.current)    && $brand in brands    && true    && !(_id in coalesce(^.posts[]._ref, []))  ] | order(publishedAt desc)[0...6]{     _id,  title,  "slug": slug.current,  brands,    "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title },  publishedAt,  excerpt,  "image": image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },  "category": category->{ title, "slug": slug.current },  "topic": primaryTopic->{ title },  briefText } },  _type == "weeklyRoundup" => {   heading[]{ _key, style, children[]{ _key, text } },  label,  title,  summary,  button{   label,    kind,  external,  internal->{    _type,    "slug": slug.current,    brand,    brands  } },  listLabel,  "posts": posts[$brand in @->brands]->{   _id,  title,  "slug": slug.current,  brands,    "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title },  publishedAt,  excerpt,  "image": image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },  "category": category->{ title, "slug": slug.current } },  "latest":   *[    _type == "post"    && defined(slug.current)    && $brand in brands    && true    && !(_id in coalesce(^.posts[]._ref, []))  ] | order(publishedAt desc)[0...8]{   _id,  title,  "slug": slug.current,  brands,    "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title },  publishedAt,  excerpt,  "image": image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },  "category": category->{ title, "slug": slug.current } } },  _type == "publications" => {   heading[]{ _key, style, children[]{ _key, text } },  body,  cards[]{    _key,    brand,    "brandTitle": *[_type == "brand" && key.current == ^.brand][0].title,    description,    image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },    linkLabel  } },  _type == "cta" => {   heading,  text,  link{ label, href } } },    "aside": aside[]{ _key, _type,   _type == "highlights" => {   source,  count,  heading[]{ _key, style, children[]{ _key, text } },  deadlineLabel,  "items": items[]->{   _id,  _type,  "slug": slug.current,  title,  category,  nominationsClosingDate,  startDate,  endDate,  country,  publishedAt },  "fill": select(  source == "awards" => [    ...*[      _type == "awardsProgramme"      && nominationsClosingDate >= $today      && !(_id in coalesce(^.items[]._ref, []))    ] | order(nominationsClosingDate asc)[0...5]{   _id,  _type,  "slug": slug.current,  title,  category,  nominationsClosingDate,  startDate,  endDate,  country,  publishedAt },    ...*[      _type == "awardsProgramme"      && !(defined(nominationsClosingDate) && nominationsClosingDate >= $today)      && startDate >= $today      && !(_id in coalesce(^.items[]._ref, []))    ] | order(startDate asc)[0...5]{   _id,  _type,  "slug": slug.current,  title,  category,  nominationsClosingDate,  startDate,  endDate,  country,  publishedAt },    ...*[      _type == "awardsProgramme"      && !(defined(nominationsClosingDate) && nominationsClosingDate >= $today)      && startDate < $today      && !(_id in coalesce(^.items[]._ref, []))    ] | order(startDate desc)[0...5]{   _id,  _type,  "slug": slug.current,  title,  category,  nominationsClosingDate,  startDate,  endDate,  country,  publishedAt }  ],  source == "events" => [    ...*[      _type == "conferenceEvent"      && coalesce(endDate, startDate) >= $today      && !(_id in coalesce(^.items[]._ref, []))    ] | order(startDate asc)[0...4]{   _id,  _type,  "slug": slug.current,  title,  category,  nominationsClosingDate,  startDate,  endDate,  country,  publishedAt },    ...*[      _type == "conferenceEvent"      && coalesce(endDate, startDate) < $today      && !(_id in coalesce(^.items[]._ref, []))    ] | order(startDate desc)[0...4]{   _id,  _type,  "slug": slug.current,  title,  category,  nominationsClosingDate,  startDate,  endDate,  country,  publishedAt }  ],  source == "research" => *[    _type == "resource"    && category == "research"    && !(_id in coalesce(^.items[]._ref, []))    && _id != coalesce(^.promo.resource._ref, "")  ] | order(defined(publishedAt) desc, publishedAt desc, legacyWpId desc)[0...3]{   _id,  _type,  "slug": slug.current,  title,  category,  nominationsClosingDate,  startDate,  endDate,  country,  publishedAt }),  button{   label,    kind,  external,  internal->{    _type,    "slug": slug.current,    brand,    brands  } },  promo{    resource->{      title,      "downloadThumbnail": downloadThumbnail{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },      "downloadFileUrl": downloadFile.asset->url,      "downloadFileName": downloadFile.asset->originalFilename,      downloadUrl    },    title,    description,    "image": image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },    link{   kind,  external,  internal->{    _type,    "slug": slug.current,    brand,    brands  } }  } },  _type == "awardsWinners" => { heading[]{ _key, style, children[]{ _key, text } } } }  } },    blocksBottom[]{ _key, _type,   _type == "topStories" => {   linkLabel,  label,  "slides": slides[$brand == "clearview" || $brand in @->brands]->{   _id,  title,  "slug": slug.current,  brands,    "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title },  publishedAt,  excerpt,  "image": image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },  "category": category->{ title, "slug": slug.current } },  "articles": articles[$brand == "clearview" || $brand in @->brands]->{   _id,  title,  "slug": slug.current,  brands,    "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title },  publishedAt,  excerpt,  "image": image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },  "category": category->{ title, "slug": slug.current } },  "latest": *[    _type == "post"    && defined(slug.current)    && ($brand == "clearview" || $brand in brands)    && !(_id in coalesce(^.slides[]._ref, []))    && !(_id in coalesce(^.articles[]._ref, []))  ] | order(publishedAt desc)[0...6]{   _id,  title,  "slug": slug.current,  brands,    "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title },  publishedAt,  excerpt,  "image": image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },  "category": category->{ title, "slug": slug.current } } },  _type == "publications" => {   heading[]{ _key, style, children[]{ _key, text } },  body,  cards[]{    _key,    brand,    "brandTitle": *[_type == "brand" && key.current == ^.brand][0].title,    description,    image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },    linkLabel  } },  _type == "cta" => {   heading,  text,  link{ label, href } },  _type == "highlights" => {   source,  count,  heading[]{ _key, style, children[]{ _key, text } },  deadlineLabel,  "items": items[]->{   _id,  _type,  "slug": slug.current,  title,  category,  nominationsClosingDate,  startDate,  endDate,  country,  publishedAt },  "fill": select(  source == "awards" => [    ...*[      _type == "awardsProgramme"      && nominationsClosingDate >= $today      && !(_id in coalesce(^.items[]._ref, []))    ] | order(nominationsClosingDate asc)[0...5]{   _id,  _type,  "slug": slug.current,  title,  category,  nominationsClosingDate,  startDate,  endDate,  country,  publishedAt },    ...*[      _type == "awardsProgramme"      && !(defined(nominationsClosingDate) && nominationsClosingDate >= $today)      && startDate >= $today      && !(_id in coalesce(^.items[]._ref, []))    ] | order(startDate asc)[0...5]{   _id,  _type,  "slug": slug.current,  title,  category,  nominationsClosingDate,  startDate,  endDate,  country,  publishedAt },    ...*[      _type == "awardsProgramme"      && !(defined(nominationsClosingDate) && nominationsClosingDate >= $today)      && startDate < $today      && !(_id in coalesce(^.items[]._ref, []))    ] | order(startDate desc)[0...5]{   _id,  _type,  "slug": slug.current,  title,  category,  nominationsClosingDate,  startDate,  endDate,  country,  publishedAt }  ],  source == "events" => [    ...*[      _type == "conferenceEvent"      && coalesce(endDate, startDate) >= $today      && !(_id in coalesce(^.items[]._ref, []))    ] | order(startDate asc)[0...4]{   _id,  _type,  "slug": slug.current,  title,  category,  nominationsClosingDate,  startDate,  endDate,  country,  publishedAt },    ...*[      _type == "conferenceEvent"      && coalesce(endDate, startDate) < $today      && !(_id in coalesce(^.items[]._ref, []))    ] | order(startDate desc)[0...4]{   _id,  _type,  "slug": slug.current,  title,  category,  nominationsClosingDate,  startDate,  endDate,  country,  publishedAt }  ],  source == "research" => *[    _type == "resource"    && category == "research"    && !(_id in coalesce(^.items[]._ref, []))    && _id != coalesce(^.promo.resource._ref, "")  ] | order(defined(publishedAt) desc, publishedAt desc, legacyWpId desc)[0...3]{   _id,  _type,  "slug": slug.current,  title,  category,  nominationsClosingDate,  startDate,  endDate,  country,  publishedAt }),  button{   label,    kind,  external,  internal->{    _type,    "slug": slug.current,    brand,    brands  } },  promo{    resource->{      title,      "downloadThumbnail": downloadThumbnail{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },      "downloadFileUrl": downloadFile.asset->url,      "downloadFileName": downloadFile.asset->originalFilename,      downloadUrl    },    title,    description,    "image": image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },    link{   kind,  external,  internal->{    _type,    "slug": slug.current,    brand,    brands  } }  } },  _type == "featuredStories" => {   heading[]{ _key, style, children[]{ _key, text } },  link{   label,    kind,  external,  internal->{    _type,    "slug": slug.current,    brand,    brands  } },  "posts": posts[]->{   _id,  title,  "slug": slug.current,  brands,    "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title },  publishedAt,  excerpt,  "image": image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },  "category": category->{ title, "slug": slug.current } } },  _type == "statsBar" => {   heading[]{ _key, style, children[]{ _key, text } },  items[]{ _key, icon, value, label } },  _type == "newsletterSignup" => {   heading[]{ _key, style, children[]{ _key, text } },  body,  preferencesLabel,  options[]{    _key,    label,    defaultChecked,    "interestKey": *[_type == "subscribeModal" && _id == "subscribe-modal-" + $brand][0].interests[attribute.name == ^.attribute.name][0]._key  },  emailPlaceholder,  buttonLabel,  invalidEmailMessage,  noOptionMessage,  image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) } },  _type == "sponsoredContent" => {   label,  link{   label,    kind,  external,  internal->{    _type,    "slug": slug.current,    brand,    brands  } },  profileLabel,  "post": *[    _type == "post"    && _id == ^.post._ref    && defined(slug.current)    && defined(sponsor)    && ($brand == "clearview" || $brand in brands)  ][0]{      _id,  title,  "slug": slug.current,  brands,    "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title },  publishedAt,  excerpt,  "image": image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },  "category": category->{ title, "slug": slug.current },    "sponsor": sponsor->{      title,      "slug": slug.current,      "logo": logo{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) }    }  } },  _type == "postCards" => {     heading[]{ _key, style, children[]{ _key, text } },  link{   label,    kind,  external,  internal->{    _type,    "slug": slug.current,    brand,    brands  } },  "category": category->{ title, "slug": slug.current },  "posts": posts[$brand in @->brands]->{   _id,  title,  "slug": slug.current,  brands,    "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title },  publishedAt,  excerpt,  "image": image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },  "category": category->{ title, "slug": slug.current } },  "latest":   *[    _type == "post"    && defined(slug.current)    && $brand in brands    && defined(^.category._ref) && category._ref == ^.category._ref    && !(_id in coalesce(^.posts[]._ref, []))  ] | order(publishedAt desc)[0...6]{   _id,  title,  "slug": slug.current,  brands,    "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title },  publishedAt,  excerpt,  "image": image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },  "category": category->{ title, "slug": slug.current } } },  _type == "postBriefs" => {     heading[]{ _key, style, children[]{ _key, text } },  link{   label,    kind,  external,  internal->{    _type,    "slug": slug.current,    brand,    brands  } },  count,  "posts": posts[$brand in @->brands]->{     _id,  title,  "slug": slug.current,  brands,    "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title },  publishedAt,  excerpt,  "image": image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },  "category": category->{ title, "slug": slug.current },  "topic": primaryTopic->{ title },  briefText },  "latest":   *[    _type == "post"    && defined(slug.current)    && $brand in brands    && true    && !(_id in coalesce(^.posts[]._ref, []))  ] | order(publishedAt desc)[0...6]{     _id,  title,  "slug": slug.current,  brands,    "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title },  publishedAt,  excerpt,  "image": image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },  "category": category->{ title, "slug": slug.current },  "topic": primaryTopic->{ title },  briefText } },  _type == "weeklyRoundup" => {   heading[]{ _key, style, children[]{ _key, text } },  label,  title,  summary,  button{   label,    kind,  external,  internal->{    _type,    "slug": slug.current,    brand,    brands  } },  listLabel,  "posts": posts[$brand in @->brands]->{   _id,  title,  "slug": slug.current,  brands,    "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title },  publishedAt,  excerpt,  "image": image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },  "category": category->{ title, "slug": slug.current } },  "latest":   *[    _type == "post"    && defined(slug.current)    && $brand in brands    && true    && !(_id in coalesce(^.posts[]._ref, []))  ] | order(publishedAt desc)[0...8]{   _id,  title,  "slug": slug.current,  brands,    "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title },  publishedAt,  excerpt,  "image": image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },  "category": category->{ title, "slug": slug.current } } },  _type == "topPicks" => {   heading[]{ _key, style, children[]{ _key, text } },  link{   label,    kind,  external,  internal->{    _type,    "slug": slug.current,    brand,    brands  } },  "posts": posts[$brand in @->brands]->{   _id,  title,  "slug": slug.current,  brands,    "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title },  publishedAt,  excerpt,  "image": image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },  "category": category->{ title, "slug": slug.current }, "sponsored": defined(sponsor) },  "fill": [    ...  *[    _type == "post"    && defined(slug.current)    && $brand in brands    && !defined(sponsor) && dateTime(publishedAt) >= dateTime($today + "T00:00:00Z") - 60*60*24*7    && !(_id in coalesce(^.posts[]._ref, []))  ] | order(publishedAt desc)[0...6]{   _id,  title,  "slug": slug.current,  brands,    "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title },  publishedAt,  excerpt,  "image": image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },  "category": category->{ title, "slug": slug.current } },    ...  *[    _type == "post"    && defined(slug.current)    && $brand in brands    && !defined(sponsor) && dateTime(publishedAt) < dateTime($today + "T00:00:00Z") - 60*60*24*7    && !(_id in coalesce(^.posts[]._ref, []))  ] | order(publishedAt desc)[0...6]{   _id,  title,  "slug": slug.current,  brands,    "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title },  publishedAt,  excerpt,  "image": image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },  "category": category->{ title, "slug": slug.current } }  ] },  _type == "exploreGrid" => {   cards[]{    _key,    heading[]{ _key, style, children[]{ _key, text } },    icon,    source,    count,    deadlineLabel,    button{   label,    kind,  external,  internal->{    _type,    "slug": slug.current,    brand,    brands  } },    "items": items[@->_type != "post" || $brand in @->brands]->{   _type == "post" => { _type,   _id,  title,  "slug": slug.current,  brands,    "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title },  publishedAt,  excerpt,  "image": image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },  "category": category->{ title, "slug": slug.current } },  _type != "post" => {   _id,  _type,  "slug": slug.current,  title,  category,  nominationsClosingDate,  startDate,  endDate,  country,  publishedAt } },    "fill": select(      source == "posts" =>   *[    _type == "post"    && defined(slug.current)    && $brand in brands    && defined(^.category._ref) && category._ref == ^.category._ref    && !(_id in coalesce(^.items[]._ref, []))  ] | order(publishedAt desc)[0...6]{ _type,   _id,  title,  "slug": slug.current,  brands,    "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title },  publishedAt,  excerpt,  "image": image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },  "category": category->{ title, "slug": slug.current } },        source == "awards" => [    ...*[      _type == "awardsProgramme"      && nominationsClosingDate >= $today      && !(_id in coalesce(^.items[]._ref, []))    ] | order(nominationsClosingDate asc)[0...5]{   _id,  _type,  "slug": slug.current,  title,  category,  nominationsClosingDate,  startDate,  endDate,  country,  publishedAt },    ...*[      _type == "awardsProgramme"      && !(defined(nominationsClosingDate) && nominationsClosingDate >= $today)      && startDate >= $today      && !(_id in coalesce(^.items[]._ref, []))    ] | order(startDate asc)[0...5]{   _id,  _type,  "slug": slug.current,  title,  category,  nominationsClosingDate,  startDate,  endDate,  country,  publishedAt },    ...*[      _type == "awardsProgramme"      && !(defined(nominationsClosingDate) && nominationsClosingDate >= $today)      && startDate < $today      && !(_id in coalesce(^.items[]._ref, []))    ] | order(startDate desc)[0...5]{   _id,  _type,  "slug": slug.current,  title,  category,  nominationsClosingDate,  startDate,  endDate,  country,  publishedAt }  ],  source == "events" => [    ...*[      _type == "conferenceEvent"      && coalesce(endDate, startDate) >= $today      && !(_id in coalesce(^.items[]._ref, []))    ] | order(startDate asc)[0...4]{   _id,  _type,  "slug": slug.current,  title,  category,  nominationsClosingDate,  startDate,  endDate,  country,  publishedAt },    ...*[      _type == "conferenceEvent"      && coalesce(endDate, startDate) < $today      && !(_id in coalesce(^.items[]._ref, []))    ] | order(startDate desc)[0...4]{   _id,  _type,  "slug": slug.current,  title,  category,  nominationsClosingDate,  startDate,  endDate,  country,  publishedAt }  ],  source == "research" => *[    _type == "resource"    && category == "research"    && !(_id in coalesce(^.items[]._ref, []))    && _id != coalesce(^.promo.resource._ref, "")  ] | order(defined(publishedAt) desc, publishedAt desc, legacyWpId desc)[0...3]{   _id,  _type,  "slug": slug.current,  title,  category,  nominationsClosingDate,  startDate,  endDate,  country,  publishedAt }    )  } },  _type == "subscribeBanner" => {   heading[]{ _key, style, children[]{ _key, text } },  description,  buttonLabel,  cta{   label,    kind,  external,  internal->{    _type,    "slug": slug.current,    brand,    brands  } } },  _type == "splitLayout" => {    "main": main[]{ _key, _type,   _type == "topStories" => {   linkLabel,  label,  "slides": slides[$brand == "clearview" || $brand in @->brands]->{   _id,  title,  "slug": slug.current,  brands,    "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title },  publishedAt,  excerpt,  "image": image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },  "category": category->{ title, "slug": slug.current } },  "articles": articles[$brand == "clearview" || $brand in @->brands]->{   _id,  title,  "slug": slug.current,  brands,    "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title },  publishedAt,  excerpt,  "image": image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },  "category": category->{ title, "slug": slug.current } },  "latest": *[    _type == "post"    && defined(slug.current)    && ($brand == "clearview" || $brand in brands)    && !(_id in coalesce(^.slides[]._ref, []))    && !(_id in coalesce(^.articles[]._ref, []))  ] | order(publishedAt desc)[0...6]{   _id,  title,  "slug": slug.current,  brands,    "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title },  publishedAt,  excerpt,  "image": image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },  "category": category->{ title, "slug": slug.current } } },  _type == "sponsoredContent" => {   label,  link{   label,    kind,  external,  internal->{    _type,    "slug": slug.current,    brand,    brands  } },  profileLabel,  "post": *[    _type == "post"    && _id == ^.post._ref    && defined(slug.current)    && defined(sponsor)    && ($brand == "clearview" || $brand in brands)  ][0]{      _id,  title,  "slug": slug.current,  brands,    "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title },  publishedAt,  excerpt,  "image": image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },  "category": category->{ title, "slug": slug.current },    "sponsor": sponsor->{      title,      "slug": slug.current,      "logo": logo{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) }    }  } },  _type == "postCards" => {     heading[]{ _key, style, children[]{ _key, text } },  link{   label,    kind,  external,  internal->{    _type,    "slug": slug.current,    brand,    brands  } },  "category": category->{ title, "slug": slug.current },  "posts": posts[$brand in @->brands]->{   _id,  title,  "slug": slug.current,  brands,    "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title },  publishedAt,  excerpt,  "image": image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },  "category": category->{ title, "slug": slug.current } },  "latest":   *[    _type == "post"    && defined(slug.current)    && $brand in brands    && defined(^.category._ref) && category._ref == ^.category._ref    && !(_id in coalesce(^.posts[]._ref, []))  ] | order(publishedAt desc)[0...6]{   _id,  title,  "slug": slug.current,  brands,    "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title },  publishedAt,  excerpt,  "image": image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },  "category": category->{ title, "slug": slug.current } } },  _type == "postBriefs" => {     heading[]{ _key, style, children[]{ _key, text } },  link{   label,    kind,  external,  internal->{    _type,    "slug": slug.current,    brand,    brands  } },  count,  "posts": posts[$brand in @->brands]->{     _id,  title,  "slug": slug.current,  brands,    "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title },  publishedAt,  excerpt,  "image": image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },  "category": category->{ title, "slug": slug.current },  "topic": primaryTopic->{ title },  briefText },  "latest":   *[    _type == "post"    && defined(slug.current)    && $brand in brands    && true    && !(_id in coalesce(^.posts[]._ref, []))  ] | order(publishedAt desc)[0...6]{     _id,  title,  "slug": slug.current,  brands,    "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title },  publishedAt,  excerpt,  "image": image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },  "category": category->{ title, "slug": slug.current },  "topic": primaryTopic->{ title },  briefText } },  _type == "weeklyRoundup" => {   heading[]{ _key, style, children[]{ _key, text } },  label,  title,  summary,  button{   label,    kind,  external,  internal->{    _type,    "slug": slug.current,    brand,    brands  } },  listLabel,  "posts": posts[$brand in @->brands]->{   _id,  title,  "slug": slug.current,  brands,    "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title },  publishedAt,  excerpt,  "image": image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },  "category": category->{ title, "slug": slug.current } },  "latest":   *[    _type == "post"    && defined(slug.current)    && $brand in brands    && true    && !(_id in coalesce(^.posts[]._ref, []))  ] | order(publishedAt desc)[0...8]{   _id,  title,  "slug": slug.current,  brands,    "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title },  publishedAt,  excerpt,  "image": image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },  "category": category->{ title, "slug": slug.current } } },  _type == "publications" => {   heading[]{ _key, style, children[]{ _key, text } },  body,  cards[]{    _key,    brand,    "brandTitle": *[_type == "brand" && key.current == ^.brand][0].title,    description,    image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },    linkLabel  } },  _type == "cta" => {   heading,  text,  link{ label, href } } },    "aside": aside[]{ _key, _type,   _type == "highlights" => {   source,  count,  heading[]{ _key, style, children[]{ _key, text } },  deadlineLabel,  "items": items[]->{   _id,  _type,  "slug": slug.current,  title,  category,  nominationsClosingDate,  startDate,  endDate,  country,  publishedAt },  "fill": select(  source == "awards" => [    ...*[      _type == "awardsProgramme"      && nominationsClosingDate >= $today      && !(_id in coalesce(^.items[]._ref, []))    ] | order(nominationsClosingDate asc)[0...5]{   _id,  _type,  "slug": slug.current,  title,  category,  nominationsClosingDate,  startDate,  endDate,  country,  publishedAt },    ...*[      _type == "awardsProgramme"      && !(defined(nominationsClosingDate) && nominationsClosingDate >= $today)      && startDate >= $today      && !(_id in coalesce(^.items[]._ref, []))    ] | order(startDate asc)[0...5]{   _id,  _type,  "slug": slug.current,  title,  category,  nominationsClosingDate,  startDate,  endDate,  country,  publishedAt },    ...*[      _type == "awardsProgramme"      && !(defined(nominationsClosingDate) && nominationsClosingDate >= $today)      && startDate < $today      && !(_id in coalesce(^.items[]._ref, []))    ] | order(startDate desc)[0...5]{   _id,  _type,  "slug": slug.current,  title,  category,  nominationsClosingDate,  startDate,  endDate,  country,  publishedAt }  ],  source == "events" => [    ...*[      _type == "conferenceEvent"      && coalesce(endDate, startDate) >= $today      && !(_id in coalesce(^.items[]._ref, []))    ] | order(startDate asc)[0...4]{   _id,  _type,  "slug": slug.current,  title,  category,  nominationsClosingDate,  startDate,  endDate,  country,  publishedAt },    ...*[      _type == "conferenceEvent"      && coalesce(endDate, startDate) < $today      && !(_id in coalesce(^.items[]._ref, []))    ] | order(startDate desc)[0...4]{   _id,  _type,  "slug": slug.current,  title,  category,  nominationsClosingDate,  startDate,  endDate,  country,  publishedAt }  ],  source == "research" => *[    _type == "resource"    && category == "research"    && !(_id in coalesce(^.items[]._ref, []))    && _id != coalesce(^.promo.resource._ref, "")  ] | order(defined(publishedAt) desc, publishedAt desc, legacyWpId desc)[0...3]{   _id,  _type,  "slug": slug.current,  title,  category,  nominationsClosingDate,  startDate,  endDate,  country,  publishedAt }),  button{   label,    kind,  external,  internal->{    _type,    "slug": slug.current,    brand,    brands  } },  promo{    resource->{      title,      "downloadThumbnail": downloadThumbnail{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },      "downloadFileUrl": downloadFile.asset->url,      "downloadFileName": downloadFile.asset->originalFilename,      downloadUrl    },    title,    description,    "image": image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },    link{   kind,  external,  internal->{    _type,    "slug": slug.current,    brand,    brands  } }  } },  _type == "awardsWinners" => { heading[]{ _key, style, children[]{ _key, text } } } }  } }  }
+// Query: *[_type == "page" && brand == $brand && slug.current == "home"][0]{    _id,    title,    blocks[]{ _key, _type,   _type == "topStories" => {   linkLabel,  label,  "slides": slides[$brand == "clearview" || $brand in @->brands]->{   _id,  title,  "slug": slug.current,  brands,    "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title },  publishedAt,  excerpt,  "image": image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },  "category": category->{ title, "slug": slug.current } },  "articles": articles[$brand == "clearview" || $brand in @->brands]->{   _id,  title,  "slug": slug.current,  brands,    "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title },  publishedAt,  excerpt,  "image": image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },  "category": category->{ title, "slug": slug.current } },  "latest": *[    _type == "post"    && defined(slug.current)    && ($brand == "clearview" || $brand in brands)    && !(_id in coalesce(^.slides[]._ref, []))    && !(_id in coalesce(^.articles[]._ref, []))  ] | order(publishedAt desc)[0...6]{   _id,  title,  "slug": slug.current,  brands,    "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title },  publishedAt,  excerpt,  "image": image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },  "category": category->{ title, "slug": slug.current } } },  _type == "publications" => {   heading[]{ _key, style, children[]{ _key, text } },  body,  cards[]{    _key,    brand,    "brandTitle": *[_type == "brand" && key.current == ^.brand][0].title,    description,    image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },    linkLabel  } },  _type == "cta" => {   heading,  text,  link{ label, href } },  _type == "highlights" => {   source,  layout,  count,  heading[]{ _key, style, children[]{ _key, text } },  deadlineLabel,  "items": items[]->{   _id,  _type,  "slug": slug.current,  title,  category,  nominationsClosingDate,  startDate,  endDate,  country,  publishedAt },  "fill": select(  source == "awards" => [    ...*[      _type == "awardsProgramme"      && nominationsClosingDate >= $today      && !(_id in coalesce(^.items[]._ref, []))    ] | order(nominationsClosingDate asc)[0...5]{   _id,  _type,  "slug": slug.current,  title,  category,  nominationsClosingDate,  startDate,  endDate,  country,  publishedAt },    ...*[      _type == "awardsProgramme"      && !(defined(nominationsClosingDate) && nominationsClosingDate >= $today)      && startDate >= $today      && !(_id in coalesce(^.items[]._ref, []))    ] | order(startDate asc)[0...5]{   _id,  _type,  "slug": slug.current,  title,  category,  nominationsClosingDate,  startDate,  endDate,  country,  publishedAt },    ...*[      _type == "awardsProgramme"      && !(defined(nominationsClosingDate) && nominationsClosingDate >= $today)      && startDate < $today      && !(_id in coalesce(^.items[]._ref, []))    ] | order(startDate desc)[0...5]{   _id,  _type,  "slug": slug.current,  title,  category,  nominationsClosingDate,  startDate,  endDate,  country,  publishedAt }  ],  source == "events" => [    ...*[      _type == "conferenceEvent"      && coalesce(endDate, startDate) >= $today      && !(_id in coalesce(^.items[]._ref, []))    ] | order(startDate asc)[0...4]{   _id,  _type,  "slug": slug.current,  title,  category,  nominationsClosingDate,  startDate,  endDate,  country,  publishedAt },    ...*[      _type == "conferenceEvent"      && coalesce(endDate, startDate) < $today      && !(_id in coalesce(^.items[]._ref, []))    ] | order(startDate desc)[0...4]{   _id,  _type,  "slug": slug.current,  title,  category,  nominationsClosingDate,  startDate,  endDate,  country,  publishedAt }  ],  source == "research" => *[    _type == "resource"    && category == "research"    && !(_id in coalesce(^.items[]._ref, []))    && _id != coalesce(^.promo.resource._ref, "")  ] | order(defined(publishedAt) desc, publishedAt desc, legacyWpId desc)[0...3]{   _id,  _type,  "slug": slug.current,  title,  category,  nominationsClosingDate,  startDate,  endDate,  country,  publishedAt }),  button{   label,    kind,  external,  internal->{    _type,    "slug": slug.current,    brand,    brands  } },  promo{    resource->{      title,      "downloadThumbnail": downloadThumbnail{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },      "downloadFileUrl": downloadFile.asset->url,      "downloadFileName": downloadFile.asset->originalFilename,      downloadUrl    },    title,    description,    "image": image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },    link{   kind,  external,  internal->{    _type,    "slug": slug.current,    brand,    brands  } }  } },  _type == "featuredStories" => {   heading[]{ _key, style, children[]{ _key, text } },  link{   label,    kind,  external,  internal->{    _type,    "slug": slug.current,    brand,    brands  } },  "posts": posts[]->{   _id,  title,  "slug": slug.current,  brands,    "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title },  publishedAt,  excerpt,  "image": image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },  "category": category->{ title, "slug": slug.current } } },  _type == "statsBar" => {   heading[]{ _key, style, children[]{ _key, text } },  items[]{ _key, icon, value, label } },  _type == "newsletterSignup" => {   heading[]{ _key, style, children[]{ _key, text } },  body,  preferencesLabel,  options[]{    _key,    label,    defaultChecked,    "interestKey": *[_type == "subscribeModal" && _id == "subscribe-modal-" + $brand][0].interests[attribute.name == ^.attribute.name][0]._key  },  emailPlaceholder,  buttonLabel,  invalidEmailMessage,  noOptionMessage,  image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) } },  _type == "sponsoredContent" => {   label,  link{   label,    kind,  external,  internal->{    _type,    "slug": slug.current,    brand,    brands  } },  profileLabel,  "post": *[    _type == "post"    && _id == ^.post._ref    && defined(slug.current)    && defined(sponsor)    && ($brand == "clearview" || $brand in brands)  ][0]{      _id,  title,  "slug": slug.current,  brands,    "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title },  publishedAt,  excerpt,  "image": image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },  "category": category->{ title, "slug": slug.current },    "sponsor": sponsor->{      title,      "slug": slug.current,      "logo": logo{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) }    }  } },  _type == "postCards" => {     heading[]{ _key, style, children[]{ _key, text } },  link{   label,    kind,  external,  internal->{    _type,    "slug": slug.current,    brand,    brands  } },  "category": category->{ title, "slug": slug.current },  "posts": posts[$brand in @->brands]->{   _id,  title,  "slug": slug.current,  brands,    "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title },  publishedAt,  excerpt,  "image": image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },  "category": category->{ title, "slug": slug.current } },  "latest":   *[    _type == "post"    && defined(slug.current)    && $brand in brands    && defined(^.category._ref) && category._ref == ^.category._ref    && !(_id in coalesce(^.posts[]._ref, []))  ] | order(publishedAt desc)[0...6]{   _id,  title,  "slug": slug.current,  brands,    "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title },  publishedAt,  excerpt,  "image": image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },  "category": category->{ title, "slug": slug.current } } },  _type == "postBriefs" => {     heading[]{ _key, style, children[]{ _key, text } },  link{   label,    kind,  external,  internal->{    _type,    "slug": slug.current,    brand,    brands  } },  count,  "posts": posts[$brand in @->brands]->{     _id,  title,  "slug": slug.current,  brands,    "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title },  publishedAt,  excerpt,  "image": image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },  "category": category->{ title, "slug": slug.current },  "topic": primaryTopic->{ title },  briefText },  "latest":   *[    _type == "post"    && defined(slug.current)    && $brand in brands    && true    && !(_id in coalesce(^.posts[]._ref, []))  ] | order(publishedAt desc)[0...6]{     _id,  title,  "slug": slug.current,  brands,    "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title },  publishedAt,  excerpt,  "image": image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },  "category": category->{ title, "slug": slug.current },  "topic": primaryTopic->{ title },  briefText } },  _type == "weeklyRoundup" => {   heading[]{ _key, style, children[]{ _key, text } },  label,  title,  summary,  button{   label,    kind,  external,  internal->{    _type,    "slug": slug.current,    brand,    brands  } },  listLabel,  "posts": posts[$brand in @->brands]->{   _id,  title,  "slug": slug.current,  brands,    "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title },  publishedAt,  excerpt,  "image": image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },  "category": category->{ title, "slug": slug.current } },  "latest":   *[    _type == "post"    && defined(slug.current)    && $brand in brands    && true    && !(_id in coalesce(^.posts[]._ref, []))  ] | order(publishedAt desc)[0...8]{   _id,  title,  "slug": slug.current,  brands,    "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title },  publishedAt,  excerpt,  "image": image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },  "category": category->{ title, "slug": slug.current } } },  _type == "topPicks" => {   heading[]{ _key, style, children[]{ _key, text } },  link{   label,    kind,  external,  internal->{    _type,    "slug": slug.current,    brand,    brands  } },  "posts": posts[$brand in @->brands]->{   _id,  title,  "slug": slug.current,  brands,    "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title },  publishedAt,  excerpt,  "image": image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },  "category": category->{ title, "slug": slug.current }, "sponsored": defined(sponsor) },  "fill": [    ...  *[    _type == "post"    && defined(slug.current)    && $brand in brands    && !defined(sponsor) && dateTime(publishedAt) >= dateTime($today + "T00:00:00Z") - 60*60*24*7    && !(_id in coalesce(^.posts[]._ref, []))  ] | order(publishedAt desc)[0...6]{   _id,  title,  "slug": slug.current,  brands,    "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title },  publishedAt,  excerpt,  "image": image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },  "category": category->{ title, "slug": slug.current } },    ...  *[    _type == "post"    && defined(slug.current)    && $brand in brands    && !defined(sponsor) && dateTime(publishedAt) < dateTime($today + "T00:00:00Z") - 60*60*24*7    && !(_id in coalesce(^.posts[]._ref, []))  ] | order(publishedAt desc)[0...6]{   _id,  title,  "slug": slug.current,  brands,    "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title },  publishedAt,  excerpt,  "image": image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },  "category": category->{ title, "slug": slug.current } }  ] },  _type == "exploreGrid" => {   cards[]{    _key,    heading[]{ _key, style, children[]{ _key, text } },    icon,    source,    count,    deadlineLabel,    button{   label,    kind,  external,  internal->{    _type,    "slug": slug.current,    brand,    brands  } },    "items": items[@->_type != "post" || $brand in @->brands]->{   _type == "post" => { _type,   _id,  title,  "slug": slug.current,  brands,    "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title },  publishedAt,  excerpt,  "image": image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },  "category": category->{ title, "slug": slug.current } },  _type != "post" => {   _id,  _type,  "slug": slug.current,  title,  category,  nominationsClosingDate,  startDate,  endDate,  country,  publishedAt } },    "fill": select(      source == "posts" =>   *[    _type == "post"    && defined(slug.current)    && $brand in brands    && defined(^.category._ref) && category._ref == ^.category._ref    && !(_id in coalesce(^.items[]._ref, []))  ] | order(publishedAt desc)[0...6]{ _type,   _id,  title,  "slug": slug.current,  brands,    "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title },  publishedAt,  excerpt,  "image": image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },  "category": category->{ title, "slug": slug.current } },        source == "awards" => [    ...*[      _type == "awardsProgramme"      && nominationsClosingDate >= $today      && !(_id in coalesce(^.items[]._ref, []))    ] | order(nominationsClosingDate asc)[0...5]{   _id,  _type,  "slug": slug.current,  title,  category,  nominationsClosingDate,  startDate,  endDate,  country,  publishedAt },    ...*[      _type == "awardsProgramme"      && !(defined(nominationsClosingDate) && nominationsClosingDate >= $today)      && startDate >= $today      && !(_id in coalesce(^.items[]._ref, []))    ] | order(startDate asc)[0...5]{   _id,  _type,  "slug": slug.current,  title,  category,  nominationsClosingDate,  startDate,  endDate,  country,  publishedAt },    ...*[      _type == "awardsProgramme"      && !(defined(nominationsClosingDate) && nominationsClosingDate >= $today)      && startDate < $today      && !(_id in coalesce(^.items[]._ref, []))    ] | order(startDate desc)[0...5]{   _id,  _type,  "slug": slug.current,  title,  category,  nominationsClosingDate,  startDate,  endDate,  country,  publishedAt }  ],  source == "events" => [    ...*[      _type == "conferenceEvent"      && coalesce(endDate, startDate) >= $today      && !(_id in coalesce(^.items[]._ref, []))    ] | order(startDate asc)[0...4]{   _id,  _type,  "slug": slug.current,  title,  category,  nominationsClosingDate,  startDate,  endDate,  country,  publishedAt },    ...*[      _type == "conferenceEvent"      && coalesce(endDate, startDate) < $today      && !(_id in coalesce(^.items[]._ref, []))    ] | order(startDate desc)[0...4]{   _id,  _type,  "slug": slug.current,  title,  category,  nominationsClosingDate,  startDate,  endDate,  country,  publishedAt }  ],  source == "research" => *[    _type == "resource"    && category == "research"    && !(_id in coalesce(^.items[]._ref, []))    && _id != coalesce(^.promo.resource._ref, "")  ] | order(defined(publishedAt) desc, publishedAt desc, legacyWpId desc)[0...3]{   _id,  _type,  "slug": slug.current,  title,  category,  nominationsClosingDate,  startDate,  endDate,  country,  publishedAt }    )  } },  _type == "subscribeBanner" => {   heading[]{ _key, style, children[]{ _key, text } },  description,  buttonLabel,  cta{   label,    kind,  external,  internal->{    _type,    "slug": slug.current,    brand,    brands  } } },  _type == "splitLayout" => {    "main": main[]{ _key, _type,   _type == "topStories" => {   linkLabel,  label,  "slides": slides[$brand == "clearview" || $brand in @->brands]->{   _id,  title,  "slug": slug.current,  brands,    "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title },  publishedAt,  excerpt,  "image": image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },  "category": category->{ title, "slug": slug.current } },  "articles": articles[$brand == "clearview" || $brand in @->brands]->{   _id,  title,  "slug": slug.current,  brands,    "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title },  publishedAt,  excerpt,  "image": image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },  "category": category->{ title, "slug": slug.current } },  "latest": *[    _type == "post"    && defined(slug.current)    && ($brand == "clearview" || $brand in brands)    && !(_id in coalesce(^.slides[]._ref, []))    && !(_id in coalesce(^.articles[]._ref, []))  ] | order(publishedAt desc)[0...6]{   _id,  title,  "slug": slug.current,  brands,    "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title },  publishedAt,  excerpt,  "image": image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },  "category": category->{ title, "slug": slug.current } } },  _type == "sponsoredContent" => {   label,  link{   label,    kind,  external,  internal->{    _type,    "slug": slug.current,    brand,    brands  } },  profileLabel,  "post": *[    _type == "post"    && _id == ^.post._ref    && defined(slug.current)    && defined(sponsor)    && ($brand == "clearview" || $brand in brands)  ][0]{      _id,  title,  "slug": slug.current,  brands,    "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title },  publishedAt,  excerpt,  "image": image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },  "category": category->{ title, "slug": slug.current },    "sponsor": sponsor->{      title,      "slug": slug.current,      "logo": logo{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) }    }  } },  _type == "postCards" => {     heading[]{ _key, style, children[]{ _key, text } },  link{   label,    kind,  external,  internal->{    _type,    "slug": slug.current,    brand,    brands  } },  "category": category->{ title, "slug": slug.current },  "posts": posts[$brand in @->brands]->{   _id,  title,  "slug": slug.current,  brands,    "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title },  publishedAt,  excerpt,  "image": image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },  "category": category->{ title, "slug": slug.current } },  "latest":   *[    _type == "post"    && defined(slug.current)    && $brand in brands    && defined(^.category._ref) && category._ref == ^.category._ref    && !(_id in coalesce(^.posts[]._ref, []))  ] | order(publishedAt desc)[0...6]{   _id,  title,  "slug": slug.current,  brands,    "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title },  publishedAt,  excerpt,  "image": image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },  "category": category->{ title, "slug": slug.current } } },  _type == "postBriefs" => {     heading[]{ _key, style, children[]{ _key, text } },  link{   label,    kind,  external,  internal->{    _type,    "slug": slug.current,    brand,    brands  } },  count,  "posts": posts[$brand in @->brands]->{     _id,  title,  "slug": slug.current,  brands,    "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title },  publishedAt,  excerpt,  "image": image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },  "category": category->{ title, "slug": slug.current },  "topic": primaryTopic->{ title },  briefText },  "latest":   *[    _type == "post"    && defined(slug.current)    && $brand in brands    && true    && !(_id in coalesce(^.posts[]._ref, []))  ] | order(publishedAt desc)[0...6]{     _id,  title,  "slug": slug.current,  brands,    "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title },  publishedAt,  excerpt,  "image": image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },  "category": category->{ title, "slug": slug.current },  "topic": primaryTopic->{ title },  briefText } },  _type == "weeklyRoundup" => {   heading[]{ _key, style, children[]{ _key, text } },  label,  title,  summary,  button{   label,    kind,  external,  internal->{    _type,    "slug": slug.current,    brand,    brands  } },  listLabel,  "posts": posts[$brand in @->brands]->{   _id,  title,  "slug": slug.current,  brands,    "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title },  publishedAt,  excerpt,  "image": image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },  "category": category->{ title, "slug": slug.current } },  "latest":   *[    _type == "post"    && defined(slug.current)    && $brand in brands    && true    && !(_id in coalesce(^.posts[]._ref, []))  ] | order(publishedAt desc)[0...8]{   _id,  title,  "slug": slug.current,  brands,    "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title },  publishedAt,  excerpt,  "image": image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },  "category": category->{ title, "slug": slug.current } } },  _type == "publications" => {   heading[]{ _key, style, children[]{ _key, text } },  body,  cards[]{    _key,    brand,    "brandTitle": *[_type == "brand" && key.current == ^.brand][0].title,    description,    image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },    linkLabel  } },  _type == "cta" => {   heading,  text,  link{ label, href } },  _type == "pageHero" => {   breadcrumbHomeLabel,  breadcrumbLabel,  title,  intro },  _type == "recordListing" => {   awardsTabLabel,  eventsTabLabel,  researchTabLabel,  regionFilterLabel,  regionEuropeLabel,  regionMenaLabel,  regionAsiaLabel,  regionNorthAmericaLabel,  yearFilterLabel,  statusFilterLabel,  allOptionLabel,  clearFiltersLabel,  upcomingEventLabel,  pastEventLabel,  publishedLabel,  emptyHeading,  emptyText,  emptyAwardNoun,  emptyEventNoun,  emptyResearchNoun,  emptyButtonLabel,  previousLabel,  nextLabel } },    "aside": aside[]{ _key, _type,   _type == "highlights" => {   source,  layout,  count,  heading[]{ _key, style, children[]{ _key, text } },  deadlineLabel,  "items": items[]->{   _id,  _type,  "slug": slug.current,  title,  category,  nominationsClosingDate,  startDate,  endDate,  country,  publishedAt },  "fill": select(  source == "awards" => [    ...*[      _type == "awardsProgramme"      && nominationsClosingDate >= $today      && !(_id in coalesce(^.items[]._ref, []))    ] | order(nominationsClosingDate asc)[0...5]{   _id,  _type,  "slug": slug.current,  title,  category,  nominationsClosingDate,  startDate,  endDate,  country,  publishedAt },    ...*[      _type == "awardsProgramme"      && !(defined(nominationsClosingDate) && nominationsClosingDate >= $today)      && startDate >= $today      && !(_id in coalesce(^.items[]._ref, []))    ] | order(startDate asc)[0...5]{   _id,  _type,  "slug": slug.current,  title,  category,  nominationsClosingDate,  startDate,  endDate,  country,  publishedAt },    ...*[      _type == "awardsProgramme"      && !(defined(nominationsClosingDate) && nominationsClosingDate >= $today)      && startDate < $today      && !(_id in coalesce(^.items[]._ref, []))    ] | order(startDate desc)[0...5]{   _id,  _type,  "slug": slug.current,  title,  category,  nominationsClosingDate,  startDate,  endDate,  country,  publishedAt }  ],  source == "events" => [    ...*[      _type == "conferenceEvent"      && coalesce(endDate, startDate) >= $today      && !(_id in coalesce(^.items[]._ref, []))    ] | order(startDate asc)[0...4]{   _id,  _type,  "slug": slug.current,  title,  category,  nominationsClosingDate,  startDate,  endDate,  country,  publishedAt },    ...*[      _type == "conferenceEvent"      && coalesce(endDate, startDate) < $today      && !(_id in coalesce(^.items[]._ref, []))    ] | order(startDate desc)[0...4]{   _id,  _type,  "slug": slug.current,  title,  category,  nominationsClosingDate,  startDate,  endDate,  country,  publishedAt }  ],  source == "research" => *[    _type == "resource"    && category == "research"    && !(_id in coalesce(^.items[]._ref, []))    && _id != coalesce(^.promo.resource._ref, "")  ] | order(defined(publishedAt) desc, publishedAt desc, legacyWpId desc)[0...3]{   _id,  _type,  "slug": slug.current,  title,  category,  nominationsClosingDate,  startDate,  endDate,  country,  publishedAt }),  button{   label,    kind,  external,  internal->{    _type,    "slug": slug.current,    brand,    brands  } },  promo{    resource->{      title,      "downloadThumbnail": downloadThumbnail{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },      "downloadFileUrl": downloadFile.asset->url,      "downloadFileName": downloadFile.asset->originalFilename,      downloadUrl    },    title,    description,    "image": image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },    link{   kind,  external,  internal->{    _type,    "slug": slug.current,    brand,    brands  } }  } },  _type == "awardsWinners" => { heading[]{ _key, style, children[]{ _key, text } } } }  } },    blocksMiddle[]{ _key, _type,   _type == "topStories" => {   linkLabel,  label,  "slides": slides[$brand == "clearview" || $brand in @->brands]->{   _id,  title,  "slug": slug.current,  brands,    "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title },  publishedAt,  excerpt,  "image": image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },  "category": category->{ title, "slug": slug.current } },  "articles": articles[$brand == "clearview" || $brand in @->brands]->{   _id,  title,  "slug": slug.current,  brands,    "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title },  publishedAt,  excerpt,  "image": image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },  "category": category->{ title, "slug": slug.current } },  "latest": *[    _type == "post"    && defined(slug.current)    && ($brand == "clearview" || $brand in brands)    && !(_id in coalesce(^.slides[]._ref, []))    && !(_id in coalesce(^.articles[]._ref, []))  ] | order(publishedAt desc)[0...6]{   _id,  title,  "slug": slug.current,  brands,    "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title },  publishedAt,  excerpt,  "image": image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },  "category": category->{ title, "slug": slug.current } } },  _type == "publications" => {   heading[]{ _key, style, children[]{ _key, text } },  body,  cards[]{    _key,    brand,    "brandTitle": *[_type == "brand" && key.current == ^.brand][0].title,    description,    image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },    linkLabel  } },  _type == "cta" => {   heading,  text,  link{ label, href } },  _type == "highlights" => {   source,  layout,  count,  heading[]{ _key, style, children[]{ _key, text } },  deadlineLabel,  "items": items[]->{   _id,  _type,  "slug": slug.current,  title,  category,  nominationsClosingDate,  startDate,  endDate,  country,  publishedAt },  "fill": select(  source == "awards" => [    ...*[      _type == "awardsProgramme"      && nominationsClosingDate >= $today      && !(_id in coalesce(^.items[]._ref, []))    ] | order(nominationsClosingDate asc)[0...5]{   _id,  _type,  "slug": slug.current,  title,  category,  nominationsClosingDate,  startDate,  endDate,  country,  publishedAt },    ...*[      _type == "awardsProgramme"      && !(defined(nominationsClosingDate) && nominationsClosingDate >= $today)      && startDate >= $today      && !(_id in coalesce(^.items[]._ref, []))    ] | order(startDate asc)[0...5]{   _id,  _type,  "slug": slug.current,  title,  category,  nominationsClosingDate,  startDate,  endDate,  country,  publishedAt },    ...*[      _type == "awardsProgramme"      && !(defined(nominationsClosingDate) && nominationsClosingDate >= $today)      && startDate < $today      && !(_id in coalesce(^.items[]._ref, []))    ] | order(startDate desc)[0...5]{   _id,  _type,  "slug": slug.current,  title,  category,  nominationsClosingDate,  startDate,  endDate,  country,  publishedAt }  ],  source == "events" => [    ...*[      _type == "conferenceEvent"      && coalesce(endDate, startDate) >= $today      && !(_id in coalesce(^.items[]._ref, []))    ] | order(startDate asc)[0...4]{   _id,  _type,  "slug": slug.current,  title,  category,  nominationsClosingDate,  startDate,  endDate,  country,  publishedAt },    ...*[      _type == "conferenceEvent"      && coalesce(endDate, startDate) < $today      && !(_id in coalesce(^.items[]._ref, []))    ] | order(startDate desc)[0...4]{   _id,  _type,  "slug": slug.current,  title,  category,  nominationsClosingDate,  startDate,  endDate,  country,  publishedAt }  ],  source == "research" => *[    _type == "resource"    && category == "research"    && !(_id in coalesce(^.items[]._ref, []))    && _id != coalesce(^.promo.resource._ref, "")  ] | order(defined(publishedAt) desc, publishedAt desc, legacyWpId desc)[0...3]{   _id,  _type,  "slug": slug.current,  title,  category,  nominationsClosingDate,  startDate,  endDate,  country,  publishedAt }),  button{   label,    kind,  external,  internal->{    _type,    "slug": slug.current,    brand,    brands  } },  promo{    resource->{      title,      "downloadThumbnail": downloadThumbnail{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },      "downloadFileUrl": downloadFile.asset->url,      "downloadFileName": downloadFile.asset->originalFilename,      downloadUrl    },    title,    description,    "image": image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },    link{   kind,  external,  internal->{    _type,    "slug": slug.current,    brand,    brands  } }  } },  _type == "featuredStories" => {   heading[]{ _key, style, children[]{ _key, text } },  link{   label,    kind,  external,  internal->{    _type,    "slug": slug.current,    brand,    brands  } },  "posts": posts[]->{   _id,  title,  "slug": slug.current,  brands,    "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title },  publishedAt,  excerpt,  "image": image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },  "category": category->{ title, "slug": slug.current } } },  _type == "statsBar" => {   heading[]{ _key, style, children[]{ _key, text } },  items[]{ _key, icon, value, label } },  _type == "newsletterSignup" => {   heading[]{ _key, style, children[]{ _key, text } },  body,  preferencesLabel,  options[]{    _key,    label,    defaultChecked,    "interestKey": *[_type == "subscribeModal" && _id == "subscribe-modal-" + $brand][0].interests[attribute.name == ^.attribute.name][0]._key  },  emailPlaceholder,  buttonLabel,  invalidEmailMessage,  noOptionMessage,  image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) } },  _type == "sponsoredContent" => {   label,  link{   label,    kind,  external,  internal->{    _type,    "slug": slug.current,    brand,    brands  } },  profileLabel,  "post": *[    _type == "post"    && _id == ^.post._ref    && defined(slug.current)    && defined(sponsor)    && ($brand == "clearview" || $brand in brands)  ][0]{      _id,  title,  "slug": slug.current,  brands,    "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title },  publishedAt,  excerpt,  "image": image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },  "category": category->{ title, "slug": slug.current },    "sponsor": sponsor->{      title,      "slug": slug.current,      "logo": logo{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) }    }  } },  _type == "postCards" => {     heading[]{ _key, style, children[]{ _key, text } },  link{   label,    kind,  external,  internal->{    _type,    "slug": slug.current,    brand,    brands  } },  "category": category->{ title, "slug": slug.current },  "posts": posts[$brand in @->brands]->{   _id,  title,  "slug": slug.current,  brands,    "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title },  publishedAt,  excerpt,  "image": image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },  "category": category->{ title, "slug": slug.current } },  "latest":   *[    _type == "post"    && defined(slug.current)    && $brand in brands    && defined(^.category._ref) && category._ref == ^.category._ref    && !(_id in coalesce(^.posts[]._ref, []))  ] | order(publishedAt desc)[0...6]{   _id,  title,  "slug": slug.current,  brands,    "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title },  publishedAt,  excerpt,  "image": image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },  "category": category->{ title, "slug": slug.current } } },  _type == "postBriefs" => {     heading[]{ _key, style, children[]{ _key, text } },  link{   label,    kind,  external,  internal->{    _type,    "slug": slug.current,    brand,    brands  } },  count,  "posts": posts[$brand in @->brands]->{     _id,  title,  "slug": slug.current,  brands,    "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title },  publishedAt,  excerpt,  "image": image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },  "category": category->{ title, "slug": slug.current },  "topic": primaryTopic->{ title },  briefText },  "latest":   *[    _type == "post"    && defined(slug.current)    && $brand in brands    && true    && !(_id in coalesce(^.posts[]._ref, []))  ] | order(publishedAt desc)[0...6]{     _id,  title,  "slug": slug.current,  brands,    "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title },  publishedAt,  excerpt,  "image": image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },  "category": category->{ title, "slug": slug.current },  "topic": primaryTopic->{ title },  briefText } },  _type == "weeklyRoundup" => {   heading[]{ _key, style, children[]{ _key, text } },  label,  title,  summary,  button{   label,    kind,  external,  internal->{    _type,    "slug": slug.current,    brand,    brands  } },  listLabel,  "posts": posts[$brand in @->brands]->{   _id,  title,  "slug": slug.current,  brands,    "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title },  publishedAt,  excerpt,  "image": image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },  "category": category->{ title, "slug": slug.current } },  "latest":   *[    _type == "post"    && defined(slug.current)    && $brand in brands    && true    && !(_id in coalesce(^.posts[]._ref, []))  ] | order(publishedAt desc)[0...8]{   _id,  title,  "slug": slug.current,  brands,    "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title },  publishedAt,  excerpt,  "image": image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },  "category": category->{ title, "slug": slug.current } } },  _type == "topPicks" => {   heading[]{ _key, style, children[]{ _key, text } },  link{   label,    kind,  external,  internal->{    _type,    "slug": slug.current,    brand,    brands  } },  "posts": posts[$brand in @->brands]->{   _id,  title,  "slug": slug.current,  brands,    "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title },  publishedAt,  excerpt,  "image": image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },  "category": category->{ title, "slug": slug.current }, "sponsored": defined(sponsor) },  "fill": [    ...  *[    _type == "post"    && defined(slug.current)    && $brand in brands    && !defined(sponsor) && dateTime(publishedAt) >= dateTime($today + "T00:00:00Z") - 60*60*24*7    && !(_id in coalesce(^.posts[]._ref, []))  ] | order(publishedAt desc)[0...6]{   _id,  title,  "slug": slug.current,  brands,    "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title },  publishedAt,  excerpt,  "image": image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },  "category": category->{ title, "slug": slug.current } },    ...  *[    _type == "post"    && defined(slug.current)    && $brand in brands    && !defined(sponsor) && dateTime(publishedAt) < dateTime($today + "T00:00:00Z") - 60*60*24*7    && !(_id in coalesce(^.posts[]._ref, []))  ] | order(publishedAt desc)[0...6]{   _id,  title,  "slug": slug.current,  brands,    "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title },  publishedAt,  excerpt,  "image": image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },  "category": category->{ title, "slug": slug.current } }  ] },  _type == "exploreGrid" => {   cards[]{    _key,    heading[]{ _key, style, children[]{ _key, text } },    icon,    source,    count,    deadlineLabel,    button{   label,    kind,  external,  internal->{    _type,    "slug": slug.current,    brand,    brands  } },    "items": items[@->_type != "post" || $brand in @->brands]->{   _type == "post" => { _type,   _id,  title,  "slug": slug.current,  brands,    "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title },  publishedAt,  excerpt,  "image": image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },  "category": category->{ title, "slug": slug.current } },  _type != "post" => {   _id,  _type,  "slug": slug.current,  title,  category,  nominationsClosingDate,  startDate,  endDate,  country,  publishedAt } },    "fill": select(      source == "posts" =>   *[    _type == "post"    && defined(slug.current)    && $brand in brands    && defined(^.category._ref) && category._ref == ^.category._ref    && !(_id in coalesce(^.items[]._ref, []))  ] | order(publishedAt desc)[0...6]{ _type,   _id,  title,  "slug": slug.current,  brands,    "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title },  publishedAt,  excerpt,  "image": image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },  "category": category->{ title, "slug": slug.current } },        source == "awards" => [    ...*[      _type == "awardsProgramme"      && nominationsClosingDate >= $today      && !(_id in coalesce(^.items[]._ref, []))    ] | order(nominationsClosingDate asc)[0...5]{   _id,  _type,  "slug": slug.current,  title,  category,  nominationsClosingDate,  startDate,  endDate,  country,  publishedAt },    ...*[      _type == "awardsProgramme"      && !(defined(nominationsClosingDate) && nominationsClosingDate >= $today)      && startDate >= $today      && !(_id in coalesce(^.items[]._ref, []))    ] | order(startDate asc)[0...5]{   _id,  _type,  "slug": slug.current,  title,  category,  nominationsClosingDate,  startDate,  endDate,  country,  publishedAt },    ...*[      _type == "awardsProgramme"      && !(defined(nominationsClosingDate) && nominationsClosingDate >= $today)      && startDate < $today      && !(_id in coalesce(^.items[]._ref, []))    ] | order(startDate desc)[0...5]{   _id,  _type,  "slug": slug.current,  title,  category,  nominationsClosingDate,  startDate,  endDate,  country,  publishedAt }  ],  source == "events" => [    ...*[      _type == "conferenceEvent"      && coalesce(endDate, startDate) >= $today      && !(_id in coalesce(^.items[]._ref, []))    ] | order(startDate asc)[0...4]{   _id,  _type,  "slug": slug.current,  title,  category,  nominationsClosingDate,  startDate,  endDate,  country,  publishedAt },    ...*[      _type == "conferenceEvent"      && coalesce(endDate, startDate) < $today      && !(_id in coalesce(^.items[]._ref, []))    ] | order(startDate desc)[0...4]{   _id,  _type,  "slug": slug.current,  title,  category,  nominationsClosingDate,  startDate,  endDate,  country,  publishedAt }  ],  source == "research" => *[    _type == "resource"    && category == "research"    && !(_id in coalesce(^.items[]._ref, []))    && _id != coalesce(^.promo.resource._ref, "")  ] | order(defined(publishedAt) desc, publishedAt desc, legacyWpId desc)[0...3]{   _id,  _type,  "slug": slug.current,  title,  category,  nominationsClosingDate,  startDate,  endDate,  country,  publishedAt }    )  } },  _type == "subscribeBanner" => {   heading[]{ _key, style, children[]{ _key, text } },  description,  buttonLabel,  cta{   label,    kind,  external,  internal->{    _type,    "slug": slug.current,    brand,    brands  } } },  _type == "splitLayout" => {    "main": main[]{ _key, _type,   _type == "topStories" => {   linkLabel,  label,  "slides": slides[$brand == "clearview" || $brand in @->brands]->{   _id,  title,  "slug": slug.current,  brands,    "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title },  publishedAt,  excerpt,  "image": image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },  "category": category->{ title, "slug": slug.current } },  "articles": articles[$brand == "clearview" || $brand in @->brands]->{   _id,  title,  "slug": slug.current,  brands,    "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title },  publishedAt,  excerpt,  "image": image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },  "category": category->{ title, "slug": slug.current } },  "latest": *[    _type == "post"    && defined(slug.current)    && ($brand == "clearview" || $brand in brands)    && !(_id in coalesce(^.slides[]._ref, []))    && !(_id in coalesce(^.articles[]._ref, []))  ] | order(publishedAt desc)[0...6]{   _id,  title,  "slug": slug.current,  brands,    "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title },  publishedAt,  excerpt,  "image": image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },  "category": category->{ title, "slug": slug.current } } },  _type == "sponsoredContent" => {   label,  link{   label,    kind,  external,  internal->{    _type,    "slug": slug.current,    brand,    brands  } },  profileLabel,  "post": *[    _type == "post"    && _id == ^.post._ref    && defined(slug.current)    && defined(sponsor)    && ($brand == "clearview" || $brand in brands)  ][0]{      _id,  title,  "slug": slug.current,  brands,    "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title },  publishedAt,  excerpt,  "image": image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },  "category": category->{ title, "slug": slug.current },    "sponsor": sponsor->{      title,      "slug": slug.current,      "logo": logo{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) }    }  } },  _type == "postCards" => {     heading[]{ _key, style, children[]{ _key, text } },  link{   label,    kind,  external,  internal->{    _type,    "slug": slug.current,    brand,    brands  } },  "category": category->{ title, "slug": slug.current },  "posts": posts[$brand in @->brands]->{   _id,  title,  "slug": slug.current,  brands,    "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title },  publishedAt,  excerpt,  "image": image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },  "category": category->{ title, "slug": slug.current } },  "latest":   *[    _type == "post"    && defined(slug.current)    && $brand in brands    && defined(^.category._ref) && category._ref == ^.category._ref    && !(_id in coalesce(^.posts[]._ref, []))  ] | order(publishedAt desc)[0...6]{   _id,  title,  "slug": slug.current,  brands,    "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title },  publishedAt,  excerpt,  "image": image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },  "category": category->{ title, "slug": slug.current } } },  _type == "postBriefs" => {     heading[]{ _key, style, children[]{ _key, text } },  link{   label,    kind,  external,  internal->{    _type,    "slug": slug.current,    brand,    brands  } },  count,  "posts": posts[$brand in @->brands]->{     _id,  title,  "slug": slug.current,  brands,    "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title },  publishedAt,  excerpt,  "image": image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },  "category": category->{ title, "slug": slug.current },  "topic": primaryTopic->{ title },  briefText },  "latest":   *[    _type == "post"    && defined(slug.current)    && $brand in brands    && true    && !(_id in coalesce(^.posts[]._ref, []))  ] | order(publishedAt desc)[0...6]{     _id,  title,  "slug": slug.current,  brands,    "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title },  publishedAt,  excerpt,  "image": image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },  "category": category->{ title, "slug": slug.current },  "topic": primaryTopic->{ title },  briefText } },  _type == "weeklyRoundup" => {   heading[]{ _key, style, children[]{ _key, text } },  label,  title,  summary,  button{   label,    kind,  external,  internal->{    _type,    "slug": slug.current,    brand,    brands  } },  listLabel,  "posts": posts[$brand in @->brands]->{   _id,  title,  "slug": slug.current,  brands,    "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title },  publishedAt,  excerpt,  "image": image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },  "category": category->{ title, "slug": slug.current } },  "latest":   *[    _type == "post"    && defined(slug.current)    && $brand in brands    && true    && !(_id in coalesce(^.posts[]._ref, []))  ] | order(publishedAt desc)[0...8]{   _id,  title,  "slug": slug.current,  brands,    "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title },  publishedAt,  excerpt,  "image": image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },  "category": category->{ title, "slug": slug.current } } },  _type == "publications" => {   heading[]{ _key, style, children[]{ _key, text } },  body,  cards[]{    _key,    brand,    "brandTitle": *[_type == "brand" && key.current == ^.brand][0].title,    description,    image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },    linkLabel  } },  _type == "cta" => {   heading,  text,  link{ label, href } },  _type == "pageHero" => {   breadcrumbHomeLabel,  breadcrumbLabel,  title,  intro },  _type == "recordListing" => {   awardsTabLabel,  eventsTabLabel,  researchTabLabel,  regionFilterLabel,  regionEuropeLabel,  regionMenaLabel,  regionAsiaLabel,  regionNorthAmericaLabel,  yearFilterLabel,  statusFilterLabel,  allOptionLabel,  clearFiltersLabel,  upcomingEventLabel,  pastEventLabel,  publishedLabel,  emptyHeading,  emptyText,  emptyAwardNoun,  emptyEventNoun,  emptyResearchNoun,  emptyButtonLabel,  previousLabel,  nextLabel } },    "aside": aside[]{ _key, _type,   _type == "highlights" => {   source,  layout,  count,  heading[]{ _key, style, children[]{ _key, text } },  deadlineLabel,  "items": items[]->{   _id,  _type,  "slug": slug.current,  title,  category,  nominationsClosingDate,  startDate,  endDate,  country,  publishedAt },  "fill": select(  source == "awards" => [    ...*[      _type == "awardsProgramme"      && nominationsClosingDate >= $today      && !(_id in coalesce(^.items[]._ref, []))    ] | order(nominationsClosingDate asc)[0...5]{   _id,  _type,  "slug": slug.current,  title,  category,  nominationsClosingDate,  startDate,  endDate,  country,  publishedAt },    ...*[      _type == "awardsProgramme"      && !(defined(nominationsClosingDate) && nominationsClosingDate >= $today)      && startDate >= $today      && !(_id in coalesce(^.items[]._ref, []))    ] | order(startDate asc)[0...5]{   _id,  _type,  "slug": slug.current,  title,  category,  nominationsClosingDate,  startDate,  endDate,  country,  publishedAt },    ...*[      _type == "awardsProgramme"      && !(defined(nominationsClosingDate) && nominationsClosingDate >= $today)      && startDate < $today      && !(_id in coalesce(^.items[]._ref, []))    ] | order(startDate desc)[0...5]{   _id,  _type,  "slug": slug.current,  title,  category,  nominationsClosingDate,  startDate,  endDate,  country,  publishedAt }  ],  source == "events" => [    ...*[      _type == "conferenceEvent"      && coalesce(endDate, startDate) >= $today      && !(_id in coalesce(^.items[]._ref, []))    ] | order(startDate asc)[0...4]{   _id,  _type,  "slug": slug.current,  title,  category,  nominationsClosingDate,  startDate,  endDate,  country,  publishedAt },    ...*[      _type == "conferenceEvent"      && coalesce(endDate, startDate) < $today      && !(_id in coalesce(^.items[]._ref, []))    ] | order(startDate desc)[0...4]{   _id,  _type,  "slug": slug.current,  title,  category,  nominationsClosingDate,  startDate,  endDate,  country,  publishedAt }  ],  source == "research" => *[    _type == "resource"    && category == "research"    && !(_id in coalesce(^.items[]._ref, []))    && _id != coalesce(^.promo.resource._ref, "")  ] | order(defined(publishedAt) desc, publishedAt desc, legacyWpId desc)[0...3]{   _id,  _type,  "slug": slug.current,  title,  category,  nominationsClosingDate,  startDate,  endDate,  country,  publishedAt }),  button{   label,    kind,  external,  internal->{    _type,    "slug": slug.current,    brand,    brands  } },  promo{    resource->{      title,      "downloadThumbnail": downloadThumbnail{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },      "downloadFileUrl": downloadFile.asset->url,      "downloadFileName": downloadFile.asset->originalFilename,      downloadUrl    },    title,    description,    "image": image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },    link{   kind,  external,  internal->{    _type,    "slug": slug.current,    brand,    brands  } }  } },  _type == "awardsWinners" => { heading[]{ _key, style, children[]{ _key, text } } } }  } },    blocksBottom[]{ _key, _type,   _type == "topStories" => {   linkLabel,  label,  "slides": slides[$brand == "clearview" || $brand in @->brands]->{   _id,  title,  "slug": slug.current,  brands,    "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title },  publishedAt,  excerpt,  "image": image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },  "category": category->{ title, "slug": slug.current } },  "articles": articles[$brand == "clearview" || $brand in @->brands]->{   _id,  title,  "slug": slug.current,  brands,    "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title },  publishedAt,  excerpt,  "image": image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },  "category": category->{ title, "slug": slug.current } },  "latest": *[    _type == "post"    && defined(slug.current)    && ($brand == "clearview" || $brand in brands)    && !(_id in coalesce(^.slides[]._ref, []))    && !(_id in coalesce(^.articles[]._ref, []))  ] | order(publishedAt desc)[0...6]{   _id,  title,  "slug": slug.current,  brands,    "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title },  publishedAt,  excerpt,  "image": image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },  "category": category->{ title, "slug": slug.current } } },  _type == "publications" => {   heading[]{ _key, style, children[]{ _key, text } },  body,  cards[]{    _key,    brand,    "brandTitle": *[_type == "brand" && key.current == ^.brand][0].title,    description,    image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },    linkLabel  } },  _type == "cta" => {   heading,  text,  link{ label, href } },  _type == "highlights" => {   source,  layout,  count,  heading[]{ _key, style, children[]{ _key, text } },  deadlineLabel,  "items": items[]->{   _id,  _type,  "slug": slug.current,  title,  category,  nominationsClosingDate,  startDate,  endDate,  country,  publishedAt },  "fill": select(  source == "awards" => [    ...*[      _type == "awardsProgramme"      && nominationsClosingDate >= $today      && !(_id in coalesce(^.items[]._ref, []))    ] | order(nominationsClosingDate asc)[0...5]{   _id,  _type,  "slug": slug.current,  title,  category,  nominationsClosingDate,  startDate,  endDate,  country,  publishedAt },    ...*[      _type == "awardsProgramme"      && !(defined(nominationsClosingDate) && nominationsClosingDate >= $today)      && startDate >= $today      && !(_id in coalesce(^.items[]._ref, []))    ] | order(startDate asc)[0...5]{   _id,  _type,  "slug": slug.current,  title,  category,  nominationsClosingDate,  startDate,  endDate,  country,  publishedAt },    ...*[      _type == "awardsProgramme"      && !(defined(nominationsClosingDate) && nominationsClosingDate >= $today)      && startDate < $today      && !(_id in coalesce(^.items[]._ref, []))    ] | order(startDate desc)[0...5]{   _id,  _type,  "slug": slug.current,  title,  category,  nominationsClosingDate,  startDate,  endDate,  country,  publishedAt }  ],  source == "events" => [    ...*[      _type == "conferenceEvent"      && coalesce(endDate, startDate) >= $today      && !(_id in coalesce(^.items[]._ref, []))    ] | order(startDate asc)[0...4]{   _id,  _type,  "slug": slug.current,  title,  category,  nominationsClosingDate,  startDate,  endDate,  country,  publishedAt },    ...*[      _type == "conferenceEvent"      && coalesce(endDate, startDate) < $today      && !(_id in coalesce(^.items[]._ref, []))    ] | order(startDate desc)[0...4]{   _id,  _type,  "slug": slug.current,  title,  category,  nominationsClosingDate,  startDate,  endDate,  country,  publishedAt }  ],  source == "research" => *[    _type == "resource"    && category == "research"    && !(_id in coalesce(^.items[]._ref, []))    && _id != coalesce(^.promo.resource._ref, "")  ] | order(defined(publishedAt) desc, publishedAt desc, legacyWpId desc)[0...3]{   _id,  _type,  "slug": slug.current,  title,  category,  nominationsClosingDate,  startDate,  endDate,  country,  publishedAt }),  button{   label,    kind,  external,  internal->{    _type,    "slug": slug.current,    brand,    brands  } },  promo{    resource->{      title,      "downloadThumbnail": downloadThumbnail{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },      "downloadFileUrl": downloadFile.asset->url,      "downloadFileName": downloadFile.asset->originalFilename,      downloadUrl    },    title,    description,    "image": image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },    link{   kind,  external,  internal->{    _type,    "slug": slug.current,    brand,    brands  } }  } },  _type == "featuredStories" => {   heading[]{ _key, style, children[]{ _key, text } },  link{   label,    kind,  external,  internal->{    _type,    "slug": slug.current,    brand,    brands  } },  "posts": posts[]->{   _id,  title,  "slug": slug.current,  brands,    "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title },  publishedAt,  excerpt,  "image": image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },  "category": category->{ title, "slug": slug.current } } },  _type == "statsBar" => {   heading[]{ _key, style, children[]{ _key, text } },  items[]{ _key, icon, value, label } },  _type == "newsletterSignup" => {   heading[]{ _key, style, children[]{ _key, text } },  body,  preferencesLabel,  options[]{    _key,    label,    defaultChecked,    "interestKey": *[_type == "subscribeModal" && _id == "subscribe-modal-" + $brand][0].interests[attribute.name == ^.attribute.name][0]._key  },  emailPlaceholder,  buttonLabel,  invalidEmailMessage,  noOptionMessage,  image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) } },  _type == "sponsoredContent" => {   label,  link{   label,    kind,  external,  internal->{    _type,    "slug": slug.current,    brand,    brands  } },  profileLabel,  "post": *[    _type == "post"    && _id == ^.post._ref    && defined(slug.current)    && defined(sponsor)    && ($brand == "clearview" || $brand in brands)  ][0]{      _id,  title,  "slug": slug.current,  brands,    "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title },  publishedAt,  excerpt,  "image": image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },  "category": category->{ title, "slug": slug.current },    "sponsor": sponsor->{      title,      "slug": slug.current,      "logo": logo{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) }    }  } },  _type == "postCards" => {     heading[]{ _key, style, children[]{ _key, text } },  link{   label,    kind,  external,  internal->{    _type,    "slug": slug.current,    brand,    brands  } },  "category": category->{ title, "slug": slug.current },  "posts": posts[$brand in @->brands]->{   _id,  title,  "slug": slug.current,  brands,    "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title },  publishedAt,  excerpt,  "image": image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },  "category": category->{ title, "slug": slug.current } },  "latest":   *[    _type == "post"    && defined(slug.current)    && $brand in brands    && defined(^.category._ref) && category._ref == ^.category._ref    && !(_id in coalesce(^.posts[]._ref, []))  ] | order(publishedAt desc)[0...6]{   _id,  title,  "slug": slug.current,  brands,    "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title },  publishedAt,  excerpt,  "image": image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },  "category": category->{ title, "slug": slug.current } } },  _type == "postBriefs" => {     heading[]{ _key, style, children[]{ _key, text } },  link{   label,    kind,  external,  internal->{    _type,    "slug": slug.current,    brand,    brands  } },  count,  "posts": posts[$brand in @->brands]->{     _id,  title,  "slug": slug.current,  brands,    "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title },  publishedAt,  excerpt,  "image": image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },  "category": category->{ title, "slug": slug.current },  "topic": primaryTopic->{ title },  briefText },  "latest":   *[    _type == "post"    && defined(slug.current)    && $brand in brands    && true    && !(_id in coalesce(^.posts[]._ref, []))  ] | order(publishedAt desc)[0...6]{     _id,  title,  "slug": slug.current,  brands,    "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title },  publishedAt,  excerpt,  "image": image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },  "category": category->{ title, "slug": slug.current },  "topic": primaryTopic->{ title },  briefText } },  _type == "weeklyRoundup" => {   heading[]{ _key, style, children[]{ _key, text } },  label,  title,  summary,  button{   label,    kind,  external,  internal->{    _type,    "slug": slug.current,    brand,    brands  } },  listLabel,  "posts": posts[$brand in @->brands]->{   _id,  title,  "slug": slug.current,  brands,    "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title },  publishedAt,  excerpt,  "image": image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },  "category": category->{ title, "slug": slug.current } },  "latest":   *[    _type == "post"    && defined(slug.current)    && $brand in brands    && true    && !(_id in coalesce(^.posts[]._ref, []))  ] | order(publishedAt desc)[0...8]{   _id,  title,  "slug": slug.current,  brands,    "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title },  publishedAt,  excerpt,  "image": image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },  "category": category->{ title, "slug": slug.current } } },  _type == "topPicks" => {   heading[]{ _key, style, children[]{ _key, text } },  link{   label,    kind,  external,  internal->{    _type,    "slug": slug.current,    brand,    brands  } },  "posts": posts[$brand in @->brands]->{   _id,  title,  "slug": slug.current,  brands,    "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title },  publishedAt,  excerpt,  "image": image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },  "category": category->{ title, "slug": slug.current }, "sponsored": defined(sponsor) },  "fill": [    ...  *[    _type == "post"    && defined(slug.current)    && $brand in brands    && !defined(sponsor) && dateTime(publishedAt) >= dateTime($today + "T00:00:00Z") - 60*60*24*7    && !(_id in coalesce(^.posts[]._ref, []))  ] | order(publishedAt desc)[0...6]{   _id,  title,  "slug": slug.current,  brands,    "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title },  publishedAt,  excerpt,  "image": image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },  "category": category->{ title, "slug": slug.current } },    ...  *[    _type == "post"    && defined(slug.current)    && $brand in brands    && !defined(sponsor) && dateTime(publishedAt) < dateTime($today + "T00:00:00Z") - 60*60*24*7    && !(_id in coalesce(^.posts[]._ref, []))  ] | order(publishedAt desc)[0...6]{   _id,  title,  "slug": slug.current,  brands,    "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title },  publishedAt,  excerpt,  "image": image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },  "category": category->{ title, "slug": slug.current } }  ] },  _type == "exploreGrid" => {   cards[]{    _key,    heading[]{ _key, style, children[]{ _key, text } },    icon,    source,    count,    deadlineLabel,    button{   label,    kind,  external,  internal->{    _type,    "slug": slug.current,    brand,    brands  } },    "items": items[@->_type != "post" || $brand in @->brands]->{   _type == "post" => { _type,   _id,  title,  "slug": slug.current,  brands,    "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title },  publishedAt,  excerpt,  "image": image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },  "category": category->{ title, "slug": slug.current } },  _type != "post" => {   _id,  _type,  "slug": slug.current,  title,  category,  nominationsClosingDate,  startDate,  endDate,  country,  publishedAt } },    "fill": select(      source == "posts" =>   *[    _type == "post"    && defined(slug.current)    && $brand in brands    && defined(^.category._ref) && category._ref == ^.category._ref    && !(_id in coalesce(^.items[]._ref, []))  ] | order(publishedAt desc)[0...6]{ _type,   _id,  title,  "slug": slug.current,  brands,    "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title },  publishedAt,  excerpt,  "image": image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },  "category": category->{ title, "slug": slug.current } },        source == "awards" => [    ...*[      _type == "awardsProgramme"      && nominationsClosingDate >= $today      && !(_id in coalesce(^.items[]._ref, []))    ] | order(nominationsClosingDate asc)[0...5]{   _id,  _type,  "slug": slug.current,  title,  category,  nominationsClosingDate,  startDate,  endDate,  country,  publishedAt },    ...*[      _type == "awardsProgramme"      && !(defined(nominationsClosingDate) && nominationsClosingDate >= $today)      && startDate >= $today      && !(_id in coalesce(^.items[]._ref, []))    ] | order(startDate asc)[0...5]{   _id,  _type,  "slug": slug.current,  title,  category,  nominationsClosingDate,  startDate,  endDate,  country,  publishedAt },    ...*[      _type == "awardsProgramme"      && !(defined(nominationsClosingDate) && nominationsClosingDate >= $today)      && startDate < $today      && !(_id in coalesce(^.items[]._ref, []))    ] | order(startDate desc)[0...5]{   _id,  _type,  "slug": slug.current,  title,  category,  nominationsClosingDate,  startDate,  endDate,  country,  publishedAt }  ],  source == "events" => [    ...*[      _type == "conferenceEvent"      && coalesce(endDate, startDate) >= $today      && !(_id in coalesce(^.items[]._ref, []))    ] | order(startDate asc)[0...4]{   _id,  _type,  "slug": slug.current,  title,  category,  nominationsClosingDate,  startDate,  endDate,  country,  publishedAt },    ...*[      _type == "conferenceEvent"      && coalesce(endDate, startDate) < $today      && !(_id in coalesce(^.items[]._ref, []))    ] | order(startDate desc)[0...4]{   _id,  _type,  "slug": slug.current,  title,  category,  nominationsClosingDate,  startDate,  endDate,  country,  publishedAt }  ],  source == "research" => *[    _type == "resource"    && category == "research"    && !(_id in coalesce(^.items[]._ref, []))    && _id != coalesce(^.promo.resource._ref, "")  ] | order(defined(publishedAt) desc, publishedAt desc, legacyWpId desc)[0...3]{   _id,  _type,  "slug": slug.current,  title,  category,  nominationsClosingDate,  startDate,  endDate,  country,  publishedAt }    )  } },  _type == "subscribeBanner" => {   heading[]{ _key, style, children[]{ _key, text } },  description,  buttonLabel,  cta{   label,    kind,  external,  internal->{    _type,    "slug": slug.current,    brand,    brands  } } },  _type == "splitLayout" => {    "main": main[]{ _key, _type,   _type == "topStories" => {   linkLabel,  label,  "slides": slides[$brand == "clearview" || $brand in @->brands]->{   _id,  title,  "slug": slug.current,  brands,    "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title },  publishedAt,  excerpt,  "image": image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },  "category": category->{ title, "slug": slug.current } },  "articles": articles[$brand == "clearview" || $brand in @->brands]->{   _id,  title,  "slug": slug.current,  brands,    "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title },  publishedAt,  excerpt,  "image": image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },  "category": category->{ title, "slug": slug.current } },  "latest": *[    _type == "post"    && defined(slug.current)    && ($brand == "clearview" || $brand in brands)    && !(_id in coalesce(^.slides[]._ref, []))    && !(_id in coalesce(^.articles[]._ref, []))  ] | order(publishedAt desc)[0...6]{   _id,  title,  "slug": slug.current,  brands,    "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title },  publishedAt,  excerpt,  "image": image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },  "category": category->{ title, "slug": slug.current } } },  _type == "sponsoredContent" => {   label,  link{   label,    kind,  external,  internal->{    _type,    "slug": slug.current,    brand,    brands  } },  profileLabel,  "post": *[    _type == "post"    && _id == ^.post._ref    && defined(slug.current)    && defined(sponsor)    && ($brand == "clearview" || $brand in brands)  ][0]{      _id,  title,  "slug": slug.current,  brands,    "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title },  publishedAt,  excerpt,  "image": image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },  "category": category->{ title, "slug": slug.current },    "sponsor": sponsor->{      title,      "slug": slug.current,      "logo": logo{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) }    }  } },  _type == "postCards" => {     heading[]{ _key, style, children[]{ _key, text } },  link{   label,    kind,  external,  internal->{    _type,    "slug": slug.current,    brand,    brands  } },  "category": category->{ title, "slug": slug.current },  "posts": posts[$brand in @->brands]->{   _id,  title,  "slug": slug.current,  brands,    "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title },  publishedAt,  excerpt,  "image": image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },  "category": category->{ title, "slug": slug.current } },  "latest":   *[    _type == "post"    && defined(slug.current)    && $brand in brands    && defined(^.category._ref) && category._ref == ^.category._ref    && !(_id in coalesce(^.posts[]._ref, []))  ] | order(publishedAt desc)[0...6]{   _id,  title,  "slug": slug.current,  brands,    "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title },  publishedAt,  excerpt,  "image": image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },  "category": category->{ title, "slug": slug.current } } },  _type == "postBriefs" => {     heading[]{ _key, style, children[]{ _key, text } },  link{   label,    kind,  external,  internal->{    _type,    "slug": slug.current,    brand,    brands  } },  count,  "posts": posts[$brand in @->brands]->{     _id,  title,  "slug": slug.current,  brands,    "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title },  publishedAt,  excerpt,  "image": image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },  "category": category->{ title, "slug": slug.current },  "topic": primaryTopic->{ title },  briefText },  "latest":   *[    _type == "post"    && defined(slug.current)    && $brand in brands    && true    && !(_id in coalesce(^.posts[]._ref, []))  ] | order(publishedAt desc)[0...6]{     _id,  title,  "slug": slug.current,  brands,    "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title },  publishedAt,  excerpt,  "image": image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },  "category": category->{ title, "slug": slug.current },  "topic": primaryTopic->{ title },  briefText } },  _type == "weeklyRoundup" => {   heading[]{ _key, style, children[]{ _key, text } },  label,  title,  summary,  button{   label,    kind,  external,  internal->{    _type,    "slug": slug.current,    brand,    brands  } },  listLabel,  "posts": posts[$brand in @->brands]->{   _id,  title,  "slug": slug.current,  brands,    "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title },  publishedAt,  excerpt,  "image": image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },  "category": category->{ title, "slug": slug.current } },  "latest":   *[    _type == "post"    && defined(slug.current)    && $brand in brands    && true    && !(_id in coalesce(^.posts[]._ref, []))  ] | order(publishedAt desc)[0...8]{   _id,  title,  "slug": slug.current,  brands,    "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title },  publishedAt,  excerpt,  "image": image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },  "category": category->{ title, "slug": slug.current } } },  _type == "publications" => {   heading[]{ _key, style, children[]{ _key, text } },  body,  cards[]{    _key,    brand,    "brandTitle": *[_type == "brand" && key.current == ^.brand][0].title,    description,    image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },    linkLabel  } },  _type == "cta" => {   heading,  text,  link{ label, href } },  _type == "pageHero" => {   breadcrumbHomeLabel,  breadcrumbLabel,  title,  intro },  _type == "recordListing" => {   awardsTabLabel,  eventsTabLabel,  researchTabLabel,  regionFilterLabel,  regionEuropeLabel,  regionMenaLabel,  regionAsiaLabel,  regionNorthAmericaLabel,  yearFilterLabel,  statusFilterLabel,  allOptionLabel,  clearFiltersLabel,  upcomingEventLabel,  pastEventLabel,  publishedLabel,  emptyHeading,  emptyText,  emptyAwardNoun,  emptyEventNoun,  emptyResearchNoun,  emptyButtonLabel,  previousLabel,  nextLabel } },    "aside": aside[]{ _key, _type,   _type == "highlights" => {   source,  layout,  count,  heading[]{ _key, style, children[]{ _key, text } },  deadlineLabel,  "items": items[]->{   _id,  _type,  "slug": slug.current,  title,  category,  nominationsClosingDate,  startDate,  endDate,  country,  publishedAt },  "fill": select(  source == "awards" => [    ...*[      _type == "awardsProgramme"      && nominationsClosingDate >= $today      && !(_id in coalesce(^.items[]._ref, []))    ] | order(nominationsClosingDate asc)[0...5]{   _id,  _type,  "slug": slug.current,  title,  category,  nominationsClosingDate,  startDate,  endDate,  country,  publishedAt },    ...*[      _type == "awardsProgramme"      && !(defined(nominationsClosingDate) && nominationsClosingDate >= $today)      && startDate >= $today      && !(_id in coalesce(^.items[]._ref, []))    ] | order(startDate asc)[0...5]{   _id,  _type,  "slug": slug.current,  title,  category,  nominationsClosingDate,  startDate,  endDate,  country,  publishedAt },    ...*[      _type == "awardsProgramme"      && !(defined(nominationsClosingDate) && nominationsClosingDate >= $today)      && startDate < $today      && !(_id in coalesce(^.items[]._ref, []))    ] | order(startDate desc)[0...5]{   _id,  _type,  "slug": slug.current,  title,  category,  nominationsClosingDate,  startDate,  endDate,  country,  publishedAt }  ],  source == "events" => [    ...*[      _type == "conferenceEvent"      && coalesce(endDate, startDate) >= $today      && !(_id in coalesce(^.items[]._ref, []))    ] | order(startDate asc)[0...4]{   _id,  _type,  "slug": slug.current,  title,  category,  nominationsClosingDate,  startDate,  endDate,  country,  publishedAt },    ...*[      _type == "conferenceEvent"      && coalesce(endDate, startDate) < $today      && !(_id in coalesce(^.items[]._ref, []))    ] | order(startDate desc)[0...4]{   _id,  _type,  "slug": slug.current,  title,  category,  nominationsClosingDate,  startDate,  endDate,  country,  publishedAt }  ],  source == "research" => *[    _type == "resource"    && category == "research"    && !(_id in coalesce(^.items[]._ref, []))    && _id != coalesce(^.promo.resource._ref, "")  ] | order(defined(publishedAt) desc, publishedAt desc, legacyWpId desc)[0...3]{   _id,  _type,  "slug": slug.current,  title,  category,  nominationsClosingDate,  startDate,  endDate,  country,  publishedAt }),  button{   label,    kind,  external,  internal->{    _type,    "slug": slug.current,    brand,    brands  } },  promo{    resource->{      title,      "downloadThumbnail": downloadThumbnail{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },      "downloadFileUrl": downloadFile.asset->url,      "downloadFileName": downloadFile.asset->originalFilename,      downloadUrl    },    title,    description,    "image": image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },    link{   kind,  external,  internal->{    _type,    "slug": slug.current,    brand,    brands  } }  } },  _type == "awardsWinners" => { heading[]{ _key, style, children[]{ _key, text } } } }  } }  }
 export type HOME_PAGE_QUERY_RESULT = {
   _id: string;
   title: string | null;
@@ -4881,6 +4927,7 @@ export type HOME_PAGE_QUERY_RESULT = {
         _key: string;
         _type: "highlights";
         source: "awards" | "events" | "research" | null;
+        layout: "block" | "list" | null;
         count: number | null;
         heading: Array<{
           _key: string;
@@ -6357,6 +6404,14 @@ export type HOME_PAGE_QUERY_RESULT = {
             }
           | {
               _key: string;
+              _type: "pageHero";
+              breadcrumbHomeLabel: string | null;
+              breadcrumbLabel: string | null;
+              title: string | null;
+              intro: string | null;
+            }
+          | {
+              _key: string;
               _type: "postBriefs";
               heading: Array<{
                 _key: string;
@@ -6596,6 +6651,33 @@ export type HOME_PAGE_QUERY_RESULT = {
                 } | null;
                 linkLabel: string | null;
               }> | null;
+            }
+          | {
+              _key: string;
+              _type: "recordListing";
+              awardsTabLabel: string | null;
+              eventsTabLabel: string | null;
+              researchTabLabel: string | null;
+              regionFilterLabel: string | null;
+              regionEuropeLabel: string | null;
+              regionMenaLabel: string | null;
+              regionAsiaLabel: string | null;
+              regionNorthAmericaLabel: string | null;
+              yearFilterLabel: string | null;
+              statusFilterLabel: string | null;
+              allOptionLabel: string | null;
+              clearFiltersLabel: string | null;
+              upcomingEventLabel: string | null;
+              pastEventLabel: string | null;
+              publishedLabel: string | null;
+              emptyHeading: string | null;
+              emptyText: string | null;
+              emptyAwardNoun: string | null;
+              emptyEventNoun: string | null;
+              emptyResearchNoun: string | null;
+              emptyButtonLabel: string | null;
+              previousLabel: string | null;
+              nextLabel: string | null;
             }
           | {
               _key: string;
@@ -6871,6 +6953,7 @@ export type HOME_PAGE_QUERY_RESULT = {
               _key: string;
               _type: "highlights";
               source: "awards" | "events" | "research" | null;
+              layout: "block" | "list" | null;
               count: number | null;
               heading: Array<{
                 _key: string;
@@ -9780,6 +9863,7 @@ export type HOME_PAGE_QUERY_RESULT = {
         _key: string;
         _type: "highlights";
         source: "awards" | "events" | "research" | null;
+        layout: "block" | "list" | null;
         count: number | null;
         heading: Array<{
           _key: string;
@@ -11256,6 +11340,14 @@ export type HOME_PAGE_QUERY_RESULT = {
             }
           | {
               _key: string;
+              _type: "pageHero";
+              breadcrumbHomeLabel: string | null;
+              breadcrumbLabel: string | null;
+              title: string | null;
+              intro: string | null;
+            }
+          | {
+              _key: string;
               _type: "postBriefs";
               heading: Array<{
                 _key: string;
@@ -11495,6 +11587,33 @@ export type HOME_PAGE_QUERY_RESULT = {
                 } | null;
                 linkLabel: string | null;
               }> | null;
+            }
+          | {
+              _key: string;
+              _type: "recordListing";
+              awardsTabLabel: string | null;
+              eventsTabLabel: string | null;
+              researchTabLabel: string | null;
+              regionFilterLabel: string | null;
+              regionEuropeLabel: string | null;
+              regionMenaLabel: string | null;
+              regionAsiaLabel: string | null;
+              regionNorthAmericaLabel: string | null;
+              yearFilterLabel: string | null;
+              statusFilterLabel: string | null;
+              allOptionLabel: string | null;
+              clearFiltersLabel: string | null;
+              upcomingEventLabel: string | null;
+              pastEventLabel: string | null;
+              publishedLabel: string | null;
+              emptyHeading: string | null;
+              emptyText: string | null;
+              emptyAwardNoun: string | null;
+              emptyEventNoun: string | null;
+              emptyResearchNoun: string | null;
+              emptyButtonLabel: string | null;
+              previousLabel: string | null;
+              nextLabel: string | null;
             }
           | {
               _key: string;
@@ -11770,6 +11889,7 @@ export type HOME_PAGE_QUERY_RESULT = {
               _key: string;
               _type: "highlights";
               source: "awards" | "events" | "research" | null;
+              layout: "block" | "list" | null;
               count: number | null;
               heading: Array<{
                 _key: string;
@@ -14679,6 +14799,7 @@ export type HOME_PAGE_QUERY_RESULT = {
         _key: string;
         _type: "highlights";
         source: "awards" | "events" | "research" | null;
+        layout: "block" | "list" | null;
         count: number | null;
         heading: Array<{
           _key: string;
@@ -16155,6 +16276,14 @@ export type HOME_PAGE_QUERY_RESULT = {
             }
           | {
               _key: string;
+              _type: "pageHero";
+              breadcrumbHomeLabel: string | null;
+              breadcrumbLabel: string | null;
+              title: string | null;
+              intro: string | null;
+            }
+          | {
+              _key: string;
               _type: "postBriefs";
               heading: Array<{
                 _key: string;
@@ -16394,6 +16523,33 @@ export type HOME_PAGE_QUERY_RESULT = {
                 } | null;
                 linkLabel: string | null;
               }> | null;
+            }
+          | {
+              _key: string;
+              _type: "recordListing";
+              awardsTabLabel: string | null;
+              eventsTabLabel: string | null;
+              researchTabLabel: string | null;
+              regionFilterLabel: string | null;
+              regionEuropeLabel: string | null;
+              regionMenaLabel: string | null;
+              regionAsiaLabel: string | null;
+              regionNorthAmericaLabel: string | null;
+              yearFilterLabel: string | null;
+              statusFilterLabel: string | null;
+              allOptionLabel: string | null;
+              clearFiltersLabel: string | null;
+              upcomingEventLabel: string | null;
+              pastEventLabel: string | null;
+              publishedLabel: string | null;
+              emptyHeading: string | null;
+              emptyText: string | null;
+              emptyAwardNoun: string | null;
+              emptyEventNoun: string | null;
+              emptyResearchNoun: string | null;
+              emptyButtonLabel: string | null;
+              previousLabel: string | null;
+              nextLabel: string | null;
             }
           | {
               _key: string;
@@ -16669,6 +16825,7 @@ export type HOME_PAGE_QUERY_RESULT = {
               _key: string;
               _type: "highlights";
               source: "awards" | "events" | "research" | null;
+              layout: "block" | "list" | null;
               count: number | null;
               heading: Array<{
                 _key: string;
@@ -18302,7 +18459,7 @@ export type HOME_PAGE_QUERY_RESULT = {
 
 // Source: src/sanity/queries.ts
 // Variable: PAGE_QUERY
-// Query: *[_type == "page" && slug.current == $slug && brand == $brand][0]{    _id,    title,    blocks[]{ _key, _type,   _type == "topStories" => {   linkLabel,  label,  "slides": slides[$brand == "clearview" || $brand in @->brands]->{   _id,  title,  "slug": slug.current,  brands,    "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title },  publishedAt,  excerpt,  "image": image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },  "category": category->{ title, "slug": slug.current } },  "articles": articles[$brand == "clearview" || $brand in @->brands]->{   _id,  title,  "slug": slug.current,  brands,    "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title },  publishedAt,  excerpt,  "image": image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },  "category": category->{ title, "slug": slug.current } },  "latest": *[    _type == "post"    && defined(slug.current)    && ($brand == "clearview" || $brand in brands)    && !(_id in coalesce(^.slides[]._ref, []))    && !(_id in coalesce(^.articles[]._ref, []))  ] | order(publishedAt desc)[0...6]{   _id,  title,  "slug": slug.current,  brands,    "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title },  publishedAt,  excerpt,  "image": image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },  "category": category->{ title, "slug": slug.current } } },  _type == "publications" => {   heading[]{ _key, style, children[]{ _key, text } },  body,  cards[]{    _key,    brand,    "brandTitle": *[_type == "brand" && key.current == ^.brand][0].title,    description,    image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },    linkLabel  } },  _type == "cta" => {   heading,  text,  link{ label, href } },  _type == "highlights" => {   source,  count,  heading[]{ _key, style, children[]{ _key, text } },  deadlineLabel,  "items": items[]->{   _id,  _type,  "slug": slug.current,  title,  category,  nominationsClosingDate,  startDate,  endDate,  country,  publishedAt },  "fill": select(  source == "awards" => [    ...*[      _type == "awardsProgramme"      && nominationsClosingDate >= $today      && !(_id in coalesce(^.items[]._ref, []))    ] | order(nominationsClosingDate asc)[0...5]{   _id,  _type,  "slug": slug.current,  title,  category,  nominationsClosingDate,  startDate,  endDate,  country,  publishedAt },    ...*[      _type == "awardsProgramme"      && !(defined(nominationsClosingDate) && nominationsClosingDate >= $today)      && startDate >= $today      && !(_id in coalesce(^.items[]._ref, []))    ] | order(startDate asc)[0...5]{   _id,  _type,  "slug": slug.current,  title,  category,  nominationsClosingDate,  startDate,  endDate,  country,  publishedAt },    ...*[      _type == "awardsProgramme"      && !(defined(nominationsClosingDate) && nominationsClosingDate >= $today)      && startDate < $today      && !(_id in coalesce(^.items[]._ref, []))    ] | order(startDate desc)[0...5]{   _id,  _type,  "slug": slug.current,  title,  category,  nominationsClosingDate,  startDate,  endDate,  country,  publishedAt }  ],  source == "events" => [    ...*[      _type == "conferenceEvent"      && coalesce(endDate, startDate) >= $today      && !(_id in coalesce(^.items[]._ref, []))    ] | order(startDate asc)[0...4]{   _id,  _type,  "slug": slug.current,  title,  category,  nominationsClosingDate,  startDate,  endDate,  country,  publishedAt },    ...*[      _type == "conferenceEvent"      && coalesce(endDate, startDate) < $today      && !(_id in coalesce(^.items[]._ref, []))    ] | order(startDate desc)[0...4]{   _id,  _type,  "slug": slug.current,  title,  category,  nominationsClosingDate,  startDate,  endDate,  country,  publishedAt }  ],  source == "research" => *[    _type == "resource"    && category == "research"    && !(_id in coalesce(^.items[]._ref, []))    && _id != coalesce(^.promo.resource._ref, "")  ] | order(defined(publishedAt) desc, publishedAt desc, legacyWpId desc)[0...3]{   _id,  _type,  "slug": slug.current,  title,  category,  nominationsClosingDate,  startDate,  endDate,  country,  publishedAt }),  button{   label,    kind,  external,  internal->{    _type,    "slug": slug.current,    brand,    brands  } },  promo{    resource->{      title,      "downloadThumbnail": downloadThumbnail{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },      "downloadFileUrl": downloadFile.asset->url,      "downloadFileName": downloadFile.asset->originalFilename,      downloadUrl    },    title,    description,    "image": image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },    link{   kind,  external,  internal->{    _type,    "slug": slug.current,    brand,    brands  } }  } },  _type == "featuredStories" => {   heading[]{ _key, style, children[]{ _key, text } },  link{   label,    kind,  external,  internal->{    _type,    "slug": slug.current,    brand,    brands  } },  "posts": posts[]->{   _id,  title,  "slug": slug.current,  brands,    "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title },  publishedAt,  excerpt,  "image": image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },  "category": category->{ title, "slug": slug.current } } },  _type == "statsBar" => {   heading[]{ _key, style, children[]{ _key, text } },  items[]{ _key, icon, value, label } },  _type == "newsletterSignup" => {   heading[]{ _key, style, children[]{ _key, text } },  body,  preferencesLabel,  options[]{    _key,    label,    defaultChecked,    "interestKey": *[_type == "subscribeModal" && _id == "subscribe-modal-" + $brand][0].interests[attribute.name == ^.attribute.name][0]._key  },  emailPlaceholder,  buttonLabel,  invalidEmailMessage,  noOptionMessage,  image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) } },  _type == "sponsoredContent" => {   label,  link{   label,    kind,  external,  internal->{    _type,    "slug": slug.current,    brand,    brands  } },  profileLabel,  "post": *[    _type == "post"    && _id == ^.post._ref    && defined(slug.current)    && defined(sponsor)    && ($brand == "clearview" || $brand in brands)  ][0]{      _id,  title,  "slug": slug.current,  brands,    "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title },  publishedAt,  excerpt,  "image": image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },  "category": category->{ title, "slug": slug.current },    "sponsor": sponsor->{      title,      "slug": slug.current,      "logo": logo{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) }    }  } },  _type == "postCards" => {     heading[]{ _key, style, children[]{ _key, text } },  link{   label,    kind,  external,  internal->{    _type,    "slug": slug.current,    brand,    brands  } },  "category": category->{ title, "slug": slug.current },  "posts": posts[$brand in @->brands]->{   _id,  title,  "slug": slug.current,  brands,    "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title },  publishedAt,  excerpt,  "image": image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },  "category": category->{ title, "slug": slug.current } },  "latest":   *[    _type == "post"    && defined(slug.current)    && $brand in brands    && defined(^.category._ref) && category._ref == ^.category._ref    && !(_id in coalesce(^.posts[]._ref, []))  ] | order(publishedAt desc)[0...6]{   _id,  title,  "slug": slug.current,  brands,    "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title },  publishedAt,  excerpt,  "image": image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },  "category": category->{ title, "slug": slug.current } } },  _type == "postBriefs" => {     heading[]{ _key, style, children[]{ _key, text } },  link{   label,    kind,  external,  internal->{    _type,    "slug": slug.current,    brand,    brands  } },  count,  "posts": posts[$brand in @->brands]->{     _id,  title,  "slug": slug.current,  brands,    "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title },  publishedAt,  excerpt,  "image": image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },  "category": category->{ title, "slug": slug.current },  "topic": primaryTopic->{ title },  briefText },  "latest":   *[    _type == "post"    && defined(slug.current)    && $brand in brands    && true    && !(_id in coalesce(^.posts[]._ref, []))  ] | order(publishedAt desc)[0...6]{     _id,  title,  "slug": slug.current,  brands,    "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title },  publishedAt,  excerpt,  "image": image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },  "category": category->{ title, "slug": slug.current },  "topic": primaryTopic->{ title },  briefText } },  _type == "weeklyRoundup" => {   heading[]{ _key, style, children[]{ _key, text } },  label,  title,  summary,  button{   label,    kind,  external,  internal->{    _type,    "slug": slug.current,    brand,    brands  } },  listLabel,  "posts": posts[$brand in @->brands]->{   _id,  title,  "slug": slug.current,  brands,    "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title },  publishedAt,  excerpt,  "image": image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },  "category": category->{ title, "slug": slug.current } },  "latest":   *[    _type == "post"    && defined(slug.current)    && $brand in brands    && true    && !(_id in coalesce(^.posts[]._ref, []))  ] | order(publishedAt desc)[0...8]{   _id,  title,  "slug": slug.current,  brands,    "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title },  publishedAt,  excerpt,  "image": image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },  "category": category->{ title, "slug": slug.current } } },  _type == "topPicks" => {   heading[]{ _key, style, children[]{ _key, text } },  link{   label,    kind,  external,  internal->{    _type,    "slug": slug.current,    brand,    brands  } },  "posts": posts[$brand in @->brands]->{   _id,  title,  "slug": slug.current,  brands,    "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title },  publishedAt,  excerpt,  "image": image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },  "category": category->{ title, "slug": slug.current }, "sponsored": defined(sponsor) },  "fill": [    ...  *[    _type == "post"    && defined(slug.current)    && $brand in brands    && !defined(sponsor) && dateTime(publishedAt) >= dateTime($today + "T00:00:00Z") - 60*60*24*7    && !(_id in coalesce(^.posts[]._ref, []))  ] | order(publishedAt desc)[0...6]{   _id,  title,  "slug": slug.current,  brands,    "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title },  publishedAt,  excerpt,  "image": image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },  "category": category->{ title, "slug": slug.current } },    ...  *[    _type == "post"    && defined(slug.current)    && $brand in brands    && !defined(sponsor) && dateTime(publishedAt) < dateTime($today + "T00:00:00Z") - 60*60*24*7    && !(_id in coalesce(^.posts[]._ref, []))  ] | order(publishedAt desc)[0...6]{   _id,  title,  "slug": slug.current,  brands,    "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title },  publishedAt,  excerpt,  "image": image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },  "category": category->{ title, "slug": slug.current } }  ] },  _type == "exploreGrid" => {   cards[]{    _key,    heading[]{ _key, style, children[]{ _key, text } },    icon,    source,    count,    deadlineLabel,    button{   label,    kind,  external,  internal->{    _type,    "slug": slug.current,    brand,    brands  } },    "items": items[@->_type != "post" || $brand in @->brands]->{   _type == "post" => { _type,   _id,  title,  "slug": slug.current,  brands,    "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title },  publishedAt,  excerpt,  "image": image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },  "category": category->{ title, "slug": slug.current } },  _type != "post" => {   _id,  _type,  "slug": slug.current,  title,  category,  nominationsClosingDate,  startDate,  endDate,  country,  publishedAt } },    "fill": select(      source == "posts" =>   *[    _type == "post"    && defined(slug.current)    && $brand in brands    && defined(^.category._ref) && category._ref == ^.category._ref    && !(_id in coalesce(^.items[]._ref, []))  ] | order(publishedAt desc)[0...6]{ _type,   _id,  title,  "slug": slug.current,  brands,    "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title },  publishedAt,  excerpt,  "image": image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },  "category": category->{ title, "slug": slug.current } },        source == "awards" => [    ...*[      _type == "awardsProgramme"      && nominationsClosingDate >= $today      && !(_id in coalesce(^.items[]._ref, []))    ] | order(nominationsClosingDate asc)[0...5]{   _id,  _type,  "slug": slug.current,  title,  category,  nominationsClosingDate,  startDate,  endDate,  country,  publishedAt },    ...*[      _type == "awardsProgramme"      && !(defined(nominationsClosingDate) && nominationsClosingDate >= $today)      && startDate >= $today      && !(_id in coalesce(^.items[]._ref, []))    ] | order(startDate asc)[0...5]{   _id,  _type,  "slug": slug.current,  title,  category,  nominationsClosingDate,  startDate,  endDate,  country,  publishedAt },    ...*[      _type == "awardsProgramme"      && !(defined(nominationsClosingDate) && nominationsClosingDate >= $today)      && startDate < $today      && !(_id in coalesce(^.items[]._ref, []))    ] | order(startDate desc)[0...5]{   _id,  _type,  "slug": slug.current,  title,  category,  nominationsClosingDate,  startDate,  endDate,  country,  publishedAt }  ],  source == "events" => [    ...*[      _type == "conferenceEvent"      && coalesce(endDate, startDate) >= $today      && !(_id in coalesce(^.items[]._ref, []))    ] | order(startDate asc)[0...4]{   _id,  _type,  "slug": slug.current,  title,  category,  nominationsClosingDate,  startDate,  endDate,  country,  publishedAt },    ...*[      _type == "conferenceEvent"      && coalesce(endDate, startDate) < $today      && !(_id in coalesce(^.items[]._ref, []))    ] | order(startDate desc)[0...4]{   _id,  _type,  "slug": slug.current,  title,  category,  nominationsClosingDate,  startDate,  endDate,  country,  publishedAt }  ],  source == "research" => *[    _type == "resource"    && category == "research"    && !(_id in coalesce(^.items[]._ref, []))    && _id != coalesce(^.promo.resource._ref, "")  ] | order(defined(publishedAt) desc, publishedAt desc, legacyWpId desc)[0...3]{   _id,  _type,  "slug": slug.current,  title,  category,  nominationsClosingDate,  startDate,  endDate,  country,  publishedAt }    )  } },  _type == "subscribeBanner" => {   heading[]{ _key, style, children[]{ _key, text } },  description,  buttonLabel,  cta{   label,    kind,  external,  internal->{    _type,    "slug": slug.current,    brand,    brands  } } },  _type == "splitLayout" => {    "main": main[]{ _key, _type,   _type == "topStories" => {   linkLabel,  label,  "slides": slides[$brand == "clearview" || $brand in @->brands]->{   _id,  title,  "slug": slug.current,  brands,    "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title },  publishedAt,  excerpt,  "image": image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },  "category": category->{ title, "slug": slug.current } },  "articles": articles[$brand == "clearview" || $brand in @->brands]->{   _id,  title,  "slug": slug.current,  brands,    "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title },  publishedAt,  excerpt,  "image": image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },  "category": category->{ title, "slug": slug.current } },  "latest": *[    _type == "post"    && defined(slug.current)    && ($brand == "clearview" || $brand in brands)    && !(_id in coalesce(^.slides[]._ref, []))    && !(_id in coalesce(^.articles[]._ref, []))  ] | order(publishedAt desc)[0...6]{   _id,  title,  "slug": slug.current,  brands,    "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title },  publishedAt,  excerpt,  "image": image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },  "category": category->{ title, "slug": slug.current } } },  _type == "sponsoredContent" => {   label,  link{   label,    kind,  external,  internal->{    _type,    "slug": slug.current,    brand,    brands  } },  profileLabel,  "post": *[    _type == "post"    && _id == ^.post._ref    && defined(slug.current)    && defined(sponsor)    && ($brand == "clearview" || $brand in brands)  ][0]{      _id,  title,  "slug": slug.current,  brands,    "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title },  publishedAt,  excerpt,  "image": image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },  "category": category->{ title, "slug": slug.current },    "sponsor": sponsor->{      title,      "slug": slug.current,      "logo": logo{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) }    }  } },  _type == "postCards" => {     heading[]{ _key, style, children[]{ _key, text } },  link{   label,    kind,  external,  internal->{    _type,    "slug": slug.current,    brand,    brands  } },  "category": category->{ title, "slug": slug.current },  "posts": posts[$brand in @->brands]->{   _id,  title,  "slug": slug.current,  brands,    "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title },  publishedAt,  excerpt,  "image": image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },  "category": category->{ title, "slug": slug.current } },  "latest":   *[    _type == "post"    && defined(slug.current)    && $brand in brands    && defined(^.category._ref) && category._ref == ^.category._ref    && !(_id in coalesce(^.posts[]._ref, []))  ] | order(publishedAt desc)[0...6]{   _id,  title,  "slug": slug.current,  brands,    "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title },  publishedAt,  excerpt,  "image": image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },  "category": category->{ title, "slug": slug.current } } },  _type == "postBriefs" => {     heading[]{ _key, style, children[]{ _key, text } },  link{   label,    kind,  external,  internal->{    _type,    "slug": slug.current,    brand,    brands  } },  count,  "posts": posts[$brand in @->brands]->{     _id,  title,  "slug": slug.current,  brands,    "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title },  publishedAt,  excerpt,  "image": image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },  "category": category->{ title, "slug": slug.current },  "topic": primaryTopic->{ title },  briefText },  "latest":   *[    _type == "post"    && defined(slug.current)    && $brand in brands    && true    && !(_id in coalesce(^.posts[]._ref, []))  ] | order(publishedAt desc)[0...6]{     _id,  title,  "slug": slug.current,  brands,    "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title },  publishedAt,  excerpt,  "image": image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },  "category": category->{ title, "slug": slug.current },  "topic": primaryTopic->{ title },  briefText } },  _type == "weeklyRoundup" => {   heading[]{ _key, style, children[]{ _key, text } },  label,  title,  summary,  button{   label,    kind,  external,  internal->{    _type,    "slug": slug.current,    brand,    brands  } },  listLabel,  "posts": posts[$brand in @->brands]->{   _id,  title,  "slug": slug.current,  brands,    "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title },  publishedAt,  excerpt,  "image": image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },  "category": category->{ title, "slug": slug.current } },  "latest":   *[    _type == "post"    && defined(slug.current)    && $brand in brands    && true    && !(_id in coalesce(^.posts[]._ref, []))  ] | order(publishedAt desc)[0...8]{   _id,  title,  "slug": slug.current,  brands,    "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title },  publishedAt,  excerpt,  "image": image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },  "category": category->{ title, "slug": slug.current } } },  _type == "publications" => {   heading[]{ _key, style, children[]{ _key, text } },  body,  cards[]{    _key,    brand,    "brandTitle": *[_type == "brand" && key.current == ^.brand][0].title,    description,    image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },    linkLabel  } },  _type == "cta" => {   heading,  text,  link{ label, href } } },    "aside": aside[]{ _key, _type,   _type == "highlights" => {   source,  count,  heading[]{ _key, style, children[]{ _key, text } },  deadlineLabel,  "items": items[]->{   _id,  _type,  "slug": slug.current,  title,  category,  nominationsClosingDate,  startDate,  endDate,  country,  publishedAt },  "fill": select(  source == "awards" => [    ...*[      _type == "awardsProgramme"      && nominationsClosingDate >= $today      && !(_id in coalesce(^.items[]._ref, []))    ] | order(nominationsClosingDate asc)[0...5]{   _id,  _type,  "slug": slug.current,  title,  category,  nominationsClosingDate,  startDate,  endDate,  country,  publishedAt },    ...*[      _type == "awardsProgramme"      && !(defined(nominationsClosingDate) && nominationsClosingDate >= $today)      && startDate >= $today      && !(_id in coalesce(^.items[]._ref, []))    ] | order(startDate asc)[0...5]{   _id,  _type,  "slug": slug.current,  title,  category,  nominationsClosingDate,  startDate,  endDate,  country,  publishedAt },    ...*[      _type == "awardsProgramme"      && !(defined(nominationsClosingDate) && nominationsClosingDate >= $today)      && startDate < $today      && !(_id in coalesce(^.items[]._ref, []))    ] | order(startDate desc)[0...5]{   _id,  _type,  "slug": slug.current,  title,  category,  nominationsClosingDate,  startDate,  endDate,  country,  publishedAt }  ],  source == "events" => [    ...*[      _type == "conferenceEvent"      && coalesce(endDate, startDate) >= $today      && !(_id in coalesce(^.items[]._ref, []))    ] | order(startDate asc)[0...4]{   _id,  _type,  "slug": slug.current,  title,  category,  nominationsClosingDate,  startDate,  endDate,  country,  publishedAt },    ...*[      _type == "conferenceEvent"      && coalesce(endDate, startDate) < $today      && !(_id in coalesce(^.items[]._ref, []))    ] | order(startDate desc)[0...4]{   _id,  _type,  "slug": slug.current,  title,  category,  nominationsClosingDate,  startDate,  endDate,  country,  publishedAt }  ],  source == "research" => *[    _type == "resource"    && category == "research"    && !(_id in coalesce(^.items[]._ref, []))    && _id != coalesce(^.promo.resource._ref, "")  ] | order(defined(publishedAt) desc, publishedAt desc, legacyWpId desc)[0...3]{   _id,  _type,  "slug": slug.current,  title,  category,  nominationsClosingDate,  startDate,  endDate,  country,  publishedAt }),  button{   label,    kind,  external,  internal->{    _type,    "slug": slug.current,    brand,    brands  } },  promo{    resource->{      title,      "downloadThumbnail": downloadThumbnail{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },      "downloadFileUrl": downloadFile.asset->url,      "downloadFileName": downloadFile.asset->originalFilename,      downloadUrl    },    title,    description,    "image": image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },    link{   kind,  external,  internal->{    _type,    "slug": slug.current,    brand,    brands  } }  } },  _type == "awardsWinners" => { heading[]{ _key, style, children[]{ _key, text } } } }  } }  }
+// Query: *[_type == "page" && slug.current == $slug && brand == $brand][0]{    _id,    title,    blocks[]{ _key, _type,   _type == "topStories" => {   linkLabel,  label,  "slides": slides[$brand == "clearview" || $brand in @->brands]->{   _id,  title,  "slug": slug.current,  brands,    "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title },  publishedAt,  excerpt,  "image": image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },  "category": category->{ title, "slug": slug.current } },  "articles": articles[$brand == "clearview" || $brand in @->brands]->{   _id,  title,  "slug": slug.current,  brands,    "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title },  publishedAt,  excerpt,  "image": image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },  "category": category->{ title, "slug": slug.current } },  "latest": *[    _type == "post"    && defined(slug.current)    && ($brand == "clearview" || $brand in brands)    && !(_id in coalesce(^.slides[]._ref, []))    && !(_id in coalesce(^.articles[]._ref, []))  ] | order(publishedAt desc)[0...6]{   _id,  title,  "slug": slug.current,  brands,    "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title },  publishedAt,  excerpt,  "image": image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },  "category": category->{ title, "slug": slug.current } } },  _type == "publications" => {   heading[]{ _key, style, children[]{ _key, text } },  body,  cards[]{    _key,    brand,    "brandTitle": *[_type == "brand" && key.current == ^.brand][0].title,    description,    image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },    linkLabel  } },  _type == "cta" => {   heading,  text,  link{ label, href } },  _type == "highlights" => {   source,  layout,  count,  heading[]{ _key, style, children[]{ _key, text } },  deadlineLabel,  "items": items[]->{   _id,  _type,  "slug": slug.current,  title,  category,  nominationsClosingDate,  startDate,  endDate,  country,  publishedAt },  "fill": select(  source == "awards" => [    ...*[      _type == "awardsProgramme"      && nominationsClosingDate >= $today      && !(_id in coalesce(^.items[]._ref, []))    ] | order(nominationsClosingDate asc)[0...5]{   _id,  _type,  "slug": slug.current,  title,  category,  nominationsClosingDate,  startDate,  endDate,  country,  publishedAt },    ...*[      _type == "awardsProgramme"      && !(defined(nominationsClosingDate) && nominationsClosingDate >= $today)      && startDate >= $today      && !(_id in coalesce(^.items[]._ref, []))    ] | order(startDate asc)[0...5]{   _id,  _type,  "slug": slug.current,  title,  category,  nominationsClosingDate,  startDate,  endDate,  country,  publishedAt },    ...*[      _type == "awardsProgramme"      && !(defined(nominationsClosingDate) && nominationsClosingDate >= $today)      && startDate < $today      && !(_id in coalesce(^.items[]._ref, []))    ] | order(startDate desc)[0...5]{   _id,  _type,  "slug": slug.current,  title,  category,  nominationsClosingDate,  startDate,  endDate,  country,  publishedAt }  ],  source == "events" => [    ...*[      _type == "conferenceEvent"      && coalesce(endDate, startDate) >= $today      && !(_id in coalesce(^.items[]._ref, []))    ] | order(startDate asc)[0...4]{   _id,  _type,  "slug": slug.current,  title,  category,  nominationsClosingDate,  startDate,  endDate,  country,  publishedAt },    ...*[      _type == "conferenceEvent"      && coalesce(endDate, startDate) < $today      && !(_id in coalesce(^.items[]._ref, []))    ] | order(startDate desc)[0...4]{   _id,  _type,  "slug": slug.current,  title,  category,  nominationsClosingDate,  startDate,  endDate,  country,  publishedAt }  ],  source == "research" => *[    _type == "resource"    && category == "research"    && !(_id in coalesce(^.items[]._ref, []))    && _id != coalesce(^.promo.resource._ref, "")  ] | order(defined(publishedAt) desc, publishedAt desc, legacyWpId desc)[0...3]{   _id,  _type,  "slug": slug.current,  title,  category,  nominationsClosingDate,  startDate,  endDate,  country,  publishedAt }),  button{   label,    kind,  external,  internal->{    _type,    "slug": slug.current,    brand,    brands  } },  promo{    resource->{      title,      "downloadThumbnail": downloadThumbnail{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },      "downloadFileUrl": downloadFile.asset->url,      "downloadFileName": downloadFile.asset->originalFilename,      downloadUrl    },    title,    description,    "image": image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },    link{   kind,  external,  internal->{    _type,    "slug": slug.current,    brand,    brands  } }  } },  _type == "featuredStories" => {   heading[]{ _key, style, children[]{ _key, text } },  link{   label,    kind,  external,  internal->{    _type,    "slug": slug.current,    brand,    brands  } },  "posts": posts[]->{   _id,  title,  "slug": slug.current,  brands,    "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title },  publishedAt,  excerpt,  "image": image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },  "category": category->{ title, "slug": slug.current } } },  _type == "statsBar" => {   heading[]{ _key, style, children[]{ _key, text } },  items[]{ _key, icon, value, label } },  _type == "newsletterSignup" => {   heading[]{ _key, style, children[]{ _key, text } },  body,  preferencesLabel,  options[]{    _key,    label,    defaultChecked,    "interestKey": *[_type == "subscribeModal" && _id == "subscribe-modal-" + $brand][0].interests[attribute.name == ^.attribute.name][0]._key  },  emailPlaceholder,  buttonLabel,  invalidEmailMessage,  noOptionMessage,  image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) } },  _type == "sponsoredContent" => {   label,  link{   label,    kind,  external,  internal->{    _type,    "slug": slug.current,    brand,    brands  } },  profileLabel,  "post": *[    _type == "post"    && _id == ^.post._ref    && defined(slug.current)    && defined(sponsor)    && ($brand == "clearview" || $brand in brands)  ][0]{      _id,  title,  "slug": slug.current,  brands,    "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title },  publishedAt,  excerpt,  "image": image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },  "category": category->{ title, "slug": slug.current },    "sponsor": sponsor->{      title,      "slug": slug.current,      "logo": logo{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) }    }  } },  _type == "postCards" => {     heading[]{ _key, style, children[]{ _key, text } },  link{   label,    kind,  external,  internal->{    _type,    "slug": slug.current,    brand,    brands  } },  "category": category->{ title, "slug": slug.current },  "posts": posts[$brand in @->brands]->{   _id,  title,  "slug": slug.current,  brands,    "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title },  publishedAt,  excerpt,  "image": image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },  "category": category->{ title, "slug": slug.current } },  "latest":   *[    _type == "post"    && defined(slug.current)    && $brand in brands    && defined(^.category._ref) && category._ref == ^.category._ref    && !(_id in coalesce(^.posts[]._ref, []))  ] | order(publishedAt desc)[0...6]{   _id,  title,  "slug": slug.current,  brands,    "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title },  publishedAt,  excerpt,  "image": image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },  "category": category->{ title, "slug": slug.current } } },  _type == "postBriefs" => {     heading[]{ _key, style, children[]{ _key, text } },  link{   label,    kind,  external,  internal->{    _type,    "slug": slug.current,    brand,    brands  } },  count,  "posts": posts[$brand in @->brands]->{     _id,  title,  "slug": slug.current,  brands,    "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title },  publishedAt,  excerpt,  "image": image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },  "category": category->{ title, "slug": slug.current },  "topic": primaryTopic->{ title },  briefText },  "latest":   *[    _type == "post"    && defined(slug.current)    && $brand in brands    && true    && !(_id in coalesce(^.posts[]._ref, []))  ] | order(publishedAt desc)[0...6]{     _id,  title,  "slug": slug.current,  brands,    "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title },  publishedAt,  excerpt,  "image": image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },  "category": category->{ title, "slug": slug.current },  "topic": primaryTopic->{ title },  briefText } },  _type == "weeklyRoundup" => {   heading[]{ _key, style, children[]{ _key, text } },  label,  title,  summary,  button{   label,    kind,  external,  internal->{    _type,    "slug": slug.current,    brand,    brands  } },  listLabel,  "posts": posts[$brand in @->brands]->{   _id,  title,  "slug": slug.current,  brands,    "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title },  publishedAt,  excerpt,  "image": image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },  "category": category->{ title, "slug": slug.current } },  "latest":   *[    _type == "post"    && defined(slug.current)    && $brand in brands    && true    && !(_id in coalesce(^.posts[]._ref, []))  ] | order(publishedAt desc)[0...8]{   _id,  title,  "slug": slug.current,  brands,    "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title },  publishedAt,  excerpt,  "image": image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },  "category": category->{ title, "slug": slug.current } } },  _type == "topPicks" => {   heading[]{ _key, style, children[]{ _key, text } },  link{   label,    kind,  external,  internal->{    _type,    "slug": slug.current,    brand,    brands  } },  "posts": posts[$brand in @->brands]->{   _id,  title,  "slug": slug.current,  brands,    "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title },  publishedAt,  excerpt,  "image": image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },  "category": category->{ title, "slug": slug.current }, "sponsored": defined(sponsor) },  "fill": [    ...  *[    _type == "post"    && defined(slug.current)    && $brand in brands    && !defined(sponsor) && dateTime(publishedAt) >= dateTime($today + "T00:00:00Z") - 60*60*24*7    && !(_id in coalesce(^.posts[]._ref, []))  ] | order(publishedAt desc)[0...6]{   _id,  title,  "slug": slug.current,  brands,    "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title },  publishedAt,  excerpt,  "image": image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },  "category": category->{ title, "slug": slug.current } },    ...  *[    _type == "post"    && defined(slug.current)    && $brand in brands    && !defined(sponsor) && dateTime(publishedAt) < dateTime($today + "T00:00:00Z") - 60*60*24*7    && !(_id in coalesce(^.posts[]._ref, []))  ] | order(publishedAt desc)[0...6]{   _id,  title,  "slug": slug.current,  brands,    "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title },  publishedAt,  excerpt,  "image": image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },  "category": category->{ title, "slug": slug.current } }  ] },  _type == "exploreGrid" => {   cards[]{    _key,    heading[]{ _key, style, children[]{ _key, text } },    icon,    source,    count,    deadlineLabel,    button{   label,    kind,  external,  internal->{    _type,    "slug": slug.current,    brand,    brands  } },    "items": items[@->_type != "post" || $brand in @->brands]->{   _type == "post" => { _type,   _id,  title,  "slug": slug.current,  brands,    "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title },  publishedAt,  excerpt,  "image": image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },  "category": category->{ title, "slug": slug.current } },  _type != "post" => {   _id,  _type,  "slug": slug.current,  title,  category,  nominationsClosingDate,  startDate,  endDate,  country,  publishedAt } },    "fill": select(      source == "posts" =>   *[    _type == "post"    && defined(slug.current)    && $brand in brands    && defined(^.category._ref) && category._ref == ^.category._ref    && !(_id in coalesce(^.items[]._ref, []))  ] | order(publishedAt desc)[0...6]{ _type,   _id,  title,  "slug": slug.current,  brands,    "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title },  publishedAt,  excerpt,  "image": image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },  "category": category->{ title, "slug": slug.current } },        source == "awards" => [    ...*[      _type == "awardsProgramme"      && nominationsClosingDate >= $today      && !(_id in coalesce(^.items[]._ref, []))    ] | order(nominationsClosingDate asc)[0...5]{   _id,  _type,  "slug": slug.current,  title,  category,  nominationsClosingDate,  startDate,  endDate,  country,  publishedAt },    ...*[      _type == "awardsProgramme"      && !(defined(nominationsClosingDate) && nominationsClosingDate >= $today)      && startDate >= $today      && !(_id in coalesce(^.items[]._ref, []))    ] | order(startDate asc)[0...5]{   _id,  _type,  "slug": slug.current,  title,  category,  nominationsClosingDate,  startDate,  endDate,  country,  publishedAt },    ...*[      _type == "awardsProgramme"      && !(defined(nominationsClosingDate) && nominationsClosingDate >= $today)      && startDate < $today      && !(_id in coalesce(^.items[]._ref, []))    ] | order(startDate desc)[0...5]{   _id,  _type,  "slug": slug.current,  title,  category,  nominationsClosingDate,  startDate,  endDate,  country,  publishedAt }  ],  source == "events" => [    ...*[      _type == "conferenceEvent"      && coalesce(endDate, startDate) >= $today      && !(_id in coalesce(^.items[]._ref, []))    ] | order(startDate asc)[0...4]{   _id,  _type,  "slug": slug.current,  title,  category,  nominationsClosingDate,  startDate,  endDate,  country,  publishedAt },    ...*[      _type == "conferenceEvent"      && coalesce(endDate, startDate) < $today      && !(_id in coalesce(^.items[]._ref, []))    ] | order(startDate desc)[0...4]{   _id,  _type,  "slug": slug.current,  title,  category,  nominationsClosingDate,  startDate,  endDate,  country,  publishedAt }  ],  source == "research" => *[    _type == "resource"    && category == "research"    && !(_id in coalesce(^.items[]._ref, []))    && _id != coalesce(^.promo.resource._ref, "")  ] | order(defined(publishedAt) desc, publishedAt desc, legacyWpId desc)[0...3]{   _id,  _type,  "slug": slug.current,  title,  category,  nominationsClosingDate,  startDate,  endDate,  country,  publishedAt }    )  } },  _type == "subscribeBanner" => {   heading[]{ _key, style, children[]{ _key, text } },  description,  buttonLabel,  cta{   label,    kind,  external,  internal->{    _type,    "slug": slug.current,    brand,    brands  } } },  _type == "splitLayout" => {    "main": main[]{ _key, _type,   _type == "topStories" => {   linkLabel,  label,  "slides": slides[$brand == "clearview" || $brand in @->brands]->{   _id,  title,  "slug": slug.current,  brands,    "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title },  publishedAt,  excerpt,  "image": image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },  "category": category->{ title, "slug": slug.current } },  "articles": articles[$brand == "clearview" || $brand in @->brands]->{   _id,  title,  "slug": slug.current,  brands,    "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title },  publishedAt,  excerpt,  "image": image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },  "category": category->{ title, "slug": slug.current } },  "latest": *[    _type == "post"    && defined(slug.current)    && ($brand == "clearview" || $brand in brands)    && !(_id in coalesce(^.slides[]._ref, []))    && !(_id in coalesce(^.articles[]._ref, []))  ] | order(publishedAt desc)[0...6]{   _id,  title,  "slug": slug.current,  brands,    "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title },  publishedAt,  excerpt,  "image": image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },  "category": category->{ title, "slug": slug.current } } },  _type == "sponsoredContent" => {   label,  link{   label,    kind,  external,  internal->{    _type,    "slug": slug.current,    brand,    brands  } },  profileLabel,  "post": *[    _type == "post"    && _id == ^.post._ref    && defined(slug.current)    && defined(sponsor)    && ($brand == "clearview" || $brand in brands)  ][0]{      _id,  title,  "slug": slug.current,  brands,    "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title },  publishedAt,  excerpt,  "image": image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },  "category": category->{ title, "slug": slug.current },    "sponsor": sponsor->{      title,      "slug": slug.current,      "logo": logo{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) }    }  } },  _type == "postCards" => {     heading[]{ _key, style, children[]{ _key, text } },  link{   label,    kind,  external,  internal->{    _type,    "slug": slug.current,    brand,    brands  } },  "category": category->{ title, "slug": slug.current },  "posts": posts[$brand in @->brands]->{   _id,  title,  "slug": slug.current,  brands,    "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title },  publishedAt,  excerpt,  "image": image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },  "category": category->{ title, "slug": slug.current } },  "latest":   *[    _type == "post"    && defined(slug.current)    && $brand in brands    && defined(^.category._ref) && category._ref == ^.category._ref    && !(_id in coalesce(^.posts[]._ref, []))  ] | order(publishedAt desc)[0...6]{   _id,  title,  "slug": slug.current,  brands,    "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title },  publishedAt,  excerpt,  "image": image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },  "category": category->{ title, "slug": slug.current } } },  _type == "postBriefs" => {     heading[]{ _key, style, children[]{ _key, text } },  link{   label,    kind,  external,  internal->{    _type,    "slug": slug.current,    brand,    brands  } },  count,  "posts": posts[$brand in @->brands]->{     _id,  title,  "slug": slug.current,  brands,    "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title },  publishedAt,  excerpt,  "image": image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },  "category": category->{ title, "slug": slug.current },  "topic": primaryTopic->{ title },  briefText },  "latest":   *[    _type == "post"    && defined(slug.current)    && $brand in brands    && true    && !(_id in coalesce(^.posts[]._ref, []))  ] | order(publishedAt desc)[0...6]{     _id,  title,  "slug": slug.current,  brands,    "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title },  publishedAt,  excerpt,  "image": image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },  "category": category->{ title, "slug": slug.current },  "topic": primaryTopic->{ title },  briefText } },  _type == "weeklyRoundup" => {   heading[]{ _key, style, children[]{ _key, text } },  label,  title,  summary,  button{   label,    kind,  external,  internal->{    _type,    "slug": slug.current,    brand,    brands  } },  listLabel,  "posts": posts[$brand in @->brands]->{   _id,  title,  "slug": slug.current,  brands,    "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title },  publishedAt,  excerpt,  "image": image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },  "category": category->{ title, "slug": slug.current } },  "latest":   *[    _type == "post"    && defined(slug.current)    && $brand in brands    && true    && !(_id in coalesce(^.posts[]._ref, []))  ] | order(publishedAt desc)[0...8]{   _id,  title,  "slug": slug.current,  brands,    "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title },  publishedAt,  excerpt,  "image": image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },  "category": category->{ title, "slug": slug.current } } },  _type == "publications" => {   heading[]{ _key, style, children[]{ _key, text } },  body,  cards[]{    _key,    brand,    "brandTitle": *[_type == "brand" && key.current == ^.brand][0].title,    description,    image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },    linkLabel  } },  _type == "cta" => {   heading,  text,  link{ label, href } },  _type == "pageHero" => {   breadcrumbHomeLabel,  breadcrumbLabel,  title,  intro },  _type == "recordListing" => {   awardsTabLabel,  eventsTabLabel,  researchTabLabel,  regionFilterLabel,  regionEuropeLabel,  regionMenaLabel,  regionAsiaLabel,  regionNorthAmericaLabel,  yearFilterLabel,  statusFilterLabel,  allOptionLabel,  clearFiltersLabel,  upcomingEventLabel,  pastEventLabel,  publishedLabel,  emptyHeading,  emptyText,  emptyAwardNoun,  emptyEventNoun,  emptyResearchNoun,  emptyButtonLabel,  previousLabel,  nextLabel } },    "aside": aside[]{ _key, _type,   _type == "highlights" => {   source,  layout,  count,  heading[]{ _key, style, children[]{ _key, text } },  deadlineLabel,  "items": items[]->{   _id,  _type,  "slug": slug.current,  title,  category,  nominationsClosingDate,  startDate,  endDate,  country,  publishedAt },  "fill": select(  source == "awards" => [    ...*[      _type == "awardsProgramme"      && nominationsClosingDate >= $today      && !(_id in coalesce(^.items[]._ref, []))    ] | order(nominationsClosingDate asc)[0...5]{   _id,  _type,  "slug": slug.current,  title,  category,  nominationsClosingDate,  startDate,  endDate,  country,  publishedAt },    ...*[      _type == "awardsProgramme"      && !(defined(nominationsClosingDate) && nominationsClosingDate >= $today)      && startDate >= $today      && !(_id in coalesce(^.items[]._ref, []))    ] | order(startDate asc)[0...5]{   _id,  _type,  "slug": slug.current,  title,  category,  nominationsClosingDate,  startDate,  endDate,  country,  publishedAt },    ...*[      _type == "awardsProgramme"      && !(defined(nominationsClosingDate) && nominationsClosingDate >= $today)      && startDate < $today      && !(_id in coalesce(^.items[]._ref, []))    ] | order(startDate desc)[0...5]{   _id,  _type,  "slug": slug.current,  title,  category,  nominationsClosingDate,  startDate,  endDate,  country,  publishedAt }  ],  source == "events" => [    ...*[      _type == "conferenceEvent"      && coalesce(endDate, startDate) >= $today      && !(_id in coalesce(^.items[]._ref, []))    ] | order(startDate asc)[0...4]{   _id,  _type,  "slug": slug.current,  title,  category,  nominationsClosingDate,  startDate,  endDate,  country,  publishedAt },    ...*[      _type == "conferenceEvent"      && coalesce(endDate, startDate) < $today      && !(_id in coalesce(^.items[]._ref, []))    ] | order(startDate desc)[0...4]{   _id,  _type,  "slug": slug.current,  title,  category,  nominationsClosingDate,  startDate,  endDate,  country,  publishedAt }  ],  source == "research" => *[    _type == "resource"    && category == "research"    && !(_id in coalesce(^.items[]._ref, []))    && _id != coalesce(^.promo.resource._ref, "")  ] | order(defined(publishedAt) desc, publishedAt desc, legacyWpId desc)[0...3]{   _id,  _type,  "slug": slug.current,  title,  category,  nominationsClosingDate,  startDate,  endDate,  country,  publishedAt }),  button{   label,    kind,  external,  internal->{    _type,    "slug": slug.current,    brand,    brands  } },  promo{    resource->{      title,      "downloadThumbnail": downloadThumbnail{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },      "downloadFileUrl": downloadFile.asset->url,      "downloadFileName": downloadFile.asset->originalFilename,      downloadUrl    },    title,    description,    "image": image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },    link{   kind,  external,  internal->{    _type,    "slug": slug.current,    brand,    brands  } }  } },  _type == "awardsWinners" => { heading[]{ _key, style, children[]{ _key, text } } } }  } }  }
 export type PAGE_QUERY_RESULT = {
   _id: string;
   title: string | null;
@@ -19586,6 +19743,7 @@ export type PAGE_QUERY_RESULT = {
         _key: string;
         _type: "highlights";
         source: "awards" | "events" | "research" | null;
+        layout: "block" | "list" | null;
         count: number | null;
         heading: Array<{
           _key: string;
@@ -21062,6 +21220,14 @@ export type PAGE_QUERY_RESULT = {
             }
           | {
               _key: string;
+              _type: "pageHero";
+              breadcrumbHomeLabel: string | null;
+              breadcrumbLabel: string | null;
+              title: string | null;
+              intro: string | null;
+            }
+          | {
+              _key: string;
               _type: "postBriefs";
               heading: Array<{
                 _key: string;
@@ -21301,6 +21467,33 @@ export type PAGE_QUERY_RESULT = {
                 } | null;
                 linkLabel: string | null;
               }> | null;
+            }
+          | {
+              _key: string;
+              _type: "recordListing";
+              awardsTabLabel: string | null;
+              eventsTabLabel: string | null;
+              researchTabLabel: string | null;
+              regionFilterLabel: string | null;
+              regionEuropeLabel: string | null;
+              regionMenaLabel: string | null;
+              regionAsiaLabel: string | null;
+              regionNorthAmericaLabel: string | null;
+              yearFilterLabel: string | null;
+              statusFilterLabel: string | null;
+              allOptionLabel: string | null;
+              clearFiltersLabel: string | null;
+              upcomingEventLabel: string | null;
+              pastEventLabel: string | null;
+              publishedLabel: string | null;
+              emptyHeading: string | null;
+              emptyText: string | null;
+              emptyAwardNoun: string | null;
+              emptyEventNoun: string | null;
+              emptyResearchNoun: string | null;
+              emptyButtonLabel: string | null;
+              previousLabel: string | null;
+              nextLabel: string | null;
             }
           | {
               _key: string;
@@ -21576,6 +21769,7 @@ export type PAGE_QUERY_RESULT = {
               _key: string;
               _type: "highlights";
               source: "awards" | "events" | "research" | null;
+              layout: "block" | "list" | null;
               count: number | null;
               heading: Array<{
                 _key: string;
@@ -23209,7 +23403,7 @@ export type PAGE_QUERY_RESULT = {
 
 // Source: src/sanity/queries.ts
 // Variable: PAGE_SLUGS_QUERY
-// Query: *[_type == "page" && brand == $brand && defined(slug.current) && !(slug.current in ["home", "categories"])]{    "slug": slug.current  }
+// Query: *[    _type == "page"    && brand == $brand    && defined(slug.current)    && !(slug.current in ["home", "categories", "shared-listings"])  ]{    "slug": slug.current  }
 export type PAGE_SLUGS_QUERY_RESULT = Array<{
   slug: string | null;
 }>;
@@ -27151,13 +27345,5493 @@ export type RELATED_EVENTS_QUERY_RESULT = Array<{
   venue: string | null;
 }>;
 
+// Source: src/sanity/queries.ts
+// Variable: SHARED_LISTINGS_PAGE_QUERY
+// Query: {    "page": *[_type == "page" && _id == $id && brand == $brand][0]{      _id,      title,      blocks[]{ _key, _type,   _type == "topStories" => {   linkLabel,  label,  "slides": slides[$brand == "clearview" || $brand in @->brands]->{   _id,  title,  "slug": slug.current,  brands,    "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title },  publishedAt,  excerpt,  "image": image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },  "category": category->{ title, "slug": slug.current } },  "articles": articles[$brand == "clearview" || $brand in @->brands]->{   _id,  title,  "slug": slug.current,  brands,    "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title },  publishedAt,  excerpt,  "image": image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },  "category": category->{ title, "slug": slug.current } },  "latest": *[    _type == "post"    && defined(slug.current)    && ($brand == "clearview" || $brand in brands)    && !(_id in coalesce(^.slides[]._ref, []))    && !(_id in coalesce(^.articles[]._ref, []))  ] | order(publishedAt desc)[0...6]{   _id,  title,  "slug": slug.current,  brands,    "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title },  publishedAt,  excerpt,  "image": image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },  "category": category->{ title, "slug": slug.current } } },  _type == "publications" => {   heading[]{ _key, style, children[]{ _key, text } },  body,  cards[]{    _key,    brand,    "brandTitle": *[_type == "brand" && key.current == ^.brand][0].title,    description,    image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },    linkLabel  } },  _type == "cta" => {   heading,  text,  link{ label, href } },  _type == "highlights" => {   source,  layout,  count,  heading[]{ _key, style, children[]{ _key, text } },  deadlineLabel,  "items": items[]->{   _id,  _type,  "slug": slug.current,  title,  category,  nominationsClosingDate,  startDate,  endDate,  country,  publishedAt },  "fill": select(  source == "awards" => [    ...*[      _type == "awardsProgramme"      && nominationsClosingDate >= $today      && !(_id in coalesce(^.items[]._ref, []))    ] | order(nominationsClosingDate asc)[0...5]{   _id,  _type,  "slug": slug.current,  title,  category,  nominationsClosingDate,  startDate,  endDate,  country,  publishedAt },    ...*[      _type == "awardsProgramme"      && !(defined(nominationsClosingDate) && nominationsClosingDate >= $today)      && startDate >= $today      && !(_id in coalesce(^.items[]._ref, []))    ] | order(startDate asc)[0...5]{   _id,  _type,  "slug": slug.current,  title,  category,  nominationsClosingDate,  startDate,  endDate,  country,  publishedAt },    ...*[      _type == "awardsProgramme"      && !(defined(nominationsClosingDate) && nominationsClosingDate >= $today)      && startDate < $today      && !(_id in coalesce(^.items[]._ref, []))    ] | order(startDate desc)[0...5]{   _id,  _type,  "slug": slug.current,  title,  category,  nominationsClosingDate,  startDate,  endDate,  country,  publishedAt }  ],  source == "events" => [    ...*[      _type == "conferenceEvent"      && coalesce(endDate, startDate) >= $today      && !(_id in coalesce(^.items[]._ref, []))    ] | order(startDate asc)[0...4]{   _id,  _type,  "slug": slug.current,  title,  category,  nominationsClosingDate,  startDate,  endDate,  country,  publishedAt },    ...*[      _type == "conferenceEvent"      && coalesce(endDate, startDate) < $today      && !(_id in coalesce(^.items[]._ref, []))    ] | order(startDate desc)[0...4]{   _id,  _type,  "slug": slug.current,  title,  category,  nominationsClosingDate,  startDate,  endDate,  country,  publishedAt }  ],  source == "research" => *[    _type == "resource"    && category == "research"    && !(_id in coalesce(^.items[]._ref, []))    && _id != coalesce(^.promo.resource._ref, "")  ] | order(defined(publishedAt) desc, publishedAt desc, legacyWpId desc)[0...3]{   _id,  _type,  "slug": slug.current,  title,  category,  nominationsClosingDate,  startDate,  endDate,  country,  publishedAt }),  button{   label,    kind,  external,  internal->{    _type,    "slug": slug.current,    brand,    brands  } },  promo{    resource->{      title,      "downloadThumbnail": downloadThumbnail{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },      "downloadFileUrl": downloadFile.asset->url,      "downloadFileName": downloadFile.asset->originalFilename,      downloadUrl    },    title,    description,    "image": image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },    link{   kind,  external,  internal->{    _type,    "slug": slug.current,    brand,    brands  } }  } },  _type == "featuredStories" => {   heading[]{ _key, style, children[]{ _key, text } },  link{   label,    kind,  external,  internal->{    _type,    "slug": slug.current,    brand,    brands  } },  "posts": posts[]->{   _id,  title,  "slug": slug.current,  brands,    "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title },  publishedAt,  excerpt,  "image": image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },  "category": category->{ title, "slug": slug.current } } },  _type == "statsBar" => {   heading[]{ _key, style, children[]{ _key, text } },  items[]{ _key, icon, value, label } },  _type == "newsletterSignup" => {   heading[]{ _key, style, children[]{ _key, text } },  body,  preferencesLabel,  options[]{    _key,    label,    defaultChecked,    "interestKey": *[_type == "subscribeModal" && _id == "subscribe-modal-" + $brand][0].interests[attribute.name == ^.attribute.name][0]._key  },  emailPlaceholder,  buttonLabel,  invalidEmailMessage,  noOptionMessage,  image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) } },  _type == "sponsoredContent" => {   label,  link{   label,    kind,  external,  internal->{    _type,    "slug": slug.current,    brand,    brands  } },  profileLabel,  "post": *[    _type == "post"    && _id == ^.post._ref    && defined(slug.current)    && defined(sponsor)    && ($brand == "clearview" || $brand in brands)  ][0]{      _id,  title,  "slug": slug.current,  brands,    "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title },  publishedAt,  excerpt,  "image": image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },  "category": category->{ title, "slug": slug.current },    "sponsor": sponsor->{      title,      "slug": slug.current,      "logo": logo{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) }    }  } },  _type == "postCards" => {     heading[]{ _key, style, children[]{ _key, text } },  link{   label,    kind,  external,  internal->{    _type,    "slug": slug.current,    brand,    brands  } },  "category": category->{ title, "slug": slug.current },  "posts": posts[$brand in @->brands]->{   _id,  title,  "slug": slug.current,  brands,    "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title },  publishedAt,  excerpt,  "image": image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },  "category": category->{ title, "slug": slug.current } },  "latest":   *[    _type == "post"    && defined(slug.current)    && $brand in brands    && defined(^.category._ref) && category._ref == ^.category._ref    && !(_id in coalesce(^.posts[]._ref, []))  ] | order(publishedAt desc)[0...6]{   _id,  title,  "slug": slug.current,  brands,    "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title },  publishedAt,  excerpt,  "image": image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },  "category": category->{ title, "slug": slug.current } } },  _type == "postBriefs" => {     heading[]{ _key, style, children[]{ _key, text } },  link{   label,    kind,  external,  internal->{    _type,    "slug": slug.current,    brand,    brands  } },  count,  "posts": posts[$brand in @->brands]->{     _id,  title,  "slug": slug.current,  brands,    "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title },  publishedAt,  excerpt,  "image": image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },  "category": category->{ title, "slug": slug.current },  "topic": primaryTopic->{ title },  briefText },  "latest":   *[    _type == "post"    && defined(slug.current)    && $brand in brands    && true    && !(_id in coalesce(^.posts[]._ref, []))  ] | order(publishedAt desc)[0...6]{     _id,  title,  "slug": slug.current,  brands,    "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title },  publishedAt,  excerpt,  "image": image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },  "category": category->{ title, "slug": slug.current },  "topic": primaryTopic->{ title },  briefText } },  _type == "weeklyRoundup" => {   heading[]{ _key, style, children[]{ _key, text } },  label,  title,  summary,  button{   label,    kind,  external,  internal->{    _type,    "slug": slug.current,    brand,    brands  } },  listLabel,  "posts": posts[$brand in @->brands]->{   _id,  title,  "slug": slug.current,  brands,    "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title },  publishedAt,  excerpt,  "image": image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },  "category": category->{ title, "slug": slug.current } },  "latest":   *[    _type == "post"    && defined(slug.current)    && $brand in brands    && true    && !(_id in coalesce(^.posts[]._ref, []))  ] | order(publishedAt desc)[0...8]{   _id,  title,  "slug": slug.current,  brands,    "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title },  publishedAt,  excerpt,  "image": image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },  "category": category->{ title, "slug": slug.current } } },  _type == "topPicks" => {   heading[]{ _key, style, children[]{ _key, text } },  link{   label,    kind,  external,  internal->{    _type,    "slug": slug.current,    brand,    brands  } },  "posts": posts[$brand in @->brands]->{   _id,  title,  "slug": slug.current,  brands,    "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title },  publishedAt,  excerpt,  "image": image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },  "category": category->{ title, "slug": slug.current }, "sponsored": defined(sponsor) },  "fill": [    ...  *[    _type == "post"    && defined(slug.current)    && $brand in brands    && !defined(sponsor) && dateTime(publishedAt) >= dateTime($today + "T00:00:00Z") - 60*60*24*7    && !(_id in coalesce(^.posts[]._ref, []))  ] | order(publishedAt desc)[0...6]{   _id,  title,  "slug": slug.current,  brands,    "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title },  publishedAt,  excerpt,  "image": image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },  "category": category->{ title, "slug": slug.current } },    ...  *[    _type == "post"    && defined(slug.current)    && $brand in brands    && !defined(sponsor) && dateTime(publishedAt) < dateTime($today + "T00:00:00Z") - 60*60*24*7    && !(_id in coalesce(^.posts[]._ref, []))  ] | order(publishedAt desc)[0...6]{   _id,  title,  "slug": slug.current,  brands,    "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title },  publishedAt,  excerpt,  "image": image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },  "category": category->{ title, "slug": slug.current } }  ] },  _type == "exploreGrid" => {   cards[]{    _key,    heading[]{ _key, style, children[]{ _key, text } },    icon,    source,    count,    deadlineLabel,    button{   label,    kind,  external,  internal->{    _type,    "slug": slug.current,    brand,    brands  } },    "items": items[@->_type != "post" || $brand in @->brands]->{   _type == "post" => { _type,   _id,  title,  "slug": slug.current,  brands,    "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title },  publishedAt,  excerpt,  "image": image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },  "category": category->{ title, "slug": slug.current } },  _type != "post" => {   _id,  _type,  "slug": slug.current,  title,  category,  nominationsClosingDate,  startDate,  endDate,  country,  publishedAt } },    "fill": select(      source == "posts" =>   *[    _type == "post"    && defined(slug.current)    && $brand in brands    && defined(^.category._ref) && category._ref == ^.category._ref    && !(_id in coalesce(^.items[]._ref, []))  ] | order(publishedAt desc)[0...6]{ _type,   _id,  title,  "slug": slug.current,  brands,    "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title },  publishedAt,  excerpt,  "image": image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },  "category": category->{ title, "slug": slug.current } },        source == "awards" => [    ...*[      _type == "awardsProgramme"      && nominationsClosingDate >= $today      && !(_id in coalesce(^.items[]._ref, []))    ] | order(nominationsClosingDate asc)[0...5]{   _id,  _type,  "slug": slug.current,  title,  category,  nominationsClosingDate,  startDate,  endDate,  country,  publishedAt },    ...*[      _type == "awardsProgramme"      && !(defined(nominationsClosingDate) && nominationsClosingDate >= $today)      && startDate >= $today      && !(_id in coalesce(^.items[]._ref, []))    ] | order(startDate asc)[0...5]{   _id,  _type,  "slug": slug.current,  title,  category,  nominationsClosingDate,  startDate,  endDate,  country,  publishedAt },    ...*[      _type == "awardsProgramme"      && !(defined(nominationsClosingDate) && nominationsClosingDate >= $today)      && startDate < $today      && !(_id in coalesce(^.items[]._ref, []))    ] | order(startDate desc)[0...5]{   _id,  _type,  "slug": slug.current,  title,  category,  nominationsClosingDate,  startDate,  endDate,  country,  publishedAt }  ],  source == "events" => [    ...*[      _type == "conferenceEvent"      && coalesce(endDate, startDate) >= $today      && !(_id in coalesce(^.items[]._ref, []))    ] | order(startDate asc)[0...4]{   _id,  _type,  "slug": slug.current,  title,  category,  nominationsClosingDate,  startDate,  endDate,  country,  publishedAt },    ...*[      _type == "conferenceEvent"      && coalesce(endDate, startDate) < $today      && !(_id in coalesce(^.items[]._ref, []))    ] | order(startDate desc)[0...4]{   _id,  _type,  "slug": slug.current,  title,  category,  nominationsClosingDate,  startDate,  endDate,  country,  publishedAt }  ],  source == "research" => *[    _type == "resource"    && category == "research"    && !(_id in coalesce(^.items[]._ref, []))    && _id != coalesce(^.promo.resource._ref, "")  ] | order(defined(publishedAt) desc, publishedAt desc, legacyWpId desc)[0...3]{   _id,  _type,  "slug": slug.current,  title,  category,  nominationsClosingDate,  startDate,  endDate,  country,  publishedAt }    )  } },  _type == "subscribeBanner" => {   heading[]{ _key, style, children[]{ _key, text } },  description,  buttonLabel,  cta{   label,    kind,  external,  internal->{    _type,    "slug": slug.current,    brand,    brands  } } },  _type == "splitLayout" => {    "main": main[]{ _key, _type,   _type == "topStories" => {   linkLabel,  label,  "slides": slides[$brand == "clearview" || $brand in @->brands]->{   _id,  title,  "slug": slug.current,  brands,    "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title },  publishedAt,  excerpt,  "image": image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },  "category": category->{ title, "slug": slug.current } },  "articles": articles[$brand == "clearview" || $brand in @->brands]->{   _id,  title,  "slug": slug.current,  brands,    "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title },  publishedAt,  excerpt,  "image": image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },  "category": category->{ title, "slug": slug.current } },  "latest": *[    _type == "post"    && defined(slug.current)    && ($brand == "clearview" || $brand in brands)    && !(_id in coalesce(^.slides[]._ref, []))    && !(_id in coalesce(^.articles[]._ref, []))  ] | order(publishedAt desc)[0...6]{   _id,  title,  "slug": slug.current,  brands,    "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title },  publishedAt,  excerpt,  "image": image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },  "category": category->{ title, "slug": slug.current } } },  _type == "sponsoredContent" => {   label,  link{   label,    kind,  external,  internal->{    _type,    "slug": slug.current,    brand,    brands  } },  profileLabel,  "post": *[    _type == "post"    && _id == ^.post._ref    && defined(slug.current)    && defined(sponsor)    && ($brand == "clearview" || $brand in brands)  ][0]{      _id,  title,  "slug": slug.current,  brands,    "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title },  publishedAt,  excerpt,  "image": image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },  "category": category->{ title, "slug": slug.current },    "sponsor": sponsor->{      title,      "slug": slug.current,      "logo": logo{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) }    }  } },  _type == "postCards" => {     heading[]{ _key, style, children[]{ _key, text } },  link{   label,    kind,  external,  internal->{    _type,    "slug": slug.current,    brand,    brands  } },  "category": category->{ title, "slug": slug.current },  "posts": posts[$brand in @->brands]->{   _id,  title,  "slug": slug.current,  brands,    "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title },  publishedAt,  excerpt,  "image": image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },  "category": category->{ title, "slug": slug.current } },  "latest":   *[    _type == "post"    && defined(slug.current)    && $brand in brands    && defined(^.category._ref) && category._ref == ^.category._ref    && !(_id in coalesce(^.posts[]._ref, []))  ] | order(publishedAt desc)[0...6]{   _id,  title,  "slug": slug.current,  brands,    "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title },  publishedAt,  excerpt,  "image": image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },  "category": category->{ title, "slug": slug.current } } },  _type == "postBriefs" => {     heading[]{ _key, style, children[]{ _key, text } },  link{   label,    kind,  external,  internal->{    _type,    "slug": slug.current,    brand,    brands  } },  count,  "posts": posts[$brand in @->brands]->{     _id,  title,  "slug": slug.current,  brands,    "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title },  publishedAt,  excerpt,  "image": image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },  "category": category->{ title, "slug": slug.current },  "topic": primaryTopic->{ title },  briefText },  "latest":   *[    _type == "post"    && defined(slug.current)    && $brand in brands    && true    && !(_id in coalesce(^.posts[]._ref, []))  ] | order(publishedAt desc)[0...6]{     _id,  title,  "slug": slug.current,  brands,    "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title },  publishedAt,  excerpt,  "image": image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },  "category": category->{ title, "slug": slug.current },  "topic": primaryTopic->{ title },  briefText } },  _type == "weeklyRoundup" => {   heading[]{ _key, style, children[]{ _key, text } },  label,  title,  summary,  button{   label,    kind,  external,  internal->{    _type,    "slug": slug.current,    brand,    brands  } },  listLabel,  "posts": posts[$brand in @->brands]->{   _id,  title,  "slug": slug.current,  brands,    "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title },  publishedAt,  excerpt,  "image": image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },  "category": category->{ title, "slug": slug.current } },  "latest":   *[    _type == "post"    && defined(slug.current)    && $brand in brands    && true    && !(_id in coalesce(^.posts[]._ref, []))  ] | order(publishedAt desc)[0...8]{   _id,  title,  "slug": slug.current,  brands,    "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title },  publishedAt,  excerpt,  "image": image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },  "category": category->{ title, "slug": slug.current } } },  _type == "publications" => {   heading[]{ _key, style, children[]{ _key, text } },  body,  cards[]{    _key,    brand,    "brandTitle": *[_type == "brand" && key.current == ^.brand][0].title,    description,    image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },    linkLabel  } },  _type == "cta" => {   heading,  text,  link{ label, href } },  _type == "pageHero" => {   breadcrumbHomeLabel,  breadcrumbLabel,  title,  intro },  _type == "recordListing" => {   awardsTabLabel,  eventsTabLabel,  researchTabLabel,  regionFilterLabel,  regionEuropeLabel,  regionMenaLabel,  regionAsiaLabel,  regionNorthAmericaLabel,  yearFilterLabel,  statusFilterLabel,  allOptionLabel,  clearFiltersLabel,  upcomingEventLabel,  pastEventLabel,  publishedLabel,  emptyHeading,  emptyText,  emptyAwardNoun,  emptyEventNoun,  emptyResearchNoun,  emptyButtonLabel,  previousLabel,  nextLabel } },    "aside": aside[]{ _key, _type,   _type == "highlights" => {   source,  layout,  count,  heading[]{ _key, style, children[]{ _key, text } },  deadlineLabel,  "items": items[]->{   _id,  _type,  "slug": slug.current,  title,  category,  nominationsClosingDate,  startDate,  endDate,  country,  publishedAt },  "fill": select(  source == "awards" => [    ...*[      _type == "awardsProgramme"      && nominationsClosingDate >= $today      && !(_id in coalesce(^.items[]._ref, []))    ] | order(nominationsClosingDate asc)[0...5]{   _id,  _type,  "slug": slug.current,  title,  category,  nominationsClosingDate,  startDate,  endDate,  country,  publishedAt },    ...*[      _type == "awardsProgramme"      && !(defined(nominationsClosingDate) && nominationsClosingDate >= $today)      && startDate >= $today      && !(_id in coalesce(^.items[]._ref, []))    ] | order(startDate asc)[0...5]{   _id,  _type,  "slug": slug.current,  title,  category,  nominationsClosingDate,  startDate,  endDate,  country,  publishedAt },    ...*[      _type == "awardsProgramme"      && !(defined(nominationsClosingDate) && nominationsClosingDate >= $today)      && startDate < $today      && !(_id in coalesce(^.items[]._ref, []))    ] | order(startDate desc)[0...5]{   _id,  _type,  "slug": slug.current,  title,  category,  nominationsClosingDate,  startDate,  endDate,  country,  publishedAt }  ],  source == "events" => [    ...*[      _type == "conferenceEvent"      && coalesce(endDate, startDate) >= $today      && !(_id in coalesce(^.items[]._ref, []))    ] | order(startDate asc)[0...4]{   _id,  _type,  "slug": slug.current,  title,  category,  nominationsClosingDate,  startDate,  endDate,  country,  publishedAt },    ...*[      _type == "conferenceEvent"      && coalesce(endDate, startDate) < $today      && !(_id in coalesce(^.items[]._ref, []))    ] | order(startDate desc)[0...4]{   _id,  _type,  "slug": slug.current,  title,  category,  nominationsClosingDate,  startDate,  endDate,  country,  publishedAt }  ],  source == "research" => *[    _type == "resource"    && category == "research"    && !(_id in coalesce(^.items[]._ref, []))    && _id != coalesce(^.promo.resource._ref, "")  ] | order(defined(publishedAt) desc, publishedAt desc, legacyWpId desc)[0...3]{   _id,  _type,  "slug": slug.current,  title,  category,  nominationsClosingDate,  startDate,  endDate,  country,  publishedAt }),  button{   label,    kind,  external,  internal->{    _type,    "slug": slug.current,    brand,    brands  } },  promo{    resource->{      title,      "downloadThumbnail": downloadThumbnail{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },      "downloadFileUrl": downloadFile.asset->url,      "downloadFileName": downloadFile.asset->originalFilename,      downloadUrl    },    title,    description,    "image": image{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },    link{   kind,  external,  internal->{    _type,    "slug": slug.current,    brand,    brands  } }  } },  _type == "awardsWinners" => { heading[]{ _key, style, children[]{ _key, text } } } }  } }    },    "statuses": *[_id == $statusesId && _type == "awardsProgrammePage"][0]{      launchingSoonLabel,      submissionsOpenLabel,      ceremonyDueLabel,      winnersAnnouncedLabel    },    "awards": *[$tab == "awards" && _type == "awardsProgramme" && defined(slug.current)]{      _id,      title,      "slug": slug.current,      standfirst,      startDate,      endDate,      hideDateTime,      nominationsOpeningDate,      nominationsClosingDate,      country,      "hasWinners": count(winners[defined(category->title) && defined(company->title)]) > 0    },    "events": *[$tab == "events" && _type == "conferenceEvent" && defined(slug.current)]{      _id,      title,      "slug": slug.current,      startDate,      endDate,      hideDateTime,      country    },    "research": *[$tab == "research" && _type == "resource" && category == "research" && defined(slug.current)]{      _id,      title,      "slug": slug.current,      publishedAt    }  }
+export type SHARED_LISTINGS_PAGE_QUERY_RESULT = {
+  page: {
+    _id: string;
+    title: string | null;
+    blocks: Array<
+      | {
+          _key: string;
+          _type: "cta";
+          heading: string | null;
+          text: string | null;
+          link: {
+            label: string | null;
+            href: string | null;
+          } | null;
+        }
+      | {
+          _key: string;
+          _type: "exploreGrid";
+          cards: Array<{
+            _key: string;
+            heading: Array<{
+              _key: string;
+              style: "h1" | "h2" | "h3" | "h4" | "h5" | "h6" | "normal" | null;
+              children: Array<{
+                _key: string;
+                text: string | null;
+              }> | null;
+            }> | null;
+            icon:
+              | "comment"
+              | "document"
+              | "glasses"
+              | "people-moves"
+              | "public"
+              | "star"
+              | null;
+            source: "awards" | "events" | "posts" | "research" | null;
+            count: number | null;
+            deadlineLabel: string | null;
+            button: {
+              label: string | null;
+              kind: "external" | "internal" | null;
+              external: string | null;
+              internal:
+                | {
+                    _type: "awardsProgramme";
+                    slug: string | null;
+                    brand: null;
+                    brands: null;
+                  }
+                | {
+                    _type: "conferenceEvent";
+                    slug: string | null;
+                    brand: null;
+                    brands: null;
+                  }
+                | {
+                    _type: "page";
+                    slug: string | null;
+                    brand:
+                      | "clearview"
+                      | "familywealthreport"
+                      | "wealthbriefing"
+                      | "wealthbriefingasia"
+                      | null;
+                    brands: null;
+                  }
+                | {
+                    _type: "post";
+                    slug: string | null;
+                    brand: null;
+                    brands: Array<string> | null;
+                  }
+                | {
+                    _type: "resource";
+                    slug: string | null;
+                    brand: null;
+                    brands: null;
+                  }
+                | null;
+            } | null;
+            items: Array<
+              | {
+                  _id: string;
+                  _type: "awardsProgramme";
+                  slug: string | null;
+                  title: string | null;
+                  category: null;
+                  nominationsClosingDate: string | null;
+                  startDate: string | null;
+                  endDate: string | null;
+                  country:
+                    | "AD"
+                    | "AE"
+                    | "AF"
+                    | "AG"
+                    | "AI"
+                    | "AL"
+                    | "AM"
+                    | "AO"
+                    | "AQ"
+                    | "AR"
+                    | "AS"
+                    | "AT"
+                    | "AU"
+                    | "AW"
+                    | "AX"
+                    | "AZ"
+                    | "BA"
+                    | "BB"
+                    | "BD"
+                    | "BE"
+                    | "BF"
+                    | "BG"
+                    | "BH"
+                    | "BI"
+                    | "BJ"
+                    | "BL"
+                    | "BM"
+                    | "BN"
+                    | "BO"
+                    | "BQ"
+                    | "BR"
+                    | "BS"
+                    | "BT"
+                    | "BV"
+                    | "BW"
+                    | "BY"
+                    | "BZ"
+                    | "CA"
+                    | "CC"
+                    | "CD"
+                    | "CF"
+                    | "CG"
+                    | "CH"
+                    | "CI"
+                    | "CK"
+                    | "CL"
+                    | "CM"
+                    | "CN"
+                    | "CO"
+                    | "CR"
+                    | "CU"
+                    | "CV"
+                    | "CW"
+                    | "CX"
+                    | "CY"
+                    | "CZ"
+                    | "DE"
+                    | "DJ"
+                    | "DK"
+                    | "DM"
+                    | "DO"
+                    | "DZ"
+                    | "EC"
+                    | "EE"
+                    | "EG"
+                    | "EH"
+                    | "ER"
+                    | "ES"
+                    | "ET"
+                    | "FI"
+                    | "FJ"
+                    | "FK"
+                    | "FM"
+                    | "FO"
+                    | "FR"
+                    | "GA"
+                    | "GB"
+                    | "GD"
+                    | "GE"
+                    | "GF"
+                    | "GG"
+                    | "GH"
+                    | "GI"
+                    | "GL"
+                    | "GM"
+                    | "GN"
+                    | "GP"
+                    | "GQ"
+                    | "GR"
+                    | "GS"
+                    | "GT"
+                    | "GU"
+                    | "GW"
+                    | "GY"
+                    | "HK"
+                    | "HM"
+                    | "HN"
+                    | "HR"
+                    | "HT"
+                    | "HU"
+                    | "ID"
+                    | "IE"
+                    | "IL"
+                    | "IM"
+                    | "IN"
+                    | "IO"
+                    | "IQ"
+                    | "IR"
+                    | "IS"
+                    | "IT"
+                    | "JE"
+                    | "JM"
+                    | "JO"
+                    | "JP"
+                    | "KE"
+                    | "KG"
+                    | "KH"
+                    | "KI"
+                    | "KM"
+                    | "KN"
+                    | "KP"
+                    | "KR"
+                    | "KW"
+                    | "KY"
+                    | "KZ"
+                    | "LA"
+                    | "LB"
+                    | "LC"
+                    | "LI"
+                    | "LK"
+                    | "LR"
+                    | "LS"
+                    | "LT"
+                    | "LU"
+                    | "LV"
+                    | "LY"
+                    | "MA"
+                    | "MC"
+                    | "MD"
+                    | "ME"
+                    | "MF"
+                    | "MG"
+                    | "MH"
+                    | "MK"
+                    | "ML"
+                    | "MM"
+                    | "MN"
+                    | "MO"
+                    | "MP"
+                    | "MQ"
+                    | "MR"
+                    | "MS"
+                    | "MT"
+                    | "MU"
+                    | "MV"
+                    | "MW"
+                    | "MX"
+                    | "MY"
+                    | "MZ"
+                    | "NA"
+                    | "NC"
+                    | "NE"
+                    | "NF"
+                    | "NG"
+                    | "NI"
+                    | "NL"
+                    | "NO"
+                    | "NP"
+                    | "NR"
+                    | "NU"
+                    | "NZ"
+                    | "OM"
+                    | "PA"
+                    | "PE"
+                    | "PF"
+                    | "PG"
+                    | "PH"
+                    | "PK"
+                    | "PL"
+                    | "PM"
+                    | "PN"
+                    | "PR"
+                    | "PS"
+                    | "PT"
+                    | "PW"
+                    | "PY"
+                    | "QA"
+                    | "RE"
+                    | "RO"
+                    | "RS"
+                    | "RU"
+                    | "RW"
+                    | "SA"
+                    | "SB"
+                    | "SC"
+                    | "SD"
+                    | "SE"
+                    | "SG"
+                    | "SH"
+                    | "SI"
+                    | "SJ"
+                    | "SK"
+                    | "SL"
+                    | "SM"
+                    | "SN"
+                    | "SO"
+                    | "SR"
+                    | "SS"
+                    | "ST"
+                    | "SV"
+                    | "SX"
+                    | "SY"
+                    | "SZ"
+                    | "TC"
+                    | "TD"
+                    | "TF"
+                    | "TG"
+                    | "TH"
+                    | "TJ"
+                    | "TK"
+                    | "TL"
+                    | "TM"
+                    | "TN"
+                    | "TO"
+                    | "TR"
+                    | "TT"
+                    | "TV"
+                    | "TW"
+                    | "TZ"
+                    | "UA"
+                    | "UG"
+                    | "UM"
+                    | "US"
+                    | "UY"
+                    | "UZ"
+                    | "VA"
+                    | "VC"
+                    | "VE"
+                    | "VG"
+                    | "VI"
+                    | "VN"
+                    | "VU"
+                    | "WF"
+                    | "WS"
+                    | "YE"
+                    | "YT"
+                    | "ZA"
+                    | "ZM"
+                    | "ZW"
+                    | null;
+                  publishedAt: null;
+                }
+              | {
+                  _id: string;
+                  _type: "conferenceEvent";
+                  slug: string | null;
+                  title: string | null;
+                  category: null;
+                  nominationsClosingDate: null;
+                  startDate: string | null;
+                  endDate: string | null;
+                  country:
+                    | "AD"
+                    | "AE"
+                    | "AF"
+                    | "AG"
+                    | "AI"
+                    | "AL"
+                    | "AM"
+                    | "AO"
+                    | "AQ"
+                    | "AR"
+                    | "AS"
+                    | "AT"
+                    | "AU"
+                    | "AW"
+                    | "AX"
+                    | "AZ"
+                    | "BA"
+                    | "BB"
+                    | "BD"
+                    | "BE"
+                    | "BF"
+                    | "BG"
+                    | "BH"
+                    | "BI"
+                    | "BJ"
+                    | "BL"
+                    | "BM"
+                    | "BN"
+                    | "BO"
+                    | "BQ"
+                    | "BR"
+                    | "BS"
+                    | "BT"
+                    | "BV"
+                    | "BW"
+                    | "BY"
+                    | "BZ"
+                    | "CA"
+                    | "CC"
+                    | "CD"
+                    | "CF"
+                    | "CG"
+                    | "CH"
+                    | "CI"
+                    | "CK"
+                    | "CL"
+                    | "CM"
+                    | "CN"
+                    | "CO"
+                    | "CR"
+                    | "CU"
+                    | "CV"
+                    | "CW"
+                    | "CX"
+                    | "CY"
+                    | "CZ"
+                    | "DE"
+                    | "DJ"
+                    | "DK"
+                    | "DM"
+                    | "DO"
+                    | "DZ"
+                    | "EC"
+                    | "EE"
+                    | "EG"
+                    | "EH"
+                    | "ER"
+                    | "ES"
+                    | "ET"
+                    | "FI"
+                    | "FJ"
+                    | "FK"
+                    | "FM"
+                    | "FO"
+                    | "FR"
+                    | "GA"
+                    | "GB"
+                    | "GD"
+                    | "GE"
+                    | "GF"
+                    | "GG"
+                    | "GH"
+                    | "GI"
+                    | "GL"
+                    | "GM"
+                    | "GN"
+                    | "GP"
+                    | "GQ"
+                    | "GR"
+                    | "GS"
+                    | "GT"
+                    | "GU"
+                    | "GW"
+                    | "GY"
+                    | "HK"
+                    | "HM"
+                    | "HN"
+                    | "HR"
+                    | "HT"
+                    | "HU"
+                    | "ID"
+                    | "IE"
+                    | "IL"
+                    | "IM"
+                    | "IN"
+                    | "IO"
+                    | "IQ"
+                    | "IR"
+                    | "IS"
+                    | "IT"
+                    | "JE"
+                    | "JM"
+                    | "JO"
+                    | "JP"
+                    | "KE"
+                    | "KG"
+                    | "KH"
+                    | "KI"
+                    | "KM"
+                    | "KN"
+                    | "KP"
+                    | "KR"
+                    | "KW"
+                    | "KY"
+                    | "KZ"
+                    | "LA"
+                    | "LB"
+                    | "LC"
+                    | "LI"
+                    | "LK"
+                    | "LR"
+                    | "LS"
+                    | "LT"
+                    | "LU"
+                    | "LV"
+                    | "LY"
+                    | "MA"
+                    | "MC"
+                    | "MD"
+                    | "ME"
+                    | "MF"
+                    | "MG"
+                    | "MH"
+                    | "MK"
+                    | "ML"
+                    | "MM"
+                    | "MN"
+                    | "MO"
+                    | "MP"
+                    | "MQ"
+                    | "MR"
+                    | "MS"
+                    | "MT"
+                    | "MU"
+                    | "MV"
+                    | "MW"
+                    | "MX"
+                    | "MY"
+                    | "MZ"
+                    | "NA"
+                    | "NC"
+                    | "NE"
+                    | "NF"
+                    | "NG"
+                    | "NI"
+                    | "NL"
+                    | "NO"
+                    | "NP"
+                    | "NR"
+                    | "NU"
+                    | "NZ"
+                    | "OM"
+                    | "PA"
+                    | "PE"
+                    | "PF"
+                    | "PG"
+                    | "PH"
+                    | "PK"
+                    | "PL"
+                    | "PM"
+                    | "PN"
+                    | "PR"
+                    | "PS"
+                    | "PT"
+                    | "PW"
+                    | "PY"
+                    | "QA"
+                    | "RE"
+                    | "RO"
+                    | "RS"
+                    | "RU"
+                    | "RW"
+                    | "SA"
+                    | "SB"
+                    | "SC"
+                    | "SD"
+                    | "SE"
+                    | "SG"
+                    | "SH"
+                    | "SI"
+                    | "SJ"
+                    | "SK"
+                    | "SL"
+                    | "SM"
+                    | "SN"
+                    | "SO"
+                    | "SR"
+                    | "SS"
+                    | "ST"
+                    | "SV"
+                    | "SX"
+                    | "SY"
+                    | "SZ"
+                    | "TC"
+                    | "TD"
+                    | "TF"
+                    | "TG"
+                    | "TH"
+                    | "TJ"
+                    | "TK"
+                    | "TL"
+                    | "TM"
+                    | "TN"
+                    | "TO"
+                    | "TR"
+                    | "TT"
+                    | "TV"
+                    | "TW"
+                    | "TZ"
+                    | "UA"
+                    | "UG"
+                    | "UM"
+                    | "US"
+                    | "UY"
+                    | "UZ"
+                    | "VA"
+                    | "VC"
+                    | "VE"
+                    | "VG"
+                    | "VI"
+                    | "VN"
+                    | "VU"
+                    | "WF"
+                    | "WS"
+                    | "YE"
+                    | "YT"
+                    | "ZA"
+                    | "ZM"
+                    | "ZW"
+                    | null;
+                  publishedAt: null;
+                }
+              | {
+                  _type: "post";
+                  _id: string;
+                  title: string | null;
+                  slug: string | null;
+                  brands: Array<string> | null;
+                  brandTitles: Array<{
+                    key: string | null;
+                    title: string | null;
+                  }>;
+                  publishedAt: string | null;
+                  excerpt: string | null;
+                  image: {
+                    asset: SanityImageAssetReference | null;
+                    hotspot: SanityImageHotspot | null;
+                    crop: SanityImageCrop | null;
+                    alt: string | null;
+                  } | null;
+                  category: {
+                    title: string | null;
+                    slug: string | null;
+                  } | null;
+                }
+              | {
+                  _id: string;
+                  _type: "resource";
+                  slug: string | null;
+                  title: string | null;
+                  category: "research" | null;
+                  nominationsClosingDate: null;
+                  startDate: null;
+                  endDate: null;
+                  country: null;
+                  publishedAt: string | null;
+                }
+            > | null;
+            fill:
+              | Array<{
+                  _type: "post";
+                  _id: string;
+                  title: string | null;
+                  slug: string | null;
+                  brands: Array<string> | null;
+                  brandTitles: Array<{
+                    key: string | null;
+                    title: string | null;
+                  }>;
+                  publishedAt: string | null;
+                  excerpt: string | null;
+                  image: {
+                    asset: SanityImageAssetReference | null;
+                    hotspot: SanityImageHotspot | null;
+                    crop: SanityImageCrop | null;
+                    alt: string | null;
+                  } | null;
+                  category: {
+                    title: string | null;
+                    slug: string | null;
+                  } | null;
+                }>
+              | Array<{
+                  _id: string;
+                  _type: "resource";
+                  slug: string | null;
+                  title: string | null;
+                  category: "research" | null;
+                  nominationsClosingDate: null;
+                  startDate: null;
+                  endDate: null;
+                  country: null;
+                  publishedAt: string | null;
+                }>
+              | Array<{
+                  _id: string;
+                  _type: "awardsProgramme";
+                  slug: string | null;
+                  title: string | null;
+                  category: null;
+                  nominationsClosingDate: string | null;
+                  startDate: string | null;
+                  endDate: string | null;
+                  country:
+                    | "AD"
+                    | "AE"
+                    | "AF"
+                    | "AG"
+                    | "AI"
+                    | "AL"
+                    | "AM"
+                    | "AO"
+                    | "AQ"
+                    | "AR"
+                    | "AS"
+                    | "AT"
+                    | "AU"
+                    | "AW"
+                    | "AX"
+                    | "AZ"
+                    | "BA"
+                    | "BB"
+                    | "BD"
+                    | "BE"
+                    | "BF"
+                    | "BG"
+                    | "BH"
+                    | "BI"
+                    | "BJ"
+                    | "BL"
+                    | "BM"
+                    | "BN"
+                    | "BO"
+                    | "BQ"
+                    | "BR"
+                    | "BS"
+                    | "BT"
+                    | "BV"
+                    | "BW"
+                    | "BY"
+                    | "BZ"
+                    | "CA"
+                    | "CC"
+                    | "CD"
+                    | "CF"
+                    | "CG"
+                    | "CH"
+                    | "CI"
+                    | "CK"
+                    | "CL"
+                    | "CM"
+                    | "CN"
+                    | "CO"
+                    | "CR"
+                    | "CU"
+                    | "CV"
+                    | "CW"
+                    | "CX"
+                    | "CY"
+                    | "CZ"
+                    | "DE"
+                    | "DJ"
+                    | "DK"
+                    | "DM"
+                    | "DO"
+                    | "DZ"
+                    | "EC"
+                    | "EE"
+                    | "EG"
+                    | "EH"
+                    | "ER"
+                    | "ES"
+                    | "ET"
+                    | "FI"
+                    | "FJ"
+                    | "FK"
+                    | "FM"
+                    | "FO"
+                    | "FR"
+                    | "GA"
+                    | "GB"
+                    | "GD"
+                    | "GE"
+                    | "GF"
+                    | "GG"
+                    | "GH"
+                    | "GI"
+                    | "GL"
+                    | "GM"
+                    | "GN"
+                    | "GP"
+                    | "GQ"
+                    | "GR"
+                    | "GS"
+                    | "GT"
+                    | "GU"
+                    | "GW"
+                    | "GY"
+                    | "HK"
+                    | "HM"
+                    | "HN"
+                    | "HR"
+                    | "HT"
+                    | "HU"
+                    | "ID"
+                    | "IE"
+                    | "IL"
+                    | "IM"
+                    | "IN"
+                    | "IO"
+                    | "IQ"
+                    | "IR"
+                    | "IS"
+                    | "IT"
+                    | "JE"
+                    | "JM"
+                    | "JO"
+                    | "JP"
+                    | "KE"
+                    | "KG"
+                    | "KH"
+                    | "KI"
+                    | "KM"
+                    | "KN"
+                    | "KP"
+                    | "KR"
+                    | "KW"
+                    | "KY"
+                    | "KZ"
+                    | "LA"
+                    | "LB"
+                    | "LC"
+                    | "LI"
+                    | "LK"
+                    | "LR"
+                    | "LS"
+                    | "LT"
+                    | "LU"
+                    | "LV"
+                    | "LY"
+                    | "MA"
+                    | "MC"
+                    | "MD"
+                    | "ME"
+                    | "MF"
+                    | "MG"
+                    | "MH"
+                    | "MK"
+                    | "ML"
+                    | "MM"
+                    | "MN"
+                    | "MO"
+                    | "MP"
+                    | "MQ"
+                    | "MR"
+                    | "MS"
+                    | "MT"
+                    | "MU"
+                    | "MV"
+                    | "MW"
+                    | "MX"
+                    | "MY"
+                    | "MZ"
+                    | "NA"
+                    | "NC"
+                    | "NE"
+                    | "NF"
+                    | "NG"
+                    | "NI"
+                    | "NL"
+                    | "NO"
+                    | "NP"
+                    | "NR"
+                    | "NU"
+                    | "NZ"
+                    | "OM"
+                    | "PA"
+                    | "PE"
+                    | "PF"
+                    | "PG"
+                    | "PH"
+                    | "PK"
+                    | "PL"
+                    | "PM"
+                    | "PN"
+                    | "PR"
+                    | "PS"
+                    | "PT"
+                    | "PW"
+                    | "PY"
+                    | "QA"
+                    | "RE"
+                    | "RO"
+                    | "RS"
+                    | "RU"
+                    | "RW"
+                    | "SA"
+                    | "SB"
+                    | "SC"
+                    | "SD"
+                    | "SE"
+                    | "SG"
+                    | "SH"
+                    | "SI"
+                    | "SJ"
+                    | "SK"
+                    | "SL"
+                    | "SM"
+                    | "SN"
+                    | "SO"
+                    | "SR"
+                    | "SS"
+                    | "ST"
+                    | "SV"
+                    | "SX"
+                    | "SY"
+                    | "SZ"
+                    | "TC"
+                    | "TD"
+                    | "TF"
+                    | "TG"
+                    | "TH"
+                    | "TJ"
+                    | "TK"
+                    | "TL"
+                    | "TM"
+                    | "TN"
+                    | "TO"
+                    | "TR"
+                    | "TT"
+                    | "TV"
+                    | "TW"
+                    | "TZ"
+                    | "UA"
+                    | "UG"
+                    | "UM"
+                    | "US"
+                    | "UY"
+                    | "UZ"
+                    | "VA"
+                    | "VC"
+                    | "VE"
+                    | "VG"
+                    | "VI"
+                    | "VN"
+                    | "VU"
+                    | "WF"
+                    | "WS"
+                    | "YE"
+                    | "YT"
+                    | "ZA"
+                    | "ZM"
+                    | "ZW"
+                    | null;
+                  publishedAt: null;
+                }>
+              | Array<{
+                  _id: string;
+                  _type: "conferenceEvent";
+                  slug: string | null;
+                  title: string | null;
+                  category: null;
+                  nominationsClosingDate: null;
+                  startDate: string | null;
+                  endDate: string | null;
+                  country:
+                    | "AD"
+                    | "AE"
+                    | "AF"
+                    | "AG"
+                    | "AI"
+                    | "AL"
+                    | "AM"
+                    | "AO"
+                    | "AQ"
+                    | "AR"
+                    | "AS"
+                    | "AT"
+                    | "AU"
+                    | "AW"
+                    | "AX"
+                    | "AZ"
+                    | "BA"
+                    | "BB"
+                    | "BD"
+                    | "BE"
+                    | "BF"
+                    | "BG"
+                    | "BH"
+                    | "BI"
+                    | "BJ"
+                    | "BL"
+                    | "BM"
+                    | "BN"
+                    | "BO"
+                    | "BQ"
+                    | "BR"
+                    | "BS"
+                    | "BT"
+                    | "BV"
+                    | "BW"
+                    | "BY"
+                    | "BZ"
+                    | "CA"
+                    | "CC"
+                    | "CD"
+                    | "CF"
+                    | "CG"
+                    | "CH"
+                    | "CI"
+                    | "CK"
+                    | "CL"
+                    | "CM"
+                    | "CN"
+                    | "CO"
+                    | "CR"
+                    | "CU"
+                    | "CV"
+                    | "CW"
+                    | "CX"
+                    | "CY"
+                    | "CZ"
+                    | "DE"
+                    | "DJ"
+                    | "DK"
+                    | "DM"
+                    | "DO"
+                    | "DZ"
+                    | "EC"
+                    | "EE"
+                    | "EG"
+                    | "EH"
+                    | "ER"
+                    | "ES"
+                    | "ET"
+                    | "FI"
+                    | "FJ"
+                    | "FK"
+                    | "FM"
+                    | "FO"
+                    | "FR"
+                    | "GA"
+                    | "GB"
+                    | "GD"
+                    | "GE"
+                    | "GF"
+                    | "GG"
+                    | "GH"
+                    | "GI"
+                    | "GL"
+                    | "GM"
+                    | "GN"
+                    | "GP"
+                    | "GQ"
+                    | "GR"
+                    | "GS"
+                    | "GT"
+                    | "GU"
+                    | "GW"
+                    | "GY"
+                    | "HK"
+                    | "HM"
+                    | "HN"
+                    | "HR"
+                    | "HT"
+                    | "HU"
+                    | "ID"
+                    | "IE"
+                    | "IL"
+                    | "IM"
+                    | "IN"
+                    | "IO"
+                    | "IQ"
+                    | "IR"
+                    | "IS"
+                    | "IT"
+                    | "JE"
+                    | "JM"
+                    | "JO"
+                    | "JP"
+                    | "KE"
+                    | "KG"
+                    | "KH"
+                    | "KI"
+                    | "KM"
+                    | "KN"
+                    | "KP"
+                    | "KR"
+                    | "KW"
+                    | "KY"
+                    | "KZ"
+                    | "LA"
+                    | "LB"
+                    | "LC"
+                    | "LI"
+                    | "LK"
+                    | "LR"
+                    | "LS"
+                    | "LT"
+                    | "LU"
+                    | "LV"
+                    | "LY"
+                    | "MA"
+                    | "MC"
+                    | "MD"
+                    | "ME"
+                    | "MF"
+                    | "MG"
+                    | "MH"
+                    | "MK"
+                    | "ML"
+                    | "MM"
+                    | "MN"
+                    | "MO"
+                    | "MP"
+                    | "MQ"
+                    | "MR"
+                    | "MS"
+                    | "MT"
+                    | "MU"
+                    | "MV"
+                    | "MW"
+                    | "MX"
+                    | "MY"
+                    | "MZ"
+                    | "NA"
+                    | "NC"
+                    | "NE"
+                    | "NF"
+                    | "NG"
+                    | "NI"
+                    | "NL"
+                    | "NO"
+                    | "NP"
+                    | "NR"
+                    | "NU"
+                    | "NZ"
+                    | "OM"
+                    | "PA"
+                    | "PE"
+                    | "PF"
+                    | "PG"
+                    | "PH"
+                    | "PK"
+                    | "PL"
+                    | "PM"
+                    | "PN"
+                    | "PR"
+                    | "PS"
+                    | "PT"
+                    | "PW"
+                    | "PY"
+                    | "QA"
+                    | "RE"
+                    | "RO"
+                    | "RS"
+                    | "RU"
+                    | "RW"
+                    | "SA"
+                    | "SB"
+                    | "SC"
+                    | "SD"
+                    | "SE"
+                    | "SG"
+                    | "SH"
+                    | "SI"
+                    | "SJ"
+                    | "SK"
+                    | "SL"
+                    | "SM"
+                    | "SN"
+                    | "SO"
+                    | "SR"
+                    | "SS"
+                    | "ST"
+                    | "SV"
+                    | "SX"
+                    | "SY"
+                    | "SZ"
+                    | "TC"
+                    | "TD"
+                    | "TF"
+                    | "TG"
+                    | "TH"
+                    | "TJ"
+                    | "TK"
+                    | "TL"
+                    | "TM"
+                    | "TN"
+                    | "TO"
+                    | "TR"
+                    | "TT"
+                    | "TV"
+                    | "TW"
+                    | "TZ"
+                    | "UA"
+                    | "UG"
+                    | "UM"
+                    | "US"
+                    | "UY"
+                    | "UZ"
+                    | "VA"
+                    | "VC"
+                    | "VE"
+                    | "VG"
+                    | "VI"
+                    | "VN"
+                    | "VU"
+                    | "WF"
+                    | "WS"
+                    | "YE"
+                    | "YT"
+                    | "ZA"
+                    | "ZM"
+                    | "ZW"
+                    | null;
+                  publishedAt: null;
+                }>;
+          }> | null;
+        }
+      | {
+          _key: string;
+          _type: "featuredStories";
+          heading: Array<{
+            _key: string;
+            style: "h1" | "h2" | "h3" | "h4" | "h5" | "h6" | "normal" | null;
+            children: Array<{
+              _key: string;
+              text: string | null;
+            }> | null;
+          }> | null;
+          link: {
+            label: string | null;
+            kind: "external" | "internal" | null;
+            external: string | null;
+            internal:
+              | {
+                  _type: "awardsProgramme";
+                  slug: string | null;
+                  brand: null;
+                  brands: null;
+                }
+              | {
+                  _type: "conferenceEvent";
+                  slug: string | null;
+                  brand: null;
+                  brands: null;
+                }
+              | {
+                  _type: "page";
+                  slug: string | null;
+                  brand:
+                    | "clearview"
+                    | "familywealthreport"
+                    | "wealthbriefing"
+                    | "wealthbriefingasia"
+                    | null;
+                  brands: null;
+                }
+              | {
+                  _type: "post";
+                  slug: string | null;
+                  brand: null;
+                  brands: Array<string> | null;
+                }
+              | {
+                  _type: "resource";
+                  slug: string | null;
+                  brand: null;
+                  brands: null;
+                }
+              | null;
+          } | null;
+          posts: Array<{
+            _id: string;
+            title: string | null;
+            slug: string | null;
+            brands: Array<string> | null;
+            brandTitles: Array<{
+              key: string | null;
+              title: string | null;
+            }>;
+            publishedAt: string | null;
+            excerpt: string | null;
+            image: {
+              asset: SanityImageAssetReference | null;
+              hotspot: SanityImageHotspot | null;
+              crop: SanityImageCrop | null;
+              alt: string | null;
+            } | null;
+            category: {
+              title: string | null;
+              slug: string | null;
+            } | null;
+          }> | null;
+        }
+      | {
+          _key: string;
+          _type: "highlights";
+          source: "awards" | "events" | "research" | null;
+          layout: "block" | "list" | null;
+          count: number | null;
+          heading: Array<{
+            _key: string;
+            style: "h1" | "h2" | "h3" | "h4" | "h5" | "h6" | "normal" | null;
+            children: Array<{
+              _key: string;
+              text: string | null;
+            }> | null;
+          }> | null;
+          deadlineLabel: string | null;
+          items: Array<
+            | {
+                _id: string;
+                _type: "awardsProgramme";
+                slug: string | null;
+                title: string | null;
+                category: null;
+                nominationsClosingDate: string | null;
+                startDate: string | null;
+                endDate: string | null;
+                country:
+                  | "AD"
+                  | "AE"
+                  | "AF"
+                  | "AG"
+                  | "AI"
+                  | "AL"
+                  | "AM"
+                  | "AO"
+                  | "AQ"
+                  | "AR"
+                  | "AS"
+                  | "AT"
+                  | "AU"
+                  | "AW"
+                  | "AX"
+                  | "AZ"
+                  | "BA"
+                  | "BB"
+                  | "BD"
+                  | "BE"
+                  | "BF"
+                  | "BG"
+                  | "BH"
+                  | "BI"
+                  | "BJ"
+                  | "BL"
+                  | "BM"
+                  | "BN"
+                  | "BO"
+                  | "BQ"
+                  | "BR"
+                  | "BS"
+                  | "BT"
+                  | "BV"
+                  | "BW"
+                  | "BY"
+                  | "BZ"
+                  | "CA"
+                  | "CC"
+                  | "CD"
+                  | "CF"
+                  | "CG"
+                  | "CH"
+                  | "CI"
+                  | "CK"
+                  | "CL"
+                  | "CM"
+                  | "CN"
+                  | "CO"
+                  | "CR"
+                  | "CU"
+                  | "CV"
+                  | "CW"
+                  | "CX"
+                  | "CY"
+                  | "CZ"
+                  | "DE"
+                  | "DJ"
+                  | "DK"
+                  | "DM"
+                  | "DO"
+                  | "DZ"
+                  | "EC"
+                  | "EE"
+                  | "EG"
+                  | "EH"
+                  | "ER"
+                  | "ES"
+                  | "ET"
+                  | "FI"
+                  | "FJ"
+                  | "FK"
+                  | "FM"
+                  | "FO"
+                  | "FR"
+                  | "GA"
+                  | "GB"
+                  | "GD"
+                  | "GE"
+                  | "GF"
+                  | "GG"
+                  | "GH"
+                  | "GI"
+                  | "GL"
+                  | "GM"
+                  | "GN"
+                  | "GP"
+                  | "GQ"
+                  | "GR"
+                  | "GS"
+                  | "GT"
+                  | "GU"
+                  | "GW"
+                  | "GY"
+                  | "HK"
+                  | "HM"
+                  | "HN"
+                  | "HR"
+                  | "HT"
+                  | "HU"
+                  | "ID"
+                  | "IE"
+                  | "IL"
+                  | "IM"
+                  | "IN"
+                  | "IO"
+                  | "IQ"
+                  | "IR"
+                  | "IS"
+                  | "IT"
+                  | "JE"
+                  | "JM"
+                  | "JO"
+                  | "JP"
+                  | "KE"
+                  | "KG"
+                  | "KH"
+                  | "KI"
+                  | "KM"
+                  | "KN"
+                  | "KP"
+                  | "KR"
+                  | "KW"
+                  | "KY"
+                  | "KZ"
+                  | "LA"
+                  | "LB"
+                  | "LC"
+                  | "LI"
+                  | "LK"
+                  | "LR"
+                  | "LS"
+                  | "LT"
+                  | "LU"
+                  | "LV"
+                  | "LY"
+                  | "MA"
+                  | "MC"
+                  | "MD"
+                  | "ME"
+                  | "MF"
+                  | "MG"
+                  | "MH"
+                  | "MK"
+                  | "ML"
+                  | "MM"
+                  | "MN"
+                  | "MO"
+                  | "MP"
+                  | "MQ"
+                  | "MR"
+                  | "MS"
+                  | "MT"
+                  | "MU"
+                  | "MV"
+                  | "MW"
+                  | "MX"
+                  | "MY"
+                  | "MZ"
+                  | "NA"
+                  | "NC"
+                  | "NE"
+                  | "NF"
+                  | "NG"
+                  | "NI"
+                  | "NL"
+                  | "NO"
+                  | "NP"
+                  | "NR"
+                  | "NU"
+                  | "NZ"
+                  | "OM"
+                  | "PA"
+                  | "PE"
+                  | "PF"
+                  | "PG"
+                  | "PH"
+                  | "PK"
+                  | "PL"
+                  | "PM"
+                  | "PN"
+                  | "PR"
+                  | "PS"
+                  | "PT"
+                  | "PW"
+                  | "PY"
+                  | "QA"
+                  | "RE"
+                  | "RO"
+                  | "RS"
+                  | "RU"
+                  | "RW"
+                  | "SA"
+                  | "SB"
+                  | "SC"
+                  | "SD"
+                  | "SE"
+                  | "SG"
+                  | "SH"
+                  | "SI"
+                  | "SJ"
+                  | "SK"
+                  | "SL"
+                  | "SM"
+                  | "SN"
+                  | "SO"
+                  | "SR"
+                  | "SS"
+                  | "ST"
+                  | "SV"
+                  | "SX"
+                  | "SY"
+                  | "SZ"
+                  | "TC"
+                  | "TD"
+                  | "TF"
+                  | "TG"
+                  | "TH"
+                  | "TJ"
+                  | "TK"
+                  | "TL"
+                  | "TM"
+                  | "TN"
+                  | "TO"
+                  | "TR"
+                  | "TT"
+                  | "TV"
+                  | "TW"
+                  | "TZ"
+                  | "UA"
+                  | "UG"
+                  | "UM"
+                  | "US"
+                  | "UY"
+                  | "UZ"
+                  | "VA"
+                  | "VC"
+                  | "VE"
+                  | "VG"
+                  | "VI"
+                  | "VN"
+                  | "VU"
+                  | "WF"
+                  | "WS"
+                  | "YE"
+                  | "YT"
+                  | "ZA"
+                  | "ZM"
+                  | "ZW"
+                  | null;
+                publishedAt: null;
+              }
+            | {
+                _id: string;
+                _type: "conferenceEvent";
+                slug: string | null;
+                title: string | null;
+                category: null;
+                nominationsClosingDate: null;
+                startDate: string | null;
+                endDate: string | null;
+                country:
+                  | "AD"
+                  | "AE"
+                  | "AF"
+                  | "AG"
+                  | "AI"
+                  | "AL"
+                  | "AM"
+                  | "AO"
+                  | "AQ"
+                  | "AR"
+                  | "AS"
+                  | "AT"
+                  | "AU"
+                  | "AW"
+                  | "AX"
+                  | "AZ"
+                  | "BA"
+                  | "BB"
+                  | "BD"
+                  | "BE"
+                  | "BF"
+                  | "BG"
+                  | "BH"
+                  | "BI"
+                  | "BJ"
+                  | "BL"
+                  | "BM"
+                  | "BN"
+                  | "BO"
+                  | "BQ"
+                  | "BR"
+                  | "BS"
+                  | "BT"
+                  | "BV"
+                  | "BW"
+                  | "BY"
+                  | "BZ"
+                  | "CA"
+                  | "CC"
+                  | "CD"
+                  | "CF"
+                  | "CG"
+                  | "CH"
+                  | "CI"
+                  | "CK"
+                  | "CL"
+                  | "CM"
+                  | "CN"
+                  | "CO"
+                  | "CR"
+                  | "CU"
+                  | "CV"
+                  | "CW"
+                  | "CX"
+                  | "CY"
+                  | "CZ"
+                  | "DE"
+                  | "DJ"
+                  | "DK"
+                  | "DM"
+                  | "DO"
+                  | "DZ"
+                  | "EC"
+                  | "EE"
+                  | "EG"
+                  | "EH"
+                  | "ER"
+                  | "ES"
+                  | "ET"
+                  | "FI"
+                  | "FJ"
+                  | "FK"
+                  | "FM"
+                  | "FO"
+                  | "FR"
+                  | "GA"
+                  | "GB"
+                  | "GD"
+                  | "GE"
+                  | "GF"
+                  | "GG"
+                  | "GH"
+                  | "GI"
+                  | "GL"
+                  | "GM"
+                  | "GN"
+                  | "GP"
+                  | "GQ"
+                  | "GR"
+                  | "GS"
+                  | "GT"
+                  | "GU"
+                  | "GW"
+                  | "GY"
+                  | "HK"
+                  | "HM"
+                  | "HN"
+                  | "HR"
+                  | "HT"
+                  | "HU"
+                  | "ID"
+                  | "IE"
+                  | "IL"
+                  | "IM"
+                  | "IN"
+                  | "IO"
+                  | "IQ"
+                  | "IR"
+                  | "IS"
+                  | "IT"
+                  | "JE"
+                  | "JM"
+                  | "JO"
+                  | "JP"
+                  | "KE"
+                  | "KG"
+                  | "KH"
+                  | "KI"
+                  | "KM"
+                  | "KN"
+                  | "KP"
+                  | "KR"
+                  | "KW"
+                  | "KY"
+                  | "KZ"
+                  | "LA"
+                  | "LB"
+                  | "LC"
+                  | "LI"
+                  | "LK"
+                  | "LR"
+                  | "LS"
+                  | "LT"
+                  | "LU"
+                  | "LV"
+                  | "LY"
+                  | "MA"
+                  | "MC"
+                  | "MD"
+                  | "ME"
+                  | "MF"
+                  | "MG"
+                  | "MH"
+                  | "MK"
+                  | "ML"
+                  | "MM"
+                  | "MN"
+                  | "MO"
+                  | "MP"
+                  | "MQ"
+                  | "MR"
+                  | "MS"
+                  | "MT"
+                  | "MU"
+                  | "MV"
+                  | "MW"
+                  | "MX"
+                  | "MY"
+                  | "MZ"
+                  | "NA"
+                  | "NC"
+                  | "NE"
+                  | "NF"
+                  | "NG"
+                  | "NI"
+                  | "NL"
+                  | "NO"
+                  | "NP"
+                  | "NR"
+                  | "NU"
+                  | "NZ"
+                  | "OM"
+                  | "PA"
+                  | "PE"
+                  | "PF"
+                  | "PG"
+                  | "PH"
+                  | "PK"
+                  | "PL"
+                  | "PM"
+                  | "PN"
+                  | "PR"
+                  | "PS"
+                  | "PT"
+                  | "PW"
+                  | "PY"
+                  | "QA"
+                  | "RE"
+                  | "RO"
+                  | "RS"
+                  | "RU"
+                  | "RW"
+                  | "SA"
+                  | "SB"
+                  | "SC"
+                  | "SD"
+                  | "SE"
+                  | "SG"
+                  | "SH"
+                  | "SI"
+                  | "SJ"
+                  | "SK"
+                  | "SL"
+                  | "SM"
+                  | "SN"
+                  | "SO"
+                  | "SR"
+                  | "SS"
+                  | "ST"
+                  | "SV"
+                  | "SX"
+                  | "SY"
+                  | "SZ"
+                  | "TC"
+                  | "TD"
+                  | "TF"
+                  | "TG"
+                  | "TH"
+                  | "TJ"
+                  | "TK"
+                  | "TL"
+                  | "TM"
+                  | "TN"
+                  | "TO"
+                  | "TR"
+                  | "TT"
+                  | "TV"
+                  | "TW"
+                  | "TZ"
+                  | "UA"
+                  | "UG"
+                  | "UM"
+                  | "US"
+                  | "UY"
+                  | "UZ"
+                  | "VA"
+                  | "VC"
+                  | "VE"
+                  | "VG"
+                  | "VI"
+                  | "VN"
+                  | "VU"
+                  | "WF"
+                  | "WS"
+                  | "YE"
+                  | "YT"
+                  | "ZA"
+                  | "ZM"
+                  | "ZW"
+                  | null;
+                publishedAt: null;
+              }
+            | {
+                _id: string;
+                _type: "resource";
+                slug: string | null;
+                title: string | null;
+                category: "research" | null;
+                nominationsClosingDate: null;
+                startDate: null;
+                endDate: null;
+                country: null;
+                publishedAt: string | null;
+              }
+          > | null;
+          fill:
+            | Array<{
+                _id: string;
+                _type: "resource";
+                slug: string | null;
+                title: string | null;
+                category: "research" | null;
+                nominationsClosingDate: null;
+                startDate: null;
+                endDate: null;
+                country: null;
+                publishedAt: string | null;
+              }>
+            | Array<{
+                _id: string;
+                _type: "awardsProgramme";
+                slug: string | null;
+                title: string | null;
+                category: null;
+                nominationsClosingDate: string | null;
+                startDate: string | null;
+                endDate: string | null;
+                country:
+                  | "AD"
+                  | "AE"
+                  | "AF"
+                  | "AG"
+                  | "AI"
+                  | "AL"
+                  | "AM"
+                  | "AO"
+                  | "AQ"
+                  | "AR"
+                  | "AS"
+                  | "AT"
+                  | "AU"
+                  | "AW"
+                  | "AX"
+                  | "AZ"
+                  | "BA"
+                  | "BB"
+                  | "BD"
+                  | "BE"
+                  | "BF"
+                  | "BG"
+                  | "BH"
+                  | "BI"
+                  | "BJ"
+                  | "BL"
+                  | "BM"
+                  | "BN"
+                  | "BO"
+                  | "BQ"
+                  | "BR"
+                  | "BS"
+                  | "BT"
+                  | "BV"
+                  | "BW"
+                  | "BY"
+                  | "BZ"
+                  | "CA"
+                  | "CC"
+                  | "CD"
+                  | "CF"
+                  | "CG"
+                  | "CH"
+                  | "CI"
+                  | "CK"
+                  | "CL"
+                  | "CM"
+                  | "CN"
+                  | "CO"
+                  | "CR"
+                  | "CU"
+                  | "CV"
+                  | "CW"
+                  | "CX"
+                  | "CY"
+                  | "CZ"
+                  | "DE"
+                  | "DJ"
+                  | "DK"
+                  | "DM"
+                  | "DO"
+                  | "DZ"
+                  | "EC"
+                  | "EE"
+                  | "EG"
+                  | "EH"
+                  | "ER"
+                  | "ES"
+                  | "ET"
+                  | "FI"
+                  | "FJ"
+                  | "FK"
+                  | "FM"
+                  | "FO"
+                  | "FR"
+                  | "GA"
+                  | "GB"
+                  | "GD"
+                  | "GE"
+                  | "GF"
+                  | "GG"
+                  | "GH"
+                  | "GI"
+                  | "GL"
+                  | "GM"
+                  | "GN"
+                  | "GP"
+                  | "GQ"
+                  | "GR"
+                  | "GS"
+                  | "GT"
+                  | "GU"
+                  | "GW"
+                  | "GY"
+                  | "HK"
+                  | "HM"
+                  | "HN"
+                  | "HR"
+                  | "HT"
+                  | "HU"
+                  | "ID"
+                  | "IE"
+                  | "IL"
+                  | "IM"
+                  | "IN"
+                  | "IO"
+                  | "IQ"
+                  | "IR"
+                  | "IS"
+                  | "IT"
+                  | "JE"
+                  | "JM"
+                  | "JO"
+                  | "JP"
+                  | "KE"
+                  | "KG"
+                  | "KH"
+                  | "KI"
+                  | "KM"
+                  | "KN"
+                  | "KP"
+                  | "KR"
+                  | "KW"
+                  | "KY"
+                  | "KZ"
+                  | "LA"
+                  | "LB"
+                  | "LC"
+                  | "LI"
+                  | "LK"
+                  | "LR"
+                  | "LS"
+                  | "LT"
+                  | "LU"
+                  | "LV"
+                  | "LY"
+                  | "MA"
+                  | "MC"
+                  | "MD"
+                  | "ME"
+                  | "MF"
+                  | "MG"
+                  | "MH"
+                  | "MK"
+                  | "ML"
+                  | "MM"
+                  | "MN"
+                  | "MO"
+                  | "MP"
+                  | "MQ"
+                  | "MR"
+                  | "MS"
+                  | "MT"
+                  | "MU"
+                  | "MV"
+                  | "MW"
+                  | "MX"
+                  | "MY"
+                  | "MZ"
+                  | "NA"
+                  | "NC"
+                  | "NE"
+                  | "NF"
+                  | "NG"
+                  | "NI"
+                  | "NL"
+                  | "NO"
+                  | "NP"
+                  | "NR"
+                  | "NU"
+                  | "NZ"
+                  | "OM"
+                  | "PA"
+                  | "PE"
+                  | "PF"
+                  | "PG"
+                  | "PH"
+                  | "PK"
+                  | "PL"
+                  | "PM"
+                  | "PN"
+                  | "PR"
+                  | "PS"
+                  | "PT"
+                  | "PW"
+                  | "PY"
+                  | "QA"
+                  | "RE"
+                  | "RO"
+                  | "RS"
+                  | "RU"
+                  | "RW"
+                  | "SA"
+                  | "SB"
+                  | "SC"
+                  | "SD"
+                  | "SE"
+                  | "SG"
+                  | "SH"
+                  | "SI"
+                  | "SJ"
+                  | "SK"
+                  | "SL"
+                  | "SM"
+                  | "SN"
+                  | "SO"
+                  | "SR"
+                  | "SS"
+                  | "ST"
+                  | "SV"
+                  | "SX"
+                  | "SY"
+                  | "SZ"
+                  | "TC"
+                  | "TD"
+                  | "TF"
+                  | "TG"
+                  | "TH"
+                  | "TJ"
+                  | "TK"
+                  | "TL"
+                  | "TM"
+                  | "TN"
+                  | "TO"
+                  | "TR"
+                  | "TT"
+                  | "TV"
+                  | "TW"
+                  | "TZ"
+                  | "UA"
+                  | "UG"
+                  | "UM"
+                  | "US"
+                  | "UY"
+                  | "UZ"
+                  | "VA"
+                  | "VC"
+                  | "VE"
+                  | "VG"
+                  | "VI"
+                  | "VN"
+                  | "VU"
+                  | "WF"
+                  | "WS"
+                  | "YE"
+                  | "YT"
+                  | "ZA"
+                  | "ZM"
+                  | "ZW"
+                  | null;
+                publishedAt: null;
+              }>
+            | Array<{
+                _id: string;
+                _type: "conferenceEvent";
+                slug: string | null;
+                title: string | null;
+                category: null;
+                nominationsClosingDate: null;
+                startDate: string | null;
+                endDate: string | null;
+                country:
+                  | "AD"
+                  | "AE"
+                  | "AF"
+                  | "AG"
+                  | "AI"
+                  | "AL"
+                  | "AM"
+                  | "AO"
+                  | "AQ"
+                  | "AR"
+                  | "AS"
+                  | "AT"
+                  | "AU"
+                  | "AW"
+                  | "AX"
+                  | "AZ"
+                  | "BA"
+                  | "BB"
+                  | "BD"
+                  | "BE"
+                  | "BF"
+                  | "BG"
+                  | "BH"
+                  | "BI"
+                  | "BJ"
+                  | "BL"
+                  | "BM"
+                  | "BN"
+                  | "BO"
+                  | "BQ"
+                  | "BR"
+                  | "BS"
+                  | "BT"
+                  | "BV"
+                  | "BW"
+                  | "BY"
+                  | "BZ"
+                  | "CA"
+                  | "CC"
+                  | "CD"
+                  | "CF"
+                  | "CG"
+                  | "CH"
+                  | "CI"
+                  | "CK"
+                  | "CL"
+                  | "CM"
+                  | "CN"
+                  | "CO"
+                  | "CR"
+                  | "CU"
+                  | "CV"
+                  | "CW"
+                  | "CX"
+                  | "CY"
+                  | "CZ"
+                  | "DE"
+                  | "DJ"
+                  | "DK"
+                  | "DM"
+                  | "DO"
+                  | "DZ"
+                  | "EC"
+                  | "EE"
+                  | "EG"
+                  | "EH"
+                  | "ER"
+                  | "ES"
+                  | "ET"
+                  | "FI"
+                  | "FJ"
+                  | "FK"
+                  | "FM"
+                  | "FO"
+                  | "FR"
+                  | "GA"
+                  | "GB"
+                  | "GD"
+                  | "GE"
+                  | "GF"
+                  | "GG"
+                  | "GH"
+                  | "GI"
+                  | "GL"
+                  | "GM"
+                  | "GN"
+                  | "GP"
+                  | "GQ"
+                  | "GR"
+                  | "GS"
+                  | "GT"
+                  | "GU"
+                  | "GW"
+                  | "GY"
+                  | "HK"
+                  | "HM"
+                  | "HN"
+                  | "HR"
+                  | "HT"
+                  | "HU"
+                  | "ID"
+                  | "IE"
+                  | "IL"
+                  | "IM"
+                  | "IN"
+                  | "IO"
+                  | "IQ"
+                  | "IR"
+                  | "IS"
+                  | "IT"
+                  | "JE"
+                  | "JM"
+                  | "JO"
+                  | "JP"
+                  | "KE"
+                  | "KG"
+                  | "KH"
+                  | "KI"
+                  | "KM"
+                  | "KN"
+                  | "KP"
+                  | "KR"
+                  | "KW"
+                  | "KY"
+                  | "KZ"
+                  | "LA"
+                  | "LB"
+                  | "LC"
+                  | "LI"
+                  | "LK"
+                  | "LR"
+                  | "LS"
+                  | "LT"
+                  | "LU"
+                  | "LV"
+                  | "LY"
+                  | "MA"
+                  | "MC"
+                  | "MD"
+                  | "ME"
+                  | "MF"
+                  | "MG"
+                  | "MH"
+                  | "MK"
+                  | "ML"
+                  | "MM"
+                  | "MN"
+                  | "MO"
+                  | "MP"
+                  | "MQ"
+                  | "MR"
+                  | "MS"
+                  | "MT"
+                  | "MU"
+                  | "MV"
+                  | "MW"
+                  | "MX"
+                  | "MY"
+                  | "MZ"
+                  | "NA"
+                  | "NC"
+                  | "NE"
+                  | "NF"
+                  | "NG"
+                  | "NI"
+                  | "NL"
+                  | "NO"
+                  | "NP"
+                  | "NR"
+                  | "NU"
+                  | "NZ"
+                  | "OM"
+                  | "PA"
+                  | "PE"
+                  | "PF"
+                  | "PG"
+                  | "PH"
+                  | "PK"
+                  | "PL"
+                  | "PM"
+                  | "PN"
+                  | "PR"
+                  | "PS"
+                  | "PT"
+                  | "PW"
+                  | "PY"
+                  | "QA"
+                  | "RE"
+                  | "RO"
+                  | "RS"
+                  | "RU"
+                  | "RW"
+                  | "SA"
+                  | "SB"
+                  | "SC"
+                  | "SD"
+                  | "SE"
+                  | "SG"
+                  | "SH"
+                  | "SI"
+                  | "SJ"
+                  | "SK"
+                  | "SL"
+                  | "SM"
+                  | "SN"
+                  | "SO"
+                  | "SR"
+                  | "SS"
+                  | "ST"
+                  | "SV"
+                  | "SX"
+                  | "SY"
+                  | "SZ"
+                  | "TC"
+                  | "TD"
+                  | "TF"
+                  | "TG"
+                  | "TH"
+                  | "TJ"
+                  | "TK"
+                  | "TL"
+                  | "TM"
+                  | "TN"
+                  | "TO"
+                  | "TR"
+                  | "TT"
+                  | "TV"
+                  | "TW"
+                  | "TZ"
+                  | "UA"
+                  | "UG"
+                  | "UM"
+                  | "US"
+                  | "UY"
+                  | "UZ"
+                  | "VA"
+                  | "VC"
+                  | "VE"
+                  | "VG"
+                  | "VI"
+                  | "VN"
+                  | "VU"
+                  | "WF"
+                  | "WS"
+                  | "YE"
+                  | "YT"
+                  | "ZA"
+                  | "ZM"
+                  | "ZW"
+                  | null;
+                publishedAt: null;
+              }>;
+          button: {
+            label: string | null;
+            kind: "external" | "internal" | null;
+            external: string | null;
+            internal:
+              | {
+                  _type: "awardsProgramme";
+                  slug: string | null;
+                  brand: null;
+                  brands: null;
+                }
+              | {
+                  _type: "conferenceEvent";
+                  slug: string | null;
+                  brand: null;
+                  brands: null;
+                }
+              | {
+                  _type: "page";
+                  slug: string | null;
+                  brand:
+                    | "clearview"
+                    | "familywealthreport"
+                    | "wealthbriefing"
+                    | "wealthbriefingasia"
+                    | null;
+                  brands: null;
+                }
+              | {
+                  _type: "post";
+                  slug: string | null;
+                  brand: null;
+                  brands: Array<string> | null;
+                }
+              | {
+                  _type: "resource";
+                  slug: string | null;
+                  brand: null;
+                  brands: null;
+                }
+              | null;
+          } | null;
+          promo: {
+            resource: {
+              title: string | null;
+              downloadThumbnail: {
+                asset: SanityImageAssetReference | null;
+                hotspot: SanityImageHotspot | null;
+                crop: SanityImageCrop | null;
+                alt: string | null;
+              } | null;
+              downloadFileUrl: string | null;
+              downloadFileName: string | null;
+              downloadUrl: string | null;
+            } | null;
+            title: string | null;
+            description: string | null;
+            image: {
+              asset: SanityImageAssetReference | null;
+              hotspot: SanityImageHotspot | null;
+              crop: SanityImageCrop | null;
+              alt: string | null;
+            } | null;
+            link: {
+              kind: "external" | "internal" | null;
+              external: string | null;
+              internal:
+                | {
+                    _type: "awardsProgramme";
+                    slug: string | null;
+                    brand: null;
+                    brands: null;
+                  }
+                | {
+                    _type: "conferenceEvent";
+                    slug: string | null;
+                    brand: null;
+                    brands: null;
+                  }
+                | {
+                    _type: "page";
+                    slug: string | null;
+                    brand:
+                      | "clearview"
+                      | "familywealthreport"
+                      | "wealthbriefing"
+                      | "wealthbriefingasia"
+                      | null;
+                    brands: null;
+                  }
+                | {
+                    _type: "post";
+                    slug: string | null;
+                    brand: null;
+                    brands: Array<string> | null;
+                  }
+                | {
+                    _type: "resource";
+                    slug: string | null;
+                    brand: null;
+                    brands: null;
+                  }
+                | null;
+            } | null;
+          } | null;
+        }
+      | {
+          _key: string;
+          _type: "newsletterSignup";
+          heading: Array<{
+            _key: string;
+            style: "h1" | "h2" | "h3" | "h4" | "h5" | "h6" | "normal" | null;
+            children: Array<{
+              _key: string;
+              text: string | null;
+            }> | null;
+          }> | null;
+          body: string | null;
+          preferencesLabel: string | null;
+          options: Array<{
+            _key: string;
+            label: string | null;
+            defaultChecked: boolean | null;
+            interestKey: string | null;
+          }> | null;
+          emailPlaceholder: string | null;
+          buttonLabel: string | null;
+          invalidEmailMessage: string | null;
+          noOptionMessage: string | null;
+          image: {
+            asset: SanityImageAssetReference | null;
+            hotspot: SanityImageHotspot | null;
+            crop: SanityImageCrop | null;
+            alt: string | null;
+          } | null;
+        }
+      | {
+          _key: string;
+          _type: "postBriefs";
+          heading: Array<{
+            _key: string;
+            style: "h1" | "h2" | "h3" | "h4" | "h5" | "h6" | "normal" | null;
+            children: Array<{
+              _key: string;
+              text: string | null;
+            }> | null;
+          }> | null;
+          link: {
+            label: string | null;
+            kind: "external" | "internal" | null;
+            external: string | null;
+            internal:
+              | {
+                  _type: "awardsProgramme";
+                  slug: string | null;
+                  brand: null;
+                  brands: null;
+                }
+              | {
+                  _type: "conferenceEvent";
+                  slug: string | null;
+                  brand: null;
+                  brands: null;
+                }
+              | {
+                  _type: "page";
+                  slug: string | null;
+                  brand:
+                    | "clearview"
+                    | "familywealthreport"
+                    | "wealthbriefing"
+                    | "wealthbriefingasia"
+                    | null;
+                  brands: null;
+                }
+              | {
+                  _type: "post";
+                  slug: string | null;
+                  brand: null;
+                  brands: Array<string> | null;
+                }
+              | {
+                  _type: "resource";
+                  slug: string | null;
+                  brand: null;
+                  brands: null;
+                }
+              | null;
+          } | null;
+          count: number | null;
+          posts: Array<{
+            _id: string;
+            title: string | null;
+            slug: string | null;
+            brands: Array<string> | null;
+            brandTitles: Array<{
+              key: string | null;
+              title: string | null;
+            }>;
+            publishedAt: string | null;
+            excerpt: string | null;
+            image: {
+              asset: SanityImageAssetReference | null;
+              hotspot: SanityImageHotspot | null;
+              crop: SanityImageCrop | null;
+              alt: string | null;
+            } | null;
+            category: {
+              title: string | null;
+              slug: string | null;
+            } | null;
+            topic: {
+              title: string | null;
+            } | null;
+            briefText: string | null;
+          }> | null;
+          latest: Array<{
+            _id: string;
+            title: string | null;
+            slug: string | null;
+            brands: Array<string> | null;
+            brandTitles: Array<{
+              key: string | null;
+              title: string | null;
+            }>;
+            publishedAt: string | null;
+            excerpt: string | null;
+            image: {
+              asset: SanityImageAssetReference | null;
+              hotspot: SanityImageHotspot | null;
+              crop: SanityImageCrop | null;
+              alt: string | null;
+            } | null;
+            category: {
+              title: string | null;
+              slug: string | null;
+            } | null;
+            topic: {
+              title: string | null;
+            } | null;
+            briefText: string | null;
+          }>;
+        }
+      | {
+          _key: string;
+          _type: "postCards";
+          heading: Array<{
+            _key: string;
+            style: "h1" | "h2" | "h3" | "h4" | "h5" | "h6" | "normal" | null;
+            children: Array<{
+              _key: string;
+              text: string | null;
+            }> | null;
+          }> | null;
+          link: {
+            label: string | null;
+            kind: "external" | "internal" | null;
+            external: string | null;
+            internal:
+              | {
+                  _type: "awardsProgramme";
+                  slug: string | null;
+                  brand: null;
+                  brands: null;
+                }
+              | {
+                  _type: "conferenceEvent";
+                  slug: string | null;
+                  brand: null;
+                  brands: null;
+                }
+              | {
+                  _type: "page";
+                  slug: string | null;
+                  brand:
+                    | "clearview"
+                    | "familywealthreport"
+                    | "wealthbriefing"
+                    | "wealthbriefingasia"
+                    | null;
+                  brands: null;
+                }
+              | {
+                  _type: "post";
+                  slug: string | null;
+                  brand: null;
+                  brands: Array<string> | null;
+                }
+              | {
+                  _type: "resource";
+                  slug: string | null;
+                  brand: null;
+                  brands: null;
+                }
+              | null;
+          } | null;
+          category: {
+            title: string | null;
+            slug: string | null;
+          } | null;
+          posts: Array<{
+            _id: string;
+            title: string | null;
+            slug: string | null;
+            brands: Array<string> | null;
+            brandTitles: Array<{
+              key: string | null;
+              title: string | null;
+            }>;
+            publishedAt: string | null;
+            excerpt: string | null;
+            image: {
+              asset: SanityImageAssetReference | null;
+              hotspot: SanityImageHotspot | null;
+              crop: SanityImageCrop | null;
+              alt: string | null;
+            } | null;
+            category: {
+              title: string | null;
+              slug: string | null;
+            } | null;
+          }> | null;
+          latest: Array<{
+            _id: string;
+            title: string | null;
+            slug: string | null;
+            brands: Array<string> | null;
+            brandTitles: Array<{
+              key: string | null;
+              title: string | null;
+            }>;
+            publishedAt: string | null;
+            excerpt: string | null;
+            image: {
+              asset: SanityImageAssetReference | null;
+              hotspot: SanityImageHotspot | null;
+              crop: SanityImageCrop | null;
+              alt: string | null;
+            } | null;
+            category: {
+              title: string | null;
+              slug: string | null;
+            } | null;
+          }>;
+        }
+      | {
+          _key: string;
+          _type: "publications";
+          heading: Array<{
+            _key: string;
+            style: "h1" | "h2" | "h3" | "h4" | "h5" | "h6" | "normal" | null;
+            children: Array<{
+              _key: string;
+              text: string | null;
+            }> | null;
+          }> | null;
+          body: string | null;
+          cards: Array<{
+            _key: string;
+            brand:
+              | "familywealthreport"
+              | "wealthbriefing"
+              | "wealthbriefingasia"
+              | null;
+            brandTitle: string | null;
+            description: string | null;
+            image: {
+              asset: SanityImageAssetReference | null;
+              hotspot: SanityImageHotspot | null;
+              crop: SanityImageCrop | null;
+              alt: string | null;
+            } | null;
+            linkLabel: string | null;
+          }> | null;
+        }
+      | {
+          _key: string;
+          _type: "splitLayout";
+          main: Array<
+            | {
+                _key: string;
+                _type: "cta";
+                heading: string | null;
+                text: string | null;
+                link: {
+                  label: string | null;
+                  href: string | null;
+                } | null;
+              }
+            | {
+                _key: string;
+                _type: "pageHero";
+                breadcrumbHomeLabel: string | null;
+                breadcrumbLabel: string | null;
+                title: string | null;
+                intro: string | null;
+              }
+            | {
+                _key: string;
+                _type: "postBriefs";
+                heading: Array<{
+                  _key: string;
+                  style:
+                    "h1" | "h2" | "h3" | "h4" | "h5" | "h6" | "normal" | null;
+                  children: Array<{
+                    _key: string;
+                    text: string | null;
+                  }> | null;
+                }> | null;
+                link: {
+                  label: string | null;
+                  kind: "external" | "internal" | null;
+                  external: string | null;
+                  internal:
+                    | {
+                        _type: "awardsProgramme";
+                        slug: string | null;
+                        brand: null;
+                        brands: null;
+                      }
+                    | {
+                        _type: "conferenceEvent";
+                        slug: string | null;
+                        brand: null;
+                        brands: null;
+                      }
+                    | {
+                        _type: "page";
+                        slug: string | null;
+                        brand:
+                          | "clearview"
+                          | "familywealthreport"
+                          | "wealthbriefing"
+                          | "wealthbriefingasia"
+                          | null;
+                        brands: null;
+                      }
+                    | {
+                        _type: "post";
+                        slug: string | null;
+                        brand: null;
+                        brands: Array<string> | null;
+                      }
+                    | {
+                        _type: "resource";
+                        slug: string | null;
+                        brand: null;
+                        brands: null;
+                      }
+                    | null;
+                } | null;
+                count: number | null;
+                posts: Array<{
+                  _id: string;
+                  title: string | null;
+                  slug: string | null;
+                  brands: Array<string> | null;
+                  brandTitles: Array<{
+                    key: string | null;
+                    title: string | null;
+                  }>;
+                  publishedAt: string | null;
+                  excerpt: string | null;
+                  image: {
+                    asset: SanityImageAssetReference | null;
+                    hotspot: SanityImageHotspot | null;
+                    crop: SanityImageCrop | null;
+                    alt: string | null;
+                  } | null;
+                  category: {
+                    title: string | null;
+                    slug: string | null;
+                  } | null;
+                  topic: {
+                    title: string | null;
+                  } | null;
+                  briefText: string | null;
+                }> | null;
+                latest: Array<{
+                  _id: string;
+                  title: string | null;
+                  slug: string | null;
+                  brands: Array<string> | null;
+                  brandTitles: Array<{
+                    key: string | null;
+                    title: string | null;
+                  }>;
+                  publishedAt: string | null;
+                  excerpt: string | null;
+                  image: {
+                    asset: SanityImageAssetReference | null;
+                    hotspot: SanityImageHotspot | null;
+                    crop: SanityImageCrop | null;
+                    alt: string | null;
+                  } | null;
+                  category: {
+                    title: string | null;
+                    slug: string | null;
+                  } | null;
+                  topic: {
+                    title: string | null;
+                  } | null;
+                  briefText: string | null;
+                }>;
+              }
+            | {
+                _key: string;
+                _type: "postCards";
+                heading: Array<{
+                  _key: string;
+                  style:
+                    "h1" | "h2" | "h3" | "h4" | "h5" | "h6" | "normal" | null;
+                  children: Array<{
+                    _key: string;
+                    text: string | null;
+                  }> | null;
+                }> | null;
+                link: {
+                  label: string | null;
+                  kind: "external" | "internal" | null;
+                  external: string | null;
+                  internal:
+                    | {
+                        _type: "awardsProgramme";
+                        slug: string | null;
+                        brand: null;
+                        brands: null;
+                      }
+                    | {
+                        _type: "conferenceEvent";
+                        slug: string | null;
+                        brand: null;
+                        brands: null;
+                      }
+                    | {
+                        _type: "page";
+                        slug: string | null;
+                        brand:
+                          | "clearview"
+                          | "familywealthreport"
+                          | "wealthbriefing"
+                          | "wealthbriefingasia"
+                          | null;
+                        brands: null;
+                      }
+                    | {
+                        _type: "post";
+                        slug: string | null;
+                        brand: null;
+                        brands: Array<string> | null;
+                      }
+                    | {
+                        _type: "resource";
+                        slug: string | null;
+                        brand: null;
+                        brands: null;
+                      }
+                    | null;
+                } | null;
+                category: {
+                  title: string | null;
+                  slug: string | null;
+                } | null;
+                posts: Array<{
+                  _id: string;
+                  title: string | null;
+                  slug: string | null;
+                  brands: Array<string> | null;
+                  brandTitles: Array<{
+                    key: string | null;
+                    title: string | null;
+                  }>;
+                  publishedAt: string | null;
+                  excerpt: string | null;
+                  image: {
+                    asset: SanityImageAssetReference | null;
+                    hotspot: SanityImageHotspot | null;
+                    crop: SanityImageCrop | null;
+                    alt: string | null;
+                  } | null;
+                  category: {
+                    title: string | null;
+                    slug: string | null;
+                  } | null;
+                }> | null;
+                latest: Array<{
+                  _id: string;
+                  title: string | null;
+                  slug: string | null;
+                  brands: Array<string> | null;
+                  brandTitles: Array<{
+                    key: string | null;
+                    title: string | null;
+                  }>;
+                  publishedAt: string | null;
+                  excerpt: string | null;
+                  image: {
+                    asset: SanityImageAssetReference | null;
+                    hotspot: SanityImageHotspot | null;
+                    crop: SanityImageCrop | null;
+                    alt: string | null;
+                  } | null;
+                  category: {
+                    title: string | null;
+                    slug: string | null;
+                  } | null;
+                }>;
+              }
+            | {
+                _key: string;
+                _type: "publications";
+                heading: Array<{
+                  _key: string;
+                  style:
+                    "h1" | "h2" | "h3" | "h4" | "h5" | "h6" | "normal" | null;
+                  children: Array<{
+                    _key: string;
+                    text: string | null;
+                  }> | null;
+                }> | null;
+                body: string | null;
+                cards: Array<{
+                  _key: string;
+                  brand:
+                    | "familywealthreport"
+                    | "wealthbriefing"
+                    | "wealthbriefingasia"
+                    | null;
+                  brandTitle: string | null;
+                  description: string | null;
+                  image: {
+                    asset: SanityImageAssetReference | null;
+                    hotspot: SanityImageHotspot | null;
+                    crop: SanityImageCrop | null;
+                    alt: string | null;
+                  } | null;
+                  linkLabel: string | null;
+                }> | null;
+              }
+            | {
+                _key: string;
+                _type: "recordListing";
+                awardsTabLabel: string | null;
+                eventsTabLabel: string | null;
+                researchTabLabel: string | null;
+                regionFilterLabel: string | null;
+                regionEuropeLabel: string | null;
+                regionMenaLabel: string | null;
+                regionAsiaLabel: string | null;
+                regionNorthAmericaLabel: string | null;
+                yearFilterLabel: string | null;
+                statusFilterLabel: string | null;
+                allOptionLabel: string | null;
+                clearFiltersLabel: string | null;
+                upcomingEventLabel: string | null;
+                pastEventLabel: string | null;
+                publishedLabel: string | null;
+                emptyHeading: string | null;
+                emptyText: string | null;
+                emptyAwardNoun: string | null;
+                emptyEventNoun: string | null;
+                emptyResearchNoun: string | null;
+                emptyButtonLabel: string | null;
+                previousLabel: string | null;
+                nextLabel: string | null;
+              }
+            | {
+                _key: string;
+                _type: "sponsoredContent";
+                label: string | null;
+                link: {
+                  label: string | null;
+                  kind: "external" | "internal" | null;
+                  external: string | null;
+                  internal:
+                    | {
+                        _type: "awardsProgramme";
+                        slug: string | null;
+                        brand: null;
+                        brands: null;
+                      }
+                    | {
+                        _type: "conferenceEvent";
+                        slug: string | null;
+                        brand: null;
+                        brands: null;
+                      }
+                    | {
+                        _type: "page";
+                        slug: string | null;
+                        brand:
+                          | "clearview"
+                          | "familywealthreport"
+                          | "wealthbriefing"
+                          | "wealthbriefingasia"
+                          | null;
+                        brands: null;
+                      }
+                    | {
+                        _type: "post";
+                        slug: string | null;
+                        brand: null;
+                        brands: Array<string> | null;
+                      }
+                    | {
+                        _type: "resource";
+                        slug: string | null;
+                        brand: null;
+                        brands: null;
+                      }
+                    | null;
+                } | null;
+                profileLabel: string | null;
+                post: {
+                  _id: string;
+                  title: string | null;
+                  slug: string | null;
+                  brands: Array<string> | null;
+                  brandTitles: Array<{
+                    key: string | null;
+                    title: string | null;
+                  }>;
+                  publishedAt: string | null;
+                  excerpt: string | null;
+                  image: {
+                    asset: SanityImageAssetReference | null;
+                    hotspot: SanityImageHotspot | null;
+                    crop: SanityImageCrop | null;
+                    alt: string | null;
+                  } | null;
+                  category: {
+                    title: string | null;
+                    slug: string | null;
+                  } | null;
+                  sponsor: {
+                    title: string | null;
+                    slug: string | null;
+                    logo: {
+                      asset: SanityImageAssetReference | null;
+                      hotspot: SanityImageHotspot | null;
+                      crop: SanityImageCrop | null;
+                      alt: string | null;
+                    } | null;
+                  } | null;
+                } | null;
+              }
+            | {
+                _key: string;
+                _type: "topStories";
+                linkLabel: string | null;
+                label: string | null;
+                slides: Array<{
+                  _id: string;
+                  title: string | null;
+                  slug: string | null;
+                  brands: Array<string> | null;
+                  brandTitles: Array<{
+                    key: string | null;
+                    title: string | null;
+                  }>;
+                  publishedAt: string | null;
+                  excerpt: string | null;
+                  image: {
+                    asset: SanityImageAssetReference | null;
+                    hotspot: SanityImageHotspot | null;
+                    crop: SanityImageCrop | null;
+                    alt: string | null;
+                  } | null;
+                  category: {
+                    title: string | null;
+                    slug: string | null;
+                  } | null;
+                }> | null;
+                articles: Array<{
+                  _id: string;
+                  title: string | null;
+                  slug: string | null;
+                  brands: Array<string> | null;
+                  brandTitles: Array<{
+                    key: string | null;
+                    title: string | null;
+                  }>;
+                  publishedAt: string | null;
+                  excerpt: string | null;
+                  image: {
+                    asset: SanityImageAssetReference | null;
+                    hotspot: SanityImageHotspot | null;
+                    crop: SanityImageCrop | null;
+                    alt: string | null;
+                  } | null;
+                  category: {
+                    title: string | null;
+                    slug: string | null;
+                  } | null;
+                }> | null;
+                latest: Array<{
+                  _id: string;
+                  title: string | null;
+                  slug: string | null;
+                  brands: Array<string> | null;
+                  brandTitles: Array<{
+                    key: string | null;
+                    title: string | null;
+                  }>;
+                  publishedAt: string | null;
+                  excerpt: string | null;
+                  image: {
+                    asset: SanityImageAssetReference | null;
+                    hotspot: SanityImageHotspot | null;
+                    crop: SanityImageCrop | null;
+                    alt: string | null;
+                  } | null;
+                  category: {
+                    title: string | null;
+                    slug: string | null;
+                  } | null;
+                }>;
+              }
+            | {
+                _key: string;
+                _type: "weeklyRoundup";
+                heading: Array<{
+                  _key: string;
+                  style:
+                    "h1" | "h2" | "h3" | "h4" | "h5" | "h6" | "normal" | null;
+                  children: Array<{
+                    _key: string;
+                    text: string | null;
+                  }> | null;
+                }> | null;
+                label: string | null;
+                title: string | null;
+                summary: string | null;
+                button: {
+                  label: string | null;
+                  kind: "external" | "internal" | null;
+                  external: string | null;
+                  internal:
+                    | {
+                        _type: "awardsProgramme";
+                        slug: string | null;
+                        brand: null;
+                        brands: null;
+                      }
+                    | {
+                        _type: "conferenceEvent";
+                        slug: string | null;
+                        brand: null;
+                        brands: null;
+                      }
+                    | {
+                        _type: "page";
+                        slug: string | null;
+                        brand:
+                          | "clearview"
+                          | "familywealthreport"
+                          | "wealthbriefing"
+                          | "wealthbriefingasia"
+                          | null;
+                        brands: null;
+                      }
+                    | {
+                        _type: "post";
+                        slug: string | null;
+                        brand: null;
+                        brands: Array<string> | null;
+                      }
+                    | {
+                        _type: "resource";
+                        slug: string | null;
+                        brand: null;
+                        brands: null;
+                      }
+                    | null;
+                } | null;
+                listLabel: string | null;
+                posts: Array<{
+                  _id: string;
+                  title: string | null;
+                  slug: string | null;
+                  brands: Array<string> | null;
+                  brandTitles: Array<{
+                    key: string | null;
+                    title: string | null;
+                  }>;
+                  publishedAt: string | null;
+                  excerpt: string | null;
+                  image: {
+                    asset: SanityImageAssetReference | null;
+                    hotspot: SanityImageHotspot | null;
+                    crop: SanityImageCrop | null;
+                    alt: string | null;
+                  } | null;
+                  category: {
+                    title: string | null;
+                    slug: string | null;
+                  } | null;
+                }> | null;
+                latest: Array<{
+                  _id: string;
+                  title: string | null;
+                  slug: string | null;
+                  brands: Array<string> | null;
+                  brandTitles: Array<{
+                    key: string | null;
+                    title: string | null;
+                  }>;
+                  publishedAt: string | null;
+                  excerpt: string | null;
+                  image: {
+                    asset: SanityImageAssetReference | null;
+                    hotspot: SanityImageHotspot | null;
+                    crop: SanityImageCrop | null;
+                    alt: string | null;
+                  } | null;
+                  category: {
+                    title: string | null;
+                    slug: string | null;
+                  } | null;
+                }>;
+              }
+          > | null;
+          aside: Array<
+            | {
+                _key: string;
+                _type: "awardsWinners";
+                heading: Array<{
+                  _key: string;
+                  style:
+                    "h1" | "h2" | "h3" | "h4" | "h5" | "h6" | "normal" | null;
+                  children: Array<{
+                    _key: string;
+                    text: string | null;
+                  }> | null;
+                }> | null;
+              }
+            | {
+                _key: string;
+                _type: "highlights";
+                source: "awards" | "events" | "research" | null;
+                layout: "block" | "list" | null;
+                count: number | null;
+                heading: Array<{
+                  _key: string;
+                  style:
+                    "h1" | "h2" | "h3" | "h4" | "h5" | "h6" | "normal" | null;
+                  children: Array<{
+                    _key: string;
+                    text: string | null;
+                  }> | null;
+                }> | null;
+                deadlineLabel: string | null;
+                items: Array<
+                  | {
+                      _id: string;
+                      _type: "awardsProgramme";
+                      slug: string | null;
+                      title: string | null;
+                      category: null;
+                      nominationsClosingDate: string | null;
+                      startDate: string | null;
+                      endDate: string | null;
+                      country:
+                        | "AD"
+                        | "AE"
+                        | "AF"
+                        | "AG"
+                        | "AI"
+                        | "AL"
+                        | "AM"
+                        | "AO"
+                        | "AQ"
+                        | "AR"
+                        | "AS"
+                        | "AT"
+                        | "AU"
+                        | "AW"
+                        | "AX"
+                        | "AZ"
+                        | "BA"
+                        | "BB"
+                        | "BD"
+                        | "BE"
+                        | "BF"
+                        | "BG"
+                        | "BH"
+                        | "BI"
+                        | "BJ"
+                        | "BL"
+                        | "BM"
+                        | "BN"
+                        | "BO"
+                        | "BQ"
+                        | "BR"
+                        | "BS"
+                        | "BT"
+                        | "BV"
+                        | "BW"
+                        | "BY"
+                        | "BZ"
+                        | "CA"
+                        | "CC"
+                        | "CD"
+                        | "CF"
+                        | "CG"
+                        | "CH"
+                        | "CI"
+                        | "CK"
+                        | "CL"
+                        | "CM"
+                        | "CN"
+                        | "CO"
+                        | "CR"
+                        | "CU"
+                        | "CV"
+                        | "CW"
+                        | "CX"
+                        | "CY"
+                        | "CZ"
+                        | "DE"
+                        | "DJ"
+                        | "DK"
+                        | "DM"
+                        | "DO"
+                        | "DZ"
+                        | "EC"
+                        | "EE"
+                        | "EG"
+                        | "EH"
+                        | "ER"
+                        | "ES"
+                        | "ET"
+                        | "FI"
+                        | "FJ"
+                        | "FK"
+                        | "FM"
+                        | "FO"
+                        | "FR"
+                        | "GA"
+                        | "GB"
+                        | "GD"
+                        | "GE"
+                        | "GF"
+                        | "GG"
+                        | "GH"
+                        | "GI"
+                        | "GL"
+                        | "GM"
+                        | "GN"
+                        | "GP"
+                        | "GQ"
+                        | "GR"
+                        | "GS"
+                        | "GT"
+                        | "GU"
+                        | "GW"
+                        | "GY"
+                        | "HK"
+                        | "HM"
+                        | "HN"
+                        | "HR"
+                        | "HT"
+                        | "HU"
+                        | "ID"
+                        | "IE"
+                        | "IL"
+                        | "IM"
+                        | "IN"
+                        | "IO"
+                        | "IQ"
+                        | "IR"
+                        | "IS"
+                        | "IT"
+                        | "JE"
+                        | "JM"
+                        | "JO"
+                        | "JP"
+                        | "KE"
+                        | "KG"
+                        | "KH"
+                        | "KI"
+                        | "KM"
+                        | "KN"
+                        | "KP"
+                        | "KR"
+                        | "KW"
+                        | "KY"
+                        | "KZ"
+                        | "LA"
+                        | "LB"
+                        | "LC"
+                        | "LI"
+                        | "LK"
+                        | "LR"
+                        | "LS"
+                        | "LT"
+                        | "LU"
+                        | "LV"
+                        | "LY"
+                        | "MA"
+                        | "MC"
+                        | "MD"
+                        | "ME"
+                        | "MF"
+                        | "MG"
+                        | "MH"
+                        | "MK"
+                        | "ML"
+                        | "MM"
+                        | "MN"
+                        | "MO"
+                        | "MP"
+                        | "MQ"
+                        | "MR"
+                        | "MS"
+                        | "MT"
+                        | "MU"
+                        | "MV"
+                        | "MW"
+                        | "MX"
+                        | "MY"
+                        | "MZ"
+                        | "NA"
+                        | "NC"
+                        | "NE"
+                        | "NF"
+                        | "NG"
+                        | "NI"
+                        | "NL"
+                        | "NO"
+                        | "NP"
+                        | "NR"
+                        | "NU"
+                        | "NZ"
+                        | "OM"
+                        | "PA"
+                        | "PE"
+                        | "PF"
+                        | "PG"
+                        | "PH"
+                        | "PK"
+                        | "PL"
+                        | "PM"
+                        | "PN"
+                        | "PR"
+                        | "PS"
+                        | "PT"
+                        | "PW"
+                        | "PY"
+                        | "QA"
+                        | "RE"
+                        | "RO"
+                        | "RS"
+                        | "RU"
+                        | "RW"
+                        | "SA"
+                        | "SB"
+                        | "SC"
+                        | "SD"
+                        | "SE"
+                        | "SG"
+                        | "SH"
+                        | "SI"
+                        | "SJ"
+                        | "SK"
+                        | "SL"
+                        | "SM"
+                        | "SN"
+                        | "SO"
+                        | "SR"
+                        | "SS"
+                        | "ST"
+                        | "SV"
+                        | "SX"
+                        | "SY"
+                        | "SZ"
+                        | "TC"
+                        | "TD"
+                        | "TF"
+                        | "TG"
+                        | "TH"
+                        | "TJ"
+                        | "TK"
+                        | "TL"
+                        | "TM"
+                        | "TN"
+                        | "TO"
+                        | "TR"
+                        | "TT"
+                        | "TV"
+                        | "TW"
+                        | "TZ"
+                        | "UA"
+                        | "UG"
+                        | "UM"
+                        | "US"
+                        | "UY"
+                        | "UZ"
+                        | "VA"
+                        | "VC"
+                        | "VE"
+                        | "VG"
+                        | "VI"
+                        | "VN"
+                        | "VU"
+                        | "WF"
+                        | "WS"
+                        | "YE"
+                        | "YT"
+                        | "ZA"
+                        | "ZM"
+                        | "ZW"
+                        | null;
+                      publishedAt: null;
+                    }
+                  | {
+                      _id: string;
+                      _type: "conferenceEvent";
+                      slug: string | null;
+                      title: string | null;
+                      category: null;
+                      nominationsClosingDate: null;
+                      startDate: string | null;
+                      endDate: string | null;
+                      country:
+                        | "AD"
+                        | "AE"
+                        | "AF"
+                        | "AG"
+                        | "AI"
+                        | "AL"
+                        | "AM"
+                        | "AO"
+                        | "AQ"
+                        | "AR"
+                        | "AS"
+                        | "AT"
+                        | "AU"
+                        | "AW"
+                        | "AX"
+                        | "AZ"
+                        | "BA"
+                        | "BB"
+                        | "BD"
+                        | "BE"
+                        | "BF"
+                        | "BG"
+                        | "BH"
+                        | "BI"
+                        | "BJ"
+                        | "BL"
+                        | "BM"
+                        | "BN"
+                        | "BO"
+                        | "BQ"
+                        | "BR"
+                        | "BS"
+                        | "BT"
+                        | "BV"
+                        | "BW"
+                        | "BY"
+                        | "BZ"
+                        | "CA"
+                        | "CC"
+                        | "CD"
+                        | "CF"
+                        | "CG"
+                        | "CH"
+                        | "CI"
+                        | "CK"
+                        | "CL"
+                        | "CM"
+                        | "CN"
+                        | "CO"
+                        | "CR"
+                        | "CU"
+                        | "CV"
+                        | "CW"
+                        | "CX"
+                        | "CY"
+                        | "CZ"
+                        | "DE"
+                        | "DJ"
+                        | "DK"
+                        | "DM"
+                        | "DO"
+                        | "DZ"
+                        | "EC"
+                        | "EE"
+                        | "EG"
+                        | "EH"
+                        | "ER"
+                        | "ES"
+                        | "ET"
+                        | "FI"
+                        | "FJ"
+                        | "FK"
+                        | "FM"
+                        | "FO"
+                        | "FR"
+                        | "GA"
+                        | "GB"
+                        | "GD"
+                        | "GE"
+                        | "GF"
+                        | "GG"
+                        | "GH"
+                        | "GI"
+                        | "GL"
+                        | "GM"
+                        | "GN"
+                        | "GP"
+                        | "GQ"
+                        | "GR"
+                        | "GS"
+                        | "GT"
+                        | "GU"
+                        | "GW"
+                        | "GY"
+                        | "HK"
+                        | "HM"
+                        | "HN"
+                        | "HR"
+                        | "HT"
+                        | "HU"
+                        | "ID"
+                        | "IE"
+                        | "IL"
+                        | "IM"
+                        | "IN"
+                        | "IO"
+                        | "IQ"
+                        | "IR"
+                        | "IS"
+                        | "IT"
+                        | "JE"
+                        | "JM"
+                        | "JO"
+                        | "JP"
+                        | "KE"
+                        | "KG"
+                        | "KH"
+                        | "KI"
+                        | "KM"
+                        | "KN"
+                        | "KP"
+                        | "KR"
+                        | "KW"
+                        | "KY"
+                        | "KZ"
+                        | "LA"
+                        | "LB"
+                        | "LC"
+                        | "LI"
+                        | "LK"
+                        | "LR"
+                        | "LS"
+                        | "LT"
+                        | "LU"
+                        | "LV"
+                        | "LY"
+                        | "MA"
+                        | "MC"
+                        | "MD"
+                        | "ME"
+                        | "MF"
+                        | "MG"
+                        | "MH"
+                        | "MK"
+                        | "ML"
+                        | "MM"
+                        | "MN"
+                        | "MO"
+                        | "MP"
+                        | "MQ"
+                        | "MR"
+                        | "MS"
+                        | "MT"
+                        | "MU"
+                        | "MV"
+                        | "MW"
+                        | "MX"
+                        | "MY"
+                        | "MZ"
+                        | "NA"
+                        | "NC"
+                        | "NE"
+                        | "NF"
+                        | "NG"
+                        | "NI"
+                        | "NL"
+                        | "NO"
+                        | "NP"
+                        | "NR"
+                        | "NU"
+                        | "NZ"
+                        | "OM"
+                        | "PA"
+                        | "PE"
+                        | "PF"
+                        | "PG"
+                        | "PH"
+                        | "PK"
+                        | "PL"
+                        | "PM"
+                        | "PN"
+                        | "PR"
+                        | "PS"
+                        | "PT"
+                        | "PW"
+                        | "PY"
+                        | "QA"
+                        | "RE"
+                        | "RO"
+                        | "RS"
+                        | "RU"
+                        | "RW"
+                        | "SA"
+                        | "SB"
+                        | "SC"
+                        | "SD"
+                        | "SE"
+                        | "SG"
+                        | "SH"
+                        | "SI"
+                        | "SJ"
+                        | "SK"
+                        | "SL"
+                        | "SM"
+                        | "SN"
+                        | "SO"
+                        | "SR"
+                        | "SS"
+                        | "ST"
+                        | "SV"
+                        | "SX"
+                        | "SY"
+                        | "SZ"
+                        | "TC"
+                        | "TD"
+                        | "TF"
+                        | "TG"
+                        | "TH"
+                        | "TJ"
+                        | "TK"
+                        | "TL"
+                        | "TM"
+                        | "TN"
+                        | "TO"
+                        | "TR"
+                        | "TT"
+                        | "TV"
+                        | "TW"
+                        | "TZ"
+                        | "UA"
+                        | "UG"
+                        | "UM"
+                        | "US"
+                        | "UY"
+                        | "UZ"
+                        | "VA"
+                        | "VC"
+                        | "VE"
+                        | "VG"
+                        | "VI"
+                        | "VN"
+                        | "VU"
+                        | "WF"
+                        | "WS"
+                        | "YE"
+                        | "YT"
+                        | "ZA"
+                        | "ZM"
+                        | "ZW"
+                        | null;
+                      publishedAt: null;
+                    }
+                  | {
+                      _id: string;
+                      _type: "resource";
+                      slug: string | null;
+                      title: string | null;
+                      category: "research" | null;
+                      nominationsClosingDate: null;
+                      startDate: null;
+                      endDate: null;
+                      country: null;
+                      publishedAt: string | null;
+                    }
+                > | null;
+                fill:
+                  | Array<{
+                      _id: string;
+                      _type: "resource";
+                      slug: string | null;
+                      title: string | null;
+                      category: "research" | null;
+                      nominationsClosingDate: null;
+                      startDate: null;
+                      endDate: null;
+                      country: null;
+                      publishedAt: string | null;
+                    }>
+                  | Array<{
+                      _id: string;
+                      _type: "awardsProgramme";
+                      slug: string | null;
+                      title: string | null;
+                      category: null;
+                      nominationsClosingDate: string | null;
+                      startDate: string | null;
+                      endDate: string | null;
+                      country:
+                        | "AD"
+                        | "AE"
+                        | "AF"
+                        | "AG"
+                        | "AI"
+                        | "AL"
+                        | "AM"
+                        | "AO"
+                        | "AQ"
+                        | "AR"
+                        | "AS"
+                        | "AT"
+                        | "AU"
+                        | "AW"
+                        | "AX"
+                        | "AZ"
+                        | "BA"
+                        | "BB"
+                        | "BD"
+                        | "BE"
+                        | "BF"
+                        | "BG"
+                        | "BH"
+                        | "BI"
+                        | "BJ"
+                        | "BL"
+                        | "BM"
+                        | "BN"
+                        | "BO"
+                        | "BQ"
+                        | "BR"
+                        | "BS"
+                        | "BT"
+                        | "BV"
+                        | "BW"
+                        | "BY"
+                        | "BZ"
+                        | "CA"
+                        | "CC"
+                        | "CD"
+                        | "CF"
+                        | "CG"
+                        | "CH"
+                        | "CI"
+                        | "CK"
+                        | "CL"
+                        | "CM"
+                        | "CN"
+                        | "CO"
+                        | "CR"
+                        | "CU"
+                        | "CV"
+                        | "CW"
+                        | "CX"
+                        | "CY"
+                        | "CZ"
+                        | "DE"
+                        | "DJ"
+                        | "DK"
+                        | "DM"
+                        | "DO"
+                        | "DZ"
+                        | "EC"
+                        | "EE"
+                        | "EG"
+                        | "EH"
+                        | "ER"
+                        | "ES"
+                        | "ET"
+                        | "FI"
+                        | "FJ"
+                        | "FK"
+                        | "FM"
+                        | "FO"
+                        | "FR"
+                        | "GA"
+                        | "GB"
+                        | "GD"
+                        | "GE"
+                        | "GF"
+                        | "GG"
+                        | "GH"
+                        | "GI"
+                        | "GL"
+                        | "GM"
+                        | "GN"
+                        | "GP"
+                        | "GQ"
+                        | "GR"
+                        | "GS"
+                        | "GT"
+                        | "GU"
+                        | "GW"
+                        | "GY"
+                        | "HK"
+                        | "HM"
+                        | "HN"
+                        | "HR"
+                        | "HT"
+                        | "HU"
+                        | "ID"
+                        | "IE"
+                        | "IL"
+                        | "IM"
+                        | "IN"
+                        | "IO"
+                        | "IQ"
+                        | "IR"
+                        | "IS"
+                        | "IT"
+                        | "JE"
+                        | "JM"
+                        | "JO"
+                        | "JP"
+                        | "KE"
+                        | "KG"
+                        | "KH"
+                        | "KI"
+                        | "KM"
+                        | "KN"
+                        | "KP"
+                        | "KR"
+                        | "KW"
+                        | "KY"
+                        | "KZ"
+                        | "LA"
+                        | "LB"
+                        | "LC"
+                        | "LI"
+                        | "LK"
+                        | "LR"
+                        | "LS"
+                        | "LT"
+                        | "LU"
+                        | "LV"
+                        | "LY"
+                        | "MA"
+                        | "MC"
+                        | "MD"
+                        | "ME"
+                        | "MF"
+                        | "MG"
+                        | "MH"
+                        | "MK"
+                        | "ML"
+                        | "MM"
+                        | "MN"
+                        | "MO"
+                        | "MP"
+                        | "MQ"
+                        | "MR"
+                        | "MS"
+                        | "MT"
+                        | "MU"
+                        | "MV"
+                        | "MW"
+                        | "MX"
+                        | "MY"
+                        | "MZ"
+                        | "NA"
+                        | "NC"
+                        | "NE"
+                        | "NF"
+                        | "NG"
+                        | "NI"
+                        | "NL"
+                        | "NO"
+                        | "NP"
+                        | "NR"
+                        | "NU"
+                        | "NZ"
+                        | "OM"
+                        | "PA"
+                        | "PE"
+                        | "PF"
+                        | "PG"
+                        | "PH"
+                        | "PK"
+                        | "PL"
+                        | "PM"
+                        | "PN"
+                        | "PR"
+                        | "PS"
+                        | "PT"
+                        | "PW"
+                        | "PY"
+                        | "QA"
+                        | "RE"
+                        | "RO"
+                        | "RS"
+                        | "RU"
+                        | "RW"
+                        | "SA"
+                        | "SB"
+                        | "SC"
+                        | "SD"
+                        | "SE"
+                        | "SG"
+                        | "SH"
+                        | "SI"
+                        | "SJ"
+                        | "SK"
+                        | "SL"
+                        | "SM"
+                        | "SN"
+                        | "SO"
+                        | "SR"
+                        | "SS"
+                        | "ST"
+                        | "SV"
+                        | "SX"
+                        | "SY"
+                        | "SZ"
+                        | "TC"
+                        | "TD"
+                        | "TF"
+                        | "TG"
+                        | "TH"
+                        | "TJ"
+                        | "TK"
+                        | "TL"
+                        | "TM"
+                        | "TN"
+                        | "TO"
+                        | "TR"
+                        | "TT"
+                        | "TV"
+                        | "TW"
+                        | "TZ"
+                        | "UA"
+                        | "UG"
+                        | "UM"
+                        | "US"
+                        | "UY"
+                        | "UZ"
+                        | "VA"
+                        | "VC"
+                        | "VE"
+                        | "VG"
+                        | "VI"
+                        | "VN"
+                        | "VU"
+                        | "WF"
+                        | "WS"
+                        | "YE"
+                        | "YT"
+                        | "ZA"
+                        | "ZM"
+                        | "ZW"
+                        | null;
+                      publishedAt: null;
+                    }>
+                  | Array<{
+                      _id: string;
+                      _type: "conferenceEvent";
+                      slug: string | null;
+                      title: string | null;
+                      category: null;
+                      nominationsClosingDate: null;
+                      startDate: string | null;
+                      endDate: string | null;
+                      country:
+                        | "AD"
+                        | "AE"
+                        | "AF"
+                        | "AG"
+                        | "AI"
+                        | "AL"
+                        | "AM"
+                        | "AO"
+                        | "AQ"
+                        | "AR"
+                        | "AS"
+                        | "AT"
+                        | "AU"
+                        | "AW"
+                        | "AX"
+                        | "AZ"
+                        | "BA"
+                        | "BB"
+                        | "BD"
+                        | "BE"
+                        | "BF"
+                        | "BG"
+                        | "BH"
+                        | "BI"
+                        | "BJ"
+                        | "BL"
+                        | "BM"
+                        | "BN"
+                        | "BO"
+                        | "BQ"
+                        | "BR"
+                        | "BS"
+                        | "BT"
+                        | "BV"
+                        | "BW"
+                        | "BY"
+                        | "BZ"
+                        | "CA"
+                        | "CC"
+                        | "CD"
+                        | "CF"
+                        | "CG"
+                        | "CH"
+                        | "CI"
+                        | "CK"
+                        | "CL"
+                        | "CM"
+                        | "CN"
+                        | "CO"
+                        | "CR"
+                        | "CU"
+                        | "CV"
+                        | "CW"
+                        | "CX"
+                        | "CY"
+                        | "CZ"
+                        | "DE"
+                        | "DJ"
+                        | "DK"
+                        | "DM"
+                        | "DO"
+                        | "DZ"
+                        | "EC"
+                        | "EE"
+                        | "EG"
+                        | "EH"
+                        | "ER"
+                        | "ES"
+                        | "ET"
+                        | "FI"
+                        | "FJ"
+                        | "FK"
+                        | "FM"
+                        | "FO"
+                        | "FR"
+                        | "GA"
+                        | "GB"
+                        | "GD"
+                        | "GE"
+                        | "GF"
+                        | "GG"
+                        | "GH"
+                        | "GI"
+                        | "GL"
+                        | "GM"
+                        | "GN"
+                        | "GP"
+                        | "GQ"
+                        | "GR"
+                        | "GS"
+                        | "GT"
+                        | "GU"
+                        | "GW"
+                        | "GY"
+                        | "HK"
+                        | "HM"
+                        | "HN"
+                        | "HR"
+                        | "HT"
+                        | "HU"
+                        | "ID"
+                        | "IE"
+                        | "IL"
+                        | "IM"
+                        | "IN"
+                        | "IO"
+                        | "IQ"
+                        | "IR"
+                        | "IS"
+                        | "IT"
+                        | "JE"
+                        | "JM"
+                        | "JO"
+                        | "JP"
+                        | "KE"
+                        | "KG"
+                        | "KH"
+                        | "KI"
+                        | "KM"
+                        | "KN"
+                        | "KP"
+                        | "KR"
+                        | "KW"
+                        | "KY"
+                        | "KZ"
+                        | "LA"
+                        | "LB"
+                        | "LC"
+                        | "LI"
+                        | "LK"
+                        | "LR"
+                        | "LS"
+                        | "LT"
+                        | "LU"
+                        | "LV"
+                        | "LY"
+                        | "MA"
+                        | "MC"
+                        | "MD"
+                        | "ME"
+                        | "MF"
+                        | "MG"
+                        | "MH"
+                        | "MK"
+                        | "ML"
+                        | "MM"
+                        | "MN"
+                        | "MO"
+                        | "MP"
+                        | "MQ"
+                        | "MR"
+                        | "MS"
+                        | "MT"
+                        | "MU"
+                        | "MV"
+                        | "MW"
+                        | "MX"
+                        | "MY"
+                        | "MZ"
+                        | "NA"
+                        | "NC"
+                        | "NE"
+                        | "NF"
+                        | "NG"
+                        | "NI"
+                        | "NL"
+                        | "NO"
+                        | "NP"
+                        | "NR"
+                        | "NU"
+                        | "NZ"
+                        | "OM"
+                        | "PA"
+                        | "PE"
+                        | "PF"
+                        | "PG"
+                        | "PH"
+                        | "PK"
+                        | "PL"
+                        | "PM"
+                        | "PN"
+                        | "PR"
+                        | "PS"
+                        | "PT"
+                        | "PW"
+                        | "PY"
+                        | "QA"
+                        | "RE"
+                        | "RO"
+                        | "RS"
+                        | "RU"
+                        | "RW"
+                        | "SA"
+                        | "SB"
+                        | "SC"
+                        | "SD"
+                        | "SE"
+                        | "SG"
+                        | "SH"
+                        | "SI"
+                        | "SJ"
+                        | "SK"
+                        | "SL"
+                        | "SM"
+                        | "SN"
+                        | "SO"
+                        | "SR"
+                        | "SS"
+                        | "ST"
+                        | "SV"
+                        | "SX"
+                        | "SY"
+                        | "SZ"
+                        | "TC"
+                        | "TD"
+                        | "TF"
+                        | "TG"
+                        | "TH"
+                        | "TJ"
+                        | "TK"
+                        | "TL"
+                        | "TM"
+                        | "TN"
+                        | "TO"
+                        | "TR"
+                        | "TT"
+                        | "TV"
+                        | "TW"
+                        | "TZ"
+                        | "UA"
+                        | "UG"
+                        | "UM"
+                        | "US"
+                        | "UY"
+                        | "UZ"
+                        | "VA"
+                        | "VC"
+                        | "VE"
+                        | "VG"
+                        | "VI"
+                        | "VN"
+                        | "VU"
+                        | "WF"
+                        | "WS"
+                        | "YE"
+                        | "YT"
+                        | "ZA"
+                        | "ZM"
+                        | "ZW"
+                        | null;
+                      publishedAt: null;
+                    }>;
+                button: {
+                  label: string | null;
+                  kind: "external" | "internal" | null;
+                  external: string | null;
+                  internal:
+                    | {
+                        _type: "awardsProgramme";
+                        slug: string | null;
+                        brand: null;
+                        brands: null;
+                      }
+                    | {
+                        _type: "conferenceEvent";
+                        slug: string | null;
+                        brand: null;
+                        brands: null;
+                      }
+                    | {
+                        _type: "page";
+                        slug: string | null;
+                        brand:
+                          | "clearview"
+                          | "familywealthreport"
+                          | "wealthbriefing"
+                          | "wealthbriefingasia"
+                          | null;
+                        brands: null;
+                      }
+                    | {
+                        _type: "post";
+                        slug: string | null;
+                        brand: null;
+                        brands: Array<string> | null;
+                      }
+                    | {
+                        _type: "resource";
+                        slug: string | null;
+                        brand: null;
+                        brands: null;
+                      }
+                    | null;
+                } | null;
+                promo: {
+                  resource: {
+                    title: string | null;
+                    downloadThumbnail: {
+                      asset: SanityImageAssetReference | null;
+                      hotspot: SanityImageHotspot | null;
+                      crop: SanityImageCrop | null;
+                      alt: string | null;
+                    } | null;
+                    downloadFileUrl: string | null;
+                    downloadFileName: string | null;
+                    downloadUrl: string | null;
+                  } | null;
+                  title: string | null;
+                  description: string | null;
+                  image: {
+                    asset: SanityImageAssetReference | null;
+                    hotspot: SanityImageHotspot | null;
+                    crop: SanityImageCrop | null;
+                    alt: string | null;
+                  } | null;
+                  link: {
+                    kind: "external" | "internal" | null;
+                    external: string | null;
+                    internal:
+                      | {
+                          _type: "awardsProgramme";
+                          slug: string | null;
+                          brand: null;
+                          brands: null;
+                        }
+                      | {
+                          _type: "conferenceEvent";
+                          slug: string | null;
+                          brand: null;
+                          brands: null;
+                        }
+                      | {
+                          _type: "page";
+                          slug: string | null;
+                          brand:
+                            | "clearview"
+                            | "familywealthreport"
+                            | "wealthbriefing"
+                            | "wealthbriefingasia"
+                            | null;
+                          brands: null;
+                        }
+                      | {
+                          _type: "post";
+                          slug: string | null;
+                          brand: null;
+                          brands: Array<string> | null;
+                        }
+                      | {
+                          _type: "resource";
+                          slug: string | null;
+                          brand: null;
+                          brands: null;
+                        }
+                      | null;
+                  } | null;
+                } | null;
+              }
+          > | null;
+        }
+      | {
+          _key: string;
+          _type: "sponsoredContent";
+          label: string | null;
+          link: {
+            label: string | null;
+            kind: "external" | "internal" | null;
+            external: string | null;
+            internal:
+              | {
+                  _type: "awardsProgramme";
+                  slug: string | null;
+                  brand: null;
+                  brands: null;
+                }
+              | {
+                  _type: "conferenceEvent";
+                  slug: string | null;
+                  brand: null;
+                  brands: null;
+                }
+              | {
+                  _type: "page";
+                  slug: string | null;
+                  brand:
+                    | "clearview"
+                    | "familywealthreport"
+                    | "wealthbriefing"
+                    | "wealthbriefingasia"
+                    | null;
+                  brands: null;
+                }
+              | {
+                  _type: "post";
+                  slug: string | null;
+                  brand: null;
+                  brands: Array<string> | null;
+                }
+              | {
+                  _type: "resource";
+                  slug: string | null;
+                  brand: null;
+                  brands: null;
+                }
+              | null;
+          } | null;
+          profileLabel: string | null;
+          post: {
+            _id: string;
+            title: string | null;
+            slug: string | null;
+            brands: Array<string> | null;
+            brandTitles: Array<{
+              key: string | null;
+              title: string | null;
+            }>;
+            publishedAt: string | null;
+            excerpt: string | null;
+            image: {
+              asset: SanityImageAssetReference | null;
+              hotspot: SanityImageHotspot | null;
+              crop: SanityImageCrop | null;
+              alt: string | null;
+            } | null;
+            category: {
+              title: string | null;
+              slug: string | null;
+            } | null;
+            sponsor: {
+              title: string | null;
+              slug: string | null;
+              logo: {
+                asset: SanityImageAssetReference | null;
+                hotspot: SanityImageHotspot | null;
+                crop: SanityImageCrop | null;
+                alt: string | null;
+              } | null;
+            } | null;
+          } | null;
+        }
+      | {
+          _key: string;
+          _type: "statsBar";
+          heading: Array<{
+            _key: string;
+            style: "h1" | "h2" | "h3" | "h4" | "h5" | "h6" | "normal" | null;
+            children: Array<{
+              _key: string;
+              text: string | null;
+            }> | null;
+          }> | null;
+          items: Array<{
+            _key: string;
+            icon:
+              | "stat-article"
+              | "stat-globe"
+              | "stat-public"
+              | "stat-search"
+              | "stat-star"
+              | "stat-user"
+              | null;
+            value: string | null;
+            label: string | null;
+          }> | null;
+        }
+      | {
+          _key: string;
+          _type: "subscribeBanner";
+          heading: Array<{
+            _key: string;
+            style: "h1" | "h2" | "h3" | "h4" | "h5" | "h6" | "normal" | null;
+            children: Array<{
+              _key: string;
+              text: string | null;
+            }> | null;
+          }> | null;
+          description: string | null;
+          buttonLabel: string | null;
+          cta: {
+            label: string | null;
+            kind: "external" | "internal" | null;
+            external: string | null;
+            internal:
+              | {
+                  _type: "awardsProgramme";
+                  slug: string | null;
+                  brand: null;
+                  brands: null;
+                }
+              | {
+                  _type: "conferenceEvent";
+                  slug: string | null;
+                  brand: null;
+                  brands: null;
+                }
+              | {
+                  _type: "page";
+                  slug: string | null;
+                  brand:
+                    | "clearview"
+                    | "familywealthreport"
+                    | "wealthbriefing"
+                    | "wealthbriefingasia"
+                    | null;
+                  brands: null;
+                }
+              | {
+                  _type: "post";
+                  slug: string | null;
+                  brand: null;
+                  brands: Array<string> | null;
+                }
+              | {
+                  _type: "resource";
+                  slug: string | null;
+                  brand: null;
+                  brands: null;
+                }
+              | null;
+          } | null;
+        }
+      | {
+          _key: string;
+          _type: "topPicks";
+          heading: Array<{
+            _key: string;
+            style: "h1" | "h2" | "h3" | "h4" | "h5" | "h6" | "normal" | null;
+            children: Array<{
+              _key: string;
+              text: string | null;
+            }> | null;
+          }> | null;
+          link: {
+            label: string | null;
+            kind: "external" | "internal" | null;
+            external: string | null;
+            internal:
+              | {
+                  _type: "awardsProgramme";
+                  slug: string | null;
+                  brand: null;
+                  brands: null;
+                }
+              | {
+                  _type: "conferenceEvent";
+                  slug: string | null;
+                  brand: null;
+                  brands: null;
+                }
+              | {
+                  _type: "page";
+                  slug: string | null;
+                  brand:
+                    | "clearview"
+                    | "familywealthreport"
+                    | "wealthbriefing"
+                    | "wealthbriefingasia"
+                    | null;
+                  brands: null;
+                }
+              | {
+                  _type: "post";
+                  slug: string | null;
+                  brand: null;
+                  brands: Array<string> | null;
+                }
+              | {
+                  _type: "resource";
+                  slug: string | null;
+                  brand: null;
+                  brands: null;
+                }
+              | null;
+          } | null;
+          posts: Array<{
+            _id: string;
+            title: string | null;
+            slug: string | null;
+            brands: Array<string> | null;
+            brandTitles: Array<{
+              key: string | null;
+              title: string | null;
+            }>;
+            publishedAt: string | null;
+            excerpt: string | null;
+            image: {
+              asset: SanityImageAssetReference | null;
+              hotspot: SanityImageHotspot | null;
+              crop: SanityImageCrop | null;
+              alt: string | null;
+            } | null;
+            category: {
+              title: string | null;
+              slug: string | null;
+            } | null;
+            sponsored: false | true;
+          }> | null;
+          fill: Array<{
+            _id: string;
+            title: string | null;
+            slug: string | null;
+            brands: Array<string> | null;
+            brandTitles: Array<{
+              key: string | null;
+              title: string | null;
+            }>;
+            publishedAt: string | null;
+            excerpt: string | null;
+            image: {
+              asset: SanityImageAssetReference | null;
+              hotspot: SanityImageHotspot | null;
+              crop: SanityImageCrop | null;
+              alt: string | null;
+            } | null;
+            category: {
+              title: string | null;
+              slug: string | null;
+            } | null;
+          }>;
+        }
+      | {
+          _key: string;
+          _type: "topStories";
+          linkLabel: string | null;
+          label: string | null;
+          slides: Array<{
+            _id: string;
+            title: string | null;
+            slug: string | null;
+            brands: Array<string> | null;
+            brandTitles: Array<{
+              key: string | null;
+              title: string | null;
+            }>;
+            publishedAt: string | null;
+            excerpt: string | null;
+            image: {
+              asset: SanityImageAssetReference | null;
+              hotspot: SanityImageHotspot | null;
+              crop: SanityImageCrop | null;
+              alt: string | null;
+            } | null;
+            category: {
+              title: string | null;
+              slug: string | null;
+            } | null;
+          }> | null;
+          articles: Array<{
+            _id: string;
+            title: string | null;
+            slug: string | null;
+            brands: Array<string> | null;
+            brandTitles: Array<{
+              key: string | null;
+              title: string | null;
+            }>;
+            publishedAt: string | null;
+            excerpt: string | null;
+            image: {
+              asset: SanityImageAssetReference | null;
+              hotspot: SanityImageHotspot | null;
+              crop: SanityImageCrop | null;
+              alt: string | null;
+            } | null;
+            category: {
+              title: string | null;
+              slug: string | null;
+            } | null;
+          }> | null;
+          latest: Array<{
+            _id: string;
+            title: string | null;
+            slug: string | null;
+            brands: Array<string> | null;
+            brandTitles: Array<{
+              key: string | null;
+              title: string | null;
+            }>;
+            publishedAt: string | null;
+            excerpt: string | null;
+            image: {
+              asset: SanityImageAssetReference | null;
+              hotspot: SanityImageHotspot | null;
+              crop: SanityImageCrop | null;
+              alt: string | null;
+            } | null;
+            category: {
+              title: string | null;
+              slug: string | null;
+            } | null;
+          }>;
+        }
+      | {
+          _key: string;
+          _type: "weeklyRoundup";
+          heading: Array<{
+            _key: string;
+            style: "h1" | "h2" | "h3" | "h4" | "h5" | "h6" | "normal" | null;
+            children: Array<{
+              _key: string;
+              text: string | null;
+            }> | null;
+          }> | null;
+          label: string | null;
+          title: string | null;
+          summary: string | null;
+          button: {
+            label: string | null;
+            kind: "external" | "internal" | null;
+            external: string | null;
+            internal:
+              | {
+                  _type: "awardsProgramme";
+                  slug: string | null;
+                  brand: null;
+                  brands: null;
+                }
+              | {
+                  _type: "conferenceEvent";
+                  slug: string | null;
+                  brand: null;
+                  brands: null;
+                }
+              | {
+                  _type: "page";
+                  slug: string | null;
+                  brand:
+                    | "clearview"
+                    | "familywealthreport"
+                    | "wealthbriefing"
+                    | "wealthbriefingasia"
+                    | null;
+                  brands: null;
+                }
+              | {
+                  _type: "post";
+                  slug: string | null;
+                  brand: null;
+                  brands: Array<string> | null;
+                }
+              | {
+                  _type: "resource";
+                  slug: string | null;
+                  brand: null;
+                  brands: null;
+                }
+              | null;
+          } | null;
+          listLabel: string | null;
+          posts: Array<{
+            _id: string;
+            title: string | null;
+            slug: string | null;
+            brands: Array<string> | null;
+            brandTitles: Array<{
+              key: string | null;
+              title: string | null;
+            }>;
+            publishedAt: string | null;
+            excerpt: string | null;
+            image: {
+              asset: SanityImageAssetReference | null;
+              hotspot: SanityImageHotspot | null;
+              crop: SanityImageCrop | null;
+              alt: string | null;
+            } | null;
+            category: {
+              title: string | null;
+              slug: string | null;
+            } | null;
+          }> | null;
+          latest: Array<{
+            _id: string;
+            title: string | null;
+            slug: string | null;
+            brands: Array<string> | null;
+            brandTitles: Array<{
+              key: string | null;
+              title: string | null;
+            }>;
+            publishedAt: string | null;
+            excerpt: string | null;
+            image: {
+              asset: SanityImageAssetReference | null;
+              hotspot: SanityImageHotspot | null;
+              crop: SanityImageCrop | null;
+              alt: string | null;
+            } | null;
+            category: {
+              title: string | null;
+              slug: string | null;
+            } | null;
+          }>;
+        }
+    > | null;
+  } | null;
+  statuses: {
+    launchingSoonLabel: string | null;
+    submissionsOpenLabel: string | null;
+    ceremonyDueLabel: string | null;
+    winnersAnnouncedLabel: string | null;
+  } | null;
+  awards: Array<{
+    _id: string;
+    title: string | null;
+    slug: string | null;
+    standfirst: string | null;
+    startDate: string | null;
+    endDate: string | null;
+    hideDateTime: boolean | null;
+    nominationsOpeningDate: string | null;
+    nominationsClosingDate: string | null;
+    country:
+      | "AD"
+      | "AE"
+      | "AF"
+      | "AG"
+      | "AI"
+      | "AL"
+      | "AM"
+      | "AO"
+      | "AQ"
+      | "AR"
+      | "AS"
+      | "AT"
+      | "AU"
+      | "AW"
+      | "AX"
+      | "AZ"
+      | "BA"
+      | "BB"
+      | "BD"
+      | "BE"
+      | "BF"
+      | "BG"
+      | "BH"
+      | "BI"
+      | "BJ"
+      | "BL"
+      | "BM"
+      | "BN"
+      | "BO"
+      | "BQ"
+      | "BR"
+      | "BS"
+      | "BT"
+      | "BV"
+      | "BW"
+      | "BY"
+      | "BZ"
+      | "CA"
+      | "CC"
+      | "CD"
+      | "CF"
+      | "CG"
+      | "CH"
+      | "CI"
+      | "CK"
+      | "CL"
+      | "CM"
+      | "CN"
+      | "CO"
+      | "CR"
+      | "CU"
+      | "CV"
+      | "CW"
+      | "CX"
+      | "CY"
+      | "CZ"
+      | "DE"
+      | "DJ"
+      | "DK"
+      | "DM"
+      | "DO"
+      | "DZ"
+      | "EC"
+      | "EE"
+      | "EG"
+      | "EH"
+      | "ER"
+      | "ES"
+      | "ET"
+      | "FI"
+      | "FJ"
+      | "FK"
+      | "FM"
+      | "FO"
+      | "FR"
+      | "GA"
+      | "GB"
+      | "GD"
+      | "GE"
+      | "GF"
+      | "GG"
+      | "GH"
+      | "GI"
+      | "GL"
+      | "GM"
+      | "GN"
+      | "GP"
+      | "GQ"
+      | "GR"
+      | "GS"
+      | "GT"
+      | "GU"
+      | "GW"
+      | "GY"
+      | "HK"
+      | "HM"
+      | "HN"
+      | "HR"
+      | "HT"
+      | "HU"
+      | "ID"
+      | "IE"
+      | "IL"
+      | "IM"
+      | "IN"
+      | "IO"
+      | "IQ"
+      | "IR"
+      | "IS"
+      | "IT"
+      | "JE"
+      | "JM"
+      | "JO"
+      | "JP"
+      | "KE"
+      | "KG"
+      | "KH"
+      | "KI"
+      | "KM"
+      | "KN"
+      | "KP"
+      | "KR"
+      | "KW"
+      | "KY"
+      | "KZ"
+      | "LA"
+      | "LB"
+      | "LC"
+      | "LI"
+      | "LK"
+      | "LR"
+      | "LS"
+      | "LT"
+      | "LU"
+      | "LV"
+      | "LY"
+      | "MA"
+      | "MC"
+      | "MD"
+      | "ME"
+      | "MF"
+      | "MG"
+      | "MH"
+      | "MK"
+      | "ML"
+      | "MM"
+      | "MN"
+      | "MO"
+      | "MP"
+      | "MQ"
+      | "MR"
+      | "MS"
+      | "MT"
+      | "MU"
+      | "MV"
+      | "MW"
+      | "MX"
+      | "MY"
+      | "MZ"
+      | "NA"
+      | "NC"
+      | "NE"
+      | "NF"
+      | "NG"
+      | "NI"
+      | "NL"
+      | "NO"
+      | "NP"
+      | "NR"
+      | "NU"
+      | "NZ"
+      | "OM"
+      | "PA"
+      | "PE"
+      | "PF"
+      | "PG"
+      | "PH"
+      | "PK"
+      | "PL"
+      | "PM"
+      | "PN"
+      | "PR"
+      | "PS"
+      | "PT"
+      | "PW"
+      | "PY"
+      | "QA"
+      | "RE"
+      | "RO"
+      | "RS"
+      | "RU"
+      | "RW"
+      | "SA"
+      | "SB"
+      | "SC"
+      | "SD"
+      | "SE"
+      | "SG"
+      | "SH"
+      | "SI"
+      | "SJ"
+      | "SK"
+      | "SL"
+      | "SM"
+      | "SN"
+      | "SO"
+      | "SR"
+      | "SS"
+      | "ST"
+      | "SV"
+      | "SX"
+      | "SY"
+      | "SZ"
+      | "TC"
+      | "TD"
+      | "TF"
+      | "TG"
+      | "TH"
+      | "TJ"
+      | "TK"
+      | "TL"
+      | "TM"
+      | "TN"
+      | "TO"
+      | "TR"
+      | "TT"
+      | "TV"
+      | "TW"
+      | "TZ"
+      | "UA"
+      | "UG"
+      | "UM"
+      | "US"
+      | "UY"
+      | "UZ"
+      | "VA"
+      | "VC"
+      | "VE"
+      | "VG"
+      | "VI"
+      | "VN"
+      | "VU"
+      | "WF"
+      | "WS"
+      | "YE"
+      | "YT"
+      | "ZA"
+      | "ZM"
+      | "ZW"
+      | null;
+    hasWinners: boolean | null;
+  }>;
+  events: Array<{
+    _id: string;
+    title: string | null;
+    slug: string | null;
+    startDate: string | null;
+    endDate: string | null;
+    hideDateTime: boolean | null;
+    country:
+      | "AD"
+      | "AE"
+      | "AF"
+      | "AG"
+      | "AI"
+      | "AL"
+      | "AM"
+      | "AO"
+      | "AQ"
+      | "AR"
+      | "AS"
+      | "AT"
+      | "AU"
+      | "AW"
+      | "AX"
+      | "AZ"
+      | "BA"
+      | "BB"
+      | "BD"
+      | "BE"
+      | "BF"
+      | "BG"
+      | "BH"
+      | "BI"
+      | "BJ"
+      | "BL"
+      | "BM"
+      | "BN"
+      | "BO"
+      | "BQ"
+      | "BR"
+      | "BS"
+      | "BT"
+      | "BV"
+      | "BW"
+      | "BY"
+      | "BZ"
+      | "CA"
+      | "CC"
+      | "CD"
+      | "CF"
+      | "CG"
+      | "CH"
+      | "CI"
+      | "CK"
+      | "CL"
+      | "CM"
+      | "CN"
+      | "CO"
+      | "CR"
+      | "CU"
+      | "CV"
+      | "CW"
+      | "CX"
+      | "CY"
+      | "CZ"
+      | "DE"
+      | "DJ"
+      | "DK"
+      | "DM"
+      | "DO"
+      | "DZ"
+      | "EC"
+      | "EE"
+      | "EG"
+      | "EH"
+      | "ER"
+      | "ES"
+      | "ET"
+      | "FI"
+      | "FJ"
+      | "FK"
+      | "FM"
+      | "FO"
+      | "FR"
+      | "GA"
+      | "GB"
+      | "GD"
+      | "GE"
+      | "GF"
+      | "GG"
+      | "GH"
+      | "GI"
+      | "GL"
+      | "GM"
+      | "GN"
+      | "GP"
+      | "GQ"
+      | "GR"
+      | "GS"
+      | "GT"
+      | "GU"
+      | "GW"
+      | "GY"
+      | "HK"
+      | "HM"
+      | "HN"
+      | "HR"
+      | "HT"
+      | "HU"
+      | "ID"
+      | "IE"
+      | "IL"
+      | "IM"
+      | "IN"
+      | "IO"
+      | "IQ"
+      | "IR"
+      | "IS"
+      | "IT"
+      | "JE"
+      | "JM"
+      | "JO"
+      | "JP"
+      | "KE"
+      | "KG"
+      | "KH"
+      | "KI"
+      | "KM"
+      | "KN"
+      | "KP"
+      | "KR"
+      | "KW"
+      | "KY"
+      | "KZ"
+      | "LA"
+      | "LB"
+      | "LC"
+      | "LI"
+      | "LK"
+      | "LR"
+      | "LS"
+      | "LT"
+      | "LU"
+      | "LV"
+      | "LY"
+      | "MA"
+      | "MC"
+      | "MD"
+      | "ME"
+      | "MF"
+      | "MG"
+      | "MH"
+      | "MK"
+      | "ML"
+      | "MM"
+      | "MN"
+      | "MO"
+      | "MP"
+      | "MQ"
+      | "MR"
+      | "MS"
+      | "MT"
+      | "MU"
+      | "MV"
+      | "MW"
+      | "MX"
+      | "MY"
+      | "MZ"
+      | "NA"
+      | "NC"
+      | "NE"
+      | "NF"
+      | "NG"
+      | "NI"
+      | "NL"
+      | "NO"
+      | "NP"
+      | "NR"
+      | "NU"
+      | "NZ"
+      | "OM"
+      | "PA"
+      | "PE"
+      | "PF"
+      | "PG"
+      | "PH"
+      | "PK"
+      | "PL"
+      | "PM"
+      | "PN"
+      | "PR"
+      | "PS"
+      | "PT"
+      | "PW"
+      | "PY"
+      | "QA"
+      | "RE"
+      | "RO"
+      | "RS"
+      | "RU"
+      | "RW"
+      | "SA"
+      | "SB"
+      | "SC"
+      | "SD"
+      | "SE"
+      | "SG"
+      | "SH"
+      | "SI"
+      | "SJ"
+      | "SK"
+      | "SL"
+      | "SM"
+      | "SN"
+      | "SO"
+      | "SR"
+      | "SS"
+      | "ST"
+      | "SV"
+      | "SX"
+      | "SY"
+      | "SZ"
+      | "TC"
+      | "TD"
+      | "TF"
+      | "TG"
+      | "TH"
+      | "TJ"
+      | "TK"
+      | "TL"
+      | "TM"
+      | "TN"
+      | "TO"
+      | "TR"
+      | "TT"
+      | "TV"
+      | "TW"
+      | "TZ"
+      | "UA"
+      | "UG"
+      | "UM"
+      | "US"
+      | "UY"
+      | "UZ"
+      | "VA"
+      | "VC"
+      | "VE"
+      | "VG"
+      | "VI"
+      | "VN"
+      | "VU"
+      | "WF"
+      | "WS"
+      | "YE"
+      | "YT"
+      | "ZA"
+      | "ZM"
+      | "ZW"
+      | null;
+  }>;
+  research: Array<{
+    _id: string;
+    title: string | null;
+    slug: string | null;
+    publishedAt: string | null;
+  }>;
+};
+
 // Query TypeMap
 declare global {
   interface SanityQueries {
     '\n  {\n    "header": *[_id == $headerId && _type in ["clearviewHeader", "publicationHeader"]][0]{\n      _type,\n      navigation[]{\n        _key,\n        _type,\n        label,\n        link{ \n  kind,\n  external,\n  internal->{\n    _type,\n    "slug": slug.current,\n    brand,\n    brands\n  }\n },\n        links[]{ _key, _type, label, link{ \n  kind,\n  external,\n  internal->{\n    _type,\n    "slug": slug.current,\n    brand,\n    brands\n  }\n } }\n      },\n      searchPlaceholder,\n      searchLabels,\n      subscribeLabel,\n      subscribe{ \n  label,\n  \n  kind,\n  external,\n  internal->{\n    _type,\n    "slug": slug.current,\n    brand,\n    brands\n  }\n\n }\n    },\n    "footer": *[_id == $footerId && _type in ["clearviewFooter", "publicationFooter"]][0]{\n      _type,\n      description,\n      publisherLine,\n      columns[]{\n        _key,\n        title,\n        links[]{ _key, label, link{ \n  kind,\n  external,\n  internal->{\n    _type,\n    "slug": slug.current,\n    brand,\n    brands\n  }\n } }\n      },\n      socialHeading,\n      social[]{ _key, name, url, icon{ asset->{ url } } },\n      copyright,\n      cookieSettingsLabel\n    },\n    "brand": *[_type == "brand" && _id == $brandId && key.current == $brand][0]{\n      title,\n      logo{ "alt": asset->altText, asset->{ url, metadata{ dimensions{ width, height } } } },\n      footerLogo{ "alt": asset->altText, asset->{ url, metadata{ dimensions{ width, height } } } },\n      \n  advertising{\n    top{ home, other },\n    side{ home, other },\n    publications{ home, other },\n    article{ other },\n    banner3{ home, other },\n    banner4{ home },\n    awardsWinners{ home, other }\n  }\n\n    },\n    "subscribeModal": *[_id == $subscribeModalId && _type == "subscribeModal"][0]{ \n  title,\n  description,\n  firstNameLabel,\n  lastNameLabel,\n  emailLabel,\n  emailPlaceholder,\n  companyLabel,\n  jobTitleLabel,\n  countryLabel,\n  countryPlaceholder,\n  industryLabel,\n  industryPlaceholder,\n  optionalMarker,\n  requiredMarker,\n  interestsLegend,\n  interests[]{ _key, label, locked, defaultChecked },\n  consentText,\n  privacyLinkLabel,\n  privacyLink{ \n  kind,\n  external,\n  internal->{\n    _type,\n    "slug": slug.current,\n    brand,\n    brands\n  }\n },\n  submitLabel,\n  firstNameError,\n  lastNameError,\n  emailMissingError,\n  emailInvalidError,\n  consentError,\n  noPublicationError,\n  genericError,\n  successTitle,\n  successText,\n  closeLabel\n }\n  }\n': SHELL_QUERY_RESULT;
-    '\n  *[_type == "page" && brand == $brand && slug.current == "home"][0]{\n    _id,\n    title,\n    blocks[]{ _key, _type, \n  _type == "topStories" => { \n  linkLabel,\n  label,\n  "slides": slides[$brand == "clearview" || $brand in @->brands]->{ \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  \n  "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title }\n,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n  "category": category->{ title, "slug": slug.current }\n },\n  "articles": articles[$brand == "clearview" || $brand in @->brands]->{ \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  \n  "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title }\n,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n  "category": category->{ title, "slug": slug.current }\n },\n  "latest": *[\n    _type == "post"\n    && defined(slug.current)\n    && ($brand == "clearview" || $brand in brands)\n    && !(_id in coalesce(^.slides[]._ref, []))\n    && !(_id in coalesce(^.articles[]._ref, []))\n  ] | order(publishedAt desc)[0...6]{ \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  \n  "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title }\n,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n  "category": category->{ title, "slug": slug.current }\n }\n },\n  _type == "publications" => { \n  heading[]{ _key, style, children[]{ _key, text } },\n  body,\n  cards[]{\n    _key,\n    brand,\n    "brandTitle": *[_type == "brand" && key.current == ^.brand][0].title,\n    description,\n    image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n    linkLabel\n  }\n },\n  _type == "cta" => { \n  heading,\n  text,\n  link{ label, href }\n },\n  _type == "highlights" => { \n  source,\n  count,\n  heading[]{ _key, style, children[]{ _key, text } },\n  deadlineLabel,\n  "items": items[]->{ \n  _id,\n  _type,\n  "slug": slug.current,\n  title,\n  category,\n  nominationsClosingDate,\n  startDate,\n  endDate,\n  country,\n  publishedAt\n },\n  "fill": select(\n  source == "awards" => [\n    ...*[\n      _type == "awardsProgramme"\n      && nominationsClosingDate >= $today\n      && !(_id in coalesce(^.items[]._ref, []))\n    ] | order(nominationsClosingDate asc)[0...5]{ \n  _id,\n  _type,\n  "slug": slug.current,\n  title,\n  category,\n  nominationsClosingDate,\n  startDate,\n  endDate,\n  country,\n  publishedAt\n },\n    ...*[\n      _type == "awardsProgramme"\n      && !(defined(nominationsClosingDate) && nominationsClosingDate >= $today)\n      && startDate >= $today\n      && !(_id in coalesce(^.items[]._ref, []))\n    ] | order(startDate asc)[0...5]{ \n  _id,\n  _type,\n  "slug": slug.current,\n  title,\n  category,\n  nominationsClosingDate,\n  startDate,\n  endDate,\n  country,\n  publishedAt\n },\n    ...*[\n      _type == "awardsProgramme"\n      && !(defined(nominationsClosingDate) && nominationsClosingDate >= $today)\n      && startDate < $today\n      && !(_id in coalesce(^.items[]._ref, []))\n    ] | order(startDate desc)[0...5]{ \n  _id,\n  _type,\n  "slug": slug.current,\n  title,\n  category,\n  nominationsClosingDate,\n  startDate,\n  endDate,\n  country,\n  publishedAt\n }\n  ],\n  source == "events" => [\n    ...*[\n      _type == "conferenceEvent"\n      && coalesce(endDate, startDate) >= $today\n      && !(_id in coalesce(^.items[]._ref, []))\n    ] | order(startDate asc)[0...4]{ \n  _id,\n  _type,\n  "slug": slug.current,\n  title,\n  category,\n  nominationsClosingDate,\n  startDate,\n  endDate,\n  country,\n  publishedAt\n },\n    ...*[\n      _type == "conferenceEvent"\n      && coalesce(endDate, startDate) < $today\n      && !(_id in coalesce(^.items[]._ref, []))\n    ] | order(startDate desc)[0...4]{ \n  _id,\n  _type,\n  "slug": slug.current,\n  title,\n  category,\n  nominationsClosingDate,\n  startDate,\n  endDate,\n  country,\n  publishedAt\n }\n  ],\n  source == "research" => *[\n    _type == "resource"\n    && category == "research"\n    && !(_id in coalesce(^.items[]._ref, []))\n    && _id != coalesce(^.promo.resource._ref, "")\n  ] | order(defined(publishedAt) desc, publishedAt desc, legacyWpId desc)[0...3]{ \n  _id,\n  _type,\n  "slug": slug.current,\n  title,\n  category,\n  nominationsClosingDate,\n  startDate,\n  endDate,\n  country,\n  publishedAt\n }\n),\n  button{ \n  label,\n  \n  kind,\n  external,\n  internal->{\n    _type,\n    "slug": slug.current,\n    brand,\n    brands\n  }\n\n },\n  promo{\n    resource->{\n      title,\n      "downloadThumbnail": downloadThumbnail{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n      "downloadFileUrl": downloadFile.asset->url,\n      "downloadFileName": downloadFile.asset->originalFilename,\n      downloadUrl\n    },\n    title,\n    description,\n    "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n    link{ \n  kind,\n  external,\n  internal->{\n    _type,\n    "slug": slug.current,\n    brand,\n    brands\n  }\n }\n  }\n },\n  _type == "featuredStories" => { \n  heading[]{ _key, style, children[]{ _key, text } },\n  link{ \n  label,\n  \n  kind,\n  external,\n  internal->{\n    _type,\n    "slug": slug.current,\n    brand,\n    brands\n  }\n\n },\n  "posts": posts[]->{ \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  \n  "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title }\n,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n  "category": category->{ title, "slug": slug.current }\n }\n },\n  _type == "statsBar" => { \n  heading[]{ _key, style, children[]{ _key, text } },\n  items[]{ _key, icon, value, label }\n },\n  _type == "newsletterSignup" => { \n  heading[]{ _key, style, children[]{ _key, text } },\n  body,\n  preferencesLabel,\n  options[]{\n    _key,\n    label,\n    defaultChecked,\n    "interestKey": *[_type == "subscribeModal" && _id == "subscribe-modal-" + $brand][0].interests[attribute.name == ^.attribute.name][0]._key\n  },\n  emailPlaceholder,\n  buttonLabel,\n  invalidEmailMessage,\n  noOptionMessage,\n  image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n }\n },\n  _type == "sponsoredContent" => { \n  label,\n  link{ \n  label,\n  \n  kind,\n  external,\n  internal->{\n    _type,\n    "slug": slug.current,\n    brand,\n    brands\n  }\n\n },\n  profileLabel,\n  "post": *[\n    _type == "post"\n    && _id == ^.post._ref\n    && defined(slug.current)\n    && defined(sponsor)\n    && ($brand == "clearview" || $brand in brands)\n  ][0]{\n    \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  \n  "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title }\n,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n  "category": category->{ title, "slug": slug.current }\n,\n    "sponsor": sponsor->{\n      title,\n      "slug": slug.current,\n      "logo": logo{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n }\n    }\n  }\n },\n  _type == "postCards" => { \n  \n  heading[]{ _key, style, children[]{ _key, text } },\n  link{ \n  label,\n  \n  kind,\n  external,\n  internal->{\n    _type,\n    "slug": slug.current,\n    brand,\n    brands\n  }\n\n }\n,\n  "category": category->{ title, "slug": slug.current },\n  "posts": posts[$brand in @->brands]->{ \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  \n  "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title }\n,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n  "category": category->{ title, "slug": slug.current }\n },\n  "latest": \n  *[\n    _type == "post"\n    && defined(slug.current)\n    && $brand in brands\n    && defined(^.category._ref) && category._ref == ^.category._ref\n    && !(_id in coalesce(^.posts[]._ref, []))\n  ] | order(publishedAt desc)[0...6]\n{ \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  \n  "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title }\n,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n  "category": category->{ title, "slug": slug.current }\n }\n },\n  _type == "postBriefs" => { \n  \n  heading[]{ _key, style, children[]{ _key, text } },\n  link{ \n  label,\n  \n  kind,\n  external,\n  internal->{\n    _type,\n    "slug": slug.current,\n    brand,\n    brands\n  }\n\n }\n,\n  count,\n  "posts": posts[$brand in @->brands]->{ \n  \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  \n  "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title }\n,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n  "category": category->{ title, "slug": slug.current }\n,\n  "topic": primaryTopic->{ title },\n  briefText\n },\n  "latest": \n  *[\n    _type == "post"\n    && defined(slug.current)\n    && $brand in brands\n    && true\n    && !(_id in coalesce(^.posts[]._ref, []))\n  ] | order(publishedAt desc)[0...6]\n{ \n  \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  \n  "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title }\n,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n  "category": category->{ title, "slug": slug.current }\n,\n  "topic": primaryTopic->{ title },\n  briefText\n }\n },\n  _type == "weeklyRoundup" => { \n  heading[]{ _key, style, children[]{ _key, text } },\n  label,\n  title,\n  summary,\n  button{ \n  label,\n  \n  kind,\n  external,\n  internal->{\n    _type,\n    "slug": slug.current,\n    brand,\n    brands\n  }\n\n },\n  listLabel,\n  "posts": posts[$brand in @->brands]->{ \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  \n  "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title }\n,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n  "category": category->{ title, "slug": slug.current }\n },\n  "latest": \n  *[\n    _type == "post"\n    && defined(slug.current)\n    && $brand in brands\n    && true\n    && !(_id in coalesce(^.posts[]._ref, []))\n  ] | order(publishedAt desc)[0...8]\n{ \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  \n  "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title }\n,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n  "category": category->{ title, "slug": slug.current }\n }\n },\n  _type == "topPicks" => { \n  heading[]{ _key, style, children[]{ _key, text } },\n  link{ \n  label,\n  \n  kind,\n  external,\n  internal->{\n    _type,\n    "slug": slug.current,\n    brand,\n    brands\n  }\n\n },\n  "posts": posts[$brand in @->brands]->{ \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  \n  "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title }\n,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n  "category": category->{ title, "slug": slug.current }\n, "sponsored": defined(sponsor) },\n  "fill": [\n    ...\n  *[\n    _type == "post"\n    && defined(slug.current)\n    && $brand in brands\n    && !defined(sponsor) && dateTime(publishedAt) >= dateTime($today + "T00:00:00Z") - 60*60*24*7\n    && !(_id in coalesce(^.posts[]._ref, []))\n  ] | order(publishedAt desc)[0...6]\n{ \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  \n  "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title }\n,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n  "category": category->{ title, "slug": slug.current }\n },\n    ...\n  *[\n    _type == "post"\n    && defined(slug.current)\n    && $brand in brands\n    && !defined(sponsor) && dateTime(publishedAt) < dateTime($today + "T00:00:00Z") - 60*60*24*7\n    && !(_id in coalesce(^.posts[]._ref, []))\n  ] | order(publishedAt desc)[0...6]\n{ \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  \n  "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title }\n,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n  "category": category->{ title, "slug": slug.current }\n }\n  ]\n },\n  _type == "exploreGrid" => { \n  cards[]{\n    _key,\n    heading[]{ _key, style, children[]{ _key, text } },\n    icon,\n    source,\n    count,\n    deadlineLabel,\n    button{ \n  label,\n  \n  kind,\n  external,\n  internal->{\n    _type,\n    "slug": slug.current,\n    brand,\n    brands\n  }\n\n },\n    "items": items[@->_type != "post" || $brand in @->brands]->{ \n  _type == "post" => { _type, \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  \n  "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title }\n,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n  "category": category->{ title, "slug": slug.current }\n },\n  _type != "post" => { \n  _id,\n  _type,\n  "slug": slug.current,\n  title,\n  category,\n  nominationsClosingDate,\n  startDate,\n  endDate,\n  country,\n  publishedAt\n }\n },\n    "fill": select(\n      source == "posts" => \n  *[\n    _type == "post"\n    && defined(slug.current)\n    && $brand in brands\n    && defined(^.category._ref) && category._ref == ^.category._ref\n    && !(_id in coalesce(^.items[]._ref, []))\n  ] | order(publishedAt desc)[0...6]\n{ _type, \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  \n  "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title }\n,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n  "category": category->{ title, "slug": slug.current }\n },\n      \n  source == "awards" => [\n    ...*[\n      _type == "awardsProgramme"\n      && nominationsClosingDate >= $today\n      && !(_id in coalesce(^.items[]._ref, []))\n    ] | order(nominationsClosingDate asc)[0...5]{ \n  _id,\n  _type,\n  "slug": slug.current,\n  title,\n  category,\n  nominationsClosingDate,\n  startDate,\n  endDate,\n  country,\n  publishedAt\n },\n    ...*[\n      _type == "awardsProgramme"\n      && !(defined(nominationsClosingDate) && nominationsClosingDate >= $today)\n      && startDate >= $today\n      && !(_id in coalesce(^.items[]._ref, []))\n    ] | order(startDate asc)[0...5]{ \n  _id,\n  _type,\n  "slug": slug.current,\n  title,\n  category,\n  nominationsClosingDate,\n  startDate,\n  endDate,\n  country,\n  publishedAt\n },\n    ...*[\n      _type == "awardsProgramme"\n      && !(defined(nominationsClosingDate) && nominationsClosingDate >= $today)\n      && startDate < $today\n      && !(_id in coalesce(^.items[]._ref, []))\n    ] | order(startDate desc)[0...5]{ \n  _id,\n  _type,\n  "slug": slug.current,\n  title,\n  category,\n  nominationsClosingDate,\n  startDate,\n  endDate,\n  country,\n  publishedAt\n }\n  ],\n  source == "events" => [\n    ...*[\n      _type == "conferenceEvent"\n      && coalesce(endDate, startDate) >= $today\n      && !(_id in coalesce(^.items[]._ref, []))\n    ] | order(startDate asc)[0...4]{ \n  _id,\n  _type,\n  "slug": slug.current,\n  title,\n  category,\n  nominationsClosingDate,\n  startDate,\n  endDate,\n  country,\n  publishedAt\n },\n    ...*[\n      _type == "conferenceEvent"\n      && coalesce(endDate, startDate) < $today\n      && !(_id in coalesce(^.items[]._ref, []))\n    ] | order(startDate desc)[0...4]{ \n  _id,\n  _type,\n  "slug": slug.current,\n  title,\n  category,\n  nominationsClosingDate,\n  startDate,\n  endDate,\n  country,\n  publishedAt\n }\n  ],\n  source == "research" => *[\n    _type == "resource"\n    && category == "research"\n    && !(_id in coalesce(^.items[]._ref, []))\n    && _id != coalesce(^.promo.resource._ref, "")\n  ] | order(defined(publishedAt) desc, publishedAt desc, legacyWpId desc)[0...3]{ \n  _id,\n  _type,\n  "slug": slug.current,\n  title,\n  category,\n  nominationsClosingDate,\n  startDate,\n  endDate,\n  country,\n  publishedAt\n }\n\n    )\n  }\n },\n  _type == "subscribeBanner" => { \n  heading[]{ _key, style, children[]{ _key, text } },\n  description,\n  buttonLabel,\n  cta{ \n  label,\n  \n  kind,\n  external,\n  internal->{\n    _type,\n    "slug": slug.current,\n    brand,\n    brands\n  }\n\n }\n },\n  _type == "splitLayout" => {\n    "main": main[]{ _key, _type, \n  _type == "topStories" => { \n  linkLabel,\n  label,\n  "slides": slides[$brand == "clearview" || $brand in @->brands]->{ \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  \n  "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title }\n,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n  "category": category->{ title, "slug": slug.current }\n },\n  "articles": articles[$brand == "clearview" || $brand in @->brands]->{ \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  \n  "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title }\n,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n  "category": category->{ title, "slug": slug.current }\n },\n  "latest": *[\n    _type == "post"\n    && defined(slug.current)\n    && ($brand == "clearview" || $brand in brands)\n    && !(_id in coalesce(^.slides[]._ref, []))\n    && !(_id in coalesce(^.articles[]._ref, []))\n  ] | order(publishedAt desc)[0...6]{ \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  \n  "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title }\n,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n  "category": category->{ title, "slug": slug.current }\n }\n },\n  _type == "sponsoredContent" => { \n  label,\n  link{ \n  label,\n  \n  kind,\n  external,\n  internal->{\n    _type,\n    "slug": slug.current,\n    brand,\n    brands\n  }\n\n },\n  profileLabel,\n  "post": *[\n    _type == "post"\n    && _id == ^.post._ref\n    && defined(slug.current)\n    && defined(sponsor)\n    && ($brand == "clearview" || $brand in brands)\n  ][0]{\n    \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  \n  "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title }\n,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n  "category": category->{ title, "slug": slug.current }\n,\n    "sponsor": sponsor->{\n      title,\n      "slug": slug.current,\n      "logo": logo{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n }\n    }\n  }\n },\n  _type == "postCards" => { \n  \n  heading[]{ _key, style, children[]{ _key, text } },\n  link{ \n  label,\n  \n  kind,\n  external,\n  internal->{\n    _type,\n    "slug": slug.current,\n    brand,\n    brands\n  }\n\n }\n,\n  "category": category->{ title, "slug": slug.current },\n  "posts": posts[$brand in @->brands]->{ \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  \n  "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title }\n,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n  "category": category->{ title, "slug": slug.current }\n },\n  "latest": \n  *[\n    _type == "post"\n    && defined(slug.current)\n    && $brand in brands\n    && defined(^.category._ref) && category._ref == ^.category._ref\n    && !(_id in coalesce(^.posts[]._ref, []))\n  ] | order(publishedAt desc)[0...6]\n{ \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  \n  "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title }\n,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n  "category": category->{ title, "slug": slug.current }\n }\n },\n  _type == "postBriefs" => { \n  \n  heading[]{ _key, style, children[]{ _key, text } },\n  link{ \n  label,\n  \n  kind,\n  external,\n  internal->{\n    _type,\n    "slug": slug.current,\n    brand,\n    brands\n  }\n\n }\n,\n  count,\n  "posts": posts[$brand in @->brands]->{ \n  \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  \n  "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title }\n,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n  "category": category->{ title, "slug": slug.current }\n,\n  "topic": primaryTopic->{ title },\n  briefText\n },\n  "latest": \n  *[\n    _type == "post"\n    && defined(slug.current)\n    && $brand in brands\n    && true\n    && !(_id in coalesce(^.posts[]._ref, []))\n  ] | order(publishedAt desc)[0...6]\n{ \n  \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  \n  "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title }\n,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n  "category": category->{ title, "slug": slug.current }\n,\n  "topic": primaryTopic->{ title },\n  briefText\n }\n },\n  _type == "weeklyRoundup" => { \n  heading[]{ _key, style, children[]{ _key, text } },\n  label,\n  title,\n  summary,\n  button{ \n  label,\n  \n  kind,\n  external,\n  internal->{\n    _type,\n    "slug": slug.current,\n    brand,\n    brands\n  }\n\n },\n  listLabel,\n  "posts": posts[$brand in @->brands]->{ \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  \n  "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title }\n,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n  "category": category->{ title, "slug": slug.current }\n },\n  "latest": \n  *[\n    _type == "post"\n    && defined(slug.current)\n    && $brand in brands\n    && true\n    && !(_id in coalesce(^.posts[]._ref, []))\n  ] | order(publishedAt desc)[0...8]\n{ \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  \n  "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title }\n,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n  "category": category->{ title, "slug": slug.current }\n }\n },\n  _type == "publications" => { \n  heading[]{ _key, style, children[]{ _key, text } },\n  body,\n  cards[]{\n    _key,\n    brand,\n    "brandTitle": *[_type == "brand" && key.current == ^.brand][0].title,\n    description,\n    image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n    linkLabel\n  }\n },\n  _type == "cta" => { \n  heading,\n  text,\n  link{ label, href }\n }\n },\n    "aside": aside[]{ _key, _type, \n  _type == "highlights" => { \n  source,\n  count,\n  heading[]{ _key, style, children[]{ _key, text } },\n  deadlineLabel,\n  "items": items[]->{ \n  _id,\n  _type,\n  "slug": slug.current,\n  title,\n  category,\n  nominationsClosingDate,\n  startDate,\n  endDate,\n  country,\n  publishedAt\n },\n  "fill": select(\n  source == "awards" => [\n    ...*[\n      _type == "awardsProgramme"\n      && nominationsClosingDate >= $today\n      && !(_id in coalesce(^.items[]._ref, []))\n    ] | order(nominationsClosingDate asc)[0...5]{ \n  _id,\n  _type,\n  "slug": slug.current,\n  title,\n  category,\n  nominationsClosingDate,\n  startDate,\n  endDate,\n  country,\n  publishedAt\n },\n    ...*[\n      _type == "awardsProgramme"\n      && !(defined(nominationsClosingDate) && nominationsClosingDate >= $today)\n      && startDate >= $today\n      && !(_id in coalesce(^.items[]._ref, []))\n    ] | order(startDate asc)[0...5]{ \n  _id,\n  _type,\n  "slug": slug.current,\n  title,\n  category,\n  nominationsClosingDate,\n  startDate,\n  endDate,\n  country,\n  publishedAt\n },\n    ...*[\n      _type == "awardsProgramme"\n      && !(defined(nominationsClosingDate) && nominationsClosingDate >= $today)\n      && startDate < $today\n      && !(_id in coalesce(^.items[]._ref, []))\n    ] | order(startDate desc)[0...5]{ \n  _id,\n  _type,\n  "slug": slug.current,\n  title,\n  category,\n  nominationsClosingDate,\n  startDate,\n  endDate,\n  country,\n  publishedAt\n }\n  ],\n  source == "events" => [\n    ...*[\n      _type == "conferenceEvent"\n      && coalesce(endDate, startDate) >= $today\n      && !(_id in coalesce(^.items[]._ref, []))\n    ] | order(startDate asc)[0...4]{ \n  _id,\n  _type,\n  "slug": slug.current,\n  title,\n  category,\n  nominationsClosingDate,\n  startDate,\n  endDate,\n  country,\n  publishedAt\n },\n    ...*[\n      _type == "conferenceEvent"\n      && coalesce(endDate, startDate) < $today\n      && !(_id in coalesce(^.items[]._ref, []))\n    ] | order(startDate desc)[0...4]{ \n  _id,\n  _type,\n  "slug": slug.current,\n  title,\n  category,\n  nominationsClosingDate,\n  startDate,\n  endDate,\n  country,\n  publishedAt\n }\n  ],\n  source == "research" => *[\n    _type == "resource"\n    && category == "research"\n    && !(_id in coalesce(^.items[]._ref, []))\n    && _id != coalesce(^.promo.resource._ref, "")\n  ] | order(defined(publishedAt) desc, publishedAt desc, legacyWpId desc)[0...3]{ \n  _id,\n  _type,\n  "slug": slug.current,\n  title,\n  category,\n  nominationsClosingDate,\n  startDate,\n  endDate,\n  country,\n  publishedAt\n }\n),\n  button{ \n  label,\n  \n  kind,\n  external,\n  internal->{\n    _type,\n    "slug": slug.current,\n    brand,\n    brands\n  }\n\n },\n  promo{\n    resource->{\n      title,\n      "downloadThumbnail": downloadThumbnail{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n      "downloadFileUrl": downloadFile.asset->url,\n      "downloadFileName": downloadFile.asset->originalFilename,\n      downloadUrl\n    },\n    title,\n    description,\n    "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n    link{ \n  kind,\n  external,\n  internal->{\n    _type,\n    "slug": slug.current,\n    brand,\n    brands\n  }\n }\n  }\n },\n  _type == "awardsWinners" => { heading[]{ _key, style, children[]{ _key, text } } }\n }\n  }\n },\n    blocksMiddle[]{ _key, _type, \n  _type == "topStories" => { \n  linkLabel,\n  label,\n  "slides": slides[$brand == "clearview" || $brand in @->brands]->{ \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  \n  "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title }\n,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n  "category": category->{ title, "slug": slug.current }\n },\n  "articles": articles[$brand == "clearview" || $brand in @->brands]->{ \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  \n  "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title }\n,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n  "category": category->{ title, "slug": slug.current }\n },\n  "latest": *[\n    _type == "post"\n    && defined(slug.current)\n    && ($brand == "clearview" || $brand in brands)\n    && !(_id in coalesce(^.slides[]._ref, []))\n    && !(_id in coalesce(^.articles[]._ref, []))\n  ] | order(publishedAt desc)[0...6]{ \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  \n  "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title }\n,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n  "category": category->{ title, "slug": slug.current }\n }\n },\n  _type == "publications" => { \n  heading[]{ _key, style, children[]{ _key, text } },\n  body,\n  cards[]{\n    _key,\n    brand,\n    "brandTitle": *[_type == "brand" && key.current == ^.brand][0].title,\n    description,\n    image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n    linkLabel\n  }\n },\n  _type == "cta" => { \n  heading,\n  text,\n  link{ label, href }\n },\n  _type == "highlights" => { \n  source,\n  count,\n  heading[]{ _key, style, children[]{ _key, text } },\n  deadlineLabel,\n  "items": items[]->{ \n  _id,\n  _type,\n  "slug": slug.current,\n  title,\n  category,\n  nominationsClosingDate,\n  startDate,\n  endDate,\n  country,\n  publishedAt\n },\n  "fill": select(\n  source == "awards" => [\n    ...*[\n      _type == "awardsProgramme"\n      && nominationsClosingDate >= $today\n      && !(_id in coalesce(^.items[]._ref, []))\n    ] | order(nominationsClosingDate asc)[0...5]{ \n  _id,\n  _type,\n  "slug": slug.current,\n  title,\n  category,\n  nominationsClosingDate,\n  startDate,\n  endDate,\n  country,\n  publishedAt\n },\n    ...*[\n      _type == "awardsProgramme"\n      && !(defined(nominationsClosingDate) && nominationsClosingDate >= $today)\n      && startDate >= $today\n      && !(_id in coalesce(^.items[]._ref, []))\n    ] | order(startDate asc)[0...5]{ \n  _id,\n  _type,\n  "slug": slug.current,\n  title,\n  category,\n  nominationsClosingDate,\n  startDate,\n  endDate,\n  country,\n  publishedAt\n },\n    ...*[\n      _type == "awardsProgramme"\n      && !(defined(nominationsClosingDate) && nominationsClosingDate >= $today)\n      && startDate < $today\n      && !(_id in coalesce(^.items[]._ref, []))\n    ] | order(startDate desc)[0...5]{ \n  _id,\n  _type,\n  "slug": slug.current,\n  title,\n  category,\n  nominationsClosingDate,\n  startDate,\n  endDate,\n  country,\n  publishedAt\n }\n  ],\n  source == "events" => [\n    ...*[\n      _type == "conferenceEvent"\n      && coalesce(endDate, startDate) >= $today\n      && !(_id in coalesce(^.items[]._ref, []))\n    ] | order(startDate asc)[0...4]{ \n  _id,\n  _type,\n  "slug": slug.current,\n  title,\n  category,\n  nominationsClosingDate,\n  startDate,\n  endDate,\n  country,\n  publishedAt\n },\n    ...*[\n      _type == "conferenceEvent"\n      && coalesce(endDate, startDate) < $today\n      && !(_id in coalesce(^.items[]._ref, []))\n    ] | order(startDate desc)[0...4]{ \n  _id,\n  _type,\n  "slug": slug.current,\n  title,\n  category,\n  nominationsClosingDate,\n  startDate,\n  endDate,\n  country,\n  publishedAt\n }\n  ],\n  source == "research" => *[\n    _type == "resource"\n    && category == "research"\n    && !(_id in coalesce(^.items[]._ref, []))\n    && _id != coalesce(^.promo.resource._ref, "")\n  ] | order(defined(publishedAt) desc, publishedAt desc, legacyWpId desc)[0...3]{ \n  _id,\n  _type,\n  "slug": slug.current,\n  title,\n  category,\n  nominationsClosingDate,\n  startDate,\n  endDate,\n  country,\n  publishedAt\n }\n),\n  button{ \n  label,\n  \n  kind,\n  external,\n  internal->{\n    _type,\n    "slug": slug.current,\n    brand,\n    brands\n  }\n\n },\n  promo{\n    resource->{\n      title,\n      "downloadThumbnail": downloadThumbnail{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n      "downloadFileUrl": downloadFile.asset->url,\n      "downloadFileName": downloadFile.asset->originalFilename,\n      downloadUrl\n    },\n    title,\n    description,\n    "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n    link{ \n  kind,\n  external,\n  internal->{\n    _type,\n    "slug": slug.current,\n    brand,\n    brands\n  }\n }\n  }\n },\n  _type == "featuredStories" => { \n  heading[]{ _key, style, children[]{ _key, text } },\n  link{ \n  label,\n  \n  kind,\n  external,\n  internal->{\n    _type,\n    "slug": slug.current,\n    brand,\n    brands\n  }\n\n },\n  "posts": posts[]->{ \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  \n  "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title }\n,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n  "category": category->{ title, "slug": slug.current }\n }\n },\n  _type == "statsBar" => { \n  heading[]{ _key, style, children[]{ _key, text } },\n  items[]{ _key, icon, value, label }\n },\n  _type == "newsletterSignup" => { \n  heading[]{ _key, style, children[]{ _key, text } },\n  body,\n  preferencesLabel,\n  options[]{\n    _key,\n    label,\n    defaultChecked,\n    "interestKey": *[_type == "subscribeModal" && _id == "subscribe-modal-" + $brand][0].interests[attribute.name == ^.attribute.name][0]._key\n  },\n  emailPlaceholder,\n  buttonLabel,\n  invalidEmailMessage,\n  noOptionMessage,\n  image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n }\n },\n  _type == "sponsoredContent" => { \n  label,\n  link{ \n  label,\n  \n  kind,\n  external,\n  internal->{\n    _type,\n    "slug": slug.current,\n    brand,\n    brands\n  }\n\n },\n  profileLabel,\n  "post": *[\n    _type == "post"\n    && _id == ^.post._ref\n    && defined(slug.current)\n    && defined(sponsor)\n    && ($brand == "clearview" || $brand in brands)\n  ][0]{\n    \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  \n  "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title }\n,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n  "category": category->{ title, "slug": slug.current }\n,\n    "sponsor": sponsor->{\n      title,\n      "slug": slug.current,\n      "logo": logo{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n }\n    }\n  }\n },\n  _type == "postCards" => { \n  \n  heading[]{ _key, style, children[]{ _key, text } },\n  link{ \n  label,\n  \n  kind,\n  external,\n  internal->{\n    _type,\n    "slug": slug.current,\n    brand,\n    brands\n  }\n\n }\n,\n  "category": category->{ title, "slug": slug.current },\n  "posts": posts[$brand in @->brands]->{ \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  \n  "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title }\n,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n  "category": category->{ title, "slug": slug.current }\n },\n  "latest": \n  *[\n    _type == "post"\n    && defined(slug.current)\n    && $brand in brands\n    && defined(^.category._ref) && category._ref == ^.category._ref\n    && !(_id in coalesce(^.posts[]._ref, []))\n  ] | order(publishedAt desc)[0...6]\n{ \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  \n  "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title }\n,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n  "category": category->{ title, "slug": slug.current }\n }\n },\n  _type == "postBriefs" => { \n  \n  heading[]{ _key, style, children[]{ _key, text } },\n  link{ \n  label,\n  \n  kind,\n  external,\n  internal->{\n    _type,\n    "slug": slug.current,\n    brand,\n    brands\n  }\n\n }\n,\n  count,\n  "posts": posts[$brand in @->brands]->{ \n  \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  \n  "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title }\n,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n  "category": category->{ title, "slug": slug.current }\n,\n  "topic": primaryTopic->{ title },\n  briefText\n },\n  "latest": \n  *[\n    _type == "post"\n    && defined(slug.current)\n    && $brand in brands\n    && true\n    && !(_id in coalesce(^.posts[]._ref, []))\n  ] | order(publishedAt desc)[0...6]\n{ \n  \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  \n  "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title }\n,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n  "category": category->{ title, "slug": slug.current }\n,\n  "topic": primaryTopic->{ title },\n  briefText\n }\n },\n  _type == "weeklyRoundup" => { \n  heading[]{ _key, style, children[]{ _key, text } },\n  label,\n  title,\n  summary,\n  button{ \n  label,\n  \n  kind,\n  external,\n  internal->{\n    _type,\n    "slug": slug.current,\n    brand,\n    brands\n  }\n\n },\n  listLabel,\n  "posts": posts[$brand in @->brands]->{ \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  \n  "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title }\n,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n  "category": category->{ title, "slug": slug.current }\n },\n  "latest": \n  *[\n    _type == "post"\n    && defined(slug.current)\n    && $brand in brands\n    && true\n    && !(_id in coalesce(^.posts[]._ref, []))\n  ] | order(publishedAt desc)[0...8]\n{ \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  \n  "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title }\n,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n  "category": category->{ title, "slug": slug.current }\n }\n },\n  _type == "topPicks" => { \n  heading[]{ _key, style, children[]{ _key, text } },\n  link{ \n  label,\n  \n  kind,\n  external,\n  internal->{\n    _type,\n    "slug": slug.current,\n    brand,\n    brands\n  }\n\n },\n  "posts": posts[$brand in @->brands]->{ \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  \n  "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title }\n,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n  "category": category->{ title, "slug": slug.current }\n, "sponsored": defined(sponsor) },\n  "fill": [\n    ...\n  *[\n    _type == "post"\n    && defined(slug.current)\n    && $brand in brands\n    && !defined(sponsor) && dateTime(publishedAt) >= dateTime($today + "T00:00:00Z") - 60*60*24*7\n    && !(_id in coalesce(^.posts[]._ref, []))\n  ] | order(publishedAt desc)[0...6]\n{ \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  \n  "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title }\n,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n  "category": category->{ title, "slug": slug.current }\n },\n    ...\n  *[\n    _type == "post"\n    && defined(slug.current)\n    && $brand in brands\n    && !defined(sponsor) && dateTime(publishedAt) < dateTime($today + "T00:00:00Z") - 60*60*24*7\n    && !(_id in coalesce(^.posts[]._ref, []))\n  ] | order(publishedAt desc)[0...6]\n{ \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  \n  "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title }\n,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n  "category": category->{ title, "slug": slug.current }\n }\n  ]\n },\n  _type == "exploreGrid" => { \n  cards[]{\n    _key,\n    heading[]{ _key, style, children[]{ _key, text } },\n    icon,\n    source,\n    count,\n    deadlineLabel,\n    button{ \n  label,\n  \n  kind,\n  external,\n  internal->{\n    _type,\n    "slug": slug.current,\n    brand,\n    brands\n  }\n\n },\n    "items": items[@->_type != "post" || $brand in @->brands]->{ \n  _type == "post" => { _type, \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  \n  "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title }\n,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n  "category": category->{ title, "slug": slug.current }\n },\n  _type != "post" => { \n  _id,\n  _type,\n  "slug": slug.current,\n  title,\n  category,\n  nominationsClosingDate,\n  startDate,\n  endDate,\n  country,\n  publishedAt\n }\n },\n    "fill": select(\n      source == "posts" => \n  *[\n    _type == "post"\n    && defined(slug.current)\n    && $brand in brands\n    && defined(^.category._ref) && category._ref == ^.category._ref\n    && !(_id in coalesce(^.items[]._ref, []))\n  ] | order(publishedAt desc)[0...6]\n{ _type, \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  \n  "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title }\n,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n  "category": category->{ title, "slug": slug.current }\n },\n      \n  source == "awards" => [\n    ...*[\n      _type == "awardsProgramme"\n      && nominationsClosingDate >= $today\n      && !(_id in coalesce(^.items[]._ref, []))\n    ] | order(nominationsClosingDate asc)[0...5]{ \n  _id,\n  _type,\n  "slug": slug.current,\n  title,\n  category,\n  nominationsClosingDate,\n  startDate,\n  endDate,\n  country,\n  publishedAt\n },\n    ...*[\n      _type == "awardsProgramme"\n      && !(defined(nominationsClosingDate) && nominationsClosingDate >= $today)\n      && startDate >= $today\n      && !(_id in coalesce(^.items[]._ref, []))\n    ] | order(startDate asc)[0...5]{ \n  _id,\n  _type,\n  "slug": slug.current,\n  title,\n  category,\n  nominationsClosingDate,\n  startDate,\n  endDate,\n  country,\n  publishedAt\n },\n    ...*[\n      _type == "awardsProgramme"\n      && !(defined(nominationsClosingDate) && nominationsClosingDate >= $today)\n      && startDate < $today\n      && !(_id in coalesce(^.items[]._ref, []))\n    ] | order(startDate desc)[0...5]{ \n  _id,\n  _type,\n  "slug": slug.current,\n  title,\n  category,\n  nominationsClosingDate,\n  startDate,\n  endDate,\n  country,\n  publishedAt\n }\n  ],\n  source == "events" => [\n    ...*[\n      _type == "conferenceEvent"\n      && coalesce(endDate, startDate) >= $today\n      && !(_id in coalesce(^.items[]._ref, []))\n    ] | order(startDate asc)[0...4]{ \n  _id,\n  _type,\n  "slug": slug.current,\n  title,\n  category,\n  nominationsClosingDate,\n  startDate,\n  endDate,\n  country,\n  publishedAt\n },\n    ...*[\n      _type == "conferenceEvent"\n      && coalesce(endDate, startDate) < $today\n      && !(_id in coalesce(^.items[]._ref, []))\n    ] | order(startDate desc)[0...4]{ \n  _id,\n  _type,\n  "slug": slug.current,\n  title,\n  category,\n  nominationsClosingDate,\n  startDate,\n  endDate,\n  country,\n  publishedAt\n }\n  ],\n  source == "research" => *[\n    _type == "resource"\n    && category == "research"\n    && !(_id in coalesce(^.items[]._ref, []))\n    && _id != coalesce(^.promo.resource._ref, "")\n  ] | order(defined(publishedAt) desc, publishedAt desc, legacyWpId desc)[0...3]{ \n  _id,\n  _type,\n  "slug": slug.current,\n  title,\n  category,\n  nominationsClosingDate,\n  startDate,\n  endDate,\n  country,\n  publishedAt\n }\n\n    )\n  }\n },\n  _type == "subscribeBanner" => { \n  heading[]{ _key, style, children[]{ _key, text } },\n  description,\n  buttonLabel,\n  cta{ \n  label,\n  \n  kind,\n  external,\n  internal->{\n    _type,\n    "slug": slug.current,\n    brand,\n    brands\n  }\n\n }\n },\n  _type == "splitLayout" => {\n    "main": main[]{ _key, _type, \n  _type == "topStories" => { \n  linkLabel,\n  label,\n  "slides": slides[$brand == "clearview" || $brand in @->brands]->{ \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  \n  "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title }\n,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n  "category": category->{ title, "slug": slug.current }\n },\n  "articles": articles[$brand == "clearview" || $brand in @->brands]->{ \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  \n  "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title }\n,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n  "category": category->{ title, "slug": slug.current }\n },\n  "latest": *[\n    _type == "post"\n    && defined(slug.current)\n    && ($brand == "clearview" || $brand in brands)\n    && !(_id in coalesce(^.slides[]._ref, []))\n    && !(_id in coalesce(^.articles[]._ref, []))\n  ] | order(publishedAt desc)[0...6]{ \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  \n  "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title }\n,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n  "category": category->{ title, "slug": slug.current }\n }\n },\n  _type == "sponsoredContent" => { \n  label,\n  link{ \n  label,\n  \n  kind,\n  external,\n  internal->{\n    _type,\n    "slug": slug.current,\n    brand,\n    brands\n  }\n\n },\n  profileLabel,\n  "post": *[\n    _type == "post"\n    && _id == ^.post._ref\n    && defined(slug.current)\n    && defined(sponsor)\n    && ($brand == "clearview" || $brand in brands)\n  ][0]{\n    \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  \n  "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title }\n,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n  "category": category->{ title, "slug": slug.current }\n,\n    "sponsor": sponsor->{\n      title,\n      "slug": slug.current,\n      "logo": logo{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n }\n    }\n  }\n },\n  _type == "postCards" => { \n  \n  heading[]{ _key, style, children[]{ _key, text } },\n  link{ \n  label,\n  \n  kind,\n  external,\n  internal->{\n    _type,\n    "slug": slug.current,\n    brand,\n    brands\n  }\n\n }\n,\n  "category": category->{ title, "slug": slug.current },\n  "posts": posts[$brand in @->brands]->{ \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  \n  "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title }\n,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n  "category": category->{ title, "slug": slug.current }\n },\n  "latest": \n  *[\n    _type == "post"\n    && defined(slug.current)\n    && $brand in brands\n    && defined(^.category._ref) && category._ref == ^.category._ref\n    && !(_id in coalesce(^.posts[]._ref, []))\n  ] | order(publishedAt desc)[0...6]\n{ \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  \n  "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title }\n,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n  "category": category->{ title, "slug": slug.current }\n }\n },\n  _type == "postBriefs" => { \n  \n  heading[]{ _key, style, children[]{ _key, text } },\n  link{ \n  label,\n  \n  kind,\n  external,\n  internal->{\n    _type,\n    "slug": slug.current,\n    brand,\n    brands\n  }\n\n }\n,\n  count,\n  "posts": posts[$brand in @->brands]->{ \n  \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  \n  "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title }\n,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n  "category": category->{ title, "slug": slug.current }\n,\n  "topic": primaryTopic->{ title },\n  briefText\n },\n  "latest": \n  *[\n    _type == "post"\n    && defined(slug.current)\n    && $brand in brands\n    && true\n    && !(_id in coalesce(^.posts[]._ref, []))\n  ] | order(publishedAt desc)[0...6]\n{ \n  \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  \n  "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title }\n,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n  "category": category->{ title, "slug": slug.current }\n,\n  "topic": primaryTopic->{ title },\n  briefText\n }\n },\n  _type == "weeklyRoundup" => { \n  heading[]{ _key, style, children[]{ _key, text } },\n  label,\n  title,\n  summary,\n  button{ \n  label,\n  \n  kind,\n  external,\n  internal->{\n    _type,\n    "slug": slug.current,\n    brand,\n    brands\n  }\n\n },\n  listLabel,\n  "posts": posts[$brand in @->brands]->{ \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  \n  "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title }\n,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n  "category": category->{ title, "slug": slug.current }\n },\n  "latest": \n  *[\n    _type == "post"\n    && defined(slug.current)\n    && $brand in brands\n    && true\n    && !(_id in coalesce(^.posts[]._ref, []))\n  ] | order(publishedAt desc)[0...8]\n{ \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  \n  "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title }\n,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n  "category": category->{ title, "slug": slug.current }\n }\n },\n  _type == "publications" => { \n  heading[]{ _key, style, children[]{ _key, text } },\n  body,\n  cards[]{\n    _key,\n    brand,\n    "brandTitle": *[_type == "brand" && key.current == ^.brand][0].title,\n    description,\n    image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n    linkLabel\n  }\n },\n  _type == "cta" => { \n  heading,\n  text,\n  link{ label, href }\n }\n },\n    "aside": aside[]{ _key, _type, \n  _type == "highlights" => { \n  source,\n  count,\n  heading[]{ _key, style, children[]{ _key, text } },\n  deadlineLabel,\n  "items": items[]->{ \n  _id,\n  _type,\n  "slug": slug.current,\n  title,\n  category,\n  nominationsClosingDate,\n  startDate,\n  endDate,\n  country,\n  publishedAt\n },\n  "fill": select(\n  source == "awards" => [\n    ...*[\n      _type == "awardsProgramme"\n      && nominationsClosingDate >= $today\n      && !(_id in coalesce(^.items[]._ref, []))\n    ] | order(nominationsClosingDate asc)[0...5]{ \n  _id,\n  _type,\n  "slug": slug.current,\n  title,\n  category,\n  nominationsClosingDate,\n  startDate,\n  endDate,\n  country,\n  publishedAt\n },\n    ...*[\n      _type == "awardsProgramme"\n      && !(defined(nominationsClosingDate) && nominationsClosingDate >= $today)\n      && startDate >= $today\n      && !(_id in coalesce(^.items[]._ref, []))\n    ] | order(startDate asc)[0...5]{ \n  _id,\n  _type,\n  "slug": slug.current,\n  title,\n  category,\n  nominationsClosingDate,\n  startDate,\n  endDate,\n  country,\n  publishedAt\n },\n    ...*[\n      _type == "awardsProgramme"\n      && !(defined(nominationsClosingDate) && nominationsClosingDate >= $today)\n      && startDate < $today\n      && !(_id in coalesce(^.items[]._ref, []))\n    ] | order(startDate desc)[0...5]{ \n  _id,\n  _type,\n  "slug": slug.current,\n  title,\n  category,\n  nominationsClosingDate,\n  startDate,\n  endDate,\n  country,\n  publishedAt\n }\n  ],\n  source == "events" => [\n    ...*[\n      _type == "conferenceEvent"\n      && coalesce(endDate, startDate) >= $today\n      && !(_id in coalesce(^.items[]._ref, []))\n    ] | order(startDate asc)[0...4]{ \n  _id,\n  _type,\n  "slug": slug.current,\n  title,\n  category,\n  nominationsClosingDate,\n  startDate,\n  endDate,\n  country,\n  publishedAt\n },\n    ...*[\n      _type == "conferenceEvent"\n      && coalesce(endDate, startDate) < $today\n      && !(_id in coalesce(^.items[]._ref, []))\n    ] | order(startDate desc)[0...4]{ \n  _id,\n  _type,\n  "slug": slug.current,\n  title,\n  category,\n  nominationsClosingDate,\n  startDate,\n  endDate,\n  country,\n  publishedAt\n }\n  ],\n  source == "research" => *[\n    _type == "resource"\n    && category == "research"\n    && !(_id in coalesce(^.items[]._ref, []))\n    && _id != coalesce(^.promo.resource._ref, "")\n  ] | order(defined(publishedAt) desc, publishedAt desc, legacyWpId desc)[0...3]{ \n  _id,\n  _type,\n  "slug": slug.current,\n  title,\n  category,\n  nominationsClosingDate,\n  startDate,\n  endDate,\n  country,\n  publishedAt\n }\n),\n  button{ \n  label,\n  \n  kind,\n  external,\n  internal->{\n    _type,\n    "slug": slug.current,\n    brand,\n    brands\n  }\n\n },\n  promo{\n    resource->{\n      title,\n      "downloadThumbnail": downloadThumbnail{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n      "downloadFileUrl": downloadFile.asset->url,\n      "downloadFileName": downloadFile.asset->originalFilename,\n      downloadUrl\n    },\n    title,\n    description,\n    "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n    link{ \n  kind,\n  external,\n  internal->{\n    _type,\n    "slug": slug.current,\n    brand,\n    brands\n  }\n }\n  }\n },\n  _type == "awardsWinners" => { heading[]{ _key, style, children[]{ _key, text } } }\n }\n  }\n },\n    blocksBottom[]{ _key, _type, \n  _type == "topStories" => { \n  linkLabel,\n  label,\n  "slides": slides[$brand == "clearview" || $brand in @->brands]->{ \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  \n  "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title }\n,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n  "category": category->{ title, "slug": slug.current }\n },\n  "articles": articles[$brand == "clearview" || $brand in @->brands]->{ \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  \n  "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title }\n,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n  "category": category->{ title, "slug": slug.current }\n },\n  "latest": *[\n    _type == "post"\n    && defined(slug.current)\n    && ($brand == "clearview" || $brand in brands)\n    && !(_id in coalesce(^.slides[]._ref, []))\n    && !(_id in coalesce(^.articles[]._ref, []))\n  ] | order(publishedAt desc)[0...6]{ \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  \n  "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title }\n,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n  "category": category->{ title, "slug": slug.current }\n }\n },\n  _type == "publications" => { \n  heading[]{ _key, style, children[]{ _key, text } },\n  body,\n  cards[]{\n    _key,\n    brand,\n    "brandTitle": *[_type == "brand" && key.current == ^.brand][0].title,\n    description,\n    image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n    linkLabel\n  }\n },\n  _type == "cta" => { \n  heading,\n  text,\n  link{ label, href }\n },\n  _type == "highlights" => { \n  source,\n  count,\n  heading[]{ _key, style, children[]{ _key, text } },\n  deadlineLabel,\n  "items": items[]->{ \n  _id,\n  _type,\n  "slug": slug.current,\n  title,\n  category,\n  nominationsClosingDate,\n  startDate,\n  endDate,\n  country,\n  publishedAt\n },\n  "fill": select(\n  source == "awards" => [\n    ...*[\n      _type == "awardsProgramme"\n      && nominationsClosingDate >= $today\n      && !(_id in coalesce(^.items[]._ref, []))\n    ] | order(nominationsClosingDate asc)[0...5]{ \n  _id,\n  _type,\n  "slug": slug.current,\n  title,\n  category,\n  nominationsClosingDate,\n  startDate,\n  endDate,\n  country,\n  publishedAt\n },\n    ...*[\n      _type == "awardsProgramme"\n      && !(defined(nominationsClosingDate) && nominationsClosingDate >= $today)\n      && startDate >= $today\n      && !(_id in coalesce(^.items[]._ref, []))\n    ] | order(startDate asc)[0...5]{ \n  _id,\n  _type,\n  "slug": slug.current,\n  title,\n  category,\n  nominationsClosingDate,\n  startDate,\n  endDate,\n  country,\n  publishedAt\n },\n    ...*[\n      _type == "awardsProgramme"\n      && !(defined(nominationsClosingDate) && nominationsClosingDate >= $today)\n      && startDate < $today\n      && !(_id in coalesce(^.items[]._ref, []))\n    ] | order(startDate desc)[0...5]{ \n  _id,\n  _type,\n  "slug": slug.current,\n  title,\n  category,\n  nominationsClosingDate,\n  startDate,\n  endDate,\n  country,\n  publishedAt\n }\n  ],\n  source == "events" => [\n    ...*[\n      _type == "conferenceEvent"\n      && coalesce(endDate, startDate) >= $today\n      && !(_id in coalesce(^.items[]._ref, []))\n    ] | order(startDate asc)[0...4]{ \n  _id,\n  _type,\n  "slug": slug.current,\n  title,\n  category,\n  nominationsClosingDate,\n  startDate,\n  endDate,\n  country,\n  publishedAt\n },\n    ...*[\n      _type == "conferenceEvent"\n      && coalesce(endDate, startDate) < $today\n      && !(_id in coalesce(^.items[]._ref, []))\n    ] | order(startDate desc)[0...4]{ \n  _id,\n  _type,\n  "slug": slug.current,\n  title,\n  category,\n  nominationsClosingDate,\n  startDate,\n  endDate,\n  country,\n  publishedAt\n }\n  ],\n  source == "research" => *[\n    _type == "resource"\n    && category == "research"\n    && !(_id in coalesce(^.items[]._ref, []))\n    && _id != coalesce(^.promo.resource._ref, "")\n  ] | order(defined(publishedAt) desc, publishedAt desc, legacyWpId desc)[0...3]{ \n  _id,\n  _type,\n  "slug": slug.current,\n  title,\n  category,\n  nominationsClosingDate,\n  startDate,\n  endDate,\n  country,\n  publishedAt\n }\n),\n  button{ \n  label,\n  \n  kind,\n  external,\n  internal->{\n    _type,\n    "slug": slug.current,\n    brand,\n    brands\n  }\n\n },\n  promo{\n    resource->{\n      title,\n      "downloadThumbnail": downloadThumbnail{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n      "downloadFileUrl": downloadFile.asset->url,\n      "downloadFileName": downloadFile.asset->originalFilename,\n      downloadUrl\n    },\n    title,\n    description,\n    "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n    link{ \n  kind,\n  external,\n  internal->{\n    _type,\n    "slug": slug.current,\n    brand,\n    brands\n  }\n }\n  }\n },\n  _type == "featuredStories" => { \n  heading[]{ _key, style, children[]{ _key, text } },\n  link{ \n  label,\n  \n  kind,\n  external,\n  internal->{\n    _type,\n    "slug": slug.current,\n    brand,\n    brands\n  }\n\n },\n  "posts": posts[]->{ \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  \n  "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title }\n,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n  "category": category->{ title, "slug": slug.current }\n }\n },\n  _type == "statsBar" => { \n  heading[]{ _key, style, children[]{ _key, text } },\n  items[]{ _key, icon, value, label }\n },\n  _type == "newsletterSignup" => { \n  heading[]{ _key, style, children[]{ _key, text } },\n  body,\n  preferencesLabel,\n  options[]{\n    _key,\n    label,\n    defaultChecked,\n    "interestKey": *[_type == "subscribeModal" && _id == "subscribe-modal-" + $brand][0].interests[attribute.name == ^.attribute.name][0]._key\n  },\n  emailPlaceholder,\n  buttonLabel,\n  invalidEmailMessage,\n  noOptionMessage,\n  image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n }\n },\n  _type == "sponsoredContent" => { \n  label,\n  link{ \n  label,\n  \n  kind,\n  external,\n  internal->{\n    _type,\n    "slug": slug.current,\n    brand,\n    brands\n  }\n\n },\n  profileLabel,\n  "post": *[\n    _type == "post"\n    && _id == ^.post._ref\n    && defined(slug.current)\n    && defined(sponsor)\n    && ($brand == "clearview" || $brand in brands)\n  ][0]{\n    \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  \n  "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title }\n,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n  "category": category->{ title, "slug": slug.current }\n,\n    "sponsor": sponsor->{\n      title,\n      "slug": slug.current,\n      "logo": logo{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n }\n    }\n  }\n },\n  _type == "postCards" => { \n  \n  heading[]{ _key, style, children[]{ _key, text } },\n  link{ \n  label,\n  \n  kind,\n  external,\n  internal->{\n    _type,\n    "slug": slug.current,\n    brand,\n    brands\n  }\n\n }\n,\n  "category": category->{ title, "slug": slug.current },\n  "posts": posts[$brand in @->brands]->{ \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  \n  "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title }\n,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n  "category": category->{ title, "slug": slug.current }\n },\n  "latest": \n  *[\n    _type == "post"\n    && defined(slug.current)\n    && $brand in brands\n    && defined(^.category._ref) && category._ref == ^.category._ref\n    && !(_id in coalesce(^.posts[]._ref, []))\n  ] | order(publishedAt desc)[0...6]\n{ \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  \n  "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title }\n,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n  "category": category->{ title, "slug": slug.current }\n }\n },\n  _type == "postBriefs" => { \n  \n  heading[]{ _key, style, children[]{ _key, text } },\n  link{ \n  label,\n  \n  kind,\n  external,\n  internal->{\n    _type,\n    "slug": slug.current,\n    brand,\n    brands\n  }\n\n }\n,\n  count,\n  "posts": posts[$brand in @->brands]->{ \n  \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  \n  "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title }\n,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n  "category": category->{ title, "slug": slug.current }\n,\n  "topic": primaryTopic->{ title },\n  briefText\n },\n  "latest": \n  *[\n    _type == "post"\n    && defined(slug.current)\n    && $brand in brands\n    && true\n    && !(_id in coalesce(^.posts[]._ref, []))\n  ] | order(publishedAt desc)[0...6]\n{ \n  \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  \n  "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title }\n,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n  "category": category->{ title, "slug": slug.current }\n,\n  "topic": primaryTopic->{ title },\n  briefText\n }\n },\n  _type == "weeklyRoundup" => { \n  heading[]{ _key, style, children[]{ _key, text } },\n  label,\n  title,\n  summary,\n  button{ \n  label,\n  \n  kind,\n  external,\n  internal->{\n    _type,\n    "slug": slug.current,\n    brand,\n    brands\n  }\n\n },\n  listLabel,\n  "posts": posts[$brand in @->brands]->{ \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  \n  "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title }\n,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n  "category": category->{ title, "slug": slug.current }\n },\n  "latest": \n  *[\n    _type == "post"\n    && defined(slug.current)\n    && $brand in brands\n    && true\n    && !(_id in coalesce(^.posts[]._ref, []))\n  ] | order(publishedAt desc)[0...8]\n{ \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  \n  "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title }\n,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n  "category": category->{ title, "slug": slug.current }\n }\n },\n  _type == "topPicks" => { \n  heading[]{ _key, style, children[]{ _key, text } },\n  link{ \n  label,\n  \n  kind,\n  external,\n  internal->{\n    _type,\n    "slug": slug.current,\n    brand,\n    brands\n  }\n\n },\n  "posts": posts[$brand in @->brands]->{ \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  \n  "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title }\n,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n  "category": category->{ title, "slug": slug.current }\n, "sponsored": defined(sponsor) },\n  "fill": [\n    ...\n  *[\n    _type == "post"\n    && defined(slug.current)\n    && $brand in brands\n    && !defined(sponsor) && dateTime(publishedAt) >= dateTime($today + "T00:00:00Z") - 60*60*24*7\n    && !(_id in coalesce(^.posts[]._ref, []))\n  ] | order(publishedAt desc)[0...6]\n{ \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  \n  "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title }\n,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n  "category": category->{ title, "slug": slug.current }\n },\n    ...\n  *[\n    _type == "post"\n    && defined(slug.current)\n    && $brand in brands\n    && !defined(sponsor) && dateTime(publishedAt) < dateTime($today + "T00:00:00Z") - 60*60*24*7\n    && !(_id in coalesce(^.posts[]._ref, []))\n  ] | order(publishedAt desc)[0...6]\n{ \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  \n  "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title }\n,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n  "category": category->{ title, "slug": slug.current }\n }\n  ]\n },\n  _type == "exploreGrid" => { \n  cards[]{\n    _key,\n    heading[]{ _key, style, children[]{ _key, text } },\n    icon,\n    source,\n    count,\n    deadlineLabel,\n    button{ \n  label,\n  \n  kind,\n  external,\n  internal->{\n    _type,\n    "slug": slug.current,\n    brand,\n    brands\n  }\n\n },\n    "items": items[@->_type != "post" || $brand in @->brands]->{ \n  _type == "post" => { _type, \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  \n  "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title }\n,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n  "category": category->{ title, "slug": slug.current }\n },\n  _type != "post" => { \n  _id,\n  _type,\n  "slug": slug.current,\n  title,\n  category,\n  nominationsClosingDate,\n  startDate,\n  endDate,\n  country,\n  publishedAt\n }\n },\n    "fill": select(\n      source == "posts" => \n  *[\n    _type == "post"\n    && defined(slug.current)\n    && $brand in brands\n    && defined(^.category._ref) && category._ref == ^.category._ref\n    && !(_id in coalesce(^.items[]._ref, []))\n  ] | order(publishedAt desc)[0...6]\n{ _type, \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  \n  "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title }\n,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n  "category": category->{ title, "slug": slug.current }\n },\n      \n  source == "awards" => [\n    ...*[\n      _type == "awardsProgramme"\n      && nominationsClosingDate >= $today\n      && !(_id in coalesce(^.items[]._ref, []))\n    ] | order(nominationsClosingDate asc)[0...5]{ \n  _id,\n  _type,\n  "slug": slug.current,\n  title,\n  category,\n  nominationsClosingDate,\n  startDate,\n  endDate,\n  country,\n  publishedAt\n },\n    ...*[\n      _type == "awardsProgramme"\n      && !(defined(nominationsClosingDate) && nominationsClosingDate >= $today)\n      && startDate >= $today\n      && !(_id in coalesce(^.items[]._ref, []))\n    ] | order(startDate asc)[0...5]{ \n  _id,\n  _type,\n  "slug": slug.current,\n  title,\n  category,\n  nominationsClosingDate,\n  startDate,\n  endDate,\n  country,\n  publishedAt\n },\n    ...*[\n      _type == "awardsProgramme"\n      && !(defined(nominationsClosingDate) && nominationsClosingDate >= $today)\n      && startDate < $today\n      && !(_id in coalesce(^.items[]._ref, []))\n    ] | order(startDate desc)[0...5]{ \n  _id,\n  _type,\n  "slug": slug.current,\n  title,\n  category,\n  nominationsClosingDate,\n  startDate,\n  endDate,\n  country,\n  publishedAt\n }\n  ],\n  source == "events" => [\n    ...*[\n      _type == "conferenceEvent"\n      && coalesce(endDate, startDate) >= $today\n      && !(_id in coalesce(^.items[]._ref, []))\n    ] | order(startDate asc)[0...4]{ \n  _id,\n  _type,\n  "slug": slug.current,\n  title,\n  category,\n  nominationsClosingDate,\n  startDate,\n  endDate,\n  country,\n  publishedAt\n },\n    ...*[\n      _type == "conferenceEvent"\n      && coalesce(endDate, startDate) < $today\n      && !(_id in coalesce(^.items[]._ref, []))\n    ] | order(startDate desc)[0...4]{ \n  _id,\n  _type,\n  "slug": slug.current,\n  title,\n  category,\n  nominationsClosingDate,\n  startDate,\n  endDate,\n  country,\n  publishedAt\n }\n  ],\n  source == "research" => *[\n    _type == "resource"\n    && category == "research"\n    && !(_id in coalesce(^.items[]._ref, []))\n    && _id != coalesce(^.promo.resource._ref, "")\n  ] | order(defined(publishedAt) desc, publishedAt desc, legacyWpId desc)[0...3]{ \n  _id,\n  _type,\n  "slug": slug.current,\n  title,\n  category,\n  nominationsClosingDate,\n  startDate,\n  endDate,\n  country,\n  publishedAt\n }\n\n    )\n  }\n },\n  _type == "subscribeBanner" => { \n  heading[]{ _key, style, children[]{ _key, text } },\n  description,\n  buttonLabel,\n  cta{ \n  label,\n  \n  kind,\n  external,\n  internal->{\n    _type,\n    "slug": slug.current,\n    brand,\n    brands\n  }\n\n }\n },\n  _type == "splitLayout" => {\n    "main": main[]{ _key, _type, \n  _type == "topStories" => { \n  linkLabel,\n  label,\n  "slides": slides[$brand == "clearview" || $brand in @->brands]->{ \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  \n  "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title }\n,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n  "category": category->{ title, "slug": slug.current }\n },\n  "articles": articles[$brand == "clearview" || $brand in @->brands]->{ \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  \n  "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title }\n,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n  "category": category->{ title, "slug": slug.current }\n },\n  "latest": *[\n    _type == "post"\n    && defined(slug.current)\n    && ($brand == "clearview" || $brand in brands)\n    && !(_id in coalesce(^.slides[]._ref, []))\n    && !(_id in coalesce(^.articles[]._ref, []))\n  ] | order(publishedAt desc)[0...6]{ \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  \n  "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title }\n,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n  "category": category->{ title, "slug": slug.current }\n }\n },\n  _type == "sponsoredContent" => { \n  label,\n  link{ \n  label,\n  \n  kind,\n  external,\n  internal->{\n    _type,\n    "slug": slug.current,\n    brand,\n    brands\n  }\n\n },\n  profileLabel,\n  "post": *[\n    _type == "post"\n    && _id == ^.post._ref\n    && defined(slug.current)\n    && defined(sponsor)\n    && ($brand == "clearview" || $brand in brands)\n  ][0]{\n    \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  \n  "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title }\n,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n  "category": category->{ title, "slug": slug.current }\n,\n    "sponsor": sponsor->{\n      title,\n      "slug": slug.current,\n      "logo": logo{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n }\n    }\n  }\n },\n  _type == "postCards" => { \n  \n  heading[]{ _key, style, children[]{ _key, text } },\n  link{ \n  label,\n  \n  kind,\n  external,\n  internal->{\n    _type,\n    "slug": slug.current,\n    brand,\n    brands\n  }\n\n }\n,\n  "category": category->{ title, "slug": slug.current },\n  "posts": posts[$brand in @->brands]->{ \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  \n  "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title }\n,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n  "category": category->{ title, "slug": slug.current }\n },\n  "latest": \n  *[\n    _type == "post"\n    && defined(slug.current)\n    && $brand in brands\n    && defined(^.category._ref) && category._ref == ^.category._ref\n    && !(_id in coalesce(^.posts[]._ref, []))\n  ] | order(publishedAt desc)[0...6]\n{ \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  \n  "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title }\n,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n  "category": category->{ title, "slug": slug.current }\n }\n },\n  _type == "postBriefs" => { \n  \n  heading[]{ _key, style, children[]{ _key, text } },\n  link{ \n  label,\n  \n  kind,\n  external,\n  internal->{\n    _type,\n    "slug": slug.current,\n    brand,\n    brands\n  }\n\n }\n,\n  count,\n  "posts": posts[$brand in @->brands]->{ \n  \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  \n  "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title }\n,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n  "category": category->{ title, "slug": slug.current }\n,\n  "topic": primaryTopic->{ title },\n  briefText\n },\n  "latest": \n  *[\n    _type == "post"\n    && defined(slug.current)\n    && $brand in brands\n    && true\n    && !(_id in coalesce(^.posts[]._ref, []))\n  ] | order(publishedAt desc)[0...6]\n{ \n  \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  \n  "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title }\n,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n  "category": category->{ title, "slug": slug.current }\n,\n  "topic": primaryTopic->{ title },\n  briefText\n }\n },\n  _type == "weeklyRoundup" => { \n  heading[]{ _key, style, children[]{ _key, text } },\n  label,\n  title,\n  summary,\n  button{ \n  label,\n  \n  kind,\n  external,\n  internal->{\n    _type,\n    "slug": slug.current,\n    brand,\n    brands\n  }\n\n },\n  listLabel,\n  "posts": posts[$brand in @->brands]->{ \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  \n  "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title }\n,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n  "category": category->{ title, "slug": slug.current }\n },\n  "latest": \n  *[\n    _type == "post"\n    && defined(slug.current)\n    && $brand in brands\n    && true\n    && !(_id in coalesce(^.posts[]._ref, []))\n  ] | order(publishedAt desc)[0...8]\n{ \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  \n  "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title }\n,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n  "category": category->{ title, "slug": slug.current }\n }\n },\n  _type == "publications" => { \n  heading[]{ _key, style, children[]{ _key, text } },\n  body,\n  cards[]{\n    _key,\n    brand,\n    "brandTitle": *[_type == "brand" && key.current == ^.brand][0].title,\n    description,\n    image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n    linkLabel\n  }\n },\n  _type == "cta" => { \n  heading,\n  text,\n  link{ label, href }\n }\n },\n    "aside": aside[]{ _key, _type, \n  _type == "highlights" => { \n  source,\n  count,\n  heading[]{ _key, style, children[]{ _key, text } },\n  deadlineLabel,\n  "items": items[]->{ \n  _id,\n  _type,\n  "slug": slug.current,\n  title,\n  category,\n  nominationsClosingDate,\n  startDate,\n  endDate,\n  country,\n  publishedAt\n },\n  "fill": select(\n  source == "awards" => [\n    ...*[\n      _type == "awardsProgramme"\n      && nominationsClosingDate >= $today\n      && !(_id in coalesce(^.items[]._ref, []))\n    ] | order(nominationsClosingDate asc)[0...5]{ \n  _id,\n  _type,\n  "slug": slug.current,\n  title,\n  category,\n  nominationsClosingDate,\n  startDate,\n  endDate,\n  country,\n  publishedAt\n },\n    ...*[\n      _type == "awardsProgramme"\n      && !(defined(nominationsClosingDate) && nominationsClosingDate >= $today)\n      && startDate >= $today\n      && !(_id in coalesce(^.items[]._ref, []))\n    ] | order(startDate asc)[0...5]{ \n  _id,\n  _type,\n  "slug": slug.current,\n  title,\n  category,\n  nominationsClosingDate,\n  startDate,\n  endDate,\n  country,\n  publishedAt\n },\n    ...*[\n      _type == "awardsProgramme"\n      && !(defined(nominationsClosingDate) && nominationsClosingDate >= $today)\n      && startDate < $today\n      && !(_id in coalesce(^.items[]._ref, []))\n    ] | order(startDate desc)[0...5]{ \n  _id,\n  _type,\n  "slug": slug.current,\n  title,\n  category,\n  nominationsClosingDate,\n  startDate,\n  endDate,\n  country,\n  publishedAt\n }\n  ],\n  source == "events" => [\n    ...*[\n      _type == "conferenceEvent"\n      && coalesce(endDate, startDate) >= $today\n      && !(_id in coalesce(^.items[]._ref, []))\n    ] | order(startDate asc)[0...4]{ \n  _id,\n  _type,\n  "slug": slug.current,\n  title,\n  category,\n  nominationsClosingDate,\n  startDate,\n  endDate,\n  country,\n  publishedAt\n },\n    ...*[\n      _type == "conferenceEvent"\n      && coalesce(endDate, startDate) < $today\n      && !(_id in coalesce(^.items[]._ref, []))\n    ] | order(startDate desc)[0...4]{ \n  _id,\n  _type,\n  "slug": slug.current,\n  title,\n  category,\n  nominationsClosingDate,\n  startDate,\n  endDate,\n  country,\n  publishedAt\n }\n  ],\n  source == "research" => *[\n    _type == "resource"\n    && category == "research"\n    && !(_id in coalesce(^.items[]._ref, []))\n    && _id != coalesce(^.promo.resource._ref, "")\n  ] | order(defined(publishedAt) desc, publishedAt desc, legacyWpId desc)[0...3]{ \n  _id,\n  _type,\n  "slug": slug.current,\n  title,\n  category,\n  nominationsClosingDate,\n  startDate,\n  endDate,\n  country,\n  publishedAt\n }\n),\n  button{ \n  label,\n  \n  kind,\n  external,\n  internal->{\n    _type,\n    "slug": slug.current,\n    brand,\n    brands\n  }\n\n },\n  promo{\n    resource->{\n      title,\n      "downloadThumbnail": downloadThumbnail{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n      "downloadFileUrl": downloadFile.asset->url,\n      "downloadFileName": downloadFile.asset->originalFilename,\n      downloadUrl\n    },\n    title,\n    description,\n    "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n    link{ \n  kind,\n  external,\n  internal->{\n    _type,\n    "slug": slug.current,\n    brand,\n    brands\n  }\n }\n  }\n },\n  _type == "awardsWinners" => { heading[]{ _key, style, children[]{ _key, text } } }\n }\n  }\n }\n  }\n': HOME_PAGE_QUERY_RESULT;
-    '\n  *[_type == "page" && slug.current == $slug && brand == $brand][0]{\n    _id,\n    title,\n    blocks[]{ _key, _type, \n  _type == "topStories" => { \n  linkLabel,\n  label,\n  "slides": slides[$brand == "clearview" || $brand in @->brands]->{ \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  \n  "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title }\n,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n  "category": category->{ title, "slug": slug.current }\n },\n  "articles": articles[$brand == "clearview" || $brand in @->brands]->{ \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  \n  "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title }\n,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n  "category": category->{ title, "slug": slug.current }\n },\n  "latest": *[\n    _type == "post"\n    && defined(slug.current)\n    && ($brand == "clearview" || $brand in brands)\n    && !(_id in coalesce(^.slides[]._ref, []))\n    && !(_id in coalesce(^.articles[]._ref, []))\n  ] | order(publishedAt desc)[0...6]{ \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  \n  "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title }\n,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n  "category": category->{ title, "slug": slug.current }\n }\n },\n  _type == "publications" => { \n  heading[]{ _key, style, children[]{ _key, text } },\n  body,\n  cards[]{\n    _key,\n    brand,\n    "brandTitle": *[_type == "brand" && key.current == ^.brand][0].title,\n    description,\n    image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n    linkLabel\n  }\n },\n  _type == "cta" => { \n  heading,\n  text,\n  link{ label, href }\n },\n  _type == "highlights" => { \n  source,\n  count,\n  heading[]{ _key, style, children[]{ _key, text } },\n  deadlineLabel,\n  "items": items[]->{ \n  _id,\n  _type,\n  "slug": slug.current,\n  title,\n  category,\n  nominationsClosingDate,\n  startDate,\n  endDate,\n  country,\n  publishedAt\n },\n  "fill": select(\n  source == "awards" => [\n    ...*[\n      _type == "awardsProgramme"\n      && nominationsClosingDate >= $today\n      && !(_id in coalesce(^.items[]._ref, []))\n    ] | order(nominationsClosingDate asc)[0...5]{ \n  _id,\n  _type,\n  "slug": slug.current,\n  title,\n  category,\n  nominationsClosingDate,\n  startDate,\n  endDate,\n  country,\n  publishedAt\n },\n    ...*[\n      _type == "awardsProgramme"\n      && !(defined(nominationsClosingDate) && nominationsClosingDate >= $today)\n      && startDate >= $today\n      && !(_id in coalesce(^.items[]._ref, []))\n    ] | order(startDate asc)[0...5]{ \n  _id,\n  _type,\n  "slug": slug.current,\n  title,\n  category,\n  nominationsClosingDate,\n  startDate,\n  endDate,\n  country,\n  publishedAt\n },\n    ...*[\n      _type == "awardsProgramme"\n      && !(defined(nominationsClosingDate) && nominationsClosingDate >= $today)\n      && startDate < $today\n      && !(_id in coalesce(^.items[]._ref, []))\n    ] | order(startDate desc)[0...5]{ \n  _id,\n  _type,\n  "slug": slug.current,\n  title,\n  category,\n  nominationsClosingDate,\n  startDate,\n  endDate,\n  country,\n  publishedAt\n }\n  ],\n  source == "events" => [\n    ...*[\n      _type == "conferenceEvent"\n      && coalesce(endDate, startDate) >= $today\n      && !(_id in coalesce(^.items[]._ref, []))\n    ] | order(startDate asc)[0...4]{ \n  _id,\n  _type,\n  "slug": slug.current,\n  title,\n  category,\n  nominationsClosingDate,\n  startDate,\n  endDate,\n  country,\n  publishedAt\n },\n    ...*[\n      _type == "conferenceEvent"\n      && coalesce(endDate, startDate) < $today\n      && !(_id in coalesce(^.items[]._ref, []))\n    ] | order(startDate desc)[0...4]{ \n  _id,\n  _type,\n  "slug": slug.current,\n  title,\n  category,\n  nominationsClosingDate,\n  startDate,\n  endDate,\n  country,\n  publishedAt\n }\n  ],\n  source == "research" => *[\n    _type == "resource"\n    && category == "research"\n    && !(_id in coalesce(^.items[]._ref, []))\n    && _id != coalesce(^.promo.resource._ref, "")\n  ] | order(defined(publishedAt) desc, publishedAt desc, legacyWpId desc)[0...3]{ \n  _id,\n  _type,\n  "slug": slug.current,\n  title,\n  category,\n  nominationsClosingDate,\n  startDate,\n  endDate,\n  country,\n  publishedAt\n }\n),\n  button{ \n  label,\n  \n  kind,\n  external,\n  internal->{\n    _type,\n    "slug": slug.current,\n    brand,\n    brands\n  }\n\n },\n  promo{\n    resource->{\n      title,\n      "downloadThumbnail": downloadThumbnail{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n      "downloadFileUrl": downloadFile.asset->url,\n      "downloadFileName": downloadFile.asset->originalFilename,\n      downloadUrl\n    },\n    title,\n    description,\n    "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n    link{ \n  kind,\n  external,\n  internal->{\n    _type,\n    "slug": slug.current,\n    brand,\n    brands\n  }\n }\n  }\n },\n  _type == "featuredStories" => { \n  heading[]{ _key, style, children[]{ _key, text } },\n  link{ \n  label,\n  \n  kind,\n  external,\n  internal->{\n    _type,\n    "slug": slug.current,\n    brand,\n    brands\n  }\n\n },\n  "posts": posts[]->{ \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  \n  "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title }\n,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n  "category": category->{ title, "slug": slug.current }\n }\n },\n  _type == "statsBar" => { \n  heading[]{ _key, style, children[]{ _key, text } },\n  items[]{ _key, icon, value, label }\n },\n  _type == "newsletterSignup" => { \n  heading[]{ _key, style, children[]{ _key, text } },\n  body,\n  preferencesLabel,\n  options[]{\n    _key,\n    label,\n    defaultChecked,\n    "interestKey": *[_type == "subscribeModal" && _id == "subscribe-modal-" + $brand][0].interests[attribute.name == ^.attribute.name][0]._key\n  },\n  emailPlaceholder,\n  buttonLabel,\n  invalidEmailMessage,\n  noOptionMessage,\n  image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n }\n },\n  _type == "sponsoredContent" => { \n  label,\n  link{ \n  label,\n  \n  kind,\n  external,\n  internal->{\n    _type,\n    "slug": slug.current,\n    brand,\n    brands\n  }\n\n },\n  profileLabel,\n  "post": *[\n    _type == "post"\n    && _id == ^.post._ref\n    && defined(slug.current)\n    && defined(sponsor)\n    && ($brand == "clearview" || $brand in brands)\n  ][0]{\n    \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  \n  "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title }\n,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n  "category": category->{ title, "slug": slug.current }\n,\n    "sponsor": sponsor->{\n      title,\n      "slug": slug.current,\n      "logo": logo{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n }\n    }\n  }\n },\n  _type == "postCards" => { \n  \n  heading[]{ _key, style, children[]{ _key, text } },\n  link{ \n  label,\n  \n  kind,\n  external,\n  internal->{\n    _type,\n    "slug": slug.current,\n    brand,\n    brands\n  }\n\n }\n,\n  "category": category->{ title, "slug": slug.current },\n  "posts": posts[$brand in @->brands]->{ \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  \n  "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title }\n,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n  "category": category->{ title, "slug": slug.current }\n },\n  "latest": \n  *[\n    _type == "post"\n    && defined(slug.current)\n    && $brand in brands\n    && defined(^.category._ref) && category._ref == ^.category._ref\n    && !(_id in coalesce(^.posts[]._ref, []))\n  ] | order(publishedAt desc)[0...6]\n{ \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  \n  "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title }\n,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n  "category": category->{ title, "slug": slug.current }\n }\n },\n  _type == "postBriefs" => { \n  \n  heading[]{ _key, style, children[]{ _key, text } },\n  link{ \n  label,\n  \n  kind,\n  external,\n  internal->{\n    _type,\n    "slug": slug.current,\n    brand,\n    brands\n  }\n\n }\n,\n  count,\n  "posts": posts[$brand in @->brands]->{ \n  \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  \n  "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title }\n,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n  "category": category->{ title, "slug": slug.current }\n,\n  "topic": primaryTopic->{ title },\n  briefText\n },\n  "latest": \n  *[\n    _type == "post"\n    && defined(slug.current)\n    && $brand in brands\n    && true\n    && !(_id in coalesce(^.posts[]._ref, []))\n  ] | order(publishedAt desc)[0...6]\n{ \n  \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  \n  "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title }\n,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n  "category": category->{ title, "slug": slug.current }\n,\n  "topic": primaryTopic->{ title },\n  briefText\n }\n },\n  _type == "weeklyRoundup" => { \n  heading[]{ _key, style, children[]{ _key, text } },\n  label,\n  title,\n  summary,\n  button{ \n  label,\n  \n  kind,\n  external,\n  internal->{\n    _type,\n    "slug": slug.current,\n    brand,\n    brands\n  }\n\n },\n  listLabel,\n  "posts": posts[$brand in @->brands]->{ \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  \n  "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title }\n,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n  "category": category->{ title, "slug": slug.current }\n },\n  "latest": \n  *[\n    _type == "post"\n    && defined(slug.current)\n    && $brand in brands\n    && true\n    && !(_id in coalesce(^.posts[]._ref, []))\n  ] | order(publishedAt desc)[0...8]\n{ \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  \n  "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title }\n,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n  "category": category->{ title, "slug": slug.current }\n }\n },\n  _type == "topPicks" => { \n  heading[]{ _key, style, children[]{ _key, text } },\n  link{ \n  label,\n  \n  kind,\n  external,\n  internal->{\n    _type,\n    "slug": slug.current,\n    brand,\n    brands\n  }\n\n },\n  "posts": posts[$brand in @->brands]->{ \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  \n  "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title }\n,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n  "category": category->{ title, "slug": slug.current }\n, "sponsored": defined(sponsor) },\n  "fill": [\n    ...\n  *[\n    _type == "post"\n    && defined(slug.current)\n    && $brand in brands\n    && !defined(sponsor) && dateTime(publishedAt) >= dateTime($today + "T00:00:00Z") - 60*60*24*7\n    && !(_id in coalesce(^.posts[]._ref, []))\n  ] | order(publishedAt desc)[0...6]\n{ \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  \n  "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title }\n,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n  "category": category->{ title, "slug": slug.current }\n },\n    ...\n  *[\n    _type == "post"\n    && defined(slug.current)\n    && $brand in brands\n    && !defined(sponsor) && dateTime(publishedAt) < dateTime($today + "T00:00:00Z") - 60*60*24*7\n    && !(_id in coalesce(^.posts[]._ref, []))\n  ] | order(publishedAt desc)[0...6]\n{ \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  \n  "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title }\n,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n  "category": category->{ title, "slug": slug.current }\n }\n  ]\n },\n  _type == "exploreGrid" => { \n  cards[]{\n    _key,\n    heading[]{ _key, style, children[]{ _key, text } },\n    icon,\n    source,\n    count,\n    deadlineLabel,\n    button{ \n  label,\n  \n  kind,\n  external,\n  internal->{\n    _type,\n    "slug": slug.current,\n    brand,\n    brands\n  }\n\n },\n    "items": items[@->_type != "post" || $brand in @->brands]->{ \n  _type == "post" => { _type, \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  \n  "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title }\n,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n  "category": category->{ title, "slug": slug.current }\n },\n  _type != "post" => { \n  _id,\n  _type,\n  "slug": slug.current,\n  title,\n  category,\n  nominationsClosingDate,\n  startDate,\n  endDate,\n  country,\n  publishedAt\n }\n },\n    "fill": select(\n      source == "posts" => \n  *[\n    _type == "post"\n    && defined(slug.current)\n    && $brand in brands\n    && defined(^.category._ref) && category._ref == ^.category._ref\n    && !(_id in coalesce(^.items[]._ref, []))\n  ] | order(publishedAt desc)[0...6]\n{ _type, \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  \n  "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title }\n,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n  "category": category->{ title, "slug": slug.current }\n },\n      \n  source == "awards" => [\n    ...*[\n      _type == "awardsProgramme"\n      && nominationsClosingDate >= $today\n      && !(_id in coalesce(^.items[]._ref, []))\n    ] | order(nominationsClosingDate asc)[0...5]{ \n  _id,\n  _type,\n  "slug": slug.current,\n  title,\n  category,\n  nominationsClosingDate,\n  startDate,\n  endDate,\n  country,\n  publishedAt\n },\n    ...*[\n      _type == "awardsProgramme"\n      && !(defined(nominationsClosingDate) && nominationsClosingDate >= $today)\n      && startDate >= $today\n      && !(_id in coalesce(^.items[]._ref, []))\n    ] | order(startDate asc)[0...5]{ \n  _id,\n  _type,\n  "slug": slug.current,\n  title,\n  category,\n  nominationsClosingDate,\n  startDate,\n  endDate,\n  country,\n  publishedAt\n },\n    ...*[\n      _type == "awardsProgramme"\n      && !(defined(nominationsClosingDate) && nominationsClosingDate >= $today)\n      && startDate < $today\n      && !(_id in coalesce(^.items[]._ref, []))\n    ] | order(startDate desc)[0...5]{ \n  _id,\n  _type,\n  "slug": slug.current,\n  title,\n  category,\n  nominationsClosingDate,\n  startDate,\n  endDate,\n  country,\n  publishedAt\n }\n  ],\n  source == "events" => [\n    ...*[\n      _type == "conferenceEvent"\n      && coalesce(endDate, startDate) >= $today\n      && !(_id in coalesce(^.items[]._ref, []))\n    ] | order(startDate asc)[0...4]{ \n  _id,\n  _type,\n  "slug": slug.current,\n  title,\n  category,\n  nominationsClosingDate,\n  startDate,\n  endDate,\n  country,\n  publishedAt\n },\n    ...*[\n      _type == "conferenceEvent"\n      && coalesce(endDate, startDate) < $today\n      && !(_id in coalesce(^.items[]._ref, []))\n    ] | order(startDate desc)[0...4]{ \n  _id,\n  _type,\n  "slug": slug.current,\n  title,\n  category,\n  nominationsClosingDate,\n  startDate,\n  endDate,\n  country,\n  publishedAt\n }\n  ],\n  source == "research" => *[\n    _type == "resource"\n    && category == "research"\n    && !(_id in coalesce(^.items[]._ref, []))\n    && _id != coalesce(^.promo.resource._ref, "")\n  ] | order(defined(publishedAt) desc, publishedAt desc, legacyWpId desc)[0...3]{ \n  _id,\n  _type,\n  "slug": slug.current,\n  title,\n  category,\n  nominationsClosingDate,\n  startDate,\n  endDate,\n  country,\n  publishedAt\n }\n\n    )\n  }\n },\n  _type == "subscribeBanner" => { \n  heading[]{ _key, style, children[]{ _key, text } },\n  description,\n  buttonLabel,\n  cta{ \n  label,\n  \n  kind,\n  external,\n  internal->{\n    _type,\n    "slug": slug.current,\n    brand,\n    brands\n  }\n\n }\n },\n  _type == "splitLayout" => {\n    "main": main[]{ _key, _type, \n  _type == "topStories" => { \n  linkLabel,\n  label,\n  "slides": slides[$brand == "clearview" || $brand in @->brands]->{ \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  \n  "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title }\n,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n  "category": category->{ title, "slug": slug.current }\n },\n  "articles": articles[$brand == "clearview" || $brand in @->brands]->{ \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  \n  "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title }\n,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n  "category": category->{ title, "slug": slug.current }\n },\n  "latest": *[\n    _type == "post"\n    && defined(slug.current)\n    && ($brand == "clearview" || $brand in brands)\n    && !(_id in coalesce(^.slides[]._ref, []))\n    && !(_id in coalesce(^.articles[]._ref, []))\n  ] | order(publishedAt desc)[0...6]{ \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  \n  "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title }\n,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n  "category": category->{ title, "slug": slug.current }\n }\n },\n  _type == "sponsoredContent" => { \n  label,\n  link{ \n  label,\n  \n  kind,\n  external,\n  internal->{\n    _type,\n    "slug": slug.current,\n    brand,\n    brands\n  }\n\n },\n  profileLabel,\n  "post": *[\n    _type == "post"\n    && _id == ^.post._ref\n    && defined(slug.current)\n    && defined(sponsor)\n    && ($brand == "clearview" || $brand in brands)\n  ][0]{\n    \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  \n  "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title }\n,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n  "category": category->{ title, "slug": slug.current }\n,\n    "sponsor": sponsor->{\n      title,\n      "slug": slug.current,\n      "logo": logo{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n }\n    }\n  }\n },\n  _type == "postCards" => { \n  \n  heading[]{ _key, style, children[]{ _key, text } },\n  link{ \n  label,\n  \n  kind,\n  external,\n  internal->{\n    _type,\n    "slug": slug.current,\n    brand,\n    brands\n  }\n\n }\n,\n  "category": category->{ title, "slug": slug.current },\n  "posts": posts[$brand in @->brands]->{ \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  \n  "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title }\n,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n  "category": category->{ title, "slug": slug.current }\n },\n  "latest": \n  *[\n    _type == "post"\n    && defined(slug.current)\n    && $brand in brands\n    && defined(^.category._ref) && category._ref == ^.category._ref\n    && !(_id in coalesce(^.posts[]._ref, []))\n  ] | order(publishedAt desc)[0...6]\n{ \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  \n  "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title }\n,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n  "category": category->{ title, "slug": slug.current }\n }\n },\n  _type == "postBriefs" => { \n  \n  heading[]{ _key, style, children[]{ _key, text } },\n  link{ \n  label,\n  \n  kind,\n  external,\n  internal->{\n    _type,\n    "slug": slug.current,\n    brand,\n    brands\n  }\n\n }\n,\n  count,\n  "posts": posts[$brand in @->brands]->{ \n  \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  \n  "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title }\n,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n  "category": category->{ title, "slug": slug.current }\n,\n  "topic": primaryTopic->{ title },\n  briefText\n },\n  "latest": \n  *[\n    _type == "post"\n    && defined(slug.current)\n    && $brand in brands\n    && true\n    && !(_id in coalesce(^.posts[]._ref, []))\n  ] | order(publishedAt desc)[0...6]\n{ \n  \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  \n  "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title }\n,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n  "category": category->{ title, "slug": slug.current }\n,\n  "topic": primaryTopic->{ title },\n  briefText\n }\n },\n  _type == "weeklyRoundup" => { \n  heading[]{ _key, style, children[]{ _key, text } },\n  label,\n  title,\n  summary,\n  button{ \n  label,\n  \n  kind,\n  external,\n  internal->{\n    _type,\n    "slug": slug.current,\n    brand,\n    brands\n  }\n\n },\n  listLabel,\n  "posts": posts[$brand in @->brands]->{ \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  \n  "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title }\n,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n  "category": category->{ title, "slug": slug.current }\n },\n  "latest": \n  *[\n    _type == "post"\n    && defined(slug.current)\n    && $brand in brands\n    && true\n    && !(_id in coalesce(^.posts[]._ref, []))\n  ] | order(publishedAt desc)[0...8]\n{ \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  \n  "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title }\n,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n  "category": category->{ title, "slug": slug.current }\n }\n },\n  _type == "publications" => { \n  heading[]{ _key, style, children[]{ _key, text } },\n  body,\n  cards[]{\n    _key,\n    brand,\n    "brandTitle": *[_type == "brand" && key.current == ^.brand][0].title,\n    description,\n    image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n    linkLabel\n  }\n },\n  _type == "cta" => { \n  heading,\n  text,\n  link{ label, href }\n }\n },\n    "aside": aside[]{ _key, _type, \n  _type == "highlights" => { \n  source,\n  count,\n  heading[]{ _key, style, children[]{ _key, text } },\n  deadlineLabel,\n  "items": items[]->{ \n  _id,\n  _type,\n  "slug": slug.current,\n  title,\n  category,\n  nominationsClosingDate,\n  startDate,\n  endDate,\n  country,\n  publishedAt\n },\n  "fill": select(\n  source == "awards" => [\n    ...*[\n      _type == "awardsProgramme"\n      && nominationsClosingDate >= $today\n      && !(_id in coalesce(^.items[]._ref, []))\n    ] | order(nominationsClosingDate asc)[0...5]{ \n  _id,\n  _type,\n  "slug": slug.current,\n  title,\n  category,\n  nominationsClosingDate,\n  startDate,\n  endDate,\n  country,\n  publishedAt\n },\n    ...*[\n      _type == "awardsProgramme"\n      && !(defined(nominationsClosingDate) && nominationsClosingDate >= $today)\n      && startDate >= $today\n      && !(_id in coalesce(^.items[]._ref, []))\n    ] | order(startDate asc)[0...5]{ \n  _id,\n  _type,\n  "slug": slug.current,\n  title,\n  category,\n  nominationsClosingDate,\n  startDate,\n  endDate,\n  country,\n  publishedAt\n },\n    ...*[\n      _type == "awardsProgramme"\n      && !(defined(nominationsClosingDate) && nominationsClosingDate >= $today)\n      && startDate < $today\n      && !(_id in coalesce(^.items[]._ref, []))\n    ] | order(startDate desc)[0...5]{ \n  _id,\n  _type,\n  "slug": slug.current,\n  title,\n  category,\n  nominationsClosingDate,\n  startDate,\n  endDate,\n  country,\n  publishedAt\n }\n  ],\n  source == "events" => [\n    ...*[\n      _type == "conferenceEvent"\n      && coalesce(endDate, startDate) >= $today\n      && !(_id in coalesce(^.items[]._ref, []))\n    ] | order(startDate asc)[0...4]{ \n  _id,\n  _type,\n  "slug": slug.current,\n  title,\n  category,\n  nominationsClosingDate,\n  startDate,\n  endDate,\n  country,\n  publishedAt\n },\n    ...*[\n      _type == "conferenceEvent"\n      && coalesce(endDate, startDate) < $today\n      && !(_id in coalesce(^.items[]._ref, []))\n    ] | order(startDate desc)[0...4]{ \n  _id,\n  _type,\n  "slug": slug.current,\n  title,\n  category,\n  nominationsClosingDate,\n  startDate,\n  endDate,\n  country,\n  publishedAt\n }\n  ],\n  source == "research" => *[\n    _type == "resource"\n    && category == "research"\n    && !(_id in coalesce(^.items[]._ref, []))\n    && _id != coalesce(^.promo.resource._ref, "")\n  ] | order(defined(publishedAt) desc, publishedAt desc, legacyWpId desc)[0...3]{ \n  _id,\n  _type,\n  "slug": slug.current,\n  title,\n  category,\n  nominationsClosingDate,\n  startDate,\n  endDate,\n  country,\n  publishedAt\n }\n),\n  button{ \n  label,\n  \n  kind,\n  external,\n  internal->{\n    _type,\n    "slug": slug.current,\n    brand,\n    brands\n  }\n\n },\n  promo{\n    resource->{\n      title,\n      "downloadThumbnail": downloadThumbnail{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n      "downloadFileUrl": downloadFile.asset->url,\n      "downloadFileName": downloadFile.asset->originalFilename,\n      downloadUrl\n    },\n    title,\n    description,\n    "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n    link{ \n  kind,\n  external,\n  internal->{\n    _type,\n    "slug": slug.current,\n    brand,\n    brands\n  }\n }\n  }\n },\n  _type == "awardsWinners" => { heading[]{ _key, style, children[]{ _key, text } } }\n }\n  }\n }\n  }\n': PAGE_QUERY_RESULT;
-    '\n  *[_type == "page" && brand == $brand && defined(slug.current) && !(slug.current in ["home", "categories"])]{\n    "slug": slug.current\n  }\n': PAGE_SLUGS_QUERY_RESULT;
+    '\n  *[_type == "page" && brand == $brand && slug.current == "home"][0]{\n    _id,\n    title,\n    blocks[]{ _key, _type, \n  _type == "topStories" => { \n  linkLabel,\n  label,\n  "slides": slides[$brand == "clearview" || $brand in @->brands]->{ \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  \n  "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title }\n,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n  "category": category->{ title, "slug": slug.current }\n },\n  "articles": articles[$brand == "clearview" || $brand in @->brands]->{ \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  \n  "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title }\n,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n  "category": category->{ title, "slug": slug.current }\n },\n  "latest": *[\n    _type == "post"\n    && defined(slug.current)\n    && ($brand == "clearview" || $brand in brands)\n    && !(_id in coalesce(^.slides[]._ref, []))\n    && !(_id in coalesce(^.articles[]._ref, []))\n  ] | order(publishedAt desc)[0...6]{ \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  \n  "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title }\n,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n  "category": category->{ title, "slug": slug.current }\n }\n },\n  _type == "publications" => { \n  heading[]{ _key, style, children[]{ _key, text } },\n  body,\n  cards[]{\n    _key,\n    brand,\n    "brandTitle": *[_type == "brand" && key.current == ^.brand][0].title,\n    description,\n    image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n    linkLabel\n  }\n },\n  _type == "cta" => { \n  heading,\n  text,\n  link{ label, href }\n },\n  _type == "highlights" => { \n  source,\n  layout,\n  count,\n  heading[]{ _key, style, children[]{ _key, text } },\n  deadlineLabel,\n  "items": items[]->{ \n  _id,\n  _type,\n  "slug": slug.current,\n  title,\n  category,\n  nominationsClosingDate,\n  startDate,\n  endDate,\n  country,\n  publishedAt\n },\n  "fill": select(\n  source == "awards" => [\n    ...*[\n      _type == "awardsProgramme"\n      && nominationsClosingDate >= $today\n      && !(_id in coalesce(^.items[]._ref, []))\n    ] | order(nominationsClosingDate asc)[0...5]{ \n  _id,\n  _type,\n  "slug": slug.current,\n  title,\n  category,\n  nominationsClosingDate,\n  startDate,\n  endDate,\n  country,\n  publishedAt\n },\n    ...*[\n      _type == "awardsProgramme"\n      && !(defined(nominationsClosingDate) && nominationsClosingDate >= $today)\n      && startDate >= $today\n      && !(_id in coalesce(^.items[]._ref, []))\n    ] | order(startDate asc)[0...5]{ \n  _id,\n  _type,\n  "slug": slug.current,\n  title,\n  category,\n  nominationsClosingDate,\n  startDate,\n  endDate,\n  country,\n  publishedAt\n },\n    ...*[\n      _type == "awardsProgramme"\n      && !(defined(nominationsClosingDate) && nominationsClosingDate >= $today)\n      && startDate < $today\n      && !(_id in coalesce(^.items[]._ref, []))\n    ] | order(startDate desc)[0...5]{ \n  _id,\n  _type,\n  "slug": slug.current,\n  title,\n  category,\n  nominationsClosingDate,\n  startDate,\n  endDate,\n  country,\n  publishedAt\n }\n  ],\n  source == "events" => [\n    ...*[\n      _type == "conferenceEvent"\n      && coalesce(endDate, startDate) >= $today\n      && !(_id in coalesce(^.items[]._ref, []))\n    ] | order(startDate asc)[0...4]{ \n  _id,\n  _type,\n  "slug": slug.current,\n  title,\n  category,\n  nominationsClosingDate,\n  startDate,\n  endDate,\n  country,\n  publishedAt\n },\n    ...*[\n      _type == "conferenceEvent"\n      && coalesce(endDate, startDate) < $today\n      && !(_id in coalesce(^.items[]._ref, []))\n    ] | order(startDate desc)[0...4]{ \n  _id,\n  _type,\n  "slug": slug.current,\n  title,\n  category,\n  nominationsClosingDate,\n  startDate,\n  endDate,\n  country,\n  publishedAt\n }\n  ],\n  source == "research" => *[\n    _type == "resource"\n    && category == "research"\n    && !(_id in coalesce(^.items[]._ref, []))\n    && _id != coalesce(^.promo.resource._ref, "")\n  ] | order(defined(publishedAt) desc, publishedAt desc, legacyWpId desc)[0...3]{ \n  _id,\n  _type,\n  "slug": slug.current,\n  title,\n  category,\n  nominationsClosingDate,\n  startDate,\n  endDate,\n  country,\n  publishedAt\n }\n),\n  button{ \n  label,\n  \n  kind,\n  external,\n  internal->{\n    _type,\n    "slug": slug.current,\n    brand,\n    brands\n  }\n\n },\n  promo{\n    resource->{\n      title,\n      "downloadThumbnail": downloadThumbnail{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n      "downloadFileUrl": downloadFile.asset->url,\n      "downloadFileName": downloadFile.asset->originalFilename,\n      downloadUrl\n    },\n    title,\n    description,\n    "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n    link{ \n  kind,\n  external,\n  internal->{\n    _type,\n    "slug": slug.current,\n    brand,\n    brands\n  }\n }\n  }\n },\n  _type == "featuredStories" => { \n  heading[]{ _key, style, children[]{ _key, text } },\n  link{ \n  label,\n  \n  kind,\n  external,\n  internal->{\n    _type,\n    "slug": slug.current,\n    brand,\n    brands\n  }\n\n },\n  "posts": posts[]->{ \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  \n  "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title }\n,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n  "category": category->{ title, "slug": slug.current }\n }\n },\n  _type == "statsBar" => { \n  heading[]{ _key, style, children[]{ _key, text } },\n  items[]{ _key, icon, value, label }\n },\n  _type == "newsletterSignup" => { \n  heading[]{ _key, style, children[]{ _key, text } },\n  body,\n  preferencesLabel,\n  options[]{\n    _key,\n    label,\n    defaultChecked,\n    "interestKey": *[_type == "subscribeModal" && _id == "subscribe-modal-" + $brand][0].interests[attribute.name == ^.attribute.name][0]._key\n  },\n  emailPlaceholder,\n  buttonLabel,\n  invalidEmailMessage,\n  noOptionMessage,\n  image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n }\n },\n  _type == "sponsoredContent" => { \n  label,\n  link{ \n  label,\n  \n  kind,\n  external,\n  internal->{\n    _type,\n    "slug": slug.current,\n    brand,\n    brands\n  }\n\n },\n  profileLabel,\n  "post": *[\n    _type == "post"\n    && _id == ^.post._ref\n    && defined(slug.current)\n    && defined(sponsor)\n    && ($brand == "clearview" || $brand in brands)\n  ][0]{\n    \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  \n  "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title }\n,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n  "category": category->{ title, "slug": slug.current }\n,\n    "sponsor": sponsor->{\n      title,\n      "slug": slug.current,\n      "logo": logo{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n }\n    }\n  }\n },\n  _type == "postCards" => { \n  \n  heading[]{ _key, style, children[]{ _key, text } },\n  link{ \n  label,\n  \n  kind,\n  external,\n  internal->{\n    _type,\n    "slug": slug.current,\n    brand,\n    brands\n  }\n\n }\n,\n  "category": category->{ title, "slug": slug.current },\n  "posts": posts[$brand in @->brands]->{ \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  \n  "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title }\n,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n  "category": category->{ title, "slug": slug.current }\n },\n  "latest": \n  *[\n    _type == "post"\n    && defined(slug.current)\n    && $brand in brands\n    && defined(^.category._ref) && category._ref == ^.category._ref\n    && !(_id in coalesce(^.posts[]._ref, []))\n  ] | order(publishedAt desc)[0...6]\n{ \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  \n  "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title }\n,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n  "category": category->{ title, "slug": slug.current }\n }\n },\n  _type == "postBriefs" => { \n  \n  heading[]{ _key, style, children[]{ _key, text } },\n  link{ \n  label,\n  \n  kind,\n  external,\n  internal->{\n    _type,\n    "slug": slug.current,\n    brand,\n    brands\n  }\n\n }\n,\n  count,\n  "posts": posts[$brand in @->brands]->{ \n  \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  \n  "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title }\n,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n  "category": category->{ title, "slug": slug.current }\n,\n  "topic": primaryTopic->{ title },\n  briefText\n },\n  "latest": \n  *[\n    _type == "post"\n    && defined(slug.current)\n    && $brand in brands\n    && true\n    && !(_id in coalesce(^.posts[]._ref, []))\n  ] | order(publishedAt desc)[0...6]\n{ \n  \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  \n  "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title }\n,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n  "category": category->{ title, "slug": slug.current }\n,\n  "topic": primaryTopic->{ title },\n  briefText\n }\n },\n  _type == "weeklyRoundup" => { \n  heading[]{ _key, style, children[]{ _key, text } },\n  label,\n  title,\n  summary,\n  button{ \n  label,\n  \n  kind,\n  external,\n  internal->{\n    _type,\n    "slug": slug.current,\n    brand,\n    brands\n  }\n\n },\n  listLabel,\n  "posts": posts[$brand in @->brands]->{ \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  \n  "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title }\n,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n  "category": category->{ title, "slug": slug.current }\n },\n  "latest": \n  *[\n    _type == "post"\n    && defined(slug.current)\n    && $brand in brands\n    && true\n    && !(_id in coalesce(^.posts[]._ref, []))\n  ] | order(publishedAt desc)[0...8]\n{ \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  \n  "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title }\n,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n  "category": category->{ title, "slug": slug.current }\n }\n },\n  _type == "topPicks" => { \n  heading[]{ _key, style, children[]{ _key, text } },\n  link{ \n  label,\n  \n  kind,\n  external,\n  internal->{\n    _type,\n    "slug": slug.current,\n    brand,\n    brands\n  }\n\n },\n  "posts": posts[$brand in @->brands]->{ \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  \n  "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title }\n,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n  "category": category->{ title, "slug": slug.current }\n, "sponsored": defined(sponsor) },\n  "fill": [\n    ...\n  *[\n    _type == "post"\n    && defined(slug.current)\n    && $brand in brands\n    && !defined(sponsor) && dateTime(publishedAt) >= dateTime($today + "T00:00:00Z") - 60*60*24*7\n    && !(_id in coalesce(^.posts[]._ref, []))\n  ] | order(publishedAt desc)[0...6]\n{ \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  \n  "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title }\n,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n  "category": category->{ title, "slug": slug.current }\n },\n    ...\n  *[\n    _type == "post"\n    && defined(slug.current)\n    && $brand in brands\n    && !defined(sponsor) && dateTime(publishedAt) < dateTime($today + "T00:00:00Z") - 60*60*24*7\n    && !(_id in coalesce(^.posts[]._ref, []))\n  ] | order(publishedAt desc)[0...6]\n{ \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  \n  "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title }\n,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n  "category": category->{ title, "slug": slug.current }\n }\n  ]\n },\n  _type == "exploreGrid" => { \n  cards[]{\n    _key,\n    heading[]{ _key, style, children[]{ _key, text } },\n    icon,\n    source,\n    count,\n    deadlineLabel,\n    button{ \n  label,\n  \n  kind,\n  external,\n  internal->{\n    _type,\n    "slug": slug.current,\n    brand,\n    brands\n  }\n\n },\n    "items": items[@->_type != "post" || $brand in @->brands]->{ \n  _type == "post" => { _type, \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  \n  "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title }\n,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n  "category": category->{ title, "slug": slug.current }\n },\n  _type != "post" => { \n  _id,\n  _type,\n  "slug": slug.current,\n  title,\n  category,\n  nominationsClosingDate,\n  startDate,\n  endDate,\n  country,\n  publishedAt\n }\n },\n    "fill": select(\n      source == "posts" => \n  *[\n    _type == "post"\n    && defined(slug.current)\n    && $brand in brands\n    && defined(^.category._ref) && category._ref == ^.category._ref\n    && !(_id in coalesce(^.items[]._ref, []))\n  ] | order(publishedAt desc)[0...6]\n{ _type, \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  \n  "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title }\n,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n  "category": category->{ title, "slug": slug.current }\n },\n      \n  source == "awards" => [\n    ...*[\n      _type == "awardsProgramme"\n      && nominationsClosingDate >= $today\n      && !(_id in coalesce(^.items[]._ref, []))\n    ] | order(nominationsClosingDate asc)[0...5]{ \n  _id,\n  _type,\n  "slug": slug.current,\n  title,\n  category,\n  nominationsClosingDate,\n  startDate,\n  endDate,\n  country,\n  publishedAt\n },\n    ...*[\n      _type == "awardsProgramme"\n      && !(defined(nominationsClosingDate) && nominationsClosingDate >= $today)\n      && startDate >= $today\n      && !(_id in coalesce(^.items[]._ref, []))\n    ] | order(startDate asc)[0...5]{ \n  _id,\n  _type,\n  "slug": slug.current,\n  title,\n  category,\n  nominationsClosingDate,\n  startDate,\n  endDate,\n  country,\n  publishedAt\n },\n    ...*[\n      _type == "awardsProgramme"\n      && !(defined(nominationsClosingDate) && nominationsClosingDate >= $today)\n      && startDate < $today\n      && !(_id in coalesce(^.items[]._ref, []))\n    ] | order(startDate desc)[0...5]{ \n  _id,\n  _type,\n  "slug": slug.current,\n  title,\n  category,\n  nominationsClosingDate,\n  startDate,\n  endDate,\n  country,\n  publishedAt\n }\n  ],\n  source == "events" => [\n    ...*[\n      _type == "conferenceEvent"\n      && coalesce(endDate, startDate) >= $today\n      && !(_id in coalesce(^.items[]._ref, []))\n    ] | order(startDate asc)[0...4]{ \n  _id,\n  _type,\n  "slug": slug.current,\n  title,\n  category,\n  nominationsClosingDate,\n  startDate,\n  endDate,\n  country,\n  publishedAt\n },\n    ...*[\n      _type == "conferenceEvent"\n      && coalesce(endDate, startDate) < $today\n      && !(_id in coalesce(^.items[]._ref, []))\n    ] | order(startDate desc)[0...4]{ \n  _id,\n  _type,\n  "slug": slug.current,\n  title,\n  category,\n  nominationsClosingDate,\n  startDate,\n  endDate,\n  country,\n  publishedAt\n }\n  ],\n  source == "research" => *[\n    _type == "resource"\n    && category == "research"\n    && !(_id in coalesce(^.items[]._ref, []))\n    && _id != coalesce(^.promo.resource._ref, "")\n  ] | order(defined(publishedAt) desc, publishedAt desc, legacyWpId desc)[0...3]{ \n  _id,\n  _type,\n  "slug": slug.current,\n  title,\n  category,\n  nominationsClosingDate,\n  startDate,\n  endDate,\n  country,\n  publishedAt\n }\n\n    )\n  }\n },\n  _type == "subscribeBanner" => { \n  heading[]{ _key, style, children[]{ _key, text } },\n  description,\n  buttonLabel,\n  cta{ \n  label,\n  \n  kind,\n  external,\n  internal->{\n    _type,\n    "slug": slug.current,\n    brand,\n    brands\n  }\n\n }\n },\n  _type == "splitLayout" => {\n    "main": main[]{ _key, _type, \n  _type == "topStories" => { \n  linkLabel,\n  label,\n  "slides": slides[$brand == "clearview" || $brand in @->brands]->{ \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  \n  "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title }\n,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n  "category": category->{ title, "slug": slug.current }\n },\n  "articles": articles[$brand == "clearview" || $brand in @->brands]->{ \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  \n  "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title }\n,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n  "category": category->{ title, "slug": slug.current }\n },\n  "latest": *[\n    _type == "post"\n    && defined(slug.current)\n    && ($brand == "clearview" || $brand in brands)\n    && !(_id in coalesce(^.slides[]._ref, []))\n    && !(_id in coalesce(^.articles[]._ref, []))\n  ] | order(publishedAt desc)[0...6]{ \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  \n  "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title }\n,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n  "category": category->{ title, "slug": slug.current }\n }\n },\n  _type == "sponsoredContent" => { \n  label,\n  link{ \n  label,\n  \n  kind,\n  external,\n  internal->{\n    _type,\n    "slug": slug.current,\n    brand,\n    brands\n  }\n\n },\n  profileLabel,\n  "post": *[\n    _type == "post"\n    && _id == ^.post._ref\n    && defined(slug.current)\n    && defined(sponsor)\n    && ($brand == "clearview" || $brand in brands)\n  ][0]{\n    \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  \n  "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title }\n,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n  "category": category->{ title, "slug": slug.current }\n,\n    "sponsor": sponsor->{\n      title,\n      "slug": slug.current,\n      "logo": logo{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n }\n    }\n  }\n },\n  _type == "postCards" => { \n  \n  heading[]{ _key, style, children[]{ _key, text } },\n  link{ \n  label,\n  \n  kind,\n  external,\n  internal->{\n    _type,\n    "slug": slug.current,\n    brand,\n    brands\n  }\n\n }\n,\n  "category": category->{ title, "slug": slug.current },\n  "posts": posts[$brand in @->brands]->{ \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  \n  "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title }\n,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n  "category": category->{ title, "slug": slug.current }\n },\n  "latest": \n  *[\n    _type == "post"\n    && defined(slug.current)\n    && $brand in brands\n    && defined(^.category._ref) && category._ref == ^.category._ref\n    && !(_id in coalesce(^.posts[]._ref, []))\n  ] | order(publishedAt desc)[0...6]\n{ \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  \n  "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title }\n,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n  "category": category->{ title, "slug": slug.current }\n }\n },\n  _type == "postBriefs" => { \n  \n  heading[]{ _key, style, children[]{ _key, text } },\n  link{ \n  label,\n  \n  kind,\n  external,\n  internal->{\n    _type,\n    "slug": slug.current,\n    brand,\n    brands\n  }\n\n }\n,\n  count,\n  "posts": posts[$brand in @->brands]->{ \n  \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  \n  "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title }\n,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n  "category": category->{ title, "slug": slug.current }\n,\n  "topic": primaryTopic->{ title },\n  briefText\n },\n  "latest": \n  *[\n    _type == "post"\n    && defined(slug.current)\n    && $brand in brands\n    && true\n    && !(_id in coalesce(^.posts[]._ref, []))\n  ] | order(publishedAt desc)[0...6]\n{ \n  \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  \n  "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title }\n,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n  "category": category->{ title, "slug": slug.current }\n,\n  "topic": primaryTopic->{ title },\n  briefText\n }\n },\n  _type == "weeklyRoundup" => { \n  heading[]{ _key, style, children[]{ _key, text } },\n  label,\n  title,\n  summary,\n  button{ \n  label,\n  \n  kind,\n  external,\n  internal->{\n    _type,\n    "slug": slug.current,\n    brand,\n    brands\n  }\n\n },\n  listLabel,\n  "posts": posts[$brand in @->brands]->{ \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  \n  "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title }\n,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n  "category": category->{ title, "slug": slug.current }\n },\n  "latest": \n  *[\n    _type == "post"\n    && defined(slug.current)\n    && $brand in brands\n    && true\n    && !(_id in coalesce(^.posts[]._ref, []))\n  ] | order(publishedAt desc)[0...8]\n{ \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  \n  "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title }\n,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n  "category": category->{ title, "slug": slug.current }\n }\n },\n  _type == "publications" => { \n  heading[]{ _key, style, children[]{ _key, text } },\n  body,\n  cards[]{\n    _key,\n    brand,\n    "brandTitle": *[_type == "brand" && key.current == ^.brand][0].title,\n    description,\n    image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n    linkLabel\n  }\n },\n  _type == "cta" => { \n  heading,\n  text,\n  link{ label, href }\n },\n  _type == "pageHero" => { \n  breadcrumbHomeLabel,\n  breadcrumbLabel,\n  title,\n  intro\n },\n  _type == "recordListing" => { \n  awardsTabLabel,\n  eventsTabLabel,\n  researchTabLabel,\n  regionFilterLabel,\n  regionEuropeLabel,\n  regionMenaLabel,\n  regionAsiaLabel,\n  regionNorthAmericaLabel,\n  yearFilterLabel,\n  statusFilterLabel,\n  allOptionLabel,\n  clearFiltersLabel,\n  upcomingEventLabel,\n  pastEventLabel,\n  publishedLabel,\n  emptyHeading,\n  emptyText,\n  emptyAwardNoun,\n  emptyEventNoun,\n  emptyResearchNoun,\n  emptyButtonLabel,\n  previousLabel,\n  nextLabel\n }\n },\n    "aside": aside[]{ _key, _type, \n  _type == "highlights" => { \n  source,\n  layout,\n  count,\n  heading[]{ _key, style, children[]{ _key, text } },\n  deadlineLabel,\n  "items": items[]->{ \n  _id,\n  _type,\n  "slug": slug.current,\n  title,\n  category,\n  nominationsClosingDate,\n  startDate,\n  endDate,\n  country,\n  publishedAt\n },\n  "fill": select(\n  source == "awards" => [\n    ...*[\n      _type == "awardsProgramme"\n      && nominationsClosingDate >= $today\n      && !(_id in coalesce(^.items[]._ref, []))\n    ] | order(nominationsClosingDate asc)[0...5]{ \n  _id,\n  _type,\n  "slug": slug.current,\n  title,\n  category,\n  nominationsClosingDate,\n  startDate,\n  endDate,\n  country,\n  publishedAt\n },\n    ...*[\n      _type == "awardsProgramme"\n      && !(defined(nominationsClosingDate) && nominationsClosingDate >= $today)\n      && startDate >= $today\n      && !(_id in coalesce(^.items[]._ref, []))\n    ] | order(startDate asc)[0...5]{ \n  _id,\n  _type,\n  "slug": slug.current,\n  title,\n  category,\n  nominationsClosingDate,\n  startDate,\n  endDate,\n  country,\n  publishedAt\n },\n    ...*[\n      _type == "awardsProgramme"\n      && !(defined(nominationsClosingDate) && nominationsClosingDate >= $today)\n      && startDate < $today\n      && !(_id in coalesce(^.items[]._ref, []))\n    ] | order(startDate desc)[0...5]{ \n  _id,\n  _type,\n  "slug": slug.current,\n  title,\n  category,\n  nominationsClosingDate,\n  startDate,\n  endDate,\n  country,\n  publishedAt\n }\n  ],\n  source == "events" => [\n    ...*[\n      _type == "conferenceEvent"\n      && coalesce(endDate, startDate) >= $today\n      && !(_id in coalesce(^.items[]._ref, []))\n    ] | order(startDate asc)[0...4]{ \n  _id,\n  _type,\n  "slug": slug.current,\n  title,\n  category,\n  nominationsClosingDate,\n  startDate,\n  endDate,\n  country,\n  publishedAt\n },\n    ...*[\n      _type == "conferenceEvent"\n      && coalesce(endDate, startDate) < $today\n      && !(_id in coalesce(^.items[]._ref, []))\n    ] | order(startDate desc)[0...4]{ \n  _id,\n  _type,\n  "slug": slug.current,\n  title,\n  category,\n  nominationsClosingDate,\n  startDate,\n  endDate,\n  country,\n  publishedAt\n }\n  ],\n  source == "research" => *[\n    _type == "resource"\n    && category == "research"\n    && !(_id in coalesce(^.items[]._ref, []))\n    && _id != coalesce(^.promo.resource._ref, "")\n  ] | order(defined(publishedAt) desc, publishedAt desc, legacyWpId desc)[0...3]{ \n  _id,\n  _type,\n  "slug": slug.current,\n  title,\n  category,\n  nominationsClosingDate,\n  startDate,\n  endDate,\n  country,\n  publishedAt\n }\n),\n  button{ \n  label,\n  \n  kind,\n  external,\n  internal->{\n    _type,\n    "slug": slug.current,\n    brand,\n    brands\n  }\n\n },\n  promo{\n    resource->{\n      title,\n      "downloadThumbnail": downloadThumbnail{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n      "downloadFileUrl": downloadFile.asset->url,\n      "downloadFileName": downloadFile.asset->originalFilename,\n      downloadUrl\n    },\n    title,\n    description,\n    "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n    link{ \n  kind,\n  external,\n  internal->{\n    _type,\n    "slug": slug.current,\n    brand,\n    brands\n  }\n }\n  }\n },\n  _type == "awardsWinners" => { heading[]{ _key, style, children[]{ _key, text } } }\n }\n  }\n },\n    blocksMiddle[]{ _key, _type, \n  _type == "topStories" => { \n  linkLabel,\n  label,\n  "slides": slides[$brand == "clearview" || $brand in @->brands]->{ \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  \n  "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title }\n,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n  "category": category->{ title, "slug": slug.current }\n },\n  "articles": articles[$brand == "clearview" || $brand in @->brands]->{ \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  \n  "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title }\n,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n  "category": category->{ title, "slug": slug.current }\n },\n  "latest": *[\n    _type == "post"\n    && defined(slug.current)\n    && ($brand == "clearview" || $brand in brands)\n    && !(_id in coalesce(^.slides[]._ref, []))\n    && !(_id in coalesce(^.articles[]._ref, []))\n  ] | order(publishedAt desc)[0...6]{ \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  \n  "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title }\n,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n  "category": category->{ title, "slug": slug.current }\n }\n },\n  _type == "publications" => { \n  heading[]{ _key, style, children[]{ _key, text } },\n  body,\n  cards[]{\n    _key,\n    brand,\n    "brandTitle": *[_type == "brand" && key.current == ^.brand][0].title,\n    description,\n    image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n    linkLabel\n  }\n },\n  _type == "cta" => { \n  heading,\n  text,\n  link{ label, href }\n },\n  _type == "highlights" => { \n  source,\n  layout,\n  count,\n  heading[]{ _key, style, children[]{ _key, text } },\n  deadlineLabel,\n  "items": items[]->{ \n  _id,\n  _type,\n  "slug": slug.current,\n  title,\n  category,\n  nominationsClosingDate,\n  startDate,\n  endDate,\n  country,\n  publishedAt\n },\n  "fill": select(\n  source == "awards" => [\n    ...*[\n      _type == "awardsProgramme"\n      && nominationsClosingDate >= $today\n      && !(_id in coalesce(^.items[]._ref, []))\n    ] | order(nominationsClosingDate asc)[0...5]{ \n  _id,\n  _type,\n  "slug": slug.current,\n  title,\n  category,\n  nominationsClosingDate,\n  startDate,\n  endDate,\n  country,\n  publishedAt\n },\n    ...*[\n      _type == "awardsProgramme"\n      && !(defined(nominationsClosingDate) && nominationsClosingDate >= $today)\n      && startDate >= $today\n      && !(_id in coalesce(^.items[]._ref, []))\n    ] | order(startDate asc)[0...5]{ \n  _id,\n  _type,\n  "slug": slug.current,\n  title,\n  category,\n  nominationsClosingDate,\n  startDate,\n  endDate,\n  country,\n  publishedAt\n },\n    ...*[\n      _type == "awardsProgramme"\n      && !(defined(nominationsClosingDate) && nominationsClosingDate >= $today)\n      && startDate < $today\n      && !(_id in coalesce(^.items[]._ref, []))\n    ] | order(startDate desc)[0...5]{ \n  _id,\n  _type,\n  "slug": slug.current,\n  title,\n  category,\n  nominationsClosingDate,\n  startDate,\n  endDate,\n  country,\n  publishedAt\n }\n  ],\n  source == "events" => [\n    ...*[\n      _type == "conferenceEvent"\n      && coalesce(endDate, startDate) >= $today\n      && !(_id in coalesce(^.items[]._ref, []))\n    ] | order(startDate asc)[0...4]{ \n  _id,\n  _type,\n  "slug": slug.current,\n  title,\n  category,\n  nominationsClosingDate,\n  startDate,\n  endDate,\n  country,\n  publishedAt\n },\n    ...*[\n      _type == "conferenceEvent"\n      && coalesce(endDate, startDate) < $today\n      && !(_id in coalesce(^.items[]._ref, []))\n    ] | order(startDate desc)[0...4]{ \n  _id,\n  _type,\n  "slug": slug.current,\n  title,\n  category,\n  nominationsClosingDate,\n  startDate,\n  endDate,\n  country,\n  publishedAt\n }\n  ],\n  source == "research" => *[\n    _type == "resource"\n    && category == "research"\n    && !(_id in coalesce(^.items[]._ref, []))\n    && _id != coalesce(^.promo.resource._ref, "")\n  ] | order(defined(publishedAt) desc, publishedAt desc, legacyWpId desc)[0...3]{ \n  _id,\n  _type,\n  "slug": slug.current,\n  title,\n  category,\n  nominationsClosingDate,\n  startDate,\n  endDate,\n  country,\n  publishedAt\n }\n),\n  button{ \n  label,\n  \n  kind,\n  external,\n  internal->{\n    _type,\n    "slug": slug.current,\n    brand,\n    brands\n  }\n\n },\n  promo{\n    resource->{\n      title,\n      "downloadThumbnail": downloadThumbnail{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n      "downloadFileUrl": downloadFile.asset->url,\n      "downloadFileName": downloadFile.asset->originalFilename,\n      downloadUrl\n    },\n    title,\n    description,\n    "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n    link{ \n  kind,\n  external,\n  internal->{\n    _type,\n    "slug": slug.current,\n    brand,\n    brands\n  }\n }\n  }\n },\n  _type == "featuredStories" => { \n  heading[]{ _key, style, children[]{ _key, text } },\n  link{ \n  label,\n  \n  kind,\n  external,\n  internal->{\n    _type,\n    "slug": slug.current,\n    brand,\n    brands\n  }\n\n },\n  "posts": posts[]->{ \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  \n  "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title }\n,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n  "category": category->{ title, "slug": slug.current }\n }\n },\n  _type == "statsBar" => { \n  heading[]{ _key, style, children[]{ _key, text } },\n  items[]{ _key, icon, value, label }\n },\n  _type == "newsletterSignup" => { \n  heading[]{ _key, style, children[]{ _key, text } },\n  body,\n  preferencesLabel,\n  options[]{\n    _key,\n    label,\n    defaultChecked,\n    "interestKey": *[_type == "subscribeModal" && _id == "subscribe-modal-" + $brand][0].interests[attribute.name == ^.attribute.name][0]._key\n  },\n  emailPlaceholder,\n  buttonLabel,\n  invalidEmailMessage,\n  noOptionMessage,\n  image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n }\n },\n  _type == "sponsoredContent" => { \n  label,\n  link{ \n  label,\n  \n  kind,\n  external,\n  internal->{\n    _type,\n    "slug": slug.current,\n    brand,\n    brands\n  }\n\n },\n  profileLabel,\n  "post": *[\n    _type == "post"\n    && _id == ^.post._ref\n    && defined(slug.current)\n    && defined(sponsor)\n    && ($brand == "clearview" || $brand in brands)\n  ][0]{\n    \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  \n  "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title }\n,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n  "category": category->{ title, "slug": slug.current }\n,\n    "sponsor": sponsor->{\n      title,\n      "slug": slug.current,\n      "logo": logo{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n }\n    }\n  }\n },\n  _type == "postCards" => { \n  \n  heading[]{ _key, style, children[]{ _key, text } },\n  link{ \n  label,\n  \n  kind,\n  external,\n  internal->{\n    _type,\n    "slug": slug.current,\n    brand,\n    brands\n  }\n\n }\n,\n  "category": category->{ title, "slug": slug.current },\n  "posts": posts[$brand in @->brands]->{ \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  \n  "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title }\n,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n  "category": category->{ title, "slug": slug.current }\n },\n  "latest": \n  *[\n    _type == "post"\n    && defined(slug.current)\n    && $brand in brands\n    && defined(^.category._ref) && category._ref == ^.category._ref\n    && !(_id in coalesce(^.posts[]._ref, []))\n  ] | order(publishedAt desc)[0...6]\n{ \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  \n  "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title }\n,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n  "category": category->{ title, "slug": slug.current }\n }\n },\n  _type == "postBriefs" => { \n  \n  heading[]{ _key, style, children[]{ _key, text } },\n  link{ \n  label,\n  \n  kind,\n  external,\n  internal->{\n    _type,\n    "slug": slug.current,\n    brand,\n    brands\n  }\n\n }\n,\n  count,\n  "posts": posts[$brand in @->brands]->{ \n  \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  \n  "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title }\n,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n  "category": category->{ title, "slug": slug.current }\n,\n  "topic": primaryTopic->{ title },\n  briefText\n },\n  "latest": \n  *[\n    _type == "post"\n    && defined(slug.current)\n    && $brand in brands\n    && true\n    && !(_id in coalesce(^.posts[]._ref, []))\n  ] | order(publishedAt desc)[0...6]\n{ \n  \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  \n  "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title }\n,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n  "category": category->{ title, "slug": slug.current }\n,\n  "topic": primaryTopic->{ title },\n  briefText\n }\n },\n  _type == "weeklyRoundup" => { \n  heading[]{ _key, style, children[]{ _key, text } },\n  label,\n  title,\n  summary,\n  button{ \n  label,\n  \n  kind,\n  external,\n  internal->{\n    _type,\n    "slug": slug.current,\n    brand,\n    brands\n  }\n\n },\n  listLabel,\n  "posts": posts[$brand in @->brands]->{ \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  \n  "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title }\n,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n  "category": category->{ title, "slug": slug.current }\n },\n  "latest": \n  *[\n    _type == "post"\n    && defined(slug.current)\n    && $brand in brands\n    && true\n    && !(_id in coalesce(^.posts[]._ref, []))\n  ] | order(publishedAt desc)[0...8]\n{ \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  \n  "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title }\n,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n  "category": category->{ title, "slug": slug.current }\n }\n },\n  _type == "topPicks" => { \n  heading[]{ _key, style, children[]{ _key, text } },\n  link{ \n  label,\n  \n  kind,\n  external,\n  internal->{\n    _type,\n    "slug": slug.current,\n    brand,\n    brands\n  }\n\n },\n  "posts": posts[$brand in @->brands]->{ \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  \n  "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title }\n,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n  "category": category->{ title, "slug": slug.current }\n, "sponsored": defined(sponsor) },\n  "fill": [\n    ...\n  *[\n    _type == "post"\n    && defined(slug.current)\n    && $brand in brands\n    && !defined(sponsor) && dateTime(publishedAt) >= dateTime($today + "T00:00:00Z") - 60*60*24*7\n    && !(_id in coalesce(^.posts[]._ref, []))\n  ] | order(publishedAt desc)[0...6]\n{ \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  \n  "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title }\n,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n  "category": category->{ title, "slug": slug.current }\n },\n    ...\n  *[\n    _type == "post"\n    && defined(slug.current)\n    && $brand in brands\n    && !defined(sponsor) && dateTime(publishedAt) < dateTime($today + "T00:00:00Z") - 60*60*24*7\n    && !(_id in coalesce(^.posts[]._ref, []))\n  ] | order(publishedAt desc)[0...6]\n{ \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  \n  "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title }\n,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n  "category": category->{ title, "slug": slug.current }\n }\n  ]\n },\n  _type == "exploreGrid" => { \n  cards[]{\n    _key,\n    heading[]{ _key, style, children[]{ _key, text } },\n    icon,\n    source,\n    count,\n    deadlineLabel,\n    button{ \n  label,\n  \n  kind,\n  external,\n  internal->{\n    _type,\n    "slug": slug.current,\n    brand,\n    brands\n  }\n\n },\n    "items": items[@->_type != "post" || $brand in @->brands]->{ \n  _type == "post" => { _type, \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  \n  "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title }\n,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n  "category": category->{ title, "slug": slug.current }\n },\n  _type != "post" => { \n  _id,\n  _type,\n  "slug": slug.current,\n  title,\n  category,\n  nominationsClosingDate,\n  startDate,\n  endDate,\n  country,\n  publishedAt\n }\n },\n    "fill": select(\n      source == "posts" => \n  *[\n    _type == "post"\n    && defined(slug.current)\n    && $brand in brands\n    && defined(^.category._ref) && category._ref == ^.category._ref\n    && !(_id in coalesce(^.items[]._ref, []))\n  ] | order(publishedAt desc)[0...6]\n{ _type, \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  \n  "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title }\n,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n  "category": category->{ title, "slug": slug.current }\n },\n      \n  source == "awards" => [\n    ...*[\n      _type == "awardsProgramme"\n      && nominationsClosingDate >= $today\n      && !(_id in coalesce(^.items[]._ref, []))\n    ] | order(nominationsClosingDate asc)[0...5]{ \n  _id,\n  _type,\n  "slug": slug.current,\n  title,\n  category,\n  nominationsClosingDate,\n  startDate,\n  endDate,\n  country,\n  publishedAt\n },\n    ...*[\n      _type == "awardsProgramme"\n      && !(defined(nominationsClosingDate) && nominationsClosingDate >= $today)\n      && startDate >= $today\n      && !(_id in coalesce(^.items[]._ref, []))\n    ] | order(startDate asc)[0...5]{ \n  _id,\n  _type,\n  "slug": slug.current,\n  title,\n  category,\n  nominationsClosingDate,\n  startDate,\n  endDate,\n  country,\n  publishedAt\n },\n    ...*[\n      _type == "awardsProgramme"\n      && !(defined(nominationsClosingDate) && nominationsClosingDate >= $today)\n      && startDate < $today\n      && !(_id in coalesce(^.items[]._ref, []))\n    ] | order(startDate desc)[0...5]{ \n  _id,\n  _type,\n  "slug": slug.current,\n  title,\n  category,\n  nominationsClosingDate,\n  startDate,\n  endDate,\n  country,\n  publishedAt\n }\n  ],\n  source == "events" => [\n    ...*[\n      _type == "conferenceEvent"\n      && coalesce(endDate, startDate) >= $today\n      && !(_id in coalesce(^.items[]._ref, []))\n    ] | order(startDate asc)[0...4]{ \n  _id,\n  _type,\n  "slug": slug.current,\n  title,\n  category,\n  nominationsClosingDate,\n  startDate,\n  endDate,\n  country,\n  publishedAt\n },\n    ...*[\n      _type == "conferenceEvent"\n      && coalesce(endDate, startDate) < $today\n      && !(_id in coalesce(^.items[]._ref, []))\n    ] | order(startDate desc)[0...4]{ \n  _id,\n  _type,\n  "slug": slug.current,\n  title,\n  category,\n  nominationsClosingDate,\n  startDate,\n  endDate,\n  country,\n  publishedAt\n }\n  ],\n  source == "research" => *[\n    _type == "resource"\n    && category == "research"\n    && !(_id in coalesce(^.items[]._ref, []))\n    && _id != coalesce(^.promo.resource._ref, "")\n  ] | order(defined(publishedAt) desc, publishedAt desc, legacyWpId desc)[0...3]{ \n  _id,\n  _type,\n  "slug": slug.current,\n  title,\n  category,\n  nominationsClosingDate,\n  startDate,\n  endDate,\n  country,\n  publishedAt\n }\n\n    )\n  }\n },\n  _type == "subscribeBanner" => { \n  heading[]{ _key, style, children[]{ _key, text } },\n  description,\n  buttonLabel,\n  cta{ \n  label,\n  \n  kind,\n  external,\n  internal->{\n    _type,\n    "slug": slug.current,\n    brand,\n    brands\n  }\n\n }\n },\n  _type == "splitLayout" => {\n    "main": main[]{ _key, _type, \n  _type == "topStories" => { \n  linkLabel,\n  label,\n  "slides": slides[$brand == "clearview" || $brand in @->brands]->{ \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  \n  "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title }\n,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n  "category": category->{ title, "slug": slug.current }\n },\n  "articles": articles[$brand == "clearview" || $brand in @->brands]->{ \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  \n  "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title }\n,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n  "category": category->{ title, "slug": slug.current }\n },\n  "latest": *[\n    _type == "post"\n    && defined(slug.current)\n    && ($brand == "clearview" || $brand in brands)\n    && !(_id in coalesce(^.slides[]._ref, []))\n    && !(_id in coalesce(^.articles[]._ref, []))\n  ] | order(publishedAt desc)[0...6]{ \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  \n  "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title }\n,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n  "category": category->{ title, "slug": slug.current }\n }\n },\n  _type == "sponsoredContent" => { \n  label,\n  link{ \n  label,\n  \n  kind,\n  external,\n  internal->{\n    _type,\n    "slug": slug.current,\n    brand,\n    brands\n  }\n\n },\n  profileLabel,\n  "post": *[\n    _type == "post"\n    && _id == ^.post._ref\n    && defined(slug.current)\n    && defined(sponsor)\n    && ($brand == "clearview" || $brand in brands)\n  ][0]{\n    \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  \n  "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title }\n,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n  "category": category->{ title, "slug": slug.current }\n,\n    "sponsor": sponsor->{\n      title,\n      "slug": slug.current,\n      "logo": logo{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n }\n    }\n  }\n },\n  _type == "postCards" => { \n  \n  heading[]{ _key, style, children[]{ _key, text } },\n  link{ \n  label,\n  \n  kind,\n  external,\n  internal->{\n    _type,\n    "slug": slug.current,\n    brand,\n    brands\n  }\n\n }\n,\n  "category": category->{ title, "slug": slug.current },\n  "posts": posts[$brand in @->brands]->{ \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  \n  "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title }\n,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n  "category": category->{ title, "slug": slug.current }\n },\n  "latest": \n  *[\n    _type == "post"\n    && defined(slug.current)\n    && $brand in brands\n    && defined(^.category._ref) && category._ref == ^.category._ref\n    && !(_id in coalesce(^.posts[]._ref, []))\n  ] | order(publishedAt desc)[0...6]\n{ \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  \n  "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title }\n,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n  "category": category->{ title, "slug": slug.current }\n }\n },\n  _type == "postBriefs" => { \n  \n  heading[]{ _key, style, children[]{ _key, text } },\n  link{ \n  label,\n  \n  kind,\n  external,\n  internal->{\n    _type,\n    "slug": slug.current,\n    brand,\n    brands\n  }\n\n }\n,\n  count,\n  "posts": posts[$brand in @->brands]->{ \n  \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  \n  "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title }\n,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n  "category": category->{ title, "slug": slug.current }\n,\n  "topic": primaryTopic->{ title },\n  briefText\n },\n  "latest": \n  *[\n    _type == "post"\n    && defined(slug.current)\n    && $brand in brands\n    && true\n    && !(_id in coalesce(^.posts[]._ref, []))\n  ] | order(publishedAt desc)[0...6]\n{ \n  \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  \n  "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title }\n,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n  "category": category->{ title, "slug": slug.current }\n,\n  "topic": primaryTopic->{ title },\n  briefText\n }\n },\n  _type == "weeklyRoundup" => { \n  heading[]{ _key, style, children[]{ _key, text } },\n  label,\n  title,\n  summary,\n  button{ \n  label,\n  \n  kind,\n  external,\n  internal->{\n    _type,\n    "slug": slug.current,\n    brand,\n    brands\n  }\n\n },\n  listLabel,\n  "posts": posts[$brand in @->brands]->{ \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  \n  "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title }\n,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n  "category": category->{ title, "slug": slug.current }\n },\n  "latest": \n  *[\n    _type == "post"\n    && defined(slug.current)\n    && $brand in brands\n    && true\n    && !(_id in coalesce(^.posts[]._ref, []))\n  ] | order(publishedAt desc)[0...8]\n{ \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  \n  "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title }\n,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n  "category": category->{ title, "slug": slug.current }\n }\n },\n  _type == "publications" => { \n  heading[]{ _key, style, children[]{ _key, text } },\n  body,\n  cards[]{\n    _key,\n    brand,\n    "brandTitle": *[_type == "brand" && key.current == ^.brand][0].title,\n    description,\n    image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n    linkLabel\n  }\n },\n  _type == "cta" => { \n  heading,\n  text,\n  link{ label, href }\n },\n  _type == "pageHero" => { \n  breadcrumbHomeLabel,\n  breadcrumbLabel,\n  title,\n  intro\n },\n  _type == "recordListing" => { \n  awardsTabLabel,\n  eventsTabLabel,\n  researchTabLabel,\n  regionFilterLabel,\n  regionEuropeLabel,\n  regionMenaLabel,\n  regionAsiaLabel,\n  regionNorthAmericaLabel,\n  yearFilterLabel,\n  statusFilterLabel,\n  allOptionLabel,\n  clearFiltersLabel,\n  upcomingEventLabel,\n  pastEventLabel,\n  publishedLabel,\n  emptyHeading,\n  emptyText,\n  emptyAwardNoun,\n  emptyEventNoun,\n  emptyResearchNoun,\n  emptyButtonLabel,\n  previousLabel,\n  nextLabel\n }\n },\n    "aside": aside[]{ _key, _type, \n  _type == "highlights" => { \n  source,\n  layout,\n  count,\n  heading[]{ _key, style, children[]{ _key, text } },\n  deadlineLabel,\n  "items": items[]->{ \n  _id,\n  _type,\n  "slug": slug.current,\n  title,\n  category,\n  nominationsClosingDate,\n  startDate,\n  endDate,\n  country,\n  publishedAt\n },\n  "fill": select(\n  source == "awards" => [\n    ...*[\n      _type == "awardsProgramme"\n      && nominationsClosingDate >= $today\n      && !(_id in coalesce(^.items[]._ref, []))\n    ] | order(nominationsClosingDate asc)[0...5]{ \n  _id,\n  _type,\n  "slug": slug.current,\n  title,\n  category,\n  nominationsClosingDate,\n  startDate,\n  endDate,\n  country,\n  publishedAt\n },\n    ...*[\n      _type == "awardsProgramme"\n      && !(defined(nominationsClosingDate) && nominationsClosingDate >= $today)\n      && startDate >= $today\n      && !(_id in coalesce(^.items[]._ref, []))\n    ] | order(startDate asc)[0...5]{ \n  _id,\n  _type,\n  "slug": slug.current,\n  title,\n  category,\n  nominationsClosingDate,\n  startDate,\n  endDate,\n  country,\n  publishedAt\n },\n    ...*[\n      _type == "awardsProgramme"\n      && !(defined(nominationsClosingDate) && nominationsClosingDate >= $today)\n      && startDate < $today\n      && !(_id in coalesce(^.items[]._ref, []))\n    ] | order(startDate desc)[0...5]{ \n  _id,\n  _type,\n  "slug": slug.current,\n  title,\n  category,\n  nominationsClosingDate,\n  startDate,\n  endDate,\n  country,\n  publishedAt\n }\n  ],\n  source == "events" => [\n    ...*[\n      _type == "conferenceEvent"\n      && coalesce(endDate, startDate) >= $today\n      && !(_id in coalesce(^.items[]._ref, []))\n    ] | order(startDate asc)[0...4]{ \n  _id,\n  _type,\n  "slug": slug.current,\n  title,\n  category,\n  nominationsClosingDate,\n  startDate,\n  endDate,\n  country,\n  publishedAt\n },\n    ...*[\n      _type == "conferenceEvent"\n      && coalesce(endDate, startDate) < $today\n      && !(_id in coalesce(^.items[]._ref, []))\n    ] | order(startDate desc)[0...4]{ \n  _id,\n  _type,\n  "slug": slug.current,\n  title,\n  category,\n  nominationsClosingDate,\n  startDate,\n  endDate,\n  country,\n  publishedAt\n }\n  ],\n  source == "research" => *[\n    _type == "resource"\n    && category == "research"\n    && !(_id in coalesce(^.items[]._ref, []))\n    && _id != coalesce(^.promo.resource._ref, "")\n  ] | order(defined(publishedAt) desc, publishedAt desc, legacyWpId desc)[0...3]{ \n  _id,\n  _type,\n  "slug": slug.current,\n  title,\n  category,\n  nominationsClosingDate,\n  startDate,\n  endDate,\n  country,\n  publishedAt\n }\n),\n  button{ \n  label,\n  \n  kind,\n  external,\n  internal->{\n    _type,\n    "slug": slug.current,\n    brand,\n    brands\n  }\n\n },\n  promo{\n    resource->{\n      title,\n      "downloadThumbnail": downloadThumbnail{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n      "downloadFileUrl": downloadFile.asset->url,\n      "downloadFileName": downloadFile.asset->originalFilename,\n      downloadUrl\n    },\n    title,\n    description,\n    "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n    link{ \n  kind,\n  external,\n  internal->{\n    _type,\n    "slug": slug.current,\n    brand,\n    brands\n  }\n }\n  }\n },\n  _type == "awardsWinners" => { heading[]{ _key, style, children[]{ _key, text } } }\n }\n  }\n },\n    blocksBottom[]{ _key, _type, \n  _type == "topStories" => { \n  linkLabel,\n  label,\n  "slides": slides[$brand == "clearview" || $brand in @->brands]->{ \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  \n  "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title }\n,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n  "category": category->{ title, "slug": slug.current }\n },\n  "articles": articles[$brand == "clearview" || $brand in @->brands]->{ \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  \n  "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title }\n,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n  "category": category->{ title, "slug": slug.current }\n },\n  "latest": *[\n    _type == "post"\n    && defined(slug.current)\n    && ($brand == "clearview" || $brand in brands)\n    && !(_id in coalesce(^.slides[]._ref, []))\n    && !(_id in coalesce(^.articles[]._ref, []))\n  ] | order(publishedAt desc)[0...6]{ \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  \n  "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title }\n,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n  "category": category->{ title, "slug": slug.current }\n }\n },\n  _type == "publications" => { \n  heading[]{ _key, style, children[]{ _key, text } },\n  body,\n  cards[]{\n    _key,\n    brand,\n    "brandTitle": *[_type == "brand" && key.current == ^.brand][0].title,\n    description,\n    image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n    linkLabel\n  }\n },\n  _type == "cta" => { \n  heading,\n  text,\n  link{ label, href }\n },\n  _type == "highlights" => { \n  source,\n  layout,\n  count,\n  heading[]{ _key, style, children[]{ _key, text } },\n  deadlineLabel,\n  "items": items[]->{ \n  _id,\n  _type,\n  "slug": slug.current,\n  title,\n  category,\n  nominationsClosingDate,\n  startDate,\n  endDate,\n  country,\n  publishedAt\n },\n  "fill": select(\n  source == "awards" => [\n    ...*[\n      _type == "awardsProgramme"\n      && nominationsClosingDate >= $today\n      && !(_id in coalesce(^.items[]._ref, []))\n    ] | order(nominationsClosingDate asc)[0...5]{ \n  _id,\n  _type,\n  "slug": slug.current,\n  title,\n  category,\n  nominationsClosingDate,\n  startDate,\n  endDate,\n  country,\n  publishedAt\n },\n    ...*[\n      _type == "awardsProgramme"\n      && !(defined(nominationsClosingDate) && nominationsClosingDate >= $today)\n      && startDate >= $today\n      && !(_id in coalesce(^.items[]._ref, []))\n    ] | order(startDate asc)[0...5]{ \n  _id,\n  _type,\n  "slug": slug.current,\n  title,\n  category,\n  nominationsClosingDate,\n  startDate,\n  endDate,\n  country,\n  publishedAt\n },\n    ...*[\n      _type == "awardsProgramme"\n      && !(defined(nominationsClosingDate) && nominationsClosingDate >= $today)\n      && startDate < $today\n      && !(_id in coalesce(^.items[]._ref, []))\n    ] | order(startDate desc)[0...5]{ \n  _id,\n  _type,\n  "slug": slug.current,\n  title,\n  category,\n  nominationsClosingDate,\n  startDate,\n  endDate,\n  country,\n  publishedAt\n }\n  ],\n  source == "events" => [\n    ...*[\n      _type == "conferenceEvent"\n      && coalesce(endDate, startDate) >= $today\n      && !(_id in coalesce(^.items[]._ref, []))\n    ] | order(startDate asc)[0...4]{ \n  _id,\n  _type,\n  "slug": slug.current,\n  title,\n  category,\n  nominationsClosingDate,\n  startDate,\n  endDate,\n  country,\n  publishedAt\n },\n    ...*[\n      _type == "conferenceEvent"\n      && coalesce(endDate, startDate) < $today\n      && !(_id in coalesce(^.items[]._ref, []))\n    ] | order(startDate desc)[0...4]{ \n  _id,\n  _type,\n  "slug": slug.current,\n  title,\n  category,\n  nominationsClosingDate,\n  startDate,\n  endDate,\n  country,\n  publishedAt\n }\n  ],\n  source == "research" => *[\n    _type == "resource"\n    && category == "research"\n    && !(_id in coalesce(^.items[]._ref, []))\n    && _id != coalesce(^.promo.resource._ref, "")\n  ] | order(defined(publishedAt) desc, publishedAt desc, legacyWpId desc)[0...3]{ \n  _id,\n  _type,\n  "slug": slug.current,\n  title,\n  category,\n  nominationsClosingDate,\n  startDate,\n  endDate,\n  country,\n  publishedAt\n }\n),\n  button{ \n  label,\n  \n  kind,\n  external,\n  internal->{\n    _type,\n    "slug": slug.current,\n    brand,\n    brands\n  }\n\n },\n  promo{\n    resource->{\n      title,\n      "downloadThumbnail": downloadThumbnail{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n      "downloadFileUrl": downloadFile.asset->url,\n      "downloadFileName": downloadFile.asset->originalFilename,\n      downloadUrl\n    },\n    title,\n    description,\n    "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n    link{ \n  kind,\n  external,\n  internal->{\n    _type,\n    "slug": slug.current,\n    brand,\n    brands\n  }\n }\n  }\n },\n  _type == "featuredStories" => { \n  heading[]{ _key, style, children[]{ _key, text } },\n  link{ \n  label,\n  \n  kind,\n  external,\n  internal->{\n    _type,\n    "slug": slug.current,\n    brand,\n    brands\n  }\n\n },\n  "posts": posts[]->{ \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  \n  "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title }\n,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n  "category": category->{ title, "slug": slug.current }\n }\n },\n  _type == "statsBar" => { \n  heading[]{ _key, style, children[]{ _key, text } },\n  items[]{ _key, icon, value, label }\n },\n  _type == "newsletterSignup" => { \n  heading[]{ _key, style, children[]{ _key, text } },\n  body,\n  preferencesLabel,\n  options[]{\n    _key,\n    label,\n    defaultChecked,\n    "interestKey": *[_type == "subscribeModal" && _id == "subscribe-modal-" + $brand][0].interests[attribute.name == ^.attribute.name][0]._key\n  },\n  emailPlaceholder,\n  buttonLabel,\n  invalidEmailMessage,\n  noOptionMessage,\n  image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n }\n },\n  _type == "sponsoredContent" => { \n  label,\n  link{ \n  label,\n  \n  kind,\n  external,\n  internal->{\n    _type,\n    "slug": slug.current,\n    brand,\n    brands\n  }\n\n },\n  profileLabel,\n  "post": *[\n    _type == "post"\n    && _id == ^.post._ref\n    && defined(slug.current)\n    && defined(sponsor)\n    && ($brand == "clearview" || $brand in brands)\n  ][0]{\n    \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  \n  "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title }\n,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n  "category": category->{ title, "slug": slug.current }\n,\n    "sponsor": sponsor->{\n      title,\n      "slug": slug.current,\n      "logo": logo{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n }\n    }\n  }\n },\n  _type == "postCards" => { \n  \n  heading[]{ _key, style, children[]{ _key, text } },\n  link{ \n  label,\n  \n  kind,\n  external,\n  internal->{\n    _type,\n    "slug": slug.current,\n    brand,\n    brands\n  }\n\n }\n,\n  "category": category->{ title, "slug": slug.current },\n  "posts": posts[$brand in @->brands]->{ \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  \n  "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title }\n,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n  "category": category->{ title, "slug": slug.current }\n },\n  "latest": \n  *[\n    _type == "post"\n    && defined(slug.current)\n    && $brand in brands\n    && defined(^.category._ref) && category._ref == ^.category._ref\n    && !(_id in coalesce(^.posts[]._ref, []))\n  ] | order(publishedAt desc)[0...6]\n{ \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  \n  "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title }\n,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n  "category": category->{ title, "slug": slug.current }\n }\n },\n  _type == "postBriefs" => { \n  \n  heading[]{ _key, style, children[]{ _key, text } },\n  link{ \n  label,\n  \n  kind,\n  external,\n  internal->{\n    _type,\n    "slug": slug.current,\n    brand,\n    brands\n  }\n\n }\n,\n  count,\n  "posts": posts[$brand in @->brands]->{ \n  \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  \n  "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title }\n,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n  "category": category->{ title, "slug": slug.current }\n,\n  "topic": primaryTopic->{ title },\n  briefText\n },\n  "latest": \n  *[\n    _type == "post"\n    && defined(slug.current)\n    && $brand in brands\n    && true\n    && !(_id in coalesce(^.posts[]._ref, []))\n  ] | order(publishedAt desc)[0...6]\n{ \n  \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  \n  "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title }\n,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n  "category": category->{ title, "slug": slug.current }\n,\n  "topic": primaryTopic->{ title },\n  briefText\n }\n },\n  _type == "weeklyRoundup" => { \n  heading[]{ _key, style, children[]{ _key, text } },\n  label,\n  title,\n  summary,\n  button{ \n  label,\n  \n  kind,\n  external,\n  internal->{\n    _type,\n    "slug": slug.current,\n    brand,\n    brands\n  }\n\n },\n  listLabel,\n  "posts": posts[$brand in @->brands]->{ \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  \n  "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title }\n,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n  "category": category->{ title, "slug": slug.current }\n },\n  "latest": \n  *[\n    _type == "post"\n    && defined(slug.current)\n    && $brand in brands\n    && true\n    && !(_id in coalesce(^.posts[]._ref, []))\n  ] | order(publishedAt desc)[0...8]\n{ \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  \n  "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title }\n,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n  "category": category->{ title, "slug": slug.current }\n }\n },\n  _type == "topPicks" => { \n  heading[]{ _key, style, children[]{ _key, text } },\n  link{ \n  label,\n  \n  kind,\n  external,\n  internal->{\n    _type,\n    "slug": slug.current,\n    brand,\n    brands\n  }\n\n },\n  "posts": posts[$brand in @->brands]->{ \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  \n  "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title }\n,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n  "category": category->{ title, "slug": slug.current }\n, "sponsored": defined(sponsor) },\n  "fill": [\n    ...\n  *[\n    _type == "post"\n    && defined(slug.current)\n    && $brand in brands\n    && !defined(sponsor) && dateTime(publishedAt) >= dateTime($today + "T00:00:00Z") - 60*60*24*7\n    && !(_id in coalesce(^.posts[]._ref, []))\n  ] | order(publishedAt desc)[0...6]\n{ \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  \n  "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title }\n,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n  "category": category->{ title, "slug": slug.current }\n },\n    ...\n  *[\n    _type == "post"\n    && defined(slug.current)\n    && $brand in brands\n    && !defined(sponsor) && dateTime(publishedAt) < dateTime($today + "T00:00:00Z") - 60*60*24*7\n    && !(_id in coalesce(^.posts[]._ref, []))\n  ] | order(publishedAt desc)[0...6]\n{ \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  \n  "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title }\n,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n  "category": category->{ title, "slug": slug.current }\n }\n  ]\n },\n  _type == "exploreGrid" => { \n  cards[]{\n    _key,\n    heading[]{ _key, style, children[]{ _key, text } },\n    icon,\n    source,\n    count,\n    deadlineLabel,\n    button{ \n  label,\n  \n  kind,\n  external,\n  internal->{\n    _type,\n    "slug": slug.current,\n    brand,\n    brands\n  }\n\n },\n    "items": items[@->_type != "post" || $brand in @->brands]->{ \n  _type == "post" => { _type, \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  \n  "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title }\n,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n  "category": category->{ title, "slug": slug.current }\n },\n  _type != "post" => { \n  _id,\n  _type,\n  "slug": slug.current,\n  title,\n  category,\n  nominationsClosingDate,\n  startDate,\n  endDate,\n  country,\n  publishedAt\n }\n },\n    "fill": select(\n      source == "posts" => \n  *[\n    _type == "post"\n    && defined(slug.current)\n    && $brand in brands\n    && defined(^.category._ref) && category._ref == ^.category._ref\n    && !(_id in coalesce(^.items[]._ref, []))\n  ] | order(publishedAt desc)[0...6]\n{ _type, \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  \n  "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title }\n,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n  "category": category->{ title, "slug": slug.current }\n },\n      \n  source == "awards" => [\n    ...*[\n      _type == "awardsProgramme"\n      && nominationsClosingDate >= $today\n      && !(_id in coalesce(^.items[]._ref, []))\n    ] | order(nominationsClosingDate asc)[0...5]{ \n  _id,\n  _type,\n  "slug": slug.current,\n  title,\n  category,\n  nominationsClosingDate,\n  startDate,\n  endDate,\n  country,\n  publishedAt\n },\n    ...*[\n      _type == "awardsProgramme"\n      && !(defined(nominationsClosingDate) && nominationsClosingDate >= $today)\n      && startDate >= $today\n      && !(_id in coalesce(^.items[]._ref, []))\n    ] | order(startDate asc)[0...5]{ \n  _id,\n  _type,\n  "slug": slug.current,\n  title,\n  category,\n  nominationsClosingDate,\n  startDate,\n  endDate,\n  country,\n  publishedAt\n },\n    ...*[\n      _type == "awardsProgramme"\n      && !(defined(nominationsClosingDate) && nominationsClosingDate >= $today)\n      && startDate < $today\n      && !(_id in coalesce(^.items[]._ref, []))\n    ] | order(startDate desc)[0...5]{ \n  _id,\n  _type,\n  "slug": slug.current,\n  title,\n  category,\n  nominationsClosingDate,\n  startDate,\n  endDate,\n  country,\n  publishedAt\n }\n  ],\n  source == "events" => [\n    ...*[\n      _type == "conferenceEvent"\n      && coalesce(endDate, startDate) >= $today\n      && !(_id in coalesce(^.items[]._ref, []))\n    ] | order(startDate asc)[0...4]{ \n  _id,\n  _type,\n  "slug": slug.current,\n  title,\n  category,\n  nominationsClosingDate,\n  startDate,\n  endDate,\n  country,\n  publishedAt\n },\n    ...*[\n      _type == "conferenceEvent"\n      && coalesce(endDate, startDate) < $today\n      && !(_id in coalesce(^.items[]._ref, []))\n    ] | order(startDate desc)[0...4]{ \n  _id,\n  _type,\n  "slug": slug.current,\n  title,\n  category,\n  nominationsClosingDate,\n  startDate,\n  endDate,\n  country,\n  publishedAt\n }\n  ],\n  source == "research" => *[\n    _type == "resource"\n    && category == "research"\n    && !(_id in coalesce(^.items[]._ref, []))\n    && _id != coalesce(^.promo.resource._ref, "")\n  ] | order(defined(publishedAt) desc, publishedAt desc, legacyWpId desc)[0...3]{ \n  _id,\n  _type,\n  "slug": slug.current,\n  title,\n  category,\n  nominationsClosingDate,\n  startDate,\n  endDate,\n  country,\n  publishedAt\n }\n\n    )\n  }\n },\n  _type == "subscribeBanner" => { \n  heading[]{ _key, style, children[]{ _key, text } },\n  description,\n  buttonLabel,\n  cta{ \n  label,\n  \n  kind,\n  external,\n  internal->{\n    _type,\n    "slug": slug.current,\n    brand,\n    brands\n  }\n\n }\n },\n  _type == "splitLayout" => {\n    "main": main[]{ _key, _type, \n  _type == "topStories" => { \n  linkLabel,\n  label,\n  "slides": slides[$brand == "clearview" || $brand in @->brands]->{ \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  \n  "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title }\n,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n  "category": category->{ title, "slug": slug.current }\n },\n  "articles": articles[$brand == "clearview" || $brand in @->brands]->{ \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  \n  "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title }\n,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n  "category": category->{ title, "slug": slug.current }\n },\n  "latest": *[\n    _type == "post"\n    && defined(slug.current)\n    && ($brand == "clearview" || $brand in brands)\n    && !(_id in coalesce(^.slides[]._ref, []))\n    && !(_id in coalesce(^.articles[]._ref, []))\n  ] | order(publishedAt desc)[0...6]{ \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  \n  "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title }\n,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n  "category": category->{ title, "slug": slug.current }\n }\n },\n  _type == "sponsoredContent" => { \n  label,\n  link{ \n  label,\n  \n  kind,\n  external,\n  internal->{\n    _type,\n    "slug": slug.current,\n    brand,\n    brands\n  }\n\n },\n  profileLabel,\n  "post": *[\n    _type == "post"\n    && _id == ^.post._ref\n    && defined(slug.current)\n    && defined(sponsor)\n    && ($brand == "clearview" || $brand in brands)\n  ][0]{\n    \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  \n  "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title }\n,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n  "category": category->{ title, "slug": slug.current }\n,\n    "sponsor": sponsor->{\n      title,\n      "slug": slug.current,\n      "logo": logo{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n }\n    }\n  }\n },\n  _type == "postCards" => { \n  \n  heading[]{ _key, style, children[]{ _key, text } },\n  link{ \n  label,\n  \n  kind,\n  external,\n  internal->{\n    _type,\n    "slug": slug.current,\n    brand,\n    brands\n  }\n\n }\n,\n  "category": category->{ title, "slug": slug.current },\n  "posts": posts[$brand in @->brands]->{ \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  \n  "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title }\n,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n  "category": category->{ title, "slug": slug.current }\n },\n  "latest": \n  *[\n    _type == "post"\n    && defined(slug.current)\n    && $brand in brands\n    && defined(^.category._ref) && category._ref == ^.category._ref\n    && !(_id in coalesce(^.posts[]._ref, []))\n  ] | order(publishedAt desc)[0...6]\n{ \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  \n  "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title }\n,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n  "category": category->{ title, "slug": slug.current }\n }\n },\n  _type == "postBriefs" => { \n  \n  heading[]{ _key, style, children[]{ _key, text } },\n  link{ \n  label,\n  \n  kind,\n  external,\n  internal->{\n    _type,\n    "slug": slug.current,\n    brand,\n    brands\n  }\n\n }\n,\n  count,\n  "posts": posts[$brand in @->brands]->{ \n  \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  \n  "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title }\n,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n  "category": category->{ title, "slug": slug.current }\n,\n  "topic": primaryTopic->{ title },\n  briefText\n },\n  "latest": \n  *[\n    _type == "post"\n    && defined(slug.current)\n    && $brand in brands\n    && true\n    && !(_id in coalesce(^.posts[]._ref, []))\n  ] | order(publishedAt desc)[0...6]\n{ \n  \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  \n  "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title }\n,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n  "category": category->{ title, "slug": slug.current }\n,\n  "topic": primaryTopic->{ title },\n  briefText\n }\n },\n  _type == "weeklyRoundup" => { \n  heading[]{ _key, style, children[]{ _key, text } },\n  label,\n  title,\n  summary,\n  button{ \n  label,\n  \n  kind,\n  external,\n  internal->{\n    _type,\n    "slug": slug.current,\n    brand,\n    brands\n  }\n\n },\n  listLabel,\n  "posts": posts[$brand in @->brands]->{ \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  \n  "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title }\n,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n  "category": category->{ title, "slug": slug.current }\n },\n  "latest": \n  *[\n    _type == "post"\n    && defined(slug.current)\n    && $brand in brands\n    && true\n    && !(_id in coalesce(^.posts[]._ref, []))\n  ] | order(publishedAt desc)[0...8]\n{ \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  \n  "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title }\n,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n  "category": category->{ title, "slug": slug.current }\n }\n },\n  _type == "publications" => { \n  heading[]{ _key, style, children[]{ _key, text } },\n  body,\n  cards[]{\n    _key,\n    brand,\n    "brandTitle": *[_type == "brand" && key.current == ^.brand][0].title,\n    description,\n    image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n    linkLabel\n  }\n },\n  _type == "cta" => { \n  heading,\n  text,\n  link{ label, href }\n },\n  _type == "pageHero" => { \n  breadcrumbHomeLabel,\n  breadcrumbLabel,\n  title,\n  intro\n },\n  _type == "recordListing" => { \n  awardsTabLabel,\n  eventsTabLabel,\n  researchTabLabel,\n  regionFilterLabel,\n  regionEuropeLabel,\n  regionMenaLabel,\n  regionAsiaLabel,\n  regionNorthAmericaLabel,\n  yearFilterLabel,\n  statusFilterLabel,\n  allOptionLabel,\n  clearFiltersLabel,\n  upcomingEventLabel,\n  pastEventLabel,\n  publishedLabel,\n  emptyHeading,\n  emptyText,\n  emptyAwardNoun,\n  emptyEventNoun,\n  emptyResearchNoun,\n  emptyButtonLabel,\n  previousLabel,\n  nextLabel\n }\n },\n    "aside": aside[]{ _key, _type, \n  _type == "highlights" => { \n  source,\n  layout,\n  count,\n  heading[]{ _key, style, children[]{ _key, text } },\n  deadlineLabel,\n  "items": items[]->{ \n  _id,\n  _type,\n  "slug": slug.current,\n  title,\n  category,\n  nominationsClosingDate,\n  startDate,\n  endDate,\n  country,\n  publishedAt\n },\n  "fill": select(\n  source == "awards" => [\n    ...*[\n      _type == "awardsProgramme"\n      && nominationsClosingDate >= $today\n      && !(_id in coalesce(^.items[]._ref, []))\n    ] | order(nominationsClosingDate asc)[0...5]{ \n  _id,\n  _type,\n  "slug": slug.current,\n  title,\n  category,\n  nominationsClosingDate,\n  startDate,\n  endDate,\n  country,\n  publishedAt\n },\n    ...*[\n      _type == "awardsProgramme"\n      && !(defined(nominationsClosingDate) && nominationsClosingDate >= $today)\n      && startDate >= $today\n      && !(_id in coalesce(^.items[]._ref, []))\n    ] | order(startDate asc)[0...5]{ \n  _id,\n  _type,\n  "slug": slug.current,\n  title,\n  category,\n  nominationsClosingDate,\n  startDate,\n  endDate,\n  country,\n  publishedAt\n },\n    ...*[\n      _type == "awardsProgramme"\n      && !(defined(nominationsClosingDate) && nominationsClosingDate >= $today)\n      && startDate < $today\n      && !(_id in coalesce(^.items[]._ref, []))\n    ] | order(startDate desc)[0...5]{ \n  _id,\n  _type,\n  "slug": slug.current,\n  title,\n  category,\n  nominationsClosingDate,\n  startDate,\n  endDate,\n  country,\n  publishedAt\n }\n  ],\n  source == "events" => [\n    ...*[\n      _type == "conferenceEvent"\n      && coalesce(endDate, startDate) >= $today\n      && !(_id in coalesce(^.items[]._ref, []))\n    ] | order(startDate asc)[0...4]{ \n  _id,\n  _type,\n  "slug": slug.current,\n  title,\n  category,\n  nominationsClosingDate,\n  startDate,\n  endDate,\n  country,\n  publishedAt\n },\n    ...*[\n      _type == "conferenceEvent"\n      && coalesce(endDate, startDate) < $today\n      && !(_id in coalesce(^.items[]._ref, []))\n    ] | order(startDate desc)[0...4]{ \n  _id,\n  _type,\n  "slug": slug.current,\n  title,\n  category,\n  nominationsClosingDate,\n  startDate,\n  endDate,\n  country,\n  publishedAt\n }\n  ],\n  source == "research" => *[\n    _type == "resource"\n    && category == "research"\n    && !(_id in coalesce(^.items[]._ref, []))\n    && _id != coalesce(^.promo.resource._ref, "")\n  ] | order(defined(publishedAt) desc, publishedAt desc, legacyWpId desc)[0...3]{ \n  _id,\n  _type,\n  "slug": slug.current,\n  title,\n  category,\n  nominationsClosingDate,\n  startDate,\n  endDate,\n  country,\n  publishedAt\n }\n),\n  button{ \n  label,\n  \n  kind,\n  external,\n  internal->{\n    _type,\n    "slug": slug.current,\n    brand,\n    brands\n  }\n\n },\n  promo{\n    resource->{\n      title,\n      "downloadThumbnail": downloadThumbnail{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n      "downloadFileUrl": downloadFile.asset->url,\n      "downloadFileName": downloadFile.asset->originalFilename,\n      downloadUrl\n    },\n    title,\n    description,\n    "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n    link{ \n  kind,\n  external,\n  internal->{\n    _type,\n    "slug": slug.current,\n    brand,\n    brands\n  }\n }\n  }\n },\n  _type == "awardsWinners" => { heading[]{ _key, style, children[]{ _key, text } } }\n }\n  }\n }\n  }\n': HOME_PAGE_QUERY_RESULT;
+    '\n  *[_type == "page" && slug.current == $slug && brand == $brand][0]{\n    _id,\n    title,\n    blocks[]{ _key, _type, \n  _type == "topStories" => { \n  linkLabel,\n  label,\n  "slides": slides[$brand == "clearview" || $brand in @->brands]->{ \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  \n  "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title }\n,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n  "category": category->{ title, "slug": slug.current }\n },\n  "articles": articles[$brand == "clearview" || $brand in @->brands]->{ \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  \n  "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title }\n,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n  "category": category->{ title, "slug": slug.current }\n },\n  "latest": *[\n    _type == "post"\n    && defined(slug.current)\n    && ($brand == "clearview" || $brand in brands)\n    && !(_id in coalesce(^.slides[]._ref, []))\n    && !(_id in coalesce(^.articles[]._ref, []))\n  ] | order(publishedAt desc)[0...6]{ \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  \n  "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title }\n,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n  "category": category->{ title, "slug": slug.current }\n }\n },\n  _type == "publications" => { \n  heading[]{ _key, style, children[]{ _key, text } },\n  body,\n  cards[]{\n    _key,\n    brand,\n    "brandTitle": *[_type == "brand" && key.current == ^.brand][0].title,\n    description,\n    image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n    linkLabel\n  }\n },\n  _type == "cta" => { \n  heading,\n  text,\n  link{ label, href }\n },\n  _type == "highlights" => { \n  source,\n  layout,\n  count,\n  heading[]{ _key, style, children[]{ _key, text } },\n  deadlineLabel,\n  "items": items[]->{ \n  _id,\n  _type,\n  "slug": slug.current,\n  title,\n  category,\n  nominationsClosingDate,\n  startDate,\n  endDate,\n  country,\n  publishedAt\n },\n  "fill": select(\n  source == "awards" => [\n    ...*[\n      _type == "awardsProgramme"\n      && nominationsClosingDate >= $today\n      && !(_id in coalesce(^.items[]._ref, []))\n    ] | order(nominationsClosingDate asc)[0...5]{ \n  _id,\n  _type,\n  "slug": slug.current,\n  title,\n  category,\n  nominationsClosingDate,\n  startDate,\n  endDate,\n  country,\n  publishedAt\n },\n    ...*[\n      _type == "awardsProgramme"\n      && !(defined(nominationsClosingDate) && nominationsClosingDate >= $today)\n      && startDate >= $today\n      && !(_id in coalesce(^.items[]._ref, []))\n    ] | order(startDate asc)[0...5]{ \n  _id,\n  _type,\n  "slug": slug.current,\n  title,\n  category,\n  nominationsClosingDate,\n  startDate,\n  endDate,\n  country,\n  publishedAt\n },\n    ...*[\n      _type == "awardsProgramme"\n      && !(defined(nominationsClosingDate) && nominationsClosingDate >= $today)\n      && startDate < $today\n      && !(_id in coalesce(^.items[]._ref, []))\n    ] | order(startDate desc)[0...5]{ \n  _id,\n  _type,\n  "slug": slug.current,\n  title,\n  category,\n  nominationsClosingDate,\n  startDate,\n  endDate,\n  country,\n  publishedAt\n }\n  ],\n  source == "events" => [\n    ...*[\n      _type == "conferenceEvent"\n      && coalesce(endDate, startDate) >= $today\n      && !(_id in coalesce(^.items[]._ref, []))\n    ] | order(startDate asc)[0...4]{ \n  _id,\n  _type,\n  "slug": slug.current,\n  title,\n  category,\n  nominationsClosingDate,\n  startDate,\n  endDate,\n  country,\n  publishedAt\n },\n    ...*[\n      _type == "conferenceEvent"\n      && coalesce(endDate, startDate) < $today\n      && !(_id in coalesce(^.items[]._ref, []))\n    ] | order(startDate desc)[0...4]{ \n  _id,\n  _type,\n  "slug": slug.current,\n  title,\n  category,\n  nominationsClosingDate,\n  startDate,\n  endDate,\n  country,\n  publishedAt\n }\n  ],\n  source == "research" => *[\n    _type == "resource"\n    && category == "research"\n    && !(_id in coalesce(^.items[]._ref, []))\n    && _id != coalesce(^.promo.resource._ref, "")\n  ] | order(defined(publishedAt) desc, publishedAt desc, legacyWpId desc)[0...3]{ \n  _id,\n  _type,\n  "slug": slug.current,\n  title,\n  category,\n  nominationsClosingDate,\n  startDate,\n  endDate,\n  country,\n  publishedAt\n }\n),\n  button{ \n  label,\n  \n  kind,\n  external,\n  internal->{\n    _type,\n    "slug": slug.current,\n    brand,\n    brands\n  }\n\n },\n  promo{\n    resource->{\n      title,\n      "downloadThumbnail": downloadThumbnail{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n      "downloadFileUrl": downloadFile.asset->url,\n      "downloadFileName": downloadFile.asset->originalFilename,\n      downloadUrl\n    },\n    title,\n    description,\n    "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n    link{ \n  kind,\n  external,\n  internal->{\n    _type,\n    "slug": slug.current,\n    brand,\n    brands\n  }\n }\n  }\n },\n  _type == "featuredStories" => { \n  heading[]{ _key, style, children[]{ _key, text } },\n  link{ \n  label,\n  \n  kind,\n  external,\n  internal->{\n    _type,\n    "slug": slug.current,\n    brand,\n    brands\n  }\n\n },\n  "posts": posts[]->{ \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  \n  "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title }\n,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n  "category": category->{ title, "slug": slug.current }\n }\n },\n  _type == "statsBar" => { \n  heading[]{ _key, style, children[]{ _key, text } },\n  items[]{ _key, icon, value, label }\n },\n  _type == "newsletterSignup" => { \n  heading[]{ _key, style, children[]{ _key, text } },\n  body,\n  preferencesLabel,\n  options[]{\n    _key,\n    label,\n    defaultChecked,\n    "interestKey": *[_type == "subscribeModal" && _id == "subscribe-modal-" + $brand][0].interests[attribute.name == ^.attribute.name][0]._key\n  },\n  emailPlaceholder,\n  buttonLabel,\n  invalidEmailMessage,\n  noOptionMessage,\n  image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n }\n },\n  _type == "sponsoredContent" => { \n  label,\n  link{ \n  label,\n  \n  kind,\n  external,\n  internal->{\n    _type,\n    "slug": slug.current,\n    brand,\n    brands\n  }\n\n },\n  profileLabel,\n  "post": *[\n    _type == "post"\n    && _id == ^.post._ref\n    && defined(slug.current)\n    && defined(sponsor)\n    && ($brand == "clearview" || $brand in brands)\n  ][0]{\n    \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  \n  "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title }\n,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n  "category": category->{ title, "slug": slug.current }\n,\n    "sponsor": sponsor->{\n      title,\n      "slug": slug.current,\n      "logo": logo{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n }\n    }\n  }\n },\n  _type == "postCards" => { \n  \n  heading[]{ _key, style, children[]{ _key, text } },\n  link{ \n  label,\n  \n  kind,\n  external,\n  internal->{\n    _type,\n    "slug": slug.current,\n    brand,\n    brands\n  }\n\n }\n,\n  "category": category->{ title, "slug": slug.current },\n  "posts": posts[$brand in @->brands]->{ \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  \n  "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title }\n,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n  "category": category->{ title, "slug": slug.current }\n },\n  "latest": \n  *[\n    _type == "post"\n    && defined(slug.current)\n    && $brand in brands\n    && defined(^.category._ref) && category._ref == ^.category._ref\n    && !(_id in coalesce(^.posts[]._ref, []))\n  ] | order(publishedAt desc)[0...6]\n{ \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  \n  "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title }\n,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n  "category": category->{ title, "slug": slug.current }\n }\n },\n  _type == "postBriefs" => { \n  \n  heading[]{ _key, style, children[]{ _key, text } },\n  link{ \n  label,\n  \n  kind,\n  external,\n  internal->{\n    _type,\n    "slug": slug.current,\n    brand,\n    brands\n  }\n\n }\n,\n  count,\n  "posts": posts[$brand in @->brands]->{ \n  \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  \n  "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title }\n,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n  "category": category->{ title, "slug": slug.current }\n,\n  "topic": primaryTopic->{ title },\n  briefText\n },\n  "latest": \n  *[\n    _type == "post"\n    && defined(slug.current)\n    && $brand in brands\n    && true\n    && !(_id in coalesce(^.posts[]._ref, []))\n  ] | order(publishedAt desc)[0...6]\n{ \n  \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  \n  "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title }\n,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n  "category": category->{ title, "slug": slug.current }\n,\n  "topic": primaryTopic->{ title },\n  briefText\n }\n },\n  _type == "weeklyRoundup" => { \n  heading[]{ _key, style, children[]{ _key, text } },\n  label,\n  title,\n  summary,\n  button{ \n  label,\n  \n  kind,\n  external,\n  internal->{\n    _type,\n    "slug": slug.current,\n    brand,\n    brands\n  }\n\n },\n  listLabel,\n  "posts": posts[$brand in @->brands]->{ \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  \n  "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title }\n,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n  "category": category->{ title, "slug": slug.current }\n },\n  "latest": \n  *[\n    _type == "post"\n    && defined(slug.current)\n    && $brand in brands\n    && true\n    && !(_id in coalesce(^.posts[]._ref, []))\n  ] | order(publishedAt desc)[0...8]\n{ \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  \n  "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title }\n,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n  "category": category->{ title, "slug": slug.current }\n }\n },\n  _type == "topPicks" => { \n  heading[]{ _key, style, children[]{ _key, text } },\n  link{ \n  label,\n  \n  kind,\n  external,\n  internal->{\n    _type,\n    "slug": slug.current,\n    brand,\n    brands\n  }\n\n },\n  "posts": posts[$brand in @->brands]->{ \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  \n  "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title }\n,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n  "category": category->{ title, "slug": slug.current }\n, "sponsored": defined(sponsor) },\n  "fill": [\n    ...\n  *[\n    _type == "post"\n    && defined(slug.current)\n    && $brand in brands\n    && !defined(sponsor) && dateTime(publishedAt) >= dateTime($today + "T00:00:00Z") - 60*60*24*7\n    && !(_id in coalesce(^.posts[]._ref, []))\n  ] | order(publishedAt desc)[0...6]\n{ \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  \n  "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title }\n,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n  "category": category->{ title, "slug": slug.current }\n },\n    ...\n  *[\n    _type == "post"\n    && defined(slug.current)\n    && $brand in brands\n    && !defined(sponsor) && dateTime(publishedAt) < dateTime($today + "T00:00:00Z") - 60*60*24*7\n    && !(_id in coalesce(^.posts[]._ref, []))\n  ] | order(publishedAt desc)[0...6]\n{ \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  \n  "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title }\n,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n  "category": category->{ title, "slug": slug.current }\n }\n  ]\n },\n  _type == "exploreGrid" => { \n  cards[]{\n    _key,\n    heading[]{ _key, style, children[]{ _key, text } },\n    icon,\n    source,\n    count,\n    deadlineLabel,\n    button{ \n  label,\n  \n  kind,\n  external,\n  internal->{\n    _type,\n    "slug": slug.current,\n    brand,\n    brands\n  }\n\n },\n    "items": items[@->_type != "post" || $brand in @->brands]->{ \n  _type == "post" => { _type, \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  \n  "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title }\n,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n  "category": category->{ title, "slug": slug.current }\n },\n  _type != "post" => { \n  _id,\n  _type,\n  "slug": slug.current,\n  title,\n  category,\n  nominationsClosingDate,\n  startDate,\n  endDate,\n  country,\n  publishedAt\n }\n },\n    "fill": select(\n      source == "posts" => \n  *[\n    _type == "post"\n    && defined(slug.current)\n    && $brand in brands\n    && defined(^.category._ref) && category._ref == ^.category._ref\n    && !(_id in coalesce(^.items[]._ref, []))\n  ] | order(publishedAt desc)[0...6]\n{ _type, \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  \n  "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title }\n,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n  "category": category->{ title, "slug": slug.current }\n },\n      \n  source == "awards" => [\n    ...*[\n      _type == "awardsProgramme"\n      && nominationsClosingDate >= $today\n      && !(_id in coalesce(^.items[]._ref, []))\n    ] | order(nominationsClosingDate asc)[0...5]{ \n  _id,\n  _type,\n  "slug": slug.current,\n  title,\n  category,\n  nominationsClosingDate,\n  startDate,\n  endDate,\n  country,\n  publishedAt\n },\n    ...*[\n      _type == "awardsProgramme"\n      && !(defined(nominationsClosingDate) && nominationsClosingDate >= $today)\n      && startDate >= $today\n      && !(_id in coalesce(^.items[]._ref, []))\n    ] | order(startDate asc)[0...5]{ \n  _id,\n  _type,\n  "slug": slug.current,\n  title,\n  category,\n  nominationsClosingDate,\n  startDate,\n  endDate,\n  country,\n  publishedAt\n },\n    ...*[\n      _type == "awardsProgramme"\n      && !(defined(nominationsClosingDate) && nominationsClosingDate >= $today)\n      && startDate < $today\n      && !(_id in coalesce(^.items[]._ref, []))\n    ] | order(startDate desc)[0...5]{ \n  _id,\n  _type,\n  "slug": slug.current,\n  title,\n  category,\n  nominationsClosingDate,\n  startDate,\n  endDate,\n  country,\n  publishedAt\n }\n  ],\n  source == "events" => [\n    ...*[\n      _type == "conferenceEvent"\n      && coalesce(endDate, startDate) >= $today\n      && !(_id in coalesce(^.items[]._ref, []))\n    ] | order(startDate asc)[0...4]{ \n  _id,\n  _type,\n  "slug": slug.current,\n  title,\n  category,\n  nominationsClosingDate,\n  startDate,\n  endDate,\n  country,\n  publishedAt\n },\n    ...*[\n      _type == "conferenceEvent"\n      && coalesce(endDate, startDate) < $today\n      && !(_id in coalesce(^.items[]._ref, []))\n    ] | order(startDate desc)[0...4]{ \n  _id,\n  _type,\n  "slug": slug.current,\n  title,\n  category,\n  nominationsClosingDate,\n  startDate,\n  endDate,\n  country,\n  publishedAt\n }\n  ],\n  source == "research" => *[\n    _type == "resource"\n    && category == "research"\n    && !(_id in coalesce(^.items[]._ref, []))\n    && _id != coalesce(^.promo.resource._ref, "")\n  ] | order(defined(publishedAt) desc, publishedAt desc, legacyWpId desc)[0...3]{ \n  _id,\n  _type,\n  "slug": slug.current,\n  title,\n  category,\n  nominationsClosingDate,\n  startDate,\n  endDate,\n  country,\n  publishedAt\n }\n\n    )\n  }\n },\n  _type == "subscribeBanner" => { \n  heading[]{ _key, style, children[]{ _key, text } },\n  description,\n  buttonLabel,\n  cta{ \n  label,\n  \n  kind,\n  external,\n  internal->{\n    _type,\n    "slug": slug.current,\n    brand,\n    brands\n  }\n\n }\n },\n  _type == "splitLayout" => {\n    "main": main[]{ _key, _type, \n  _type == "topStories" => { \n  linkLabel,\n  label,\n  "slides": slides[$brand == "clearview" || $brand in @->brands]->{ \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  \n  "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title }\n,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n  "category": category->{ title, "slug": slug.current }\n },\n  "articles": articles[$brand == "clearview" || $brand in @->brands]->{ \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  \n  "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title }\n,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n  "category": category->{ title, "slug": slug.current }\n },\n  "latest": *[\n    _type == "post"\n    && defined(slug.current)\n    && ($brand == "clearview" || $brand in brands)\n    && !(_id in coalesce(^.slides[]._ref, []))\n    && !(_id in coalesce(^.articles[]._ref, []))\n  ] | order(publishedAt desc)[0...6]{ \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  \n  "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title }\n,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n  "category": category->{ title, "slug": slug.current }\n }\n },\n  _type == "sponsoredContent" => { \n  label,\n  link{ \n  label,\n  \n  kind,\n  external,\n  internal->{\n    _type,\n    "slug": slug.current,\n    brand,\n    brands\n  }\n\n },\n  profileLabel,\n  "post": *[\n    _type == "post"\n    && _id == ^.post._ref\n    && defined(slug.current)\n    && defined(sponsor)\n    && ($brand == "clearview" || $brand in brands)\n  ][0]{\n    \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  \n  "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title }\n,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n  "category": category->{ title, "slug": slug.current }\n,\n    "sponsor": sponsor->{\n      title,\n      "slug": slug.current,\n      "logo": logo{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n }\n    }\n  }\n },\n  _type == "postCards" => { \n  \n  heading[]{ _key, style, children[]{ _key, text } },\n  link{ \n  label,\n  \n  kind,\n  external,\n  internal->{\n    _type,\n    "slug": slug.current,\n    brand,\n    brands\n  }\n\n }\n,\n  "category": category->{ title, "slug": slug.current },\n  "posts": posts[$brand in @->brands]->{ \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  \n  "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title }\n,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n  "category": category->{ title, "slug": slug.current }\n },\n  "latest": \n  *[\n    _type == "post"\n    && defined(slug.current)\n    && $brand in brands\n    && defined(^.category._ref) && category._ref == ^.category._ref\n    && !(_id in coalesce(^.posts[]._ref, []))\n  ] | order(publishedAt desc)[0...6]\n{ \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  \n  "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title }\n,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n  "category": category->{ title, "slug": slug.current }\n }\n },\n  _type == "postBriefs" => { \n  \n  heading[]{ _key, style, children[]{ _key, text } },\n  link{ \n  label,\n  \n  kind,\n  external,\n  internal->{\n    _type,\n    "slug": slug.current,\n    brand,\n    brands\n  }\n\n }\n,\n  count,\n  "posts": posts[$brand in @->brands]->{ \n  \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  \n  "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title }\n,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n  "category": category->{ title, "slug": slug.current }\n,\n  "topic": primaryTopic->{ title },\n  briefText\n },\n  "latest": \n  *[\n    _type == "post"\n    && defined(slug.current)\n    && $brand in brands\n    && true\n    && !(_id in coalesce(^.posts[]._ref, []))\n  ] | order(publishedAt desc)[0...6]\n{ \n  \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  \n  "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title }\n,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n  "category": category->{ title, "slug": slug.current }\n,\n  "topic": primaryTopic->{ title },\n  briefText\n }\n },\n  _type == "weeklyRoundup" => { \n  heading[]{ _key, style, children[]{ _key, text } },\n  label,\n  title,\n  summary,\n  button{ \n  label,\n  \n  kind,\n  external,\n  internal->{\n    _type,\n    "slug": slug.current,\n    brand,\n    brands\n  }\n\n },\n  listLabel,\n  "posts": posts[$brand in @->brands]->{ \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  \n  "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title }\n,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n  "category": category->{ title, "slug": slug.current }\n },\n  "latest": \n  *[\n    _type == "post"\n    && defined(slug.current)\n    && $brand in brands\n    && true\n    && !(_id in coalesce(^.posts[]._ref, []))\n  ] | order(publishedAt desc)[0...8]\n{ \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  \n  "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title }\n,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n  "category": category->{ title, "slug": slug.current }\n }\n },\n  _type == "publications" => { \n  heading[]{ _key, style, children[]{ _key, text } },\n  body,\n  cards[]{\n    _key,\n    brand,\n    "brandTitle": *[_type == "brand" && key.current == ^.brand][0].title,\n    description,\n    image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n    linkLabel\n  }\n },\n  _type == "cta" => { \n  heading,\n  text,\n  link{ label, href }\n },\n  _type == "pageHero" => { \n  breadcrumbHomeLabel,\n  breadcrumbLabel,\n  title,\n  intro\n },\n  _type == "recordListing" => { \n  awardsTabLabel,\n  eventsTabLabel,\n  researchTabLabel,\n  regionFilterLabel,\n  regionEuropeLabel,\n  regionMenaLabel,\n  regionAsiaLabel,\n  regionNorthAmericaLabel,\n  yearFilterLabel,\n  statusFilterLabel,\n  allOptionLabel,\n  clearFiltersLabel,\n  upcomingEventLabel,\n  pastEventLabel,\n  publishedLabel,\n  emptyHeading,\n  emptyText,\n  emptyAwardNoun,\n  emptyEventNoun,\n  emptyResearchNoun,\n  emptyButtonLabel,\n  previousLabel,\n  nextLabel\n }\n },\n    "aside": aside[]{ _key, _type, \n  _type == "highlights" => { \n  source,\n  layout,\n  count,\n  heading[]{ _key, style, children[]{ _key, text } },\n  deadlineLabel,\n  "items": items[]->{ \n  _id,\n  _type,\n  "slug": slug.current,\n  title,\n  category,\n  nominationsClosingDate,\n  startDate,\n  endDate,\n  country,\n  publishedAt\n },\n  "fill": select(\n  source == "awards" => [\n    ...*[\n      _type == "awardsProgramme"\n      && nominationsClosingDate >= $today\n      && !(_id in coalesce(^.items[]._ref, []))\n    ] | order(nominationsClosingDate asc)[0...5]{ \n  _id,\n  _type,\n  "slug": slug.current,\n  title,\n  category,\n  nominationsClosingDate,\n  startDate,\n  endDate,\n  country,\n  publishedAt\n },\n    ...*[\n      _type == "awardsProgramme"\n      && !(defined(nominationsClosingDate) && nominationsClosingDate >= $today)\n      && startDate >= $today\n      && !(_id in coalesce(^.items[]._ref, []))\n    ] | order(startDate asc)[0...5]{ \n  _id,\n  _type,\n  "slug": slug.current,\n  title,\n  category,\n  nominationsClosingDate,\n  startDate,\n  endDate,\n  country,\n  publishedAt\n },\n    ...*[\n      _type == "awardsProgramme"\n      && !(defined(nominationsClosingDate) && nominationsClosingDate >= $today)\n      && startDate < $today\n      && !(_id in coalesce(^.items[]._ref, []))\n    ] | order(startDate desc)[0...5]{ \n  _id,\n  _type,\n  "slug": slug.current,\n  title,\n  category,\n  nominationsClosingDate,\n  startDate,\n  endDate,\n  country,\n  publishedAt\n }\n  ],\n  source == "events" => [\n    ...*[\n      _type == "conferenceEvent"\n      && coalesce(endDate, startDate) >= $today\n      && !(_id in coalesce(^.items[]._ref, []))\n    ] | order(startDate asc)[0...4]{ \n  _id,\n  _type,\n  "slug": slug.current,\n  title,\n  category,\n  nominationsClosingDate,\n  startDate,\n  endDate,\n  country,\n  publishedAt\n },\n    ...*[\n      _type == "conferenceEvent"\n      && coalesce(endDate, startDate) < $today\n      && !(_id in coalesce(^.items[]._ref, []))\n    ] | order(startDate desc)[0...4]{ \n  _id,\n  _type,\n  "slug": slug.current,\n  title,\n  category,\n  nominationsClosingDate,\n  startDate,\n  endDate,\n  country,\n  publishedAt\n }\n  ],\n  source == "research" => *[\n    _type == "resource"\n    && category == "research"\n    && !(_id in coalesce(^.items[]._ref, []))\n    && _id != coalesce(^.promo.resource._ref, "")\n  ] | order(defined(publishedAt) desc, publishedAt desc, legacyWpId desc)[0...3]{ \n  _id,\n  _type,\n  "slug": slug.current,\n  title,\n  category,\n  nominationsClosingDate,\n  startDate,\n  endDate,\n  country,\n  publishedAt\n }\n),\n  button{ \n  label,\n  \n  kind,\n  external,\n  internal->{\n    _type,\n    "slug": slug.current,\n    brand,\n    brands\n  }\n\n },\n  promo{\n    resource->{\n      title,\n      "downloadThumbnail": downloadThumbnail{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n      "downloadFileUrl": downloadFile.asset->url,\n      "downloadFileName": downloadFile.asset->originalFilename,\n      downloadUrl\n    },\n    title,\n    description,\n    "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n    link{ \n  kind,\n  external,\n  internal->{\n    _type,\n    "slug": slug.current,\n    brand,\n    brands\n  }\n }\n  }\n },\n  _type == "awardsWinners" => { heading[]{ _key, style, children[]{ _key, text } } }\n }\n  }\n }\n  }\n': PAGE_QUERY_RESULT;
+    '\n  *[\n    _type == "page"\n    && brand == $brand\n    && defined(slug.current)\n    && !(slug.current in ["home", "categories", "shared-listings"])\n  ]{\n    "slug": slug.current\n  }\n': PAGE_SLUGS_QUERY_RESULT;
     '\n  *[_type == "post" && $brand in brands] | order(publishedAt desc){\n    _id,\n    title,\n    "slug": slug.current,\n    publishedAt,\n    excerpt,\n    image\n  }\n': POSTS_QUERY_RESULT;
     '\n  *[_type == "post" && slug.current == $slug && $brand in brands][0]{\n    _id,\n    title,\n    "slug": slug.current,\n    brands,\n    publishedAt,\n    excerpt,\n    "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n, credit },\n    "category": category->{ title, "slug": slug.current },\n    "primaryTopic": primaryTopic->{ title, "slug": slug.current },\n    "secondaryTopics": secondaryTopics[]->{ title, "slug": slug.current },\n    "region": region->{ title, "slug": slug.current },\n    "author": author->{ name, jobTitle, city, bio, "photo": photo{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n } },\n    content[]{ \n  _type != "infographic" => { ... },\n  _type == "infographic" => { _key, _type, eyebrow, title, description, wide, narrow },\n  _type == "image" => { "alt": coalesce(alt, asset->altText) },\n  _type == "videoFile" => { "url": asset->url, "mimeType": asset->mimeType }\n },\n    contentAfter[]{ \n  _type != "infographic" => { ... },\n  _type == "infographic" => { _key, _type, eyebrow, title, description, wide, narrow },\n  _type == "image" => { "alt": coalesce(alt, asset->altText) },\n  _type == "videoFile" => { "url": asset->url, "mimeType": asset->mimeType }\n },\n    "recommendedIds": coalesce(recommended[]._ref, []),\n    "picks": *[\n      _type == "post"\n      && _id in coalesce(^.recommended[]._ref, [])\n      && _id != ^._id\n      && $brand in brands\n      && defined(slug.current)\n    ]{ \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  publishedAt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n  "topic": primaryTopic->{ title, "slug": slug.current }\n },\n    "fill": *[\n      _type == "post"\n      && $brand in brands\n      && defined(slug.current)\n      && defined(^.category._ref)\n      && category._ref == ^.category._ref\n      && _id != ^._id\n      && !(_id in coalesce(^.recommended[]._ref, []))\n    ] | order(publishedAt desc)[0...3]{ \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  publishedAt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n  "topic": primaryTopic->{ title, "slug": slug.current }\n }\n  }\n': POST_QUERY_RESULT;
     '\n  *[_type == "articlePage" && _id == $id][0]{\n    recommendedHeading,\n    breadcrumbHomeLabel,\n    shareLabel,\n    copyLinkLabel,\n    linkCopiedLabel,\n    readTimeSuffix,\n    imageCreditPrefix,\n    shareRailLabel,\n    embedConsentText,\n    embedConsentButton,\n    "shareLinks": coalesce(shareLinks[]{ _key, label, url, icon{ asset->{ url } } }, [])\n  }\n': ARTICLE_PAGE_QUERY_RESULT;
@@ -27186,6 +32860,7 @@ declare global {
     '\n  *[_id == $id && _type == "awardsProgrammePage"][0]{\n    breadcrumbHomeLabel,\n    breadcrumbAwardsLabel,\n    registerLabel,\n    previousYearLabel,\n    previousYearWinnersLabel,\n    allCategoriesLabel,\n    viewBiographyLabel,\n    hideBiographyLabel,\n    marketingKitText,\n    acclaimLinkLabel,\n    videoConsentText,\n    videoConsentButton,\n    navOverviewLabel,\n    navJudgesLabel,\n    navWinnersLabel,\n    navCategoriesLabel,\n    navMarketingKitLabel,\n    launchingSoonLabel,\n    submissionsOpenLabel,\n    ceremonyDueLabel,\n    winnersAnnouncedLabel,\n    overviewHeading[]{ _key, style, children[]{ _key, text } },\n    videoHeading[]{ _key, style, children[]{ _key, text } },\n    judgesHeading[]{ _key, style, children[]{ _key, text } },\n    winnersHeading[]{ _key, style, children[]{ _key, text } },\n    categoriesHeading[]{ _key, style, children[]{ _key, text } },\n    marketingKitHeading[]{ _key, style, children[]{ _key, text } },\n    otherProgrammesHeading[]{ _key, style, children[]{ _key, text } },\n    "otherProgrammes": otherProgrammes[]{ _key, title, "edition": edition->{ \n  _id, title, "slug": slug.current, "programmeId": programme._ref,\n  startDate, endDate, country, nominationsOpeningDate, nominationsClosingDate\n } }\n  }\n': AWARDS_PROGRAMME_PAGE_QUERY_RESULT;
     '\n  *[_id == $id && _type == "eventPage"][0]{\n    breadcrumbHomeLabel,\n    breadcrumbEventsLabel,\n    summitTypeLabel,\n    briefingTypeLabel,\n    webinarTypeLabel,\n    statusLabel,\n    upcomingLabel,\n    pastLabel,\n    eventFormatLabel,\n    chairLabel,\n    agendaChairLabel,\n    venueLabel,\n    addressLabel,\n    dateLabel,\n    timeLabel,\n    navOverviewLabel,\n    navSpeakersLabel,\n    navWhyAttendLabel,\n    navAgendaLabel,\n    navSponsorsLabel,\n    navVenueLabel,\n    navRelatedCoverageLabel,\n    overviewHeading[]{ _key, style, children[]{ _key, text } },\n    speakersHeading[]{ _key, style, children[]{ _key, text } },\n    whyAttendHeading[]{ _key, style, children[]{ _key, text } },\n    agendaHeading[]{ _key, style, children[]{ _key, text } },\n    sponsorsHeading[]{ _key, style, children[]{ _key, text } },\n    venueHeading[]{ _key, style, children[]{ _key, text } },\n    relatedCoverageHeading[]{ _key, style, children[]{ _key, text } },\n    relatedEventsHeading[]{ _key, style, children[]{ _key, text } },\n    "relatedEvents": relatedEvents[]{ _key, title, "event": event->{ \n  _id, title, "slug": slug.current, startDate, endDate, hideDateTime, "venue": venue->title\n } }\n  }\n': EVENT_PAGE_QUERY_RESULT;
     '\n  [\n    ...*[\n      _type == "conferenceEvent"\n      && defined(slug.current)\n      && _id != $eventId\n      && coalesce(endDate, startDate) >= $today\n    ] | order(startDate asc)[0...6]{ \n  _id, title, "slug": slug.current, startDate, endDate, hideDateTime, "venue": venue->title\n },\n    ...*[\n      _type == "conferenceEvent"\n      && defined(slug.current)\n      && _id != $eventId\n      && !(coalesce(endDate, startDate) >= $today)\n    ] | order(startDate desc)[0...6]{ \n  _id, title, "slug": slug.current, startDate, endDate, hideDateTime, "venue": venue->title\n }\n  ]\n': RELATED_EVENTS_QUERY_RESULT;
+    '\n  {\n    "page": *[_type == "page" && _id == $id && brand == $brand][0]{\n      _id,\n      title,\n      blocks[]{ _key, _type, \n  _type == "topStories" => { \n  linkLabel,\n  label,\n  "slides": slides[$brand == "clearview" || $brand in @->brands]->{ \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  \n  "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title }\n,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n  "category": category->{ title, "slug": slug.current }\n },\n  "articles": articles[$brand == "clearview" || $brand in @->brands]->{ \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  \n  "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title }\n,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n  "category": category->{ title, "slug": slug.current }\n },\n  "latest": *[\n    _type == "post"\n    && defined(slug.current)\n    && ($brand == "clearview" || $brand in brands)\n    && !(_id in coalesce(^.slides[]._ref, []))\n    && !(_id in coalesce(^.articles[]._ref, []))\n  ] | order(publishedAt desc)[0...6]{ \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  \n  "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title }\n,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n  "category": category->{ title, "slug": slug.current }\n }\n },\n  _type == "publications" => { \n  heading[]{ _key, style, children[]{ _key, text } },\n  body,\n  cards[]{\n    _key,\n    brand,\n    "brandTitle": *[_type == "brand" && key.current == ^.brand][0].title,\n    description,\n    image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n    linkLabel\n  }\n },\n  _type == "cta" => { \n  heading,\n  text,\n  link{ label, href }\n },\n  _type == "highlights" => { \n  source,\n  layout,\n  count,\n  heading[]{ _key, style, children[]{ _key, text } },\n  deadlineLabel,\n  "items": items[]->{ \n  _id,\n  _type,\n  "slug": slug.current,\n  title,\n  category,\n  nominationsClosingDate,\n  startDate,\n  endDate,\n  country,\n  publishedAt\n },\n  "fill": select(\n  source == "awards" => [\n    ...*[\n      _type == "awardsProgramme"\n      && nominationsClosingDate >= $today\n      && !(_id in coalesce(^.items[]._ref, []))\n    ] | order(nominationsClosingDate asc)[0...5]{ \n  _id,\n  _type,\n  "slug": slug.current,\n  title,\n  category,\n  nominationsClosingDate,\n  startDate,\n  endDate,\n  country,\n  publishedAt\n },\n    ...*[\n      _type == "awardsProgramme"\n      && !(defined(nominationsClosingDate) && nominationsClosingDate >= $today)\n      && startDate >= $today\n      && !(_id in coalesce(^.items[]._ref, []))\n    ] | order(startDate asc)[0...5]{ \n  _id,\n  _type,\n  "slug": slug.current,\n  title,\n  category,\n  nominationsClosingDate,\n  startDate,\n  endDate,\n  country,\n  publishedAt\n },\n    ...*[\n      _type == "awardsProgramme"\n      && !(defined(nominationsClosingDate) && nominationsClosingDate >= $today)\n      && startDate < $today\n      && !(_id in coalesce(^.items[]._ref, []))\n    ] | order(startDate desc)[0...5]{ \n  _id,\n  _type,\n  "slug": slug.current,\n  title,\n  category,\n  nominationsClosingDate,\n  startDate,\n  endDate,\n  country,\n  publishedAt\n }\n  ],\n  source == "events" => [\n    ...*[\n      _type == "conferenceEvent"\n      && coalesce(endDate, startDate) >= $today\n      && !(_id in coalesce(^.items[]._ref, []))\n    ] | order(startDate asc)[0...4]{ \n  _id,\n  _type,\n  "slug": slug.current,\n  title,\n  category,\n  nominationsClosingDate,\n  startDate,\n  endDate,\n  country,\n  publishedAt\n },\n    ...*[\n      _type == "conferenceEvent"\n      && coalesce(endDate, startDate) < $today\n      && !(_id in coalesce(^.items[]._ref, []))\n    ] | order(startDate desc)[0...4]{ \n  _id,\n  _type,\n  "slug": slug.current,\n  title,\n  category,\n  nominationsClosingDate,\n  startDate,\n  endDate,\n  country,\n  publishedAt\n }\n  ],\n  source == "research" => *[\n    _type == "resource"\n    && category == "research"\n    && !(_id in coalesce(^.items[]._ref, []))\n    && _id != coalesce(^.promo.resource._ref, "")\n  ] | order(defined(publishedAt) desc, publishedAt desc, legacyWpId desc)[0...3]{ \n  _id,\n  _type,\n  "slug": slug.current,\n  title,\n  category,\n  nominationsClosingDate,\n  startDate,\n  endDate,\n  country,\n  publishedAt\n }\n),\n  button{ \n  label,\n  \n  kind,\n  external,\n  internal->{\n    _type,\n    "slug": slug.current,\n    brand,\n    brands\n  }\n\n },\n  promo{\n    resource->{\n      title,\n      "downloadThumbnail": downloadThumbnail{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n      "downloadFileUrl": downloadFile.asset->url,\n      "downloadFileName": downloadFile.asset->originalFilename,\n      downloadUrl\n    },\n    title,\n    description,\n    "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n    link{ \n  kind,\n  external,\n  internal->{\n    _type,\n    "slug": slug.current,\n    brand,\n    brands\n  }\n }\n  }\n },\n  _type == "featuredStories" => { \n  heading[]{ _key, style, children[]{ _key, text } },\n  link{ \n  label,\n  \n  kind,\n  external,\n  internal->{\n    _type,\n    "slug": slug.current,\n    brand,\n    brands\n  }\n\n },\n  "posts": posts[]->{ \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  \n  "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title }\n,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n  "category": category->{ title, "slug": slug.current }\n }\n },\n  _type == "statsBar" => { \n  heading[]{ _key, style, children[]{ _key, text } },\n  items[]{ _key, icon, value, label }\n },\n  _type == "newsletterSignup" => { \n  heading[]{ _key, style, children[]{ _key, text } },\n  body,\n  preferencesLabel,\n  options[]{\n    _key,\n    label,\n    defaultChecked,\n    "interestKey": *[_type == "subscribeModal" && _id == "subscribe-modal-" + $brand][0].interests[attribute.name == ^.attribute.name][0]._key\n  },\n  emailPlaceholder,\n  buttonLabel,\n  invalidEmailMessage,\n  noOptionMessage,\n  image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n }\n },\n  _type == "sponsoredContent" => { \n  label,\n  link{ \n  label,\n  \n  kind,\n  external,\n  internal->{\n    _type,\n    "slug": slug.current,\n    brand,\n    brands\n  }\n\n },\n  profileLabel,\n  "post": *[\n    _type == "post"\n    && _id == ^.post._ref\n    && defined(slug.current)\n    && defined(sponsor)\n    && ($brand == "clearview" || $brand in brands)\n  ][0]{\n    \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  \n  "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title }\n,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n  "category": category->{ title, "slug": slug.current }\n,\n    "sponsor": sponsor->{\n      title,\n      "slug": slug.current,\n      "logo": logo{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n }\n    }\n  }\n },\n  _type == "postCards" => { \n  \n  heading[]{ _key, style, children[]{ _key, text } },\n  link{ \n  label,\n  \n  kind,\n  external,\n  internal->{\n    _type,\n    "slug": slug.current,\n    brand,\n    brands\n  }\n\n }\n,\n  "category": category->{ title, "slug": slug.current },\n  "posts": posts[$brand in @->brands]->{ \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  \n  "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title }\n,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n  "category": category->{ title, "slug": slug.current }\n },\n  "latest": \n  *[\n    _type == "post"\n    && defined(slug.current)\n    && $brand in brands\n    && defined(^.category._ref) && category._ref == ^.category._ref\n    && !(_id in coalesce(^.posts[]._ref, []))\n  ] | order(publishedAt desc)[0...6]\n{ \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  \n  "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title }\n,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n  "category": category->{ title, "slug": slug.current }\n }\n },\n  _type == "postBriefs" => { \n  \n  heading[]{ _key, style, children[]{ _key, text } },\n  link{ \n  label,\n  \n  kind,\n  external,\n  internal->{\n    _type,\n    "slug": slug.current,\n    brand,\n    brands\n  }\n\n }\n,\n  count,\n  "posts": posts[$brand in @->brands]->{ \n  \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  \n  "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title }\n,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n  "category": category->{ title, "slug": slug.current }\n,\n  "topic": primaryTopic->{ title },\n  briefText\n },\n  "latest": \n  *[\n    _type == "post"\n    && defined(slug.current)\n    && $brand in brands\n    && true\n    && !(_id in coalesce(^.posts[]._ref, []))\n  ] | order(publishedAt desc)[0...6]\n{ \n  \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  \n  "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title }\n,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n  "category": category->{ title, "slug": slug.current }\n,\n  "topic": primaryTopic->{ title },\n  briefText\n }\n },\n  _type == "weeklyRoundup" => { \n  heading[]{ _key, style, children[]{ _key, text } },\n  label,\n  title,\n  summary,\n  button{ \n  label,\n  \n  kind,\n  external,\n  internal->{\n    _type,\n    "slug": slug.current,\n    brand,\n    brands\n  }\n\n },\n  listLabel,\n  "posts": posts[$brand in @->brands]->{ \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  \n  "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title }\n,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n  "category": category->{ title, "slug": slug.current }\n },\n  "latest": \n  *[\n    _type == "post"\n    && defined(slug.current)\n    && $brand in brands\n    && true\n    && !(_id in coalesce(^.posts[]._ref, []))\n  ] | order(publishedAt desc)[0...8]\n{ \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  \n  "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title }\n,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n  "category": category->{ title, "slug": slug.current }\n }\n },\n  _type == "topPicks" => { \n  heading[]{ _key, style, children[]{ _key, text } },\n  link{ \n  label,\n  \n  kind,\n  external,\n  internal->{\n    _type,\n    "slug": slug.current,\n    brand,\n    brands\n  }\n\n },\n  "posts": posts[$brand in @->brands]->{ \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  \n  "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title }\n,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n  "category": category->{ title, "slug": slug.current }\n, "sponsored": defined(sponsor) },\n  "fill": [\n    ...\n  *[\n    _type == "post"\n    && defined(slug.current)\n    && $brand in brands\n    && !defined(sponsor) && dateTime(publishedAt) >= dateTime($today + "T00:00:00Z") - 60*60*24*7\n    && !(_id in coalesce(^.posts[]._ref, []))\n  ] | order(publishedAt desc)[0...6]\n{ \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  \n  "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title }\n,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n  "category": category->{ title, "slug": slug.current }\n },\n    ...\n  *[\n    _type == "post"\n    && defined(slug.current)\n    && $brand in brands\n    && !defined(sponsor) && dateTime(publishedAt) < dateTime($today + "T00:00:00Z") - 60*60*24*7\n    && !(_id in coalesce(^.posts[]._ref, []))\n  ] | order(publishedAt desc)[0...6]\n{ \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  \n  "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title }\n,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n  "category": category->{ title, "slug": slug.current }\n }\n  ]\n },\n  _type == "exploreGrid" => { \n  cards[]{\n    _key,\n    heading[]{ _key, style, children[]{ _key, text } },\n    icon,\n    source,\n    count,\n    deadlineLabel,\n    button{ \n  label,\n  \n  kind,\n  external,\n  internal->{\n    _type,\n    "slug": slug.current,\n    brand,\n    brands\n  }\n\n },\n    "items": items[@->_type != "post" || $brand in @->brands]->{ \n  _type == "post" => { _type, \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  \n  "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title }\n,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n  "category": category->{ title, "slug": slug.current }\n },\n  _type != "post" => { \n  _id,\n  _type,\n  "slug": slug.current,\n  title,\n  category,\n  nominationsClosingDate,\n  startDate,\n  endDate,\n  country,\n  publishedAt\n }\n },\n    "fill": select(\n      source == "posts" => \n  *[\n    _type == "post"\n    && defined(slug.current)\n    && $brand in brands\n    && defined(^.category._ref) && category._ref == ^.category._ref\n    && !(_id in coalesce(^.items[]._ref, []))\n  ] | order(publishedAt desc)[0...6]\n{ _type, \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  \n  "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title }\n,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n  "category": category->{ title, "slug": slug.current }\n },\n      \n  source == "awards" => [\n    ...*[\n      _type == "awardsProgramme"\n      && nominationsClosingDate >= $today\n      && !(_id in coalesce(^.items[]._ref, []))\n    ] | order(nominationsClosingDate asc)[0...5]{ \n  _id,\n  _type,\n  "slug": slug.current,\n  title,\n  category,\n  nominationsClosingDate,\n  startDate,\n  endDate,\n  country,\n  publishedAt\n },\n    ...*[\n      _type == "awardsProgramme"\n      && !(defined(nominationsClosingDate) && nominationsClosingDate >= $today)\n      && startDate >= $today\n      && !(_id in coalesce(^.items[]._ref, []))\n    ] | order(startDate asc)[0...5]{ \n  _id,\n  _type,\n  "slug": slug.current,\n  title,\n  category,\n  nominationsClosingDate,\n  startDate,\n  endDate,\n  country,\n  publishedAt\n },\n    ...*[\n      _type == "awardsProgramme"\n      && !(defined(nominationsClosingDate) && nominationsClosingDate >= $today)\n      && startDate < $today\n      && !(_id in coalesce(^.items[]._ref, []))\n    ] | order(startDate desc)[0...5]{ \n  _id,\n  _type,\n  "slug": slug.current,\n  title,\n  category,\n  nominationsClosingDate,\n  startDate,\n  endDate,\n  country,\n  publishedAt\n }\n  ],\n  source == "events" => [\n    ...*[\n      _type == "conferenceEvent"\n      && coalesce(endDate, startDate) >= $today\n      && !(_id in coalesce(^.items[]._ref, []))\n    ] | order(startDate asc)[0...4]{ \n  _id,\n  _type,\n  "slug": slug.current,\n  title,\n  category,\n  nominationsClosingDate,\n  startDate,\n  endDate,\n  country,\n  publishedAt\n },\n    ...*[\n      _type == "conferenceEvent"\n      && coalesce(endDate, startDate) < $today\n      && !(_id in coalesce(^.items[]._ref, []))\n    ] | order(startDate desc)[0...4]{ \n  _id,\n  _type,\n  "slug": slug.current,\n  title,\n  category,\n  nominationsClosingDate,\n  startDate,\n  endDate,\n  country,\n  publishedAt\n }\n  ],\n  source == "research" => *[\n    _type == "resource"\n    && category == "research"\n    && !(_id in coalesce(^.items[]._ref, []))\n    && _id != coalesce(^.promo.resource._ref, "")\n  ] | order(defined(publishedAt) desc, publishedAt desc, legacyWpId desc)[0...3]{ \n  _id,\n  _type,\n  "slug": slug.current,\n  title,\n  category,\n  nominationsClosingDate,\n  startDate,\n  endDate,\n  country,\n  publishedAt\n }\n\n    )\n  }\n },\n  _type == "subscribeBanner" => { \n  heading[]{ _key, style, children[]{ _key, text } },\n  description,\n  buttonLabel,\n  cta{ \n  label,\n  \n  kind,\n  external,\n  internal->{\n    _type,\n    "slug": slug.current,\n    brand,\n    brands\n  }\n\n }\n },\n  _type == "splitLayout" => {\n    "main": main[]{ _key, _type, \n  _type == "topStories" => { \n  linkLabel,\n  label,\n  "slides": slides[$brand == "clearview" || $brand in @->brands]->{ \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  \n  "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title }\n,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n  "category": category->{ title, "slug": slug.current }\n },\n  "articles": articles[$brand == "clearview" || $brand in @->brands]->{ \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  \n  "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title }\n,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n  "category": category->{ title, "slug": slug.current }\n },\n  "latest": *[\n    _type == "post"\n    && defined(slug.current)\n    && ($brand == "clearview" || $brand in brands)\n    && !(_id in coalesce(^.slides[]._ref, []))\n    && !(_id in coalesce(^.articles[]._ref, []))\n  ] | order(publishedAt desc)[0...6]{ \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  \n  "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title }\n,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n  "category": category->{ title, "slug": slug.current }\n }\n },\n  _type == "sponsoredContent" => { \n  label,\n  link{ \n  label,\n  \n  kind,\n  external,\n  internal->{\n    _type,\n    "slug": slug.current,\n    brand,\n    brands\n  }\n\n },\n  profileLabel,\n  "post": *[\n    _type == "post"\n    && _id == ^.post._ref\n    && defined(slug.current)\n    && defined(sponsor)\n    && ($brand == "clearview" || $brand in brands)\n  ][0]{\n    \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  \n  "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title }\n,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n  "category": category->{ title, "slug": slug.current }\n,\n    "sponsor": sponsor->{\n      title,\n      "slug": slug.current,\n      "logo": logo{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n }\n    }\n  }\n },\n  _type == "postCards" => { \n  \n  heading[]{ _key, style, children[]{ _key, text } },\n  link{ \n  label,\n  \n  kind,\n  external,\n  internal->{\n    _type,\n    "slug": slug.current,\n    brand,\n    brands\n  }\n\n }\n,\n  "category": category->{ title, "slug": slug.current },\n  "posts": posts[$brand in @->brands]->{ \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  \n  "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title }\n,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n  "category": category->{ title, "slug": slug.current }\n },\n  "latest": \n  *[\n    _type == "post"\n    && defined(slug.current)\n    && $brand in brands\n    && defined(^.category._ref) && category._ref == ^.category._ref\n    && !(_id in coalesce(^.posts[]._ref, []))\n  ] | order(publishedAt desc)[0...6]\n{ \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  \n  "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title }\n,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n  "category": category->{ title, "slug": slug.current }\n }\n },\n  _type == "postBriefs" => { \n  \n  heading[]{ _key, style, children[]{ _key, text } },\n  link{ \n  label,\n  \n  kind,\n  external,\n  internal->{\n    _type,\n    "slug": slug.current,\n    brand,\n    brands\n  }\n\n }\n,\n  count,\n  "posts": posts[$brand in @->brands]->{ \n  \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  \n  "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title }\n,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n  "category": category->{ title, "slug": slug.current }\n,\n  "topic": primaryTopic->{ title },\n  briefText\n },\n  "latest": \n  *[\n    _type == "post"\n    && defined(slug.current)\n    && $brand in brands\n    && true\n    && !(_id in coalesce(^.posts[]._ref, []))\n  ] | order(publishedAt desc)[0...6]\n{ \n  \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  \n  "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title }\n,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n  "category": category->{ title, "slug": slug.current }\n,\n  "topic": primaryTopic->{ title },\n  briefText\n }\n },\n  _type == "weeklyRoundup" => { \n  heading[]{ _key, style, children[]{ _key, text } },\n  label,\n  title,\n  summary,\n  button{ \n  label,\n  \n  kind,\n  external,\n  internal->{\n    _type,\n    "slug": slug.current,\n    brand,\n    brands\n  }\n\n },\n  listLabel,\n  "posts": posts[$brand in @->brands]->{ \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  \n  "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title }\n,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n  "category": category->{ title, "slug": slug.current }\n },\n  "latest": \n  *[\n    _type == "post"\n    && defined(slug.current)\n    && $brand in brands\n    && true\n    && !(_id in coalesce(^.posts[]._ref, []))\n  ] | order(publishedAt desc)[0...8]\n{ \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  \n  "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title }\n,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n  "category": category->{ title, "slug": slug.current }\n }\n },\n  _type == "publications" => { \n  heading[]{ _key, style, children[]{ _key, text } },\n  body,\n  cards[]{\n    _key,\n    brand,\n    "brandTitle": *[_type == "brand" && key.current == ^.brand][0].title,\n    description,\n    image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n    linkLabel\n  }\n },\n  _type == "cta" => { \n  heading,\n  text,\n  link{ label, href }\n },\n  _type == "pageHero" => { \n  breadcrumbHomeLabel,\n  breadcrumbLabel,\n  title,\n  intro\n },\n  _type == "recordListing" => { \n  awardsTabLabel,\n  eventsTabLabel,\n  researchTabLabel,\n  regionFilterLabel,\n  regionEuropeLabel,\n  regionMenaLabel,\n  regionAsiaLabel,\n  regionNorthAmericaLabel,\n  yearFilterLabel,\n  statusFilterLabel,\n  allOptionLabel,\n  clearFiltersLabel,\n  upcomingEventLabel,\n  pastEventLabel,\n  publishedLabel,\n  emptyHeading,\n  emptyText,\n  emptyAwardNoun,\n  emptyEventNoun,\n  emptyResearchNoun,\n  emptyButtonLabel,\n  previousLabel,\n  nextLabel\n }\n },\n    "aside": aside[]{ _key, _type, \n  _type == "highlights" => { \n  source,\n  layout,\n  count,\n  heading[]{ _key, style, children[]{ _key, text } },\n  deadlineLabel,\n  "items": items[]->{ \n  _id,\n  _type,\n  "slug": slug.current,\n  title,\n  category,\n  nominationsClosingDate,\n  startDate,\n  endDate,\n  country,\n  publishedAt\n },\n  "fill": select(\n  source == "awards" => [\n    ...*[\n      _type == "awardsProgramme"\n      && nominationsClosingDate >= $today\n      && !(_id in coalesce(^.items[]._ref, []))\n    ] | order(nominationsClosingDate asc)[0...5]{ \n  _id,\n  _type,\n  "slug": slug.current,\n  title,\n  category,\n  nominationsClosingDate,\n  startDate,\n  endDate,\n  country,\n  publishedAt\n },\n    ...*[\n      _type == "awardsProgramme"\n      && !(defined(nominationsClosingDate) && nominationsClosingDate >= $today)\n      && startDate >= $today\n      && !(_id in coalesce(^.items[]._ref, []))\n    ] | order(startDate asc)[0...5]{ \n  _id,\n  _type,\n  "slug": slug.current,\n  title,\n  category,\n  nominationsClosingDate,\n  startDate,\n  endDate,\n  country,\n  publishedAt\n },\n    ...*[\n      _type == "awardsProgramme"\n      && !(defined(nominationsClosingDate) && nominationsClosingDate >= $today)\n      && startDate < $today\n      && !(_id in coalesce(^.items[]._ref, []))\n    ] | order(startDate desc)[0...5]{ \n  _id,\n  _type,\n  "slug": slug.current,\n  title,\n  category,\n  nominationsClosingDate,\n  startDate,\n  endDate,\n  country,\n  publishedAt\n }\n  ],\n  source == "events" => [\n    ...*[\n      _type == "conferenceEvent"\n      && coalesce(endDate, startDate) >= $today\n      && !(_id in coalesce(^.items[]._ref, []))\n    ] | order(startDate asc)[0...4]{ \n  _id,\n  _type,\n  "slug": slug.current,\n  title,\n  category,\n  nominationsClosingDate,\n  startDate,\n  endDate,\n  country,\n  publishedAt\n },\n    ...*[\n      _type == "conferenceEvent"\n      && coalesce(endDate, startDate) < $today\n      && !(_id in coalesce(^.items[]._ref, []))\n    ] | order(startDate desc)[0...4]{ \n  _id,\n  _type,\n  "slug": slug.current,\n  title,\n  category,\n  nominationsClosingDate,\n  startDate,\n  endDate,\n  country,\n  publishedAt\n }\n  ],\n  source == "research" => *[\n    _type == "resource"\n    && category == "research"\n    && !(_id in coalesce(^.items[]._ref, []))\n    && _id != coalesce(^.promo.resource._ref, "")\n  ] | order(defined(publishedAt) desc, publishedAt desc, legacyWpId desc)[0...3]{ \n  _id,\n  _type,\n  "slug": slug.current,\n  title,\n  category,\n  nominationsClosingDate,\n  startDate,\n  endDate,\n  country,\n  publishedAt\n }\n),\n  button{ \n  label,\n  \n  kind,\n  external,\n  internal->{\n    _type,\n    "slug": slug.current,\n    brand,\n    brands\n  }\n\n },\n  promo{\n    resource->{\n      title,\n      "downloadThumbnail": downloadThumbnail{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n      "downloadFileUrl": downloadFile.asset->url,\n      "downloadFileName": downloadFile.asset->originalFilename,\n      downloadUrl\n    },\n    title,\n    description,\n    "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n    link{ \n  kind,\n  external,\n  internal->{\n    _type,\n    "slug": slug.current,\n    brand,\n    brands\n  }\n }\n  }\n },\n  _type == "awardsWinners" => { heading[]{ _key, style, children[]{ _key, text } } }\n }\n  }\n }\n    },\n    "statuses": *[_id == $statusesId && _type == "awardsProgrammePage"][0]{\n      launchingSoonLabel,\n      submissionsOpenLabel,\n      ceremonyDueLabel,\n      winnersAnnouncedLabel\n    },\n    "awards": *[$tab == "awards" && _type == "awardsProgramme" && defined(slug.current)]{\n      _id,\n      title,\n      "slug": slug.current,\n      standfirst,\n      startDate,\n      endDate,\n      hideDateTime,\n      nominationsOpeningDate,\n      nominationsClosingDate,\n      country,\n      "hasWinners": count(winners[defined(category->title) && defined(company->title)]) > 0\n    },\n    "events": *[$tab == "events" && _type == "conferenceEvent" && defined(slug.current)]{\n      _id,\n      title,\n      "slug": slug.current,\n      startDate,\n      endDate,\n      hideDateTime,\n      country\n    },\n    "research": *[$tab == "research" && _type == "resource" && category == "research" && defined(slug.current)]{\n      _id,\n      title,\n      "slug": slug.current,\n      publishedAt\n    }\n  }\n': SHARED_LISTINGS_PAGE_QUERY_RESULT;
   }
 }
 // Lets @sanity/client releases that predate the global registry read it too

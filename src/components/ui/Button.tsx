@@ -12,6 +12,8 @@ const VARIANTS = {
   'outline-inverse': 'inset-ring inset-ring-white text-white hover:bg-white/20',
   // Brand-coloured label and ring (Subscribe in the publication mobile menu).
   'outline-accent': 'inset-ring inset-ring-accent text-accent hover:bg-accent hover:text-white',
+  // Accent ring and label on white, the brand tint on hover (shared listings empty state "Clear filters").
+  'outline-accent-tint': 'bg-white inset-ring inset-ring-accent text-accent hover:bg-surface-hover',
   // Thin neutral ring, accent ring and label on hover (article Share and Copy link).
   subtle: 'bg-white inset-ring inset-ring-border text-foreground hover:inset-ring-accent hover:text-accent',
 }

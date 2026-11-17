@@ -80,9 +80,15 @@ export const PAGE_QUERY = defineQuery(`
   }
 `)
 
-// The home page and the Categories page have routes of their own (src/app/sites/[brand]/categories).
+// The home page, the Categories page and the shared listings page have routes of their own
+// (src/app/sites/[brand]/categories, /events-category and /resource-categories).
 export const PAGE_SLUGS_QUERY = defineQuery(`
-  *[_type == "page" && brand == $brand && defined(slug.current) && !(slug.current in ["home", "categories"])]{
+  *[
+    _type == "page"
+    && brand == $brand
+    && defined(slug.current)
+    && !(slug.current in ["home", "categories", "shared-listings"])
+  ]{
     "slug": slug.current
   }
 `)
@@ -711,3 +717,55 @@ export const EVENT_PAGE_QUERY = defineQuery(`
 
 // The event page's "Related events" fill: RELATED_EVENTS_FILL (fragments.ts), shared with the Studio panel.
 export const RELATED_EVENTS_QUERY = defineQuery(`${RELATED_EVENTS_FILL}`)
+
+// The shared listings page (`$id` is SHARED_LISTINGS_PAGE_DOCUMENT_ID, a `page` document on ClearView): its blocks, the
+// awards status labels (`$statusesId` is AWARDS_PROGRAMME_PAGE_ID) and the records of the open tab (`$tab`: awards,
+// events or research; the other two lists come back empty) for its record listing block. One cached result per tab:
+// every filter combination and page is applied by the adapter (src/lib/shared-listings.ts), as the lists are small.
+// Statuses are derived there from the dates with `$today` (cachedUkToday), which the blocks' fills use too. Shared
+// records carry no brand: the page is served on ClearView only, which the route checks. The page 404s until both
+// documents are published.
+// `hasWinners` counts winner rows as the edition page shows them: a category and a company that both resolve.
+export const SHARED_LISTINGS_PAGE_QUERY = defineQuery(`
+  {
+    "page": *[_type == "page" && _id == $id && brand == $brand][0]{
+      _id,
+      title,
+      blocks[]{ _key, _type, ${BLOCKS_PROJECTION} }
+    },
+    "statuses": *[_id == $statusesId && _type == "awardsProgrammePage"][0]{
+      launchingSoonLabel,
+      submissionsOpenLabel,
+      ceremonyDueLabel,
+      winnersAnnouncedLabel
+    },
+    "awards": *[$tab == "awards" && _type == "awardsProgramme" && defined(slug.current)]{
+      _id,
+      title,
+      "slug": slug.current,
+      standfirst,
+      startDate,
+      endDate,
+      hideDateTime,
+      nominationsOpeningDate,
+      nominationsClosingDate,
+      country,
+      "hasWinners": count(winners[defined(category->title) && defined(company->title)]) > 0
+    },
+    "events": *[$tab == "events" && _type == "conferenceEvent" && defined(slug.current)]{
+      _id,
+      title,
+      "slug": slug.current,
+      startDate,
+      endDate,
+      hideDateTime,
+      country
+    },
+    "research": *[$tab == "research" && _type == "resource" && category == "research" && defined(slug.current)]{
+      _id,
+      title,
+      "slug": slug.current,
+      publishedAt
+    }
+  }
+`)

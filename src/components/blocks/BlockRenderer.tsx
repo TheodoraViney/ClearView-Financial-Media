@@ -1,5 +1,6 @@
 import type { BrandKey } from '@/brands'
 import type { AdUnits } from '@/lib/gam'
+import type { RecordListingContext } from '@/sanity/shared-listings-view'
 
 import { AwardsWinners } from './AwardsWinners'
 import { Cta } from './Cta'
@@ -7,9 +8,11 @@ import { ExploreGrid } from './ExploreGrid'
 import { FeaturedStories } from './FeaturedStories'
 import { Highlights } from './Highlights'
 import { NewsletterSignup } from './NewsletterSignup'
+import { PageHero } from './PageHero'
 import { PostBriefs } from './PostBriefs'
 import { PostCards } from './PostCards'
 import { Publications } from './Publications'
+import { RecordListing } from './RecordListing'
 import { SplitLayout } from './SplitLayout'
 import { SponsoredContent } from './SponsoredContent'
 import { StatsBar } from './StatsBar'
@@ -23,6 +26,7 @@ import type { PageBlock } from './types'
  * `today` is the UK date the page query ran with (`$today`), for date-dependent lines such as the awards meta.
  * `now` is the hourly-cached ISO time that server-rendered relative dates ("2 hours ago") count from.
  * `ads` are the brand's units for the page type, for the blocks that carry a banner of their own (Awards Winners).
+ * `listing` is the shared listings route's tab, URL and records; a record listing block renders nothing without it.
  */
 export function BlockRenderer({
   blocks,
@@ -30,12 +34,14 @@ export function BlockRenderer({
   today,
   now,
   ads,
+  listing,
 }: {
   blocks: PageBlock[] | null | undefined
   brand: BrandKey
   today: string
   now: string
   ads: AdUnits
+  listing?: RecordListingContext
 }) {
   if (!blocks?.length) {
     return null
@@ -44,7 +50,7 @@ export function BlockRenderer({
   return (
     <>
       {blocks.map((block) => (
-        <Block key={block._key} block={block} brand={brand} today={today} now={now} ads={ads} />
+        <Block key={block._key} block={block} brand={brand} today={today} now={now} ads={ads} listing={listing} />
       ))}
     </>
   )
@@ -56,12 +62,14 @@ function Block({
   today,
   now,
   ads,
+  listing,
 }: {
   block: PageBlock
   brand: BrandKey
   today: string
   now: string
   ads: AdUnits
+  listing?: RecordListingContext
 }) {
   switch (block._type) {
     case 'cta':
@@ -79,7 +87,9 @@ function Block({
         <SplitLayout
           block={block}
           brand={brand}
-          renderBlocks={(blocks) => <BlockRenderer blocks={blocks} brand={brand} today={today} now={now} ads={ads} />}
+          renderBlocks={(blocks) => (
+            <BlockRenderer blocks={blocks} brand={brand} today={today} now={now} ads={ads} listing={listing} />
+          )}
         />
       )
     case 'featuredStories':
@@ -101,6 +111,11 @@ function Block({
       return <ExploreGrid block={block} brand={brand} today={today} />
     case 'subscribeBanner':
       return <SubscribeBanner block={block} brand={brand} />
+    // Main column only.
+    case 'pageHero':
+      return <PageHero block={block} brand={brand} />
+    case 'recordListing':
+      return listing ? <RecordListing block={block} brand={brand} listing={listing} /> : null
     // Sidebar only.
     case 'awardsWinners':
       return <AwardsWinners block={block} brand={brand} unit={ads.awardsWinners} />

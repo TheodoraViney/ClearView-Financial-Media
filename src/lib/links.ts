@@ -192,14 +192,20 @@ export const AWARDS_LISTING_PATH = '/events-category/awards'
 
 /**
  * The ClearView conference event listings by event type, legacy clearviewpublishing.com paths kept as they are
- * (`/events-category/{summits,briefings,webinar}`). The event page's breadcrumb links to its type's listing. The
- * listing pages are not built yet: the links point at the final URLs and 404 until they exist.
+ * (`/events-category/{summits,briefings,webinar}`). The event page's breadcrumb links to its type's listing. All
+ * three open the Events tab of the shared listings page, which lists every conference event whatever its type.
  */
 export const EVENT_LISTING_PATHS = {
   summit: '/events-category/summits',
   briefing: '/events-category/briefings',
   webinar: '/events-category/webinar',
 } as const
+
+/**
+ * The ClearView research listing, a legacy clearviewpublishing.com path kept as it is (`/resource-categories/research`):
+ * the Research tab of the shared listings page.
+ */
+export const RESEARCH_LISTING_PATH = '/resource-categories/research'
 
 export type EventType = keyof typeof EVENT_LISTING_PATHS
 

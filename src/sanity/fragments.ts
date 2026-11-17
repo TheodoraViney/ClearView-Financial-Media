@@ -270,6 +270,41 @@ const WEEKLY_ROUNDUP = /* groq */ `
   "latest": ${WEEKLY_ROUNDUP_FILL}{ ${POST_CARD} }
 ` as const
 
+const PAGE_HERO = /* groq */ `
+  breadcrumbHomeLabel,
+  breadcrumbLabel,
+  title,
+  intro
+`
+
+// The record listing block's labels (RECORD_LISTING_COPY_KEYS in src/lib/record-listing-copy.ts). Its records are not
+// here: only the shared listings route fetches them (SHARED_LISTINGS_PAGE_QUERY), for the tab its path opens.
+const RECORD_LISTING = /* groq */ `
+  awardsTabLabel,
+  eventsTabLabel,
+  researchTabLabel,
+  regionFilterLabel,
+  regionEuropeLabel,
+  regionMenaLabel,
+  regionAsiaLabel,
+  regionNorthAmericaLabel,
+  yearFilterLabel,
+  statusFilterLabel,
+  allOptionLabel,
+  clearFiltersLabel,
+  upcomingEventLabel,
+  pastEventLabel,
+  publishedLabel,
+  emptyHeading,
+  emptyText,
+  emptyAwardNoun,
+  emptyEventNoun,
+  emptyResearchNoun,
+  emptyButtonLabel,
+  previousLabel,
+  nextLabel
+`
+
 // adminLabel is CMS-only and deliberately not projected.
 const MAIN_COLUMN_BLOCKS = /* groq */ `
   _type == "topStories" => { ${TOP_STORIES} },
@@ -278,7 +313,9 @@ const MAIN_COLUMN_BLOCKS = /* groq */ `
   _type == "postBriefs" => { ${POST_BRIEFS} },
   _type == "weeklyRoundup" => { ${WEEKLY_ROUNDUP} },
   _type == "publications" => { ${PUBLICATIONS} },
-  _type == "cta" => { ${CTA} }
+  _type == "cta" => { ${CTA} },
+  _type == "pageHero" => { ${PAGE_HERO} },
+  _type == "recordListing" => { ${RECORD_LISTING} }
 ` as const
 
 // What the adapter needs to build an item's title and meta line. Shared records carry no brand.
@@ -352,6 +389,7 @@ export const RECORD_FILL_BRANCHES = /* groq */ `
 // `count` is optional: empty keeps the ClearView counts (HIGHLIGHTS_DEFAULT_COUNT in the schema).
 const HIGHLIGHTS = /* groq */ `
   source,
+  layout,
   count,
   heading[]{ _key, style, children[]{ _key, text } },
   deadlineLabel,

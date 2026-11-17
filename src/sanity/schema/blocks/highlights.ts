@@ -51,9 +51,20 @@ const itemsOfSource: ReferenceFilterResolver = ({ document, parentPath }) => ({
 
 type Ref = { _ref?: string }
 
-/** The source of the highlights block a promo field sits in: path ends at promo.<field>, two levels below the block. */
+/**
+ * `list`: the plain list of the shared listings sidebar (design related-events-list): heading and rows only, no icon,
+ * surface, button or promo. Empty keeps the block look every other page uses.
+ */
+const isListLayout = (block: unknown) => (block as { layout?: unknown } | undefined)?.layout === 'list'
+
+/**
+ * The source of the highlights block a promo field sits in: path ends at promo.<field>, two levels below the block.
+ * None for a plain list block, which shows no promo, so nothing in its hidden promo is required.
+ */
 const promoSourceAt = (document: unknown, path: Path | undefined) =>
-  path === undefined ? undefined : blockSourceAt(document, path, 2)
+  path === undefined || isListLayout(getValueAtPath(document, path.slice(0, -2)))
+    ? undefined
+    : blockSourceAt(document, path, 2)
 
 /**
  * A Research promo with a report picked takes its title and cover from the
@@ -126,6 +137,21 @@ export const highlights = defineType({
         layout: 'radio',
       },
       validation: (Rule) => Rule.required(),
+    }),
+    defineField({
+      name: 'layout',
+      title: 'Look',
+      type: 'string',
+      description:
+        'Optional. "Plain list" shows the heading and the items only, without icon, background, button or promo, as in the shared listings sidebar.',
+      options: {
+        list: [
+          { title: 'Block', value: 'block' },
+          { title: 'Plain list', value: 'list' },
+        ],
+        layout: 'radio',
+        direction: 'horizontal',
+      },
     }),
     headingField('heading', { title: 'Heading', defaultLevel: 'h2', required: true }),
     defineField({
@@ -210,8 +236,10 @@ export const highlights = defineType({
       name: 'button',
       title: 'Button',
       description: 'The "View all …" button under the list.',
-      required: true,
+      // The path is the button's own: one level below the block.
+      requiredWhen: ({ document, path }) => !isListLayout(getValueAtPath(document, path.slice(0, -1))),
       labelRequired: true,
+      hidden: ({ parent }) => isListLayout(parent),
     }),
     defineField({
       name: 'promo',
@@ -220,9 +248,12 @@ export const highlights = defineType({
       description:
         'The row at the bottom of the block. Required for Summits & events on the ClearView home; optional otherwise.',
       options: { collapsible: true, collapsed: true },
+      hidden: ({ parent }) => isListLayout(parent),
       validation: (Rule) =>
         Rule.custom((value, context) =>
-          value || !eventsPromoRequired((context.parent as { source?: unknown } | undefined)?.source, context.document)
+          value ||
+          isListLayout(context.parent) ||
+          !eventsPromoRequired((context.parent as { source?: unknown } | undefined)?.source, context.document)
             ? true
             : 'Required',
         ),

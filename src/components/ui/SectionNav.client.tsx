@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState, type KeyboardEvent, type MouseEvent } from 'react'
 
 import { cx } from './cx'
+import { TAB_CURRENT, TAB_IDLE, TAB_ITEM, TAB_ROW } from './tab-classes'
 
 export type SectionNavItem = { id: string; label: string }
 
@@ -128,17 +129,14 @@ export function SectionNav({ items, label }: { items: SectionNavItem[]; label: s
 
   return (
     <nav ref={nav} aria-label={label} className="relative w-full min-w-0 border-b border-border">
-      <ul ref={row} onKeyDown={onKeyDown} className="relative flex gap-8 overflow-x-auto overflow-y-hidden px-0.5 scrollbar-none">
+      <ul ref={row} onKeyDown={onKeyDown} className={cx(TAB_ROW, 'gap-8 px-0.5')}>
         {items.map((item) => (
           <li key={item.id} className="flex shrink-0">
             <a
               href={`#${item.id}`}
               aria-current={item.id === current ? 'true' : undefined}
               onClick={(event) => go(event, item.id)}
-              className={cx(
-                'flex h-12 items-center text-base leading-none whitespace-nowrap transition-colors duration-180 ease-out focus-visible:-outline-offset-2',
-                item.id === current ? 'text-accent inset-shadow-bar' : 'text-grey hover:text-foreground',
-              )}
+              className={cx(TAB_ITEM, item.id === current ? TAB_CURRENT : TAB_IDLE)}
             >
               {item.label}
             </a>

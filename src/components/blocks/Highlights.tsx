@@ -1,6 +1,7 @@
 import { stegaClean } from 'next-sanity'
 
 import { showsListMeta, type BrandKey } from '@/brands'
+import { OtherProgrammes } from '@/components/sections/awards/OtherProgrammes'
 import {
   Highlights as HighlightsSection,
   type HighlightsItem,
@@ -172,9 +173,34 @@ export function Highlights({ block, brand, today }: BlockProps<'highlights'> & {
     (records ?? []).filter((record): record is HighlightRecord => record?._type === type)
   const entries: HighlightRecord[] = picksThenFill(ofType(block.items), ofType(block.fill), count)
 
+  const publication = brand !== 'clearview'
+  const style = publication ? 'short' : 'long'
+
+  // The opt-in plain list (shared listings sidebar, design related-events-list): heading 20 / 1.25 and rows divided by
+  // rules, 16 between title and meta, 16 / 24 padding; no icon, surface, button or promo. Inset as the design's
+  // sidebar: 40 / 64 with the gutter at the sides, 32 all round from the header breakpoint. Under a showing Side banner
+  // it has no top inset: the banner's 32 below is the gap. Fills the sidebar's height from the header breakpoint, so
+  // the list can stick 32px under the header (300 wide inside the 364 sidebar).
+  if (stegaClean(block.layout) === 'list') {
+    // An empty list shows nothing, not a heading over no rows.
+    return entries.length === 0 ? null : (
+      <div className="px-gutter pt-10 pb-16 header:flex-1 header:px-8 header:pt-8 header:pb-8 after-side-banner:pt-0">
+        <OtherProgrammes
+          heading={toHeading(block.heading)}
+          items={entries.map((record) => ({
+            ...toItem(record, source, brand, block.deadlineLabel, today, style),
+            status: null,
+            highlight: false,
+          }))}
+          spacing="relaxed"
+          className="header:sticky header:top-rail"
+        />
+      </div>
+    )
+  }
+
   const buttonHref = resolveHref(block.button, brand)
   const buttonLabel = block.button?.label
-  const publication = brand !== 'clearview'
 
   return (
     <HighlightsSection
@@ -183,7 +209,7 @@ export function Highlights({ block, brand, today }: BlockProps<'highlights'> & {
       look={publication ? 'publication' : 'group'}
       heading={toHeading(block.heading)}
       items={entries.map((record) =>
-        toItem(record, source, brand, block.deadlineLabel, today, publication ? 'short' : 'long'),
+        toItem(record, source, brand, block.deadlineLabel, today, style),
       )}
       button={buttonHref && buttonLabel ? { label: buttonLabel, href: buttonHref } : null}
       promo={toPromo(block.promo, source, brand)}
