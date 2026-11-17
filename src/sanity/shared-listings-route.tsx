@@ -9,6 +9,7 @@ import { PageBlocks } from '@/components/blocks/PageBlocks'
 import {
   isListingBaseView,
   SHARED_LISTINGS_PAGE_DOCUMENT_ID,
+  SHARED_LISTINGS_TAB_PATHS,
   type RawSearchParams,
   type SharedListingsTab,
 } from '@/lib/shared-listings'
@@ -26,7 +27,7 @@ import { isCompletePage, sharedListingsState } from './shared-listings-view'
  * the routes answer 404 on every other host before calling in.
  */
 
-/** Which tab a route opens, and its own path: the canonical of its unfiltered view and the filter form's action. */
+/** Which tab a route opens, and its own path: the filter form's action and the base of its page links. */
 export type SharedListingsRouteProps = { tab: SharedListingsTab; path: string; searchParams: RawSearchParams }
 
 const PUBLISHED: DynamicFetchOptions = { perspective: 'published', stega: false }
@@ -39,8 +40,11 @@ function fetchPage(tab: SharedListingsTab, today: string, options: DynamicFetchO
   })
 }
 
-/** Filtered and paged views are noindex and point at the unfiltered path; the base view is its own canonical. */
-export async function sharedListingsMetadata({ tab, path, searchParams }: SharedListingsRouteProps): Promise<Metadata> {
+/**
+ * The canonical is the tab's own path: /events-category/briefings and /events-category/webinar show the same Events
+ * list as /events-category/summits, so they point there. Filtered and paged views are noindex.
+ */
+export async function sharedListingsMetadata({ tab, searchParams }: SharedListingsRouteProps): Promise<Metadata> {
   const today = await cachedUkToday()
   const { data } = await fetchPage(tab, today, PUBLISHED)
 
@@ -52,7 +56,7 @@ export async function sharedListingsMetadata({ tab, path, searchParams }: Shared
 
   return {
     title: stegaClean(data.page.title),
-    alternates: { canonical: `${brandOrigin('clearview')}${path}` },
+    alternates: { canonical: `${brandOrigin('clearview')}${SHARED_LISTINGS_TAB_PATHS[tab]}` },
     ...(state && isListingBaseView(state) ? {} : { robots: { index: false, follow: true } }),
   }
 }

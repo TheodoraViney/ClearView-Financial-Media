@@ -11,7 +11,7 @@ import { REGIONS, type Region } from './regions'
  * URL state: `region` (a Region; Awards and Events tabs), `year` (four digits, a year present in the tab's records),
  * `status` (one of the tab's STATUS_PARAMS) and `page` (2 and up, no leading zeros; absent: 1). Unknown or malformed
  * values are dropped silently, as on the Search and Categories pages; a page past the end is a 404. A filtered or
- * paged view is noindex and canonical to the unfiltered path.
+ * paged view is noindex; every view's canonical is its tab's path (SHARED_LISTINGS_TAB_PATHS).
  */
 
 /** The shared listings page document: fixed id and slug. The slug is never served at /{slug}, only at the five paths. */
