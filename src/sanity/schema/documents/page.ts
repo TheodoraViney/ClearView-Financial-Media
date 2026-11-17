@@ -2,6 +2,7 @@ import { defineArrayMember, defineField, defineType } from 'sanity'
 
 import { BRAND_KEYS, BRANDS } from '@/brands'
 import { CATEGORIES_PAGE_SLUG, type CategoriesLabels } from '@/lib/categories'
+import { SHARED_LISTINGS_PAGE_DOCUMENT_ID } from '@/lib/shared-listings'
 
 import { pageBlocksField } from '../blocks'
 import { headingField } from '../fields'
@@ -18,6 +19,13 @@ const isCategories = (document: unknown) =>
 const notCategories = ({ document }: { document?: unknown }) => !isCategories(document)
 const isFixedCategoriesPage = (document: unknown) =>
   /^(drafts\.)?page-categories-/.test(String((document as { _id?: string } | undefined)?._id ?? ''))
+
+// The shared listings page (ClearView's awards, events and research lists) is the page with the fixed id
+// SHARED_LISTINGS_PAGE_DOCUMENT_ID and the slug "shared-listings". It is built from blocks like any page, but served only
+// at /events-category/{awards,summits,briefings,webinar} and /resource-categories/research, never at /shared-listings,
+// so its brand and slug are fixed.
+const isSharedListingsPage = (document: unknown) =>
+  String((document as { _id?: string } | undefined)?._id ?? '').replace(/^drafts\./, '') === SHARED_LISTINGS_PAGE_DOCUMENT_ID
 
 // The template fields start with the design copy on every new page, so they are required on the Categories page only.
 const requiredOnCategories = (value: unknown, context: { document?: unknown }) =>
@@ -52,6 +60,7 @@ export const page = defineType({
         layout: 'radio',
         direction: 'horizontal',
       },
+      readOnly: ({ document }) => isSharedListingsPage(document),
       validation: (Rule) => Rule.required(),
     }),
     defineField({
@@ -64,8 +73,9 @@ export const page = defineType({
       name: 'slug',
       title: 'Slug',
       type: 'slug',
-      description: 'Fixed on the Categories page: the site serves it at /categories.',
-      readOnly: ({ document }) => isFixedCategoriesPage(document),
+      description:
+        'Fixed on the Categories page (served at /categories) and on the shared listings page (served at /events-category/… and /resource-categories/research).',
+      readOnly: ({ document }) => isFixedCategoriesPage(document) || isSharedListingsPage(document),
       options: {
         source: 'title',
         isUnique: async (slug, context) => {

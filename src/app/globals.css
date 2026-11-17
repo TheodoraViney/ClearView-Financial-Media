@@ -522,6 +522,13 @@ main [data-section-anchor] {
 @custom-variant before-sponsored (&:has(+ [data-block='sponsored-content']));
 @custom-variant after-top-stories ([data-block='top-stories'] + &);
 
+/*
+ * A sidebar block directly under the Side banner while the banner shows (it has a unit, or draft mode shows its
+ * placeholder): the banner's own bottom inset is the gap, so the block drops its top inset. A hidden banner leaves the
+ * block's inset in place.
+ */
+@custom-variant after-side-banner (:is([data-side-banner='shown'], [data-preview] [data-side-banner]) + &);
+
 body {
   background: var(--background);
   color: var(--foreground);

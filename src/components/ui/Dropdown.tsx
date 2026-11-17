@@ -24,8 +24,10 @@ const PANEL = cx(
  *
  * `multi`: checkboxes named `name`; an "All" row first (ticked while nothing is), a divider, the options and a footer
  * link (`clear`) that clears the group. The trigger reads the All label, the one option's label, or "N selected".
- * `single`: radios named `name`, the chosen one in the accent with a tick; the trigger reads its label.
- * A change submits the form (`DropdownDisclosure`). Without JavaScript the panel shows open and the form's own submit
+ * `single`: radios named `name`, the chosen one in the accent with a tick; the trigger reads its label. An option with
+ * an empty value (an "All" first option) is not sent when JavaScript submits, so the URL carries no `name=`.
+ * A change submits the form (`DropdownDisclosure`); `submitOn="confirm"` makes a single dropdown's arrow keys only move
+ * the choice, submitted on Enter, Space, a click or the panel closing (shared listings filters). Without JavaScript the panel shows open and the form's own submit
  * button applies the choice.
  */
 export function Dropdown({
@@ -39,6 +41,8 @@ export function Dropdown({
   clear,
   syncKey,
   hideLabel = false,
+  labelTone = 'default',
+  submitOn,
   className,
 }: {
   /** Unique on the page: prefixes the label, value and panel ids. */
@@ -57,6 +61,10 @@ export function Dropdown({
   syncKey: string
   /** Keeps the label for screen readers only, for a trigger that sits in line with other controls (search Year). */
   hideLabel?: boolean
+  /** The visible label's colour: `default` dark, `muted` grey (shared listings filters). */
+  labelTone?: 'default' | 'muted'
+  /** Single only: when a choice submits the form, see `DropdownDisclosure`. Default `change`. */
+  submitOn?: 'change' | 'confirm'
   className?: string
 }) {
   const selected = options.filter((option) => option.selected)
@@ -72,7 +80,11 @@ export function Dropdown({
     <div className={cx('flex min-w-0 flex-col gap-2', className)}>
       <span
         id={`${id}-label`}
-        className={hideLabel ? 'sr-only' : 'text-caption leading-none font-medium text-foreground'}
+        className={
+          hideLabel
+            ? 'sr-only'
+            : cx('text-caption leading-none font-medium', labelTone === 'muted' ? 'text-grey' : 'text-foreground')
+        }
       >
         {label}
       </span>
@@ -88,6 +100,7 @@ export function Dropdown({
         }
         panelClassName={PANEL}
         groupLabelledBy={`${id}-label`}
+        submitOn={submitOn}
       >
         {multiple ? (
           <>
@@ -126,7 +139,15 @@ export function Dropdown({
                   'group justify-between gap-4 text-foreground transition-colors duration-180 ease-out hover:text-accent has-checked:text-accent',
                 )}
               >
-                <input type="radio" name={name} value={option.value} defaultChecked={option.selected} className="sr-only" />
+                <input
+                  type="radio"
+                  name={name}
+                  value={option.value}
+                  defaultChecked={option.selected}
+                  // An empty value ("All") is left out of the URL when JavaScript submits the form.
+                  data-omit-empty={option.value === '' || undefined}
+                  className="sr-only"
+                />
                 {option.label}
                 <Icon name="tick" className="opacity-0 group-has-checked:opacity-100" />
               </label>

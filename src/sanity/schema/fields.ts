@@ -163,8 +163,9 @@ export const linkField = (
     /** Required, object and target, only while this returns true. Ignored when `required` is set. */
     requiredWhen?: (context: LinkRequiredContext) => boolean
     withLabel?: boolean
-    /** The label has no default in this block, so the editor must type one. */
+    /** The label has no default in this block, so the editor must type one (with `requiredWhen`: only while it holds). */
     labelRequired?: boolean
+    hidden?: ConditionalProperty
   } = {},
 ) => {
   const {
@@ -176,6 +177,7 @@ export const linkField = (
     requiredWhen,
     withLabel = true,
     labelRequired = false,
+    hidden,
   } = options
   const kindOf = (parent: unknown): LinkKind | undefined => (parent as LinkValue | undefined)?.kind
 
@@ -191,6 +193,7 @@ export const linkField = (
     type: 'object',
     description,
     group,
+    hidden,
     options: { collapsible: false },
     validation: required
       ? (Rule) => Rule.required()
@@ -265,7 +268,14 @@ export const linkField = (
               description: labelRequired
                 ? 'Link text.'
                 : 'Link text. Leave empty to use the default for this block.',
-              validation: labelRequired ? (Rule) => Rule.required() : undefined,
+              validation: labelRequired
+                ? requiredWhen && !required
+                  ? (Rule) =>
+                      Rule.custom((value: string | undefined, context) =>
+                        value?.trim() || !subFieldRequired(context) ? true : 'Required',
+                      )
+                  : (Rule) => Rule.required()
+                : undefined,
             }),
           ]
         : []),

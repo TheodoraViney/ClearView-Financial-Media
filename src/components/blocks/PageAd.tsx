@@ -23,21 +23,28 @@ const PLACEMENTS = {
   },
 } as const satisfies Record<ShellVariant, Record<PagePosition, { size: AdSlotSize; spacing: AdSlotSpacing }>>
 
+/** The sidebar a Side banner heads: `home` (the homes and pages, the default) or `listing` (the shared listings page). */
+export type PageSidebar = 'home' | 'listing'
+
 /**
  * A fixed banner position of a page template, showing the brand's unit from Brand settings. Without a unit it is
- * hidden on the live site and shows its labelled placeholder in draft mode.
+ * hidden on the live site and shows its labelled placeholder in draft mode. `sidebar="listing"` gives the Side banner
+ * the shared listings sidebar's inset and left alignment (`asideListing`).
  */
 export function PageAd({
   position,
   ads,
   brand,
+  sidebar = 'home',
 }: {
   position: PagePosition
   ads: Partial<Pick<AdUnits, PagePosition>>
   brand: BrandKey
+  sidebar?: PageSidebar
 }) {
   const look = brand === 'clearview' ? 'group' : 'publication'
-  const { size, spacing } = PLACEMENTS[look][position]
+  const { size, spacing: placed } = PLACEMENTS[look][position]
+  const spacing: AdSlotSpacing = position === 'side' && sidebar === 'listing' ? 'asideListing' : placed
 
   return <AdSlot size={size} spacing={spacing} look={look} unit={ads[position] ?? null} label={adPositionLabel(position)} />
 }

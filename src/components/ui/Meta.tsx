@@ -7,6 +7,13 @@ const VARIANTS = {
   inverse: 'text-white/50',
 }
 
+// Space between items, each side of the divider: `default` 8px, `relaxed` 16px (shared-listing-record). The row is
+// shifted left by one gap plus the 1px divider.
+const SPACING = {
+  default: { row: '-ml-2.25 gap-x-2', item: 'pl-2', tag: 'gap-x-2' },
+  relaxed: { row: '-ml-4.25 gap-x-4', item: 'pl-4', tag: 'gap-x-4' },
+}
+
 // "Publication | date" line. Items after the first get the divider.
 // `accentFirst` draws the first item in the brand accent (the category label on the publication homes);
 // `strongFirst` sets it in weight 500 (the type label of a search result).
@@ -17,8 +24,10 @@ export function Meta({
   strongFirst = false,
   nowrap = false,
   wrapItems = false,
+  spacing = 'default',
   tag,
   tagLabel,
+  tagPosition = 'start',
   className,
 }: {
   items: ReactNode[]
@@ -39,6 +48,9 @@ export function Meta({
   tag?: ReactNode
   /** Screen-reader prefix of the tag, e.g. "Status: ". */
   tagLabel?: string
+  /** `end` puts the tag after the items, one gap after the last (shared-listing-record). */
+  tagPosition?: 'start' | 'end'
+  spacing?: keyof typeof SPACING
   className?: string
 }) {
   // Every item carries the divider. The row is shifted left by one gap plus the divider (9px) inside a box clipped horizontally only (descenders stay visible),
@@ -49,7 +61,8 @@ export function Meta({
     <span className={cx('-mx-1 flex overflow-x-clip px-1 text-caption', VARIANTS[variant], !tag && className)}>
       <span
         className={cx(
-          '-ml-2.25 flex min-w-0 items-center gap-x-2',
+          'flex min-w-0 items-center',
+          SPACING[spacing].row,
           nowrap ? 'flex-nowrap' : cx('flex-wrap', tag ? 'gap-y-2' : 'gap-y-1'),
         )}
       >
@@ -57,7 +70,8 @@ export function Meta({
           <span
             key={index}
             className={cx(
-              'border-l border-border pl-2',
+              'border-l border-border',
+              SPACING[spacing].item,
               wrapItems ? 'min-w-0' : 'whitespace-nowrap',
               nowrap && index === 0 ? 'block min-w-0 truncate' : 'inline-flex items-center',
               nowrap && index > 0 && 'shrink-0',
@@ -78,13 +92,31 @@ export function Meta({
     return row
   }
 
+  const tagEnd = tagPosition === 'end'
+  const tagBox = (
+    <span
+      className={cx(
+        'inline-flex h-6 items-center rounded-sm bg-surface-thumb px-2 leading-none whitespace-nowrap text-foreground',
+        !tagEnd && 'mr-2',
+      )}
+    >
+      {tagLabel && <span className="sr-only">{tagLabel}</span>}
+      {tag}
+    </span>
+  )
+
   return (
-    <span className={cx('flex flex-wrap items-center gap-y-2 text-caption', VARIANTS[variant], className)}>
-      <span className="mr-2 inline-flex h-6 items-center rounded-sm bg-surface-thumb px-2 leading-none whitespace-nowrap text-foreground">
-        {tagLabel && <span className="sr-only">{tagLabel}</span>}
-        {tag}
-      </span>
+    <span
+      className={cx(
+        'flex flex-wrap items-center gap-y-2 text-caption',
+        tagEnd && SPACING[spacing].tag,
+        VARIANTS[variant],
+        className,
+      )}
+    >
+      {!tagEnd && tagBox}
       {items.length > 0 && row}
+      {tagEnd && tagBox}
     </span>
   )
 }

@@ -3,6 +3,7 @@ import { defineDocuments, defineLocations, presentationTool } from 'sanity/prese
 
 import { BRAND_KEYS, BRANDS, brandOrigin } from '@/brands'
 import { HOME_PAGE_SLUG } from '@/lib/links'
+import { SHARED_LISTINGS_PAGE_DOCUMENT_ID } from '@/lib/shared-listings'
 
 // An awards edition or a conference event: both are served at /events/{slug} on ClearView.
 const eventLocations = defineLocations({
@@ -10,6 +11,16 @@ const eventLocations = defineLocations({
   resolve: (doc) =>
     doc?.slug ? { locations: [{ title: doc.title ?? 'Untitled', href: `/events/${doc.slug}` }] } : null,
 })
+
+// The shared listings page's routes on ClearView: one `page` document with three tabs, never served at its slug.
+// Summits, briefings and webinars all open the Events tab.
+const SHARED_LISTINGS_ROUTES = [
+  { title: 'Awards', href: '/events-category/awards' },
+  { title: 'Events', href: '/events-category/summits' },
+  { title: 'Events (briefings)', href: '/events-category/briefings' },
+  { title: 'Events (webinars)', href: '/events-category/webinar' },
+  { title: 'Research', href: '/resource-categories/research' },
+]
 
 export const presentationTools: PluginOptions[] = BRAND_KEYS.map((key) =>
   presentationTool({
@@ -47,6 +58,13 @@ export const presentationTools: PluginOptions[] = BRAND_KEYS.map((key) =>
                 route: '/events/:slug',
                 filter: '_type in ["awardsProgramme", "conferenceEvent"] && slug.current == $slug',
               },
+              // The listing rows are the records' own; the blocks (hero, listing labels, sidebar) are the shared listings
+              // page document's.
+              ...SHARED_LISTINGS_ROUTES.map(({ href }) => ({
+                route: href,
+                filter: '_id == $id',
+                params: { id: SHARED_LISTINGS_PAGE_DOCUMENT_ID },
+              })),
             ]
           : []),
         {
@@ -60,6 +78,7 @@ export const presentationTools: PluginOptions[] = BRAND_KEYS.map((key) =>
         ...(key === 'clearview' ? { awardsProgramme: eventLocations, conferenceEvent: eventLocations } : {}),
         page: defineLocations({
           select: {
+            id: '_id',
             title: 'title',
             slug: 'slug.current',
             brand: 'brand',
@@ -67,6 +86,10 @@ export const presentationTools: PluginOptions[] = BRAND_KEYS.map((key) =>
           resolve: (doc) => {
             if (doc?.brand !== key) {
               return null
+            }
+
+            if (doc.id?.replace(/^drafts\./, '') === SHARED_LISTINGS_PAGE_DOCUMENT_ID) {
+              return { locations: SHARED_LISTINGS_ROUTES }
             }
 
             return {
