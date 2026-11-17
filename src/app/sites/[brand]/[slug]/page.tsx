@@ -109,6 +109,9 @@ async function CachedPage({
     notFound()
   }
 
+  // A page that opens with a Hero with image has its H1 there, so the template's title would be a second H1.
+  const ownsHeading = data.blocks?.[0]?._type === 'imageHero'
+
   return (
     <main>
       <PageBlocks
@@ -118,7 +121,7 @@ async function CachedPage({
         now={now}
         ads={ads}
         options={{ perspective, variant, stega }}
-        intro={<h1 className="px-6 pt-10 text-3xl font-semibold">{data.title}</h1>}
+        intro={ownsHeading ? undefined : <h1 className="px-6 pt-10 text-3xl font-semibold">{data.title}</h1>}
       />
     </main>
   )

@@ -5,6 +5,12 @@ import { brandOrigin, isBrandKey, type BrandKey } from '@/brands'
 /** Slug that marks a brand's home page. The GROQ queries match the same literal. */
 export const HOME_PAGE_SLUG = 'home'
 
+/**
+ * An in-page anchor id, e.g. the id a form block sets so buttons can scroll to it. Lowercase letters, digits and
+ * hyphens, starting with a letter. Studio checks `#id` links against it (linkField `allowAnchor`).
+ */
+export const ANCHOR_ID = /^[a-z][a-z0-9-]*$/
+
 /** Document types an internal link may reference. */
 export const LINKABLE_TYPES = [
   'page',

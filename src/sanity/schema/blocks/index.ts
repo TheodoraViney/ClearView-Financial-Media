@@ -4,12 +4,17 @@ import { PageBlocksInput } from '@/sanity/components/page-blocks-input'
 
 import { articleListing } from './article-listing'
 import { awardsWinners } from './awards-winners'
+import { benefitPanel } from './benefit-panel'
 import { cta } from './cta'
+import { enquiryForm } from './enquiry-form'
 import { exploreGrid } from './explore-grid'
 import { featuredStories } from './featured-stories'
 import { highlights } from './highlights'
 import { mostReadSidebar } from './most-read-sidebar'
+import { imageHero } from './image-hero'
 import { newsletterSignup } from './newsletter-signup'
+import { numberedList } from './numbered-list'
+import { opportunityCards } from './opportunity-cards'
 import { pageHero } from './page-hero'
 import { postBriefs, postCards } from './post-list'
 import { publications } from './publications'
@@ -48,6 +53,11 @@ export const blockTypes = [
   articleListing,
   relatedTopics,
   mostReadSidebar,
+  imageHero,
+  numberedList,
+  benefitPanel,
+  opportunityCards,
+  enquiryForm,
 ]
 
 const COLUMN_ONLY_BLOCK_TYPES: readonly (typeof blockTypes)[number][] = [
@@ -79,6 +89,11 @@ const INSERT_MENU_GROUPS = [
   },
   { name: 'records', title: 'Group records', of: [highlights.name, exploreGrid.name] },
   { name: 'signup', title: 'Signup', of: [subscribeBanner.name, newsletterSignup.name] },
+  {
+    name: 'landing',
+    title: 'Landing page',
+    of: [imageHero.name, numberedList.name, benefitPanel.name, opportunityCards.name, enquiryForm.name],
+  },
   { name: 'other', title: 'Other', of: [publications.name, statsBar.name, cta.name] },
 ]
 

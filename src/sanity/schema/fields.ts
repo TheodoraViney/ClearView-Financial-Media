@@ -9,7 +9,7 @@ import {
 } from 'sanity'
 
 import { HEADING_LEVELS, type HeadingLevel, isHeadingLevel } from '@/lib/headings'
-import { LINKABLE_TYPES, isAllowedLinkTarget } from '@/lib/links'
+import { ANCHOR_ID, LINKABLE_TYPES, isAllowedLinkTarget } from '@/lib/links'
 
 /**
  * Alternative text for an image.
@@ -39,6 +39,7 @@ export const altField = defineField({
 })
 
 export { EVENT_COUNTRIES } from '@/lib/countries'
+export { ANCHOR_ID } from '@/lib/links'
 
 /** `HH:mm` clock time, kept apart from the date exactly as the source stores it. */
 export const timeField = (name: string, title: string, group?: string) =>
@@ -127,6 +128,8 @@ export const adminLabelField = defineField({
   description: 'Shown in the Studio only, to tell blocks apart. Not displayed on the site.',
 })
 
+const ANCHOR_HREF = new RegExp(`^#${ANCHOR_ID.source.slice(1)}`)
+
 type LinkKind = 'internal' | 'external'
 
 type LinkValue = { kind?: LinkKind; internal?: { _ref?: string }; external?: string; label?: string }
@@ -165,6 +168,8 @@ export const linkField = (
     withLabel?: boolean
     /** The label has no default in this block, so the editor must type one (with `requiredWhen`: only while it holds). */
     labelRequired?: boolean
+    /** Web address may also be an anchor on the same page, `#id`, e.g. a button that scrolls to a form block. */
+    allowAnchor?: boolean
     hidden?: ConditionalProperty
   } = {},
 ) => {
@@ -177,6 +182,7 @@ export const linkField = (
     requiredWhen,
     withLabel = true,
     labelRequired = false,
+    allowAnchor = false,
     hidden,
   } = options
   const kindOf = (parent: unknown): LinkKind | undefined => (parent as LinkValue | undefined)?.kind
@@ -241,7 +247,9 @@ export const linkField = (
         name: 'external',
         title: 'Address',
         type: 'string',
-        description: 'https://…, mailto:…, tel:… or a path on this site starting with /',
+        description: allowAnchor
+          ? 'https://…, mailto:…, tel:…, a path on this site starting with /, or #id for a section on this page'
+          : 'https://…, mailto:…, tel:… or a path on this site starting with /',
         hidden: ({ parent }) => kindOf(parent) !== 'external',
         validation: (Rule) =>
           Rule.custom((value, context) => {
@@ -254,9 +262,17 @@ export const linkField = (
               return subFieldRequired(context) ? 'Enter an address' : 'Enter a URL or clear the link'
             }
 
+            if (allowAnchor && value.trim().startsWith('#')) {
+              return ANCHOR_HREF.test(value.trim())
+                ? true
+                : 'An anchor is # followed by the section id: lowercase letters, digits and hyphens, e.g. #enquiry'
+            }
+
             return isAllowedLinkTarget(value.trim())
               ? true
-              : 'Use https://, http://, mailto:, tel: or a path starting with a single /'
+              : allowAnchor
+                ? 'Use https://, http://, mailto:, tel:, a path starting with a single / or #id'
+                : 'Use https://, http://, mailto:, tel: or a path starting with a single /'
           }),
       }),
       ...(withLabel
