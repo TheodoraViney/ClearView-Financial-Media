@@ -305,6 +305,31 @@ const RECORD_LISTING = /* groq */ `
   nextLabel
 `
 
+// The articles list block's labels (CATEGORIES_LABEL_KEYS in src/lib/categories.ts). Its posts and filter options are
+// not here: only the Categories route fetches them (CATEGORIES_PAGE_QUERY, CATEGORIES_LATEST_QUERY).
+const ARTICLE_LISTING = /* groq */ `
+  topicsLabel,
+  allTopicsLabel,
+  regionsLabel,
+  allRegionsLabel,
+  sortLabel,
+  sortLatestLabel,
+  sortOldestLabel,
+  selectedLabel,
+  clearFiltersLabel,
+  emptyStateText,
+  readArticleLabel,
+  previousLabel,
+  nextLabel,
+  topicHintLabel
+`
+
+// Related topics: the editor's categories and topics in order; unpublished ones dereference to null and drop out.
+const RELATED_TOPICS = /* groq */ `
+  heading[]{ _key, style, children[]{ _key, text } },
+  "items": items[defined(@->slug.current)]->{ _id, _type, title, "slug": slug.current }
+`
+
 // adminLabel is CMS-only and deliberately not projected.
 const MAIN_COLUMN_BLOCKS = /* groq */ `
   _type == "topStories" => { ${TOP_STORIES} },
@@ -315,7 +340,9 @@ const MAIN_COLUMN_BLOCKS = /* groq */ `
   _type == "publications" => { ${PUBLICATIONS} },
   _type == "cta" => { ${CTA} },
   _type == "pageHero" => { ${PAGE_HERO} },
-  _type == "recordListing" => { ${RECORD_LISTING} }
+  _type == "recordListing" => { ${RECORD_LISTING} },
+  _type == "articleListing" => { ${ARTICLE_LISTING} },
+  _type == "relatedTopics" => { ${RELATED_TOPICS} }
 ` as const
 
 // What the adapter needs to build an item's title and meta line. Shared records carry no brand.
@@ -411,7 +438,8 @@ const HIGHLIGHTS = /* groq */ `
   }
 `
 
-// Awards Winners carries only its heading: its banner unit comes from Brand settings.
+// Awards Winners carries only its heading: its banner unit comes from Brand settings. Most read (mostReadSidebar) has
+// nothing to project: the block loads the brand's Most read document itself (MOST_READ_QUERY).
 const ASIDE_BLOCKS = /* groq */ `
   _type == "highlights" => { ${HIGHLIGHTS} },
   _type == "awardsWinners" => { heading[]{ _key, style, children[]{ _key, text } } }

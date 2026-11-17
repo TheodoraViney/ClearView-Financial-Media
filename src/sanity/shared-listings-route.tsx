@@ -115,6 +115,7 @@ async function CachedSharedListings({
         today={today}
         now={now}
         ads={ads}
+        options={options}
         listing={{ tab, path, params: searchParams, today, data }}
         sidebar="listing"
       />

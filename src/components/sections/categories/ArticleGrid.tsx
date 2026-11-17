@@ -2,9 +2,9 @@ import { AD_SLOT_FITS, AD_SLOT_UNSET, AdSlot } from '@/components/ui/AdSlot'
 import { ArrowLink } from '@/components/ui/ArrowLink'
 import { ArticleCard } from '@/components/ui/ArticleCard'
 import { cx } from '@/components/ui/cx'
-import type { CategoriesCardView, CategoriesView } from '@/lib/categories'
+import type { CategoriesCardView } from '@/lib/categories'
 import { formatLongDate } from '@/lib/dates'
-import { adPositionLabel } from '@/lib/gam'
+import { adPositionLabel, type AdUnitView } from '@/lib/gam'
 
 // Banner 3 sits after the grid's first row of two cards, on every page, when more cards follow.
 const BANNER_AFTER = 2
@@ -21,13 +21,14 @@ const GRID = 'grid grid-cols-1 gap-x-8 gap-y-12 md:grid-cols-2'
 export function ArticleGrid({
   items,
   readLabel,
-  ads,
+  banner3,
   empty,
   className,
 }: {
   items: CategoriesCardView[]
   readLabel: string
-  ads: CategoriesView['ads']
+  /** The brand's Banner 3 unit; without one the position is hidden on the live site. */
+  banner3: AdUnitView | null
   /** Shown instead of the cards when there are none: the text and, while filters are set, the clear link. */
   empty: { text: string; clear: { label: string; href: string } | null } | null
   className?: string
@@ -58,9 +59,9 @@ export function ArticleGrid({
         <div
           role="complementary"
           aria-label="Advertisement, in content"
-          className={cx('border-y border-border py-4', ads.banner3 ? AD_SLOT_FITS.leaderboard : AD_SLOT_UNSET)}
+          className={cx('border-y border-border py-4', banner3 ? AD_SLOT_FITS.leaderboard : AD_SLOT_UNSET)}
         >
-          <AdSlot size="leaderboard" look="publication" unit={ads.banner3} label={adPositionLabel('banner3')} className="mx-auto w-full max-w-182" />
+          <AdSlot size="leaderboard" look="publication" unit={banner3} label={adPositionLabel('banner3')} className="mx-auto w-full max-w-182" />
         </div>
       )}
       {rest.length > 0 && <Cards items={rest} readLabel={readLabel} />}

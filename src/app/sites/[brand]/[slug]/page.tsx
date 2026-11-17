@@ -117,6 +117,7 @@ async function CachedPage({
         today={today}
         now={now}
         ads={ads}
+        options={{ perspective, variant, stega }}
         intro={<h1 className="px-6 pt-10 text-3xl font-semibold">{data.title}</h1>}
       />
     </main>

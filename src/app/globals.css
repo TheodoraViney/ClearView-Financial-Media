@@ -201,6 +201,8 @@ main [data-section-anchor] {
   --color-surface-subtle: #fafafa;
   /* Search result thumbnail frame behind an image (search-result-card) */
   --color-surface-thumb: #f5f5f5;
+  /* Dismiss cross of the Categories "Select a topic" hint (topic-hint-close) */
+  --color-icon-muted: #a3a3a3;
 }
 
 @theme {
@@ -258,6 +260,44 @@ main [data-section-anchor] {
 
   /* Dropdown panel (Categories filters, shared-shell select-dropdown) */
   --shadow-dropdown: 0 12px 24px -12px rgb(31 43 50 / 0.18), 0 2px 4px rgb(31 43 50 / 0.04);
+
+  /* Categories filter bar while it sticks under the header: a 1px rule plus a soft drop (category-controls, v1.3) */
+  --shadow-filter-bar: 0 1px 0 var(--color-border), 0 6px 16px -10px rgb(31 43 50 / 0.18);
+  /* Categories "Select a topic" hint chip */
+  --shadow-hint: 0 4px 16px rgb(31 43 50 / 0.08);
+
+  /* Categories "Select a topic" hint: a 3px nudge towards what it points at, every 1.5s (wbgTopicHintX / XL / Y) */
+  --animate-hint-right: hint-right 1.5s ease-in-out infinite;
+  --animate-hint-left: hint-left 1.5s ease-in-out infinite;
+  --animate-hint-up: hint-up 1.5s ease-in-out infinite;
+
+  @keyframes hint-right {
+    0%,
+    100% {
+      transform: translateX(0);
+    }
+    50% {
+      transform: translateX(3px);
+    }
+  }
+  @keyframes hint-left {
+    0%,
+    100% {
+      transform: translateX(0);
+    }
+    50% {
+      transform: translateX(-3px);
+    }
+  }
+  @keyframes hint-up {
+    0%,
+    100% {
+      transform: translateY(0);
+    }
+    50% {
+      transform: translateY(-3px);
+    }
+  }
 
   /* Awards programme highlight video: play circle on the thumbnail, and the player inside the lightbox */
   --shadow-play: 0 6px 16px rgb(31 43 50 / 0.24);
@@ -425,6 +465,11 @@ main [data-section-anchor] {
 /* Sticky article rail: 32px below the sticky header */
 @utility top-rail {
   top: calc(var(--header-h) + 2rem);
+}
+
+/* Categories "Select a topic" hint placed left of what it points at: 13px clear of it (8px tail + 5px) */
+@utility right-hint {
+  right: calc(100% + 0.8125rem);
 }
 
 /* Horizontal scroll without a visible scrollbar (publication nav on narrow desktops) */

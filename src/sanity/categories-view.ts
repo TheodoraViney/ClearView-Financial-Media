@@ -1,6 +1,7 @@
 import { stegaClean, type StegaBranded } from 'next-sanity'
 
 import { isBrandKey, type EditorialBrandKey } from '@/brands'
+import type { BlockOf, PageBlock } from '@/components/blocks/types'
 import {
   CATEGORIES_LABEL_KEYS,
   type CategoriesLabels,
@@ -15,18 +16,25 @@ import {
   resolveCategoriesState,
   toggleSlug,
   topicHref,
+  type ArticleListingView,
   type CategoriesCardView,
+  type CategoriesHeadingView,
   type CategoriesState,
-  type CategoriesView,
+  type RelatedTopicsView,
 } from '@/lib/categories'
-import type { AdUnits } from '@/lib/gam'
+import type { AdUnitView } from '@/lib/gam'
 import { resolveHref } from '@/lib/links'
 
-import { toMostRead } from './article-view'
 import { toHeading } from './heading'
 import { toImage } from './image'
-import type { MostReadAutoFill } from './most-read'
-import type { CATEGORIES_LATEST_QUERY_RESULT, CATEGORIES_PAGE_QUERY_RESULT, MOST_READ_QUERY_RESULT } from './types'
+import type { CATEGORIES_LATEST_QUERY_RESULT, CATEGORIES_PAGE_QUERY_RESULT } from './types'
+
+/*
+ * The Categories page (`page-categories-{brand}`) is built from blocks like any page: a Two columns block with the page
+ * heading, the articles list and the related topics in its main column, and Most read (which loads its own list) in
+ * its sidebar. The route (src/app/sites/[brand]/categories/page.tsx) resolves the URL state and runs the list query;
+ * the blocks read that through `ArticleListingContext`.
+ */
 
 // Query results as cachedSanity returns them: strings may carry stega in draft mode.
 type PageData = StegaBranded<CATEGORIES_PAGE_QUERY_RESULT>
@@ -58,20 +66,84 @@ export function resolveCategoriesFilters(state: CategoriesState, data: PageData)
 type Filters = ReturnType<typeof resolveCategoriesFilters>
 
 /**
- * What heads the list: the category when one is set, else the topic when exactly one is selected, else the page.
- * A category or topic without a description takes the page intro.
+ * What the Categories page's blocks read from its route: the brand's filter options, the resolved URL state, the
+ * page's slice of the list and the Banner 3 unit. Without it (any other page) the articles list block renders
+ * nothing, and the page heading block renders its plain form.
  */
-export function categoriesHeading(page: NonNullable<PageData['page']>, filters: Pick<Filters, 'category' | 'topic'>) {
+export type ArticleListingContext = {
+  brand: EditorialBrandKey
+  data: PageData
+  filters: Filters
+  list: { total: number; items: ListItem[] }
+  banner3: AdUnitView | null
+}
+
+/** The page's first block of a type, at the top level or in a Two columns main column. */
+function findMainBlock<T extends 'pageHero' | 'articleListing'>(
+  blocks: PageBlock[] | null | undefined,
+  type: T,
+): BlockOf<T> | null {
+  for (const block of blocks ?? []) {
+    if (block._type === type) {
+      return block as BlockOf<T>
+    }
+
+    if (block._type === 'splitLayout') {
+      const found = findMainBlock(block.main, type)
+
+      if (found) {
+        return found
+      }
+    }
+  }
+
+  return null
+}
+
+/** The page's first Page heading block, at the top level or in a Two columns main column. */
+export const findPageHero = (blocks: PageBlock[] | null | undefined) => findMainBlock(blocks, 'pageHero')
+
+/**
+ * What heads the list: the category when one is set, else the topic when exactly one is selected, else the page
+ * heading block's title. A category or topic without a description takes the block's intro.
+ */
+export function categoriesHeading(
+  base: { title: string | null; intro: string | null },
+  filters: Pick<Filters, 'category' | 'topic'>,
+) {
   const term = filters.category ?? filters.topic
-  const intro = page.intro
+  const intro = base.intro
 
   return term?.title
     ? { title: term.title, intro: term.description || intro, term: true }
-    : { title: page.title ?? '', intro, term: false }
+    : { title: base.title ?? '', intro, term: false }
 }
 
-function toLabels(labels: NonNullable<PageData['page']>['listLabels']): CategoriesLabels {
-  return Object.fromEntries(CATEGORIES_LABEL_KEYS.map((key) => [key, labels?.[key] ?? ''])) as CategoriesLabels
+/**
+ * The Page heading block on the Categories page: Home / page, or Home / page (linked) / category or topic. While no
+ * topic is selected the H1 carries the articles list's "Select a topic" hint (its label is that block's).
+ */
+export function toCategoriesHeading(block: BlockOf<'pageHero'>, context: ArticleListingContext): CategoriesHeadingView {
+  const heading = categoriesHeading({ title: block.title, intro: block.intro }, context.filters)
+  const pageLabel = block.breadcrumbLabel ?? ''
+  const listing = findMainBlock(context.data.page?.blocks, 'articleListing')
+
+  return {
+    title: heading.title,
+    intro: heading.intro,
+    topicHint:
+      listing?.topicHintLabel && context.filters.state.topics.length === 0
+        ? { label: listing.topicHintLabel, filterLabel: listing.topicsLabel ?? '' }
+        : null,
+    breadcrumb: [
+      { label: block.breadcrumbHomeLabel ?? '', href: '/' },
+      ...(heading.term ? [{ label: pageLabel, href: CATEGORIES_PATH }, { label: heading.title }] : [{ label: pageLabel }]),
+    ],
+  }
+}
+
+function toLabels(block: BlockOf<'articleListing'>): CategoriesLabels {
+  return Object.fromEntries(CATEGORIES_LABEL_KEYS.map((key) => [key, block[key] ?? ''])) as CategoriesLabels
 }
 
 function toCard(item: ListItem, brand: EditorialBrandKey): CategoriesCardView | null {
@@ -97,31 +169,13 @@ function toCard(item: ListItem, brand: EditorialBrandKey): CategoriesCardView | 
   }
 }
 
-/** The Categories page's props from its queries. `page.page` must be set; the caller 404s without it. */
-export function toCategoriesView({
-  data,
-  filters,
-  list,
-  mostRead,
-  mostReadFill,
-  ads,
-  brand,
-}: {
-  data: PageData & { page: NonNullable<PageData['page']> }
-  filters: Filters
-  list: { total: number; items: ListItem[] }
-  mostRead: StegaBranded<MOST_READ_QUERY_RESULT>
-  mostReadFill: StegaBranded<MostReadAutoFill>
-  ads: AdUnits
-  brand: EditorialBrandKey
-}): CategoriesView {
-  const { page } = data
+/** The articles list block's props: filters, the featured story (page 1), the cards and the pagination. */
+export function toArticleListingView(block: BlockOf<'articleListing'>, context: ArticleListingContext): ArticleListingView {
+  const { data, filters, list, brand } = context
   const { state } = filters
-  const heading = categoriesHeading(page, filters)
   const total = pageCount(list.total)
   const cards = list.items.map((item) => toCard(item, brand)).filter((card): card is CategoriesCardView => card !== null)
   const first = state.page === 1
-  const pageTitle = page.title ?? ''
 
   const option = (selected: string[], key: 'topics' | 'regions') => (item: { title: string | null; slug: string | null }) => {
     const slug = stegaClean(item.slug) ?? ''
@@ -136,13 +190,7 @@ export function toCategoriesView({
 
   return {
     state,
-    title: heading.title,
-    intro: heading.intro,
-    breadcrumb: [
-      { label: data.homeLabel ?? '', href: '/' },
-      ...(heading.term ? [{ label: pageTitle, href: CATEGORIES_PATH }, { label: heading.title }] : [{ label: pageTitle }]),
-    ],
-    labels: toLabels(page.listLabels),
+    labels: toLabels(block),
     filters: {
       topics: data.topics.filter((item) => item.slug).map(option(state.topics, 'topics')),
       regions: data.regions.filter((item) => item.slug).map(option(state.regions, 'regions')),
@@ -163,14 +211,13 @@ export function toCategoriesView({
         number === null ? null : { page: number, href: pageHref(state, number), current: number === state.page },
       ),
     },
-    related: toRelated(page.relatedTopics),
-    mostRead: toMostRead(null, mostRead, mostReadFill, brand),
-    ads: { top: ads.top, side: ads.side, banner3: ads.banner3 },
+    banner3: context.banner3,
   }
 }
 
-function toRelated(related: NonNullable<PageData['page']>['relatedTopics']): CategoriesView['related'] {
-  const items = (related?.items ?? []).flatMap((item) => {
+/** The related topics block: its categories and topics as links to the list. Null when none resolves. */
+export function toRelatedTopicsView(block: BlockOf<'relatedTopics'>): RelatedTopicsView | null {
+  const items = (block.items ?? []).flatMap((item) => {
     const slug = stegaClean(item.slug)
 
     return slug && item.title
@@ -178,5 +225,5 @@ function toRelated(related: NonNullable<PageData['page']>['relatedTopics']): Cat
       : []
   })
 
-  return items.length > 0 ? { heading: toHeading(related?.heading), items } : null
+  return items.length > 0 ? { heading: toHeading(block.heading), items } : null
 }

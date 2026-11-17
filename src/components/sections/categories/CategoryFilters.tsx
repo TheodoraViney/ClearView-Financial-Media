@@ -1,15 +1,24 @@
 import Form from 'next/form'
 
 import { Button } from '@/components/ui/Button'
+import { cx } from '@/components/ui/cx'
 import { Dropdown } from '@/components/ui/Dropdown'
 import type { CategoriesLabels } from '@/lib/categories'
-import { CATEGORIES_PATH, categoriesHref, type CategoriesView } from '@/lib/categories'
+import { type ArticleListingView, CATEGORIES_PATH, categoriesHref } from '@/lib/categories'
+
+import { FilterBar } from './FilterBar.client'
+import { TopicsFilterHint } from './TopicHint.client'
 
 /**
  * Topics (multi), Geographical focus (multi) and Date sort: a GET form to the list. Its fields are the URL state
  * (`topic`, `region`, `sort`, the current `category` as a hidden field); `page` is left out, so a change goes back to
  * page 1. With JavaScript a change submits at once and `next/form` navigates client-side without scrolling; without
  * it the panels show open and the submit button (shown only then) applies the choice.
+ *
+ * Design v1.3: a white bar under the page heading that sticks under the site header at every breakpoint and takes a
+ * rule and shadow while stuck (180ms ease-out); without JavaScript it stays in the flow, as its panels open in it.
+ * Below md a two-column grid, gap 12: Topics across both, then Geographical focus and Date sort side by side; from
+ * md one wrapping row, the sort pushed right. While no topic is selected the Topics filter carries the hint.
  */
 export function CategoryFilters({
   filters,
@@ -17,34 +26,45 @@ export function CategoryFilters({
   labels,
   className,
 }: {
-  filters: CategoriesView['filters']
-  state: CategoriesView['state']
+  filters: ArticleListingView['filters']
+  state: ArticleListingView['state']
   labels: CategoriesLabels
   className?: string
 }) {
   const syncKey = categoriesHref(state)
 
   return (
-    <section aria-label="Filter articles" className={className}>
+    <FilterBar
+      label="Filter articles"
+      className={cx(
+        'sticky top-header z-20 bg-white pt-5 pb-3 transition-shadow duration-180 ease-out data-stuck:shadow-filter-bar md:pt-6 md:pb-4 noscript:static',
+        className,
+      )}
+    >
       <Form
         action={CATEGORIES_PATH}
         scroll={false}
-        className="flex flex-wrap items-end justify-between gap-x-6 gap-y-4 noscript:items-start"
+        className="grid grid-cols-2 items-end gap-3 md:flex md:flex-wrap md:justify-between md:gap-x-6 md:gap-y-4 noscript:items-start"
       >
         {state.category && <input type="hidden" name="category" value={state.category} />}
-        <div className="flex w-full min-w-0 flex-wrap items-end gap-4 md:w-auto noscript:items-start">
-          <Dropdown
-            id="filter-topics"
-            name="topic"
-            multiple
-            label={labels.topicsLabel}
-            allLabel={labels.allTopicsLabel}
-            selectedLabel={labels.selectedLabel}
-            clear={{ label: labels.clearFiltersLabel, href: filters.allTopicsHref }}
-            options={filters.topics.map((option) => ({ value: option.slug, label: option.title, selected: option.selected }))}
-            syncKey={syncKey}
-            className="w-full shrink-0 md:w-55"
-          />
+        <div className="contents md:flex md:w-auto md:min-w-0 md:flex-wrap md:items-end md:gap-4 noscript:items-start">
+          <TopicsFilterHint
+            label={labels.topicHintLabel}
+            show={state.topics.length === 0}
+            className="col-span-2 min-w-0 md:w-55 md:shrink-0"
+          >
+            <Dropdown
+              id="filter-topics"
+              name="topic"
+              multiple
+              label={labels.topicsLabel}
+              allLabel={labels.allTopicsLabel}
+              selectedLabel={labels.selectedLabel}
+              clear={{ label: labels.clearFiltersLabel, href: filters.allTopicsHref }}
+              options={filters.topics.map((option) => ({ value: option.slug, label: option.title, selected: option.selected }))}
+              syncKey={syncKey}
+            />
+          </TopicsFilterHint>
           <Dropdown
             id="filter-regions"
             name="region"
@@ -55,7 +75,7 @@ export function CategoryFilters({
             clear={{ label: labels.clearFiltersLabel, href: filters.allRegionsHref }}
             options={filters.regions.map((option) => ({ value: option.slug, label: option.title, selected: option.selected }))}
             syncKey={syncKey}
-            className="w-full shrink-0 md:w-55"
+            className="md:w-55 md:shrink-0"
           />
         </div>
         <Dropdown
@@ -67,13 +87,13 @@ export function CategoryFilters({
             { value: 'oldest', label: labels.sortOldestLabel, selected: state.sort === 'oldest' },
           ]}
           syncKey={syncKey}
-          className="w-full shrink-0 md:w-35"
+          className="md:w-35 md:shrink-0"
         />
         {/* Only without JavaScript, where a change does not submit by itself. Kept in code: editors never need to change it. */}
-        <div className="hidden w-full noscript:block">
+        <div className="col-span-2 hidden w-full noscript:block">
           <Button type="submit">Filter articles</Button>
         </div>
       </Form>
-    </section>
+    </FilterBar>
   )
 }

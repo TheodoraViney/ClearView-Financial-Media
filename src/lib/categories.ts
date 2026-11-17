@@ -1,12 +1,14 @@
+import { EDITORIAL_BRAND_KEYS } from '@/brands'
 import type { HeadingValue } from '@/sanity/heading'
 
 import type { ArticleCardView, ArticleLink } from './article'
-import type { AdUnits } from './gam'
+import type { AdUnitView } from './gam'
 
-/** The Categories page is the page with this slug, one per editorial brand (`page-categories-{brand}`). */
-export const CATEGORIES_PAGE_SLUG = 'categories'
+/** Whether a document id (draft or published) is one of the Categories pages, `page-categories-{brand}`. */
+export const isCategoriesPageDocumentId = (id: unknown): boolean =>
+  EDITORIAL_BRAND_KEYS.some((key) => String(id ?? '').replace(/^drafts\./, '') === `page-categories-${key}`)
 
-/** The list labels on the Categories page. All are required there, so the page renders them as the CMS holds them. */
+/** The articles list block's labels. All are required, so the page renders them as the CMS holds them. */
 export const CATEGORIES_LABEL_KEYS = [
   'topicsLabel',
   'allTopicsLabel',
@@ -21,6 +23,7 @@ export const CATEGORIES_LABEL_KEYS = [
   'readArticleLabel',
   'previousLabel',
   'nextLabel',
+  'topicHintLabel',
 ] as const
 
 export type CategoriesLabels = Record<(typeof CATEGORIES_LABEL_KEYS)[number], string>
@@ -202,14 +205,19 @@ export type CategoriesCardView = ArticleCardView & {
 /** One option of the topics or regions filter, with the href that toggles it. */
 export type FilterOptionView = { slug: string; title: string; selected: boolean; href: string }
 
-/** The Categories page's props, independent of the CMS (filled by src/sanity/categories-view.ts). */
-export type CategoriesView = {
-  /** The URL state with unknown slugs dropped, for controls that build their own hrefs. */
-  state: CategoriesState
-  /** The page title and intro, or the category's or the single topic's when one heads the page. */
+/** The Categories page heading: the page title and intro, or the category's or the single topic's when one heads it. */
+export type CategoriesHeadingView = {
   title: string
   intro: string | null
   breadcrumb: { label: string; href?: string | null }[]
+  /** The "Select a topic" hint beside the H1 (no topic selected): its text and the Topics filter's label. */
+  topicHint: { label: string; filterLabel: string } | null
+}
+
+/** The articles list block's props, independent of the CMS (filled by src/sanity/categories-view.ts). */
+export type ArticleListingView = {
+  /** The URL state with unknown slugs dropped, for controls that build their own hrefs. */
+  state: CategoriesState
   labels: CategoriesLabels
   filters: {
     topics: FilterOptionView[]
@@ -232,8 +240,9 @@ export type CategoriesView = {
     /** null is an ellipsis. */
     pages: ({ page: number; href: string; current: boolean } | null)[]
   }
-  related: { heading: HeadingValue | null; items: { key: string; label: string; href: string }[] } | null
-  mostRead: { title: string; items: ArticleCardView[] } | null
-  /** The brand's units for other pages: Top and Side around the list, Banner 3 inside the grid. */
-  ads: Pick<AdUnits, 'top' | 'side' | 'banner3'>
+  /** The brand's Banner 3 unit for other pages, inside the grid. */
+  banner3: AdUnitView | null
 }
+
+/** The related topics block: the editor's categories and topics as links to the filtered list. */
+export type RelatedTopicsView = { heading: HeadingValue | null; items: { key: string; label: string; href: string }[] }
