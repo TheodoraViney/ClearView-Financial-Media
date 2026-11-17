@@ -11,7 +11,7 @@ import { REGIONS, type Region } from './regions'
  * URL state: `region` (a Region; Awards and Events tabs), `year` (four digits, a year present in the tab's records),
  * `status` (one of the tab's STATUS_PARAMS) and `page` (2 and up, no leading zeros; absent: 1). Unknown or malformed
  * values are dropped silently, as on the Search and Categories pages; a page past the end is a 404. A filtered or
- * paged view is noindex; every view's canonical is its tab's path (SHARED_LISTINGS_TAB_PATHS).
+ * paged unfiltered view is indexable and its own canonical; a filtered view is noindex (listingCanonical).
  */
 
 /** The shared listings page document: fixed id and slug. The slug is never served at /{slug}, only at the five paths. */
@@ -223,8 +223,16 @@ export function withoutEmptyListingParams(pathname: string, params: URLSearchPar
   return dropped ? kept.toString() : null
 }
 
-/** Whether the view is indexable: page 1 with no filter. Anything else is noindex, canonical to the base path. */
-export const isListingBaseView = (state: ListingState): boolean => !hasListingFilters(state) && state.page === 1
+/**
+ * The canonical of a view, under the tab's path. A page of the unfiltered list is indexable and its own canonical
+ * (?page=N), so search engines reach every record through the pages. A filtered view is noindex and points at the
+ * tab's unfiltered first page.
+ */
+export function listingCanonical(tabPath: string, state: ListingState): { path: string; indexable: boolean } {
+  return hasListingFilters(state)
+    ? { path: tabPath, indexable: false }
+    : { path: listingHref(tabPath, state), indexable: true }
+}
 
 /** The listing's URL for a state, parameters in a fixed order so one state has one URL. */
 export function listingHref(path: string, state: ListingState): string {

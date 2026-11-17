@@ -7,7 +7,7 @@ import { Suspense } from 'react'
 import { AWARDS_PROGRAMME_PAGE_ID, brandOrigin } from '@/brands'
 import { PageBlocks } from '@/components/blocks/PageBlocks'
 import {
-  isListingBaseView,
+  listingCanonical,
   SHARED_LISTINGS_PAGE_DOCUMENT_ID,
   SHARED_LISTINGS_TAB_PATHS,
   type RawSearchParams,
@@ -41,8 +41,9 @@ function fetchPage(tab: SharedListingsTab, today: string, options: DynamicFetchO
 }
 
 /**
- * The canonical is the tab's own path: /events-category/briefings and /events-category/webinar show the same Events
- * list as /events-category/summits, so they point there. Filtered and paged views are noindex.
+ * The canonical sits under the tab's own path: /events-category/briefings and /events-category/webinar show the same
+ * Events list as /events-category/summits, so they point there. Pages of the unfiltered list are indexable, filtered
+ * views are noindex (listingCanonical).
  */
 export async function sharedListingsMetadata({ tab, searchParams }: SharedListingsRouteProps): Promise<Metadata> {
   const today = await cachedUkToday()
@@ -53,11 +54,14 @@ export async function sharedListingsMetadata({ tab, searchParams }: SharedListin
   }
 
   const state = sharedListingsState({ tab, params: searchParams, today, data })
+  const canonical = state
+    ? listingCanonical(SHARED_LISTINGS_TAB_PATHS[tab], state)
+    : { path: SHARED_LISTINGS_TAB_PATHS[tab], indexable: false }
 
   return {
     title: stegaClean(data.page.title),
-    alternates: { canonical: `${brandOrigin('clearview')}${SHARED_LISTINGS_TAB_PATHS[tab]}` },
-    ...(state && isListingBaseView(state) ? {} : { robots: { index: false, follow: true } }),
+    alternates: { canonical: `${brandOrigin('clearview')}${canonical.path}` },
+    ...(canonical.indexable ? {} : { robots: { index: false, follow: true } }),
   }
 }
 
