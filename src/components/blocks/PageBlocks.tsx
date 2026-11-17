@@ -2,6 +2,8 @@ import { type ReactNode } from 'react'
 
 import type { BrandKey } from '@/brands'
 import type { AdUnits } from '@/lib/gam'
+import type { ArticleListingContext } from '@/sanity/categories-view'
+import type { DynamicFetchOptions } from '@/sanity/live'
 import type { RecordListingContext } from '@/sanity/shared-listings-view'
 
 import { BlockRenderer } from './BlockRenderer'
@@ -13,7 +15,9 @@ import type { PageBlock } from './types'
  * A page's blocks with the template's Top and Side banners, which come only together with a right column: when the
  * first block is a Two columns block, the Top banner heads its main column and the Side banner its sidebar. A page
  * without a right column carries neither. `intro` (a page title) comes before the blocks. `listing` is the shared
- * listings route's tab, URL and records, for its record listing block; `sidebar` the Side banner's sidebar (`PageAd`).
+ * listings route's tab, URL and records, for its record listing block; `articles` the Categories route's state and
+ * list, for its blocks; `options` the route's fetch options, for blocks that load their own data (Most read);
+ * `sidebar` the Side banner's sidebar (`PageAd`), `rail` also the Two columns layout.
  */
 export function PageBlocks({
   blocks,
@@ -21,8 +25,10 @@ export function PageBlocks({
   today,
   now,
   ads,
+  options,
   intro,
   listing,
+  articles,
   sidebar,
 }: {
   blocks: PageBlock[] | null | undefined
@@ -30,8 +36,10 @@ export function PageBlocks({
   today: string
   now: string
   ads: AdUnits
+  options: DynamicFetchOptions
   intro?: ReactNode
   listing?: RecordListingContext
+  articles?: ArticleListingContext
   sidebar?: PageSidebar
 }) {
   const [first, ...rest] = blocks ?? []
@@ -40,7 +48,7 @@ export function PageBlocks({
     return (
       <>
         {intro}
-        <BlockRenderer blocks={blocks} brand={brand} today={today} now={now} ads={ads} listing={listing} />
+        <BlockRenderer blocks={blocks} brand={brand} today={today} now={now} ads={ads} options={options} listing={listing} articles={articles} />
       </>
     )
   }
@@ -51,13 +59,14 @@ export function PageBlocks({
       <SplitLayout
         block={first}
         brand={brand}
-        top={<PageAd position="top" ads={ads} brand={brand} />}
+        variant={sidebar === 'rail' ? 'rail' : undefined}
+        top={<PageAd position="top" ads={ads} brand={brand} sidebar={sidebar} />}
         side={<PageAd position="side" ads={ads} brand={brand} sidebar={sidebar} />}
         renderBlocks={(columnBlocks) => (
-          <BlockRenderer blocks={columnBlocks} brand={brand} today={today} now={now} ads={ads} listing={listing} />
+          <BlockRenderer blocks={columnBlocks} brand={brand} today={today} now={now} ads={ads} options={options} listing={listing} articles={articles} />
         )}
       />
-      <BlockRenderer blocks={rest} brand={brand} today={today} now={now} ads={ads} listing={listing} />
+      <BlockRenderer blocks={rest} brand={brand} today={today} now={now} ads={ads} options={options} listing={listing} articles={articles} />
     </>
   )
 }

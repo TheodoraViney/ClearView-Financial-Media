@@ -189,38 +189,17 @@ export const MOST_READ_LATEST_QUERY = defineQuery(`
   ] | order(publishedAt desc)[0...$limit]{ ${ARTICLE_CARD} }
 `)
 
-// The Categories page (`$id` from categoriesPageDocumentId) and its filter options. Topics and regions are the ones
-// with at least one post on this brand, alphabetical; categories are all of them, as links to the list come from
-// articles and Related topics. The page resolves URL slugs against these lists, so the list query takes ids only.
-// Related topics: the editor's categories and topics in order; unpublished ones dereference to null and drop out.
-// The Home breadcrumb label is the article page's (`$articlePageId`).
+// The Categories page (`$id` from categoriesPageDocumentId), built from blocks, and its filter options. Topics and
+// regions are the ones with at least one post on this brand, alphabetical; categories are all of them, as links to the
+// list come from articles and Related topics. The page resolves URL slugs against these lists, so the list query takes
+// ids only.
 export const CATEGORIES_PAGE_QUERY = defineQuery(`
   {
     "page": *[_type == "page" && _id == $id && brand == $brand][0]{
       _id,
       title,
-      intro,
-      listLabels{
-        topicsLabel,
-        allTopicsLabel,
-        regionsLabel,
-        allRegionsLabel,
-        sortLabel,
-        sortLatestLabel,
-        sortOldestLabel,
-        selectedLabel,
-        clearFiltersLabel,
-        emptyStateText,
-        readArticleLabel,
-        previousLabel,
-        nextLabel
-      },
-      relatedTopics{
-        heading[]{ _key, style, children[]{ _key, text } },
-        "items": items[defined(@->slug.current)]->{ _id, _type, title, "slug": slug.current }
-      }
+      blocks[]{ _key, _type, ${BLOCKS_PROJECTION} }
     },
-    "homeLabel": *[_type == "articlePage" && _id == $articlePageId][0].breadcrumbHomeLabel,
     "topics": *[
       _type == "topic"
       && defined(slug.current)

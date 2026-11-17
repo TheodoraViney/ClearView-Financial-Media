@@ -2,13 +2,16 @@ import { SplitVerticalIcon } from '@sanity/icons/SplitVertical'
 import { defineArrayMember, defineField, defineType } from 'sanity'
 
 import { adminLabelField } from '../fields'
+import { articleListing } from './article-listing'
 import { awardsWinners } from './awards-winners'
 import { cta } from './cta'
 import { highlights } from './highlights'
+import { mostReadSidebar } from './most-read-sidebar'
 import { pageHero } from './page-hero'
 import { postBriefs, postCards } from './post-list'
 import { publications } from './publications'
 import { recordListing } from './record-listing'
+import { relatedTopics } from './related-topics'
 import { sponsoredContent } from './sponsored-content'
 import { topStories } from './top-stories'
 import { weeklyRoundup } from './weekly-roundup'
@@ -24,11 +27,13 @@ const mainBlockTypes = [
   weeklyRoundup,
   publications,
   recordListing,
+  articleListing,
+  relatedTopics,
   cta,
 ]
 
 // Blocks allowed in the sidebar.
-const asideBlockTypes = [highlights, awardsWinners]
+const asideBlockTypes = [highlights, awardsWinners, mostReadSidebar]
 
 /**
  * A main column with a sidebar beside it from 1280px. Below that the sidebar

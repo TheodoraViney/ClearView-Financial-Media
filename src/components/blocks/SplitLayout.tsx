@@ -12,10 +12,13 @@ export function SplitLayout({
   block,
   top,
   side,
+  variant,
   renderBlocks,
 }: BlockProps<'splitLayout'> & {
   top?: ReactNode
   side?: ReactNode
+  /** The section's layout, `rail` on the Categories page (PageBlocks `sidebar="rail"`). */
+  variant?: 'columns' | 'rail'
   renderBlocks: (blocks: PageBlock[]) => ReactNode
 }) {
   const main = block.main ?? []
@@ -23,6 +26,7 @@ export function SplitLayout({
 
   return (
     <SplitLayoutSection
+      variant={variant}
       main={
         <>
           {top}

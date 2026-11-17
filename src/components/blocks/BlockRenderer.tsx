@@ -1,18 +1,23 @@
 import type { BrandKey } from '@/brands'
 import type { AdUnits } from '@/lib/gam'
+import type { ArticleListingContext } from '@/sanity/categories-view'
+import type { DynamicFetchOptions } from '@/sanity/live'
 import type { RecordListingContext } from '@/sanity/shared-listings-view'
 
+import { ArticleListing } from './ArticleListing'
 import { AwardsWinners } from './AwardsWinners'
 import { Cta } from './Cta'
 import { ExploreGrid } from './ExploreGrid'
 import { FeaturedStories } from './FeaturedStories'
 import { Highlights } from './Highlights'
+import { MostReadSidebar } from './MostReadSidebar'
 import { NewsletterSignup } from './NewsletterSignup'
 import { PageHero } from './PageHero'
 import { PostBriefs } from './PostBriefs'
 import { PostCards } from './PostCards'
 import { Publications } from './Publications'
 import { RecordListing } from './RecordListing'
+import { RelatedTopics } from './RelatedTopics'
 import { SplitLayout } from './SplitLayout'
 import { SponsoredContent } from './SponsoredContent'
 import { StatsBar } from './StatsBar'
@@ -27,6 +32,9 @@ import type { PageBlock } from './types'
  * `now` is the hourly-cached ISO time that server-rendered relative dates ("2 hours ago") count from.
  * `ads` are the brand's units for the page type, for the blocks that carry a banner of their own (Awards Winners).
  * `listing` is the shared listings route's tab, URL and records; a record listing block renders nothing without it.
+ * `articles` is the Categories route's state and list; the articles list block renders nothing without it, and the
+ * page heading block takes the Categories form with it.
+ * `options` are the route's fetch options (perspective, stega), for the blocks that load their own data (Most read).
  */
 export function BlockRenderer({
   blocks,
@@ -34,14 +42,18 @@ export function BlockRenderer({
   today,
   now,
   ads,
+  options,
   listing,
+  articles,
 }: {
   blocks: PageBlock[] | null | undefined
   brand: BrandKey
   today: string
   now: string
   ads: AdUnits
+  options: DynamicFetchOptions
   listing?: RecordListingContext
+  articles?: ArticleListingContext
 }) {
   if (!blocks?.length) {
     return null
@@ -50,7 +62,17 @@ export function BlockRenderer({
   return (
     <>
       {blocks.map((block) => (
-        <Block key={block._key} block={block} brand={brand} today={today} now={now} ads={ads} listing={listing} />
+        <Block
+          key={block._key}
+          block={block}
+          brand={brand}
+          today={today}
+          now={now}
+          ads={ads}
+          options={options}
+          listing={listing}
+          articles={articles}
+        />
       ))}
     </>
   )
@@ -62,14 +84,18 @@ function Block({
   today,
   now,
   ads,
+  options,
   listing,
+  articles,
 }: {
   block: PageBlock
   brand: BrandKey
   today: string
   now: string
   ads: AdUnits
+  options: DynamicFetchOptions
   listing?: RecordListingContext
+  articles?: ArticleListingContext
 }) {
   switch (block._type) {
     case 'cta':
@@ -88,7 +114,16 @@ function Block({
           block={block}
           brand={brand}
           renderBlocks={(blocks) => (
-            <BlockRenderer blocks={blocks} brand={brand} today={today} now={now} ads={ads} listing={listing} />
+            <BlockRenderer
+              blocks={blocks}
+              brand={brand}
+              today={today}
+              now={now}
+              ads={ads}
+              options={options}
+              listing={listing}
+              articles={articles}
+            />
           )}
         />
       )
@@ -113,12 +148,18 @@ function Block({
       return <SubscribeBanner block={block} brand={brand} />
     // Main column only.
     case 'pageHero':
-      return <PageHero block={block} brand={brand} />
+      return <PageHero block={block} brand={brand} articles={articles} />
     case 'recordListing':
       return listing ? <RecordListing block={block} brand={brand} listing={listing} /> : null
+    case 'articleListing':
+      return articles ? <ArticleListing block={block} brand={brand} articles={articles} /> : null
+    case 'relatedTopics':
+      return <RelatedTopics block={block} brand={brand} />
     // Sidebar only.
     case 'awardsWinners':
       return <AwardsWinners block={block} brand={brand} unit={ads.awardsWinners} />
+    case 'mostReadSidebar':
+      return <MostReadSidebar block={block} brand={brand} options={options} />
     default:
       return unknownBlock(block)
   }

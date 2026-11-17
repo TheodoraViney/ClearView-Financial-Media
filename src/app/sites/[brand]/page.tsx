@@ -87,14 +87,15 @@ async function CachedHome({
   // The home template's banners: Top and Side with the first blocks, then Banner 3 and Banner 4 between the three
   // block lists. Banner 4 follows the middle list, so it goes with it when that list is empty.
   const hasMiddle = Boolean(data.blocksMiddle?.length)
+  const options = { perspective, variant, stega }
 
   return (
     <main>
-      <PageBlocks blocks={data.blocks} brand={brand} today={today} now={now} ads={ads} />
+      <PageBlocks blocks={data.blocks} brand={brand} today={today} now={now} ads={ads} options={options} />
       <PageAd position="banner3" ads={ads} brand={brand} />
-      <BlockRenderer blocks={data.blocksMiddle} brand={brand} today={today} now={now} ads={ads} />
+      <BlockRenderer blocks={data.blocksMiddle} brand={brand} today={today} now={now} ads={ads} options={options} />
       {hasMiddle && <PageAd position="banner4" ads={ads} brand={brand} />}
-      <BlockRenderer blocks={data.blocksBottom} brand={brand} today={today} now={now} ads={ads} />
+      <BlockRenderer blocks={data.blocksBottom} brand={brand} today={today} now={now} ads={ads} options={options} />
     </main>
   )
 }

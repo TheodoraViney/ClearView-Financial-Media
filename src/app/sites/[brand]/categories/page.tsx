@@ -4,15 +4,8 @@ import { notFound } from 'next/navigation'
 import { stegaClean } from 'next-sanity'
 import { Suspense } from 'react'
 
-import {
-  articlePageDocumentId,
-  brandOrigin,
-  categoriesPageDocumentId,
-  isEditorialBrandKey,
-  mostReadDocumentId,
-  type EditorialBrandKey,
-} from '@/brands'
-import { CategoriesPage } from '@/components/sections/categories/CategoriesPage'
+import { brandOrigin, categoriesPageDocumentId, isEditorialBrandKey, type EditorialBrandKey } from '@/brands'
+import { PageBlocks } from '@/components/blocks/PageBlocks'
 import {
   CATEGORIES_PATH,
   categoriesHref,
@@ -24,18 +17,22 @@ import {
   type RawSearchParams,
 } from '@/lib/categories'
 import { fetchAdUnits } from '@/sanity/brand-title'
-import { categoriesHeading, resolveCategoriesFilters, toCategoriesView } from '@/sanity/categories-view'
-import { cachedSanity, getDynamicFetchOptions, type DynamicFetchOptions } from '@/sanity/live'
-import { mostReadAutoFill } from '@/sanity/most-read'
+import { categoriesHeading, findPageHero, resolveCategoriesFilters } from '@/sanity/categories-view'
 import {
-  CATEGORIES_LATEST_QUERY,
-  CATEGORIES_OLDEST_QUERY,
-  CATEGORIES_PAGE_QUERY,
-  MOST_READ_QUERY,
-} from '@/sanity/queries'
+  cachedNow,
+  cachedSanity,
+  cachedUkToday,
+  getDynamicFetchOptions,
+  type DynamicFetchOptions,
+} from '@/sanity/live'
+import { CATEGORIES_LATEST_QUERY, CATEGORIES_OLDEST_QUERY, CATEGORIES_PAGE_QUERY } from '@/sanity/queries'
 
 // The Categories page (the articles list) of an editorial brand, filtered and paged by the URL
 // (src/lib/categories.ts). It takes precedence over [slug] for the page document with the slug "categories".
+// The page document `page-categories-{brand}` is built from blocks (src/sanity/categories-view.ts): a Two columns block
+// in the article page's layout (`sidebar="rail"`: Top banner, page heading, articles list, related topics; Side banner,
+// Most read, which loads its own list). The route resolves the URL state and the list and hands them to the blocks as
+// `articles`.
 //
 // A blocking route, like the archive article: the list depends on searchParams, so nothing of it prerenders, and
 // reading them before the response streams lets a page past the end return a real 404 and the robots tag sit in the
@@ -50,15 +47,18 @@ type Props = {
 
 const PUBLISHED: DynamicFetchOptions = { perspective: 'published', stega: false }
 
-function fetchPageData(brand: EditorialBrandKey, options: DynamicFetchOptions) {
+// `$today` is for the blocks' fills (BLOCKS_PROJECTION); the Categories blocks themselves do not use it.
+function fetchPageData(brand: EditorialBrandKey, today: string, options: DynamicFetchOptions) {
   return cachedSanity({
     query: CATEGORIES_PAGE_QUERY,
-    params: { brand, id: categoriesPageDocumentId(brand), articlePageId: articlePageDocumentId(brand) },
+    params: { brand, id: categoriesPageDocumentId(brand), today },
     ...options,
   })
 }
 
 // Filtered or re-sorted lists are noindex and point at the base list; plain pages 2 and up are their own canonical.
+// The title is the heading category's or topic's, else the document title; the description the heading's intro (the
+// term's description, else the page heading block's intro).
 export async function generateMetadata({ params, searchParams }: Props): Promise<Metadata> {
   const { brand } = await params
 
@@ -67,14 +67,18 @@ export async function generateMetadata({ params, searchParams }: Props): Promise
   }
 
   const state = parseCategoriesState(await searchParams)
-  const { data } = await fetchPageData(brand, PUBLISHED)
+  const { data } = await fetchPageData(brand, await cachedUkToday(), PUBLISHED)
 
   if (!data.page) {
     return {}
   }
 
   const filtered = hasFilters(state)
-  const heading = categoriesHeading(data.page, resolveCategoriesFilters(state, data))
+  const hero = findPageHero(data.page.blocks)
+  const heading = categoriesHeading(
+    { title: data.page.title, intro: hero?.intro ?? null },
+    resolveCategoriesFilters(state, data),
+  )
   const path = filtered ? CATEGORIES_PATH : categoriesHref(state)
 
   return {
@@ -121,13 +125,8 @@ async function CachedCategories({
   stega,
 }: { brand: EditorialBrandKey; state: CategoriesState } & DynamicFetchOptions) {
   const options = { perspective, variant, stega }
-  const [{ data }, { data: mostRead }, mostReadFill, ads] = await Promise.all([
-    fetchPageData(brand, options),
-    cachedSanity({ query: MOST_READ_QUERY, params: { brand, id: mostReadDocumentId(brand) }, ...options }),
-    // No post is being read: an empty slug excludes none.
-    mostReadAutoFill({ brand, slug: '', ...options }),
-    fetchAdUnits(brand, 'other', options),
-  ])
+  const [today, now] = await Promise.all([cachedUkToday(), cachedNow()])
+  const [{ data }, ads] = await Promise.all([fetchPageData(brand, today, options), fetchAdUnits(brand, 'other', options)])
 
   if (!data.page) {
     notFound()
@@ -152,15 +151,18 @@ async function CachedCategories({
     notFound()
   }
 
-  const view = toCategoriesView({
-    data: { ...data, page: data.page },
-    filters,
-    list,
-    mostRead,
-    mostReadFill,
-    ads,
-    brand,
-  })
-
-  return <CategoriesPage view={view} />
+  return (
+    <main>
+      <PageBlocks
+        blocks={data.page.blocks}
+        brand={brand}
+        today={today}
+        now={now}
+        ads={ads}
+        options={options}
+        sidebar="rail"
+        articles={{ brand, data, filters, list, banner3: ads.banner3 }}
+      />
+    </main>
+  )
 }

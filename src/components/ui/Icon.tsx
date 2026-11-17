@@ -8,6 +8,7 @@ import { ChevronLeftIcon } from './icons/chevron-left'
 import { ChevronDownIcon } from './icons/chevron-down'
 import { ChevronRightIcon } from './icons/chevron-right'
 import { CloseIcon } from './icons/close'
+import { CloseSmIcon } from './icons/close-sm'
 import { CommentIcon } from './icons/comment'
 import { DocumentIcon } from './icons/document'
 import { DownloadIcon } from './icons/download'
@@ -41,6 +42,7 @@ export const iconMap = {
   play: PlayIcon,
   search: SearchIcon,
   close: CloseIcon,
+  'close-sm': CloseSmIcon,
   menu: MenuIcon,
   'menu-close': MenuCloseIcon,
   download: DownloadIcon,
