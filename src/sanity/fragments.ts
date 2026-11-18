@@ -34,10 +34,14 @@ export const ADVERTISING = /* groq */ `
   }
 `
 
-/** A linkField value without its label (`withLabel: false`). `internal` is dereferenced to what resolveHref needs and nothing more. */
+/**
+ * A linkField value without its label (`withLabel: false`). `internal` is dereferenced to what resolveHref needs and
+ * nothing more; `hub` is the listing key (awards, events or research).
+ */
 export const LINK_TARGET = /* groq */ `
   kind,
   external,
+  hub,
   internal->{
     _type,
     "slug": slug.current,
