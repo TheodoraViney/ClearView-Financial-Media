@@ -127,9 +127,11 @@ export type CmsSearchSource = {
   title: string | null
   slug: string | null
   brands?: string[] | null
+  /** A post's excerpt, else the standfirst of a resource or awards edition. */
   excerpt?: string | null
   author?: string | null
   category?: string | null
+  /** Plain text of a post, resource, conference event or awards edition body; the record keeps an extract. */
   bodyText?: string | null
   publishedAt?: string | null
   startDate?: string | null

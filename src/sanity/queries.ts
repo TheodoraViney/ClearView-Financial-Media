@@ -348,19 +348,20 @@ export const NEWSLETTER_LATEST_POST_IDS_QUERY = defineQuery(`
 
 // The CMS side of the Algolia index (src/lib/search-index.ts): every published post, conference event, awards edition
 // and resource with a slug, flattened to what cmsSearchRecord needs. Bodies come as plain text; the record keeps a
-// short extract of it. Events and awards editions are pictured by their logo only, never their photographs.
+// short extract of it, for events and awards editions too, so they match on their overview and not only the title.
+// The standfirst is a post's excerpt, else the record's own standfirst (resources and awards editions). Events and awards editions are pictured by their logo only, never their photographs.
 const SEARCH_RECORD_PROJECTION = `
   _id,
   _type,
   title,
   "slug": slug.current,
   brands,
-  excerpt,
+  "excerpt": select(_type == "post" => excerpt, standfirst),
   "author": author->name,
   "category": category->title,
   "bodyText": select(
     _type == "post" => pt::text(content),
-    _type == "resource" => pt::text(body)
+    _type in ["resource", "conferenceEvent", "awardsProgramme"] => pt::text(body)
   ),
   publishedAt,
   startDate,
