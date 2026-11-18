@@ -30745,7 +30745,7 @@ export type NEWSLETTER_LATEST_POST_IDS_QUERY_RESULT = Array<string>;
 
 // Source: src/sanity/queries.ts
 // Variable: SEARCH_RECORDS_QUERY
-// Query: *[_type in ["post", "conferenceEvent", "awardsProgramme", "resource"] && defined(slug.current)]{      _id,  _type,  title,  "slug": slug.current,  brands,  excerpt,  "author": author->name,  "category": category->title,  "bodyText": select(    _type == "post" => pt::text(content),    _type == "resource" => pt::text(body)  ),  publishedAt,  startDate,  endDate,  hideDateTime,  "region": region->title,  country,  eventType,  "image": select(    _type == "post" => image{ asset, crop, "alt": coalesce(alt, asset->altText) },    _type == "resource" => downloadThumbnail{ asset, crop, "alt": coalesce(alt, asset->altText) }  ),  "logo": logo{ asset, crop, "alt": coalesce(alt, asset->altText) }  }
+// Query: *[_type in ["post", "conferenceEvent", "awardsProgramme", "resource"] && defined(slug.current)]{      _id,  _type,  title,  "slug": slug.current,  brands,  "excerpt": select(_type == "post" => excerpt, standfirst),  "author": author->name,  "category": category->title,  "bodyText": select(    _type == "post" => pt::text(content),    _type in ["resource", "conferenceEvent", "awardsProgramme"] => pt::text(body)  ),  publishedAt,  startDate,  endDate,  hideDateTime,  "region": region->title,  country,  eventType,  "image": select(    _type == "post" => image{ asset, crop, "alt": coalesce(alt, asset->altText) },    _type == "resource" => downloadThumbnail{ asset, crop, "alt": coalesce(alt, asset->altText) }  ),  "logo": logo{ asset, crop, "alt": coalesce(alt, asset->altText) }  }
 export type SEARCH_RECORDS_QUERY_RESULT = Array<
   | {
       _id: string;
@@ -30753,10 +30753,10 @@ export type SEARCH_RECORDS_QUERY_RESULT = Array<
       title: string | null;
       slug: string | null;
       brands: null;
-      excerpt: null;
+      excerpt: string | null;
       author: null;
       category: null;
-      bodyText: null;
+      bodyText: string;
       publishedAt: null;
       startDate: string | null;
       endDate: string | null;
@@ -31030,7 +31030,7 @@ export type SEARCH_RECORDS_QUERY_RESULT = Array<
       excerpt: null;
       author: null;
       category: null;
-      bodyText: null;
+      bodyText: string;
       publishedAt: null;
       startDate: string | null;
       endDate: string | null;
@@ -31325,7 +31325,7 @@ export type SEARCH_RECORDS_QUERY_RESULT = Array<
       title: string | null;
       slug: string | null;
       brands: null;
-      excerpt: null;
+      excerpt: string | null;
       author: null;
       category: null;
       bodyText: string;
@@ -31347,7 +31347,7 @@ export type SEARCH_RECORDS_QUERY_RESULT = Array<
 
 // Source: src/sanity/queries.ts
 // Variable: SEARCH_RECORDS_BY_ID_QUERY
-// Query: *[_id in $ids && _type in ["post", "conferenceEvent", "awardsProgramme", "resource"] && defined(slug.current)]{      _id,  _type,  title,  "slug": slug.current,  brands,  excerpt,  "author": author->name,  "category": category->title,  "bodyText": select(    _type == "post" => pt::text(content),    _type == "resource" => pt::text(body)  ),  publishedAt,  startDate,  endDate,  hideDateTime,  "region": region->title,  country,  eventType,  "image": select(    _type == "post" => image{ asset, crop, "alt": coalesce(alt, asset->altText) },    _type == "resource" => downloadThumbnail{ asset, crop, "alt": coalesce(alt, asset->altText) }  ),  "logo": logo{ asset, crop, "alt": coalesce(alt, asset->altText) }  }
+// Query: *[_id in $ids && _type in ["post", "conferenceEvent", "awardsProgramme", "resource"] && defined(slug.current)]{      _id,  _type,  title,  "slug": slug.current,  brands,  "excerpt": select(_type == "post" => excerpt, standfirst),  "author": author->name,  "category": category->title,  "bodyText": select(    _type == "post" => pt::text(content),    _type in ["resource", "conferenceEvent", "awardsProgramme"] => pt::text(body)  ),  publishedAt,  startDate,  endDate,  hideDateTime,  "region": region->title,  country,  eventType,  "image": select(    _type == "post" => image{ asset, crop, "alt": coalesce(alt, asset->altText) },    _type == "resource" => downloadThumbnail{ asset, crop, "alt": coalesce(alt, asset->altText) }  ),  "logo": logo{ asset, crop, "alt": coalesce(alt, asset->altText) }  }
 export type SEARCH_RECORDS_BY_ID_QUERY_RESULT = Array<
   | {
       _id: string;
@@ -31355,10 +31355,10 @@ export type SEARCH_RECORDS_BY_ID_QUERY_RESULT = Array<
       title: string | null;
       slug: string | null;
       brands: null;
-      excerpt: null;
+      excerpt: string | null;
       author: null;
       category: null;
-      bodyText: null;
+      bodyText: string;
       publishedAt: null;
       startDate: string | null;
       endDate: string | null;
@@ -31632,7 +31632,7 @@ export type SEARCH_RECORDS_BY_ID_QUERY_RESULT = Array<
       excerpt: null;
       author: null;
       category: null;
-      bodyText: null;
+      bodyText: string;
       publishedAt: null;
       startDate: string | null;
       endDate: string | null;
@@ -31927,7 +31927,7 @@ export type SEARCH_RECORDS_BY_ID_QUERY_RESULT = Array<
       title: string | null;
       slug: string | null;
       brands: null;
-      excerpt: null;
+      excerpt: string | null;
       author: null;
       category: null;
       bodyText: string;
@@ -40132,8 +40132,8 @@ declare global {
     '\n  *[_type == "newsletterIssue" && _id in [$id, $draftId]]._id\n': NEWSLETTER_ISSUE_EXISTING_IDS_QUERY_RESULT;
     '\n  *[_type == "brand" && _id == $brandId && key.current == $brand][0].newsletter.articlesPerIssue\n': NEWSLETTER_ARTICLES_PER_ISSUE_QUERY_RESULT;
     '\n  *[\n    _type == "post"\n    && $brand in brands\n    && defined(publishedAt)\n    && dateTime(publishedAt) <= dateTime(now())\n  ] | order(publishedAt desc)[0...20]._id\n': NEWSLETTER_LATEST_POST_IDS_QUERY_RESULT;
-    '\n  *[_type in ["post", "conferenceEvent", "awardsProgramme", "resource"] && defined(slug.current)]{\n    \n  _id,\n  _type,\n  title,\n  "slug": slug.current,\n  brands,\n  excerpt,\n  "author": author->name,\n  "category": category->title,\n  "bodyText": select(\n    _type == "post" => pt::text(content),\n    _type == "resource" => pt::text(body)\n  ),\n  publishedAt,\n  startDate,\n  endDate,\n  hideDateTime,\n  "region": region->title,\n  country,\n  eventType,\n  "image": select(\n    _type == "post" => image{ asset, crop, "alt": coalesce(alt, asset->altText) },\n    _type == "resource" => downloadThumbnail{ asset, crop, "alt": coalesce(alt, asset->altText) }\n  ),\n  "logo": logo{ asset, crop, "alt": coalesce(alt, asset->altText) }\n\n  }\n': SEARCH_RECORDS_QUERY_RESULT;
-    '\n  *[_id in $ids && _type in ["post", "conferenceEvent", "awardsProgramme", "resource"] && defined(slug.current)]{\n    \n  _id,\n  _type,\n  title,\n  "slug": slug.current,\n  brands,\n  excerpt,\n  "author": author->name,\n  "category": category->title,\n  "bodyText": select(\n    _type == "post" => pt::text(content),\n    _type == "resource" => pt::text(body)\n  ),\n  publishedAt,\n  startDate,\n  endDate,\n  hideDateTime,\n  "region": region->title,\n  country,\n  eventType,\n  "image": select(\n    _type == "post" => image{ asset, crop, "alt": coalesce(alt, asset->altText) },\n    _type == "resource" => downloadThumbnail{ asset, crop, "alt": coalesce(alt, asset->altText) }\n  ),\n  "logo": logo{ asset, crop, "alt": coalesce(alt, asset->altText) }\n\n  }\n': SEARCH_RECORDS_BY_ID_QUERY_RESULT;
+    '\n  *[_type in ["post", "conferenceEvent", "awardsProgramme", "resource"] && defined(slug.current)]{\n    \n  _id,\n  _type,\n  title,\n  "slug": slug.current,\n  brands,\n  "excerpt": select(_type == "post" => excerpt, standfirst),\n  "author": author->name,\n  "category": category->title,\n  "bodyText": select(\n    _type == "post" => pt::text(content),\n    _type in ["resource", "conferenceEvent", "awardsProgramme"] => pt::text(body)\n  ),\n  publishedAt,\n  startDate,\n  endDate,\n  hideDateTime,\n  "region": region->title,\n  country,\n  eventType,\n  "image": select(\n    _type == "post" => image{ asset, crop, "alt": coalesce(alt, asset->altText) },\n    _type == "resource" => downloadThumbnail{ asset, crop, "alt": coalesce(alt, asset->altText) }\n  ),\n  "logo": logo{ asset, crop, "alt": coalesce(alt, asset->altText) }\n\n  }\n': SEARCH_RECORDS_QUERY_RESULT;
+    '\n  *[_id in $ids && _type in ["post", "conferenceEvent", "awardsProgramme", "resource"] && defined(slug.current)]{\n    \n  _id,\n  _type,\n  title,\n  "slug": slug.current,\n  brands,\n  "excerpt": select(_type == "post" => excerpt, standfirst),\n  "author": author->name,\n  "category": category->title,\n  "bodyText": select(\n    _type == "post" => pt::text(content),\n    _type in ["resource", "conferenceEvent", "awardsProgramme"] => pt::text(body)\n  ),\n  publishedAt,\n  startDate,\n  endDate,\n  hideDateTime,\n  "region": region->title,\n  country,\n  eventType,\n  "image": select(\n    _type == "post" => image{ asset, crop, "alt": coalesce(alt, asset->altText) },\n    _type == "resource" => downloadThumbnail{ asset, crop, "alt": coalesce(alt, asset->altText) }\n  ),\n  "logo": logo{ asset, crop, "alt": coalesce(alt, asset->altText) }\n\n  }\n': SEARCH_RECORDS_BY_ID_QUERY_RESULT;
     '\n  {\n    "modal": *[_id == $subscribeModalId && _type == "subscribeModal"][0]{\n      interests[]{ _key, "attribute": attribute.name, locked }\n    },\n    "settings": *[_id == $subscribeSettingsId && _type == "subscribeFormSettings"][0]{\n      "listId": list.id,\n      "templateId": confirmationTemplate.id\n    }\n  }\n': SUBSCRIBE_CONFIG_QUERY_RESULT;
     '\n  *[_id == $id && _type == "searchPage"][0]{\n    title,\n    breadcrumbHome,\n    breadcrumbCurrent,\n    placeholder,\n    submitLabel,\n    allLabel,\n    articlesLabel,\n    awardsLabel,\n    eventsLabel,\n    researchLabel,\n    yearLabel,\n    allYearsLabel,\n    selectedLabel,\n    clearFiltersLabel,\n    clearAllLabel,\n    summaryTemplate,\n    typeSuffix,\n    resultSingular,\n    resultPlural,\n    articleType,\n    awardType,\n    eventType,\n    researchType,\n    previousLabel,\n    nextLabel,\n    emptyQueryTitle,\n    emptyQueryText,\n    noResultsTitle,\n    noResultsText,\n    newSearchLabel\n  }\n': SEARCH_PAGE_QUERY_RESULT;
     '\n  *[_id == $id && _type == "signupNotificationSettings"][0]{\n    notifyEmails,\n    "senderId": notifySender.id\n  }\n': SIGNUP_NOTIFICATION_SETTINGS_QUERY_RESULT;
