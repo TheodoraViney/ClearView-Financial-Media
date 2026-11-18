@@ -61,6 +61,17 @@ export function safeHref(value: string | null | undefined): string | null {
   return isAllowedLinkTarget(href) ? href : null
 }
 
+/**
+ * A research report's download target, on the report page and in the highlights promo: the form or Issuu link first,
+ * the uploaded PDF only without one.
+ */
+export function researchDownloadHref(report: {
+  downloadUrl?: string | null
+  downloadFileUrl?: string | null
+}): string | null {
+  return safeHref(report.downloadUrl) ?? safeHref(report.downloadFileUrl)
+}
+
 /** The shape the LINK GROQ fragment returns. */
 export type ResolvableLink = {
   kind?: string | null

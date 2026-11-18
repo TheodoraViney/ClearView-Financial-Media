@@ -348,7 +348,7 @@ export const NEWSLETTER_LATEST_POST_IDS_QUERY = defineQuery(`
 
 // The CMS side of the Algolia index (src/lib/search-index.ts): every published post, conference event, awards edition
 // and resource with a slug, flattened to what cmsSearchRecord needs. Bodies come as plain text; the record keeps a
-// short extract of it.
+// short extract of it. Events and awards editions are pictured by their logo only, never their photographs.
 const SEARCH_RECORD_PROJECTION = `
   _id,
   _type,
@@ -371,8 +371,7 @@ const SEARCH_RECORD_PROJECTION = `
   eventType,
   "image": select(
     _type == "post" => image{ asset, crop, "alt": coalesce(alt, asset->altText) },
-    _type == "resource" => downloadThumbnail{ asset, crop, "alt": coalesce(alt, asset->altText) },
-    photographs[defined(asset)][0]{ asset, crop, "alt": coalesce(alt, asset->altText) }
+    _type == "resource" => downloadThumbnail{ asset, crop, "alt": coalesce(alt, asset->altText) }
   ),
   "logo": logo{ asset, crop, "alt": coalesce(alt, asset->altText) }
 `

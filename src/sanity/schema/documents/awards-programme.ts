@@ -116,7 +116,11 @@ export const awardsProgramme = defineType({
       group: 'schedule',
       validation: (Rule) => Rule.required(),
     }),
-    timeField('startTime', 'Start time', 'schedule'),
+    {
+      ...timeField('startTime', 'Start time', 'schedule'),
+      // Legacy WordPress field, not in the new design: hidden in the Studio, data kept. Remove before launch if unused.
+      hidden: true,
+    },
     defineField({
       name: 'endDate',
       title: 'End date',
@@ -133,7 +137,11 @@ export const awardsProgramme = defineType({
           return true
         }),
     }),
-    timeField('endTime', 'End time', 'schedule'),
+    {
+      ...timeField('endTime', 'End time', 'schedule'),
+      // Legacy WordPress field, not in the new design: hidden in the Studio, data kept. Remove before launch if unused.
+      hidden: true,
+    },
     defineField({
       name: 'timezoneCode',
       title: 'Timezone code',
@@ -349,6 +357,8 @@ export const awardsProgramme = defineType({
       title: "Hide the previous year's highlights video",
       type: 'boolean',
       group: 'media',
+      // Legacy WordPress field, not in the new design: hidden in the Studio, data kept. Remove before launch if unused.
+      hidden: true,
       initialValue: false,
     }),
     defineField({
@@ -356,6 +366,8 @@ export const awardsProgramme = defineType({
       title: 'Photographs',
       type: 'array',
       group: 'media',
+      // Legacy WordPress field, not in the new design: hidden in the Studio, data kept. Remove before launch if unused.
+      hidden: true,
       of: [
         defineArrayMember({
           type: 'image',

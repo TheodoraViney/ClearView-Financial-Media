@@ -9,7 +9,7 @@ import {
 } from '@/components/sections/Highlights'
 import { countryName } from '@/lib/countries'
 import { formatDateRange, formatDay, formatLongDate, formatMediumDate } from '@/lib/dates'
-import { resolveHref, safeHref, sharedRecordHref } from '@/lib/links'
+import { researchDownloadHref, resolveHref, sharedRecordHref } from '@/lib/links'
 import { picksThenFill } from '@/lib/picks'
 import { toHeading } from '@/sanity/heading'
 import { toImage } from '@/sanity/image'
@@ -51,10 +51,17 @@ export const isSource = (value: string | null | undefined): value is Source =>
 
 // Dates and codes are cleaned before parsing or lookup; the title keeps stega for click-to-edit.
 // Dates and a country name, as events show them: "15 October 2026 | Singapore" ("15 Oct 2026 | Singapore" short).
-function datesAndCountry(record: Pick<HighlightRecord, 'startDate' | 'endDate' | 'country'>, style: DateStyle): string[] {
-  const dates = formatDateRange(stegaClean(record.startDate), stegaClean(record.endDate), {
-    month: style === 'short' ? 'short' : 'long',
-  })
+// A record set to "Hide the date and time on the page" shows the country alone, as its own page and the shared
+// listings leave the date out.
+function datesAndCountry(
+  record: Pick<HighlightRecord, 'startDate' | 'endDate' | 'hideDateTime' | 'country'>,
+  style: DateStyle,
+): string[] {
+  const dates = stegaClean(record.hideDateTime)
+    ? null
+    : formatDateRange(stegaClean(record.startDate), stegaClean(record.endDate), {
+        month: style === 'short' ? 'short' : 'long',
+      })
   const country = countryName(stegaClean(record.country))
 
   return [dates, country].filter((part): part is string => Boolean(part))
@@ -66,7 +73,10 @@ function datesAndCountry(record: Pick<HighlightRecord, 'startDate' | 'endDate' |
  * so the line agrees with the fill tiers and the cached result.
  */
 export function recordMeta(
-  record: Pick<HighlightRecord, 'nominationsClosingDate' | 'startDate' | 'endDate' | 'country' | 'publishedAt'>,
+  record: Pick<
+    HighlightRecord,
+    'nominationsClosingDate' | 'startDate' | 'endDate' | 'hideDateTime' | 'country' | 'publishedAt'
+  >,
   source: Source,
   deadlineLabel: string | null | undefined,
   today: string,
@@ -89,7 +99,8 @@ export function recordMeta(
       return [label ? `${label} ${deadline}` : deadline]
     }
     case 'events': {
-      // An event without a readable date shows no meta line, not the country alone.
+      // An event without a readable date shows no meta line, not the country alone. One that hides its date keeps the
+      // country, as the shared listings keep the region.
       const dated = formatDateRange(stegaClean(record.startDate), stegaClean(record.endDate)) !== null
 
       return dated ? datesAndCountry(record, style) : []
@@ -122,13 +133,6 @@ function toItem(
   }
 }
 
-// `?dl=` makes the Sanity CDN answer with `Content-Disposition: attachment`, named after the uploaded file.
-function fileDownloadHref(url: string | null | undefined, filename: string | null | undefined): string | null {
-  const href = safeHref(url)
-
-  return href ? `${href}?dl=${encodeURIComponent(stegaClean(filename) ?? '')}` : null
-}
-
 function toPromo(promo: Block['promo'], source: Source, brand: BrandKey): HighlightsPromo | null {
   if (!promo) {
     return null
@@ -144,8 +148,8 @@ function toPromo(promo: Block['promo'], source: Source, brand: BrandKey): Highli
 
   const image = toImage(promo.image) ?? toImage(resource?.downloadThumbnail)
   const href = resolveHref(promo.link, brand)
-  // Interim until the client decides on lead capture: the PDF if present, else the form URL.
-  const downloadHref = fileDownloadHref(resource?.downloadFileUrl, resource?.downloadFileName) ?? safeHref(resource?.downloadUrl)
+  // As the report page's download button: the form or Issuu link first, the PDF only without one.
+  const downloadHref = resource ? researchDownloadHref(resource) : null
 
   return {
     title,

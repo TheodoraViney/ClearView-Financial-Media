@@ -355,6 +355,7 @@ const HIGHLIGHT_ITEM = /* groq */ `
   nominationsClosingDate,
   startDate,
   endDate,
+  hideDateTime,
   country,
   publishedAt
 `
@@ -428,7 +429,6 @@ const HIGHLIGHTS = /* groq */ `
       title,
       "downloadThumbnail": downloadThumbnail{ ${IMAGE} },
       "downloadFileUrl": downloadFile.asset->url,
-      "downloadFileName": downloadFile.asset->originalFilename,
       downloadUrl
     },
     title,
@@ -610,9 +610,10 @@ export const BLOCKS_PROJECTION = /* groq */ `
 ` as const
 
 // One edition in the award category page's sidebar: its own fields and its programme, for the one-per-programme rule.
+// The status still reads the dates when `hideDateTime` is set; only the date in the meta line is left out.
 export const OTHER_AWARDS_EDITION = /* groq */ `
   _id, title, "slug": slug.current, "programmeId": programme._ref,
-  startDate, endDate, country, nominationsOpeningDate, nominationsClosingDate
+  startDate, endDate, hideDateTime, country, nominationsOpeningDate, nominationsClosingDate
 `
 
 // The award category page's sidebar: upcoming editions of other programmes (`$programme` is the page's programme

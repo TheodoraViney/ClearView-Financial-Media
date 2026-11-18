@@ -124,7 +124,8 @@ function toOtherProgramme(edition: SidebarEdition, title: string, statuses: Edit
     today,
   )
   const place = countryName(stegaClean(edition.country))
-  const dates = formatDateRange(stegaClean(edition.startDate), stegaClean(edition.endDate))
+  // "Hide the date and time on the page" leaves the ceremony date out, as on the edition's own page and the listings.
+  const dates = stegaClean(edition.hideDateTime) ? null : formatDateRange(stegaClean(edition.startDate), stegaClean(edition.endDate))
 
   return {
     key: edition._id,

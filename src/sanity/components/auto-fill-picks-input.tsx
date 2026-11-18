@@ -42,7 +42,8 @@ function dateOf(item: AutoFillItem): string | null {
     return formatMediumDate(item.publishedAt)
   }
 
-  return formatDay(item.startDate) ?? formatMediumDate(item.publishedAt)
+  // An event or awards edition that hides its date on the site shows none here either.
+  return item.hideDateTime ? null : (formatDay(item.startDate) ?? formatMediumDate(item.publishedAt))
 }
 
 const randomKey = () => Math.random().toString(36).slice(2, 14).padEnd(12, '0')
