@@ -1,6 +1,6 @@
 import { defineArrayMember, defineField, defineType } from 'sanity'
 
-import { BRANDS, EDITORIAL_BRAND_KEYS } from '@/brands'
+import { BRANDS, EDITORIAL_BRAND_KEYS, type EditorialBrandKey, isEditorialBrandKey } from '@/brands'
 import { BRIEF_MAX_CHARS, BRIEF_TARGET_MIN_CHARS } from '@/lib/brief-prompt'
 
 import { BriefTextInput } from '@/sanity/components/brief-text-input'
@@ -221,4 +221,19 @@ export const post = defineType({
           }),
     }),
   ],
+  // The publications under the title, so posts with the same headline tell apart in reference pickers, lists and search.
+  preview: {
+    select: { title: 'title', brands: 'brands', media: 'image' },
+    prepare({ title, brands, media }) {
+      const publications = (Array.isArray(brands) ? brands : [])
+        .filter((brand): brand is EditorialBrandKey => typeof brand === 'string' && isEditorialBrandKey(brand))
+        .map((brand) => BRANDS[brand].title)
+
+      return {
+        title: title || 'Untitled article',
+        subtitle: publications.length > 0 ? publications.join(', ') : 'No publication',
+        media,
+      }
+    },
+  },
 })

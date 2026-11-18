@@ -1,6 +1,6 @@
 import { defineField, defineType } from 'sanity'
 
-import { BRAND_KEYS, BRANDS } from '@/brands'
+import { BRAND_KEYS, BRANDS, isBrandKey } from '@/brands'
 import { isCategoriesPageDocumentId } from '@/lib/categories'
 import { SHARED_LISTINGS_PAGE_DOCUMENT_ID } from '@/lib/shared-listings'
 
@@ -98,4 +98,18 @@ export const page = defineType({
       hidden: notHome,
     }),
   ],
+  // The brand and the address under the title, so the four "Contact" or "Privacy policy" pages tell apart in reference
+  // pickers, lists and search.
+  preview: {
+    select: { title: 'title', brand: 'brand', slug: 'slug.current' },
+    prepare({ title, brand, slug }) {
+      const brandTitle = typeof brand === 'string' && isBrandKey(brand) ? BRANDS[brand].title : null
+      const path = typeof slug === 'string' ? (slug === 'home' ? '/' : `/${slug}`) : null
+
+      return {
+        title: title || 'Untitled page',
+        subtitle: [brandTitle ?? 'No brand', path].filter(Boolean).join(' · '),
+      }
+    },
+  },
 })
