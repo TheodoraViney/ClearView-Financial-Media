@@ -7,6 +7,7 @@ import type { RecordListingContext } from '@/sanity/shared-listings-view'
 import { ArticleListing } from './ArticleListing'
 import { AwardsWinners } from './AwardsWinners'
 import { BenefitPanel } from './BenefitPanel'
+import { ContactForm } from './ContactForm'
 import { Cta } from './Cta'
 import { EnquiryForm } from './EnquiryForm'
 import { ExploreGrid } from './ExploreGrid'
@@ -176,6 +177,9 @@ function Block({
       return <OpportunityCards block={block} brand={brand} />
     case 'enquiryForm':
       return <EnquiryForm block={block} brand={brand} />
+    // Contact page.
+    case 'contactForm':
+      return <ContactForm block={block} brand={brand} />
     default:
       return unknownBlock(block)
   }

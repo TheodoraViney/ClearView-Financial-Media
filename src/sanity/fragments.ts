@@ -542,6 +542,34 @@ const ENQUIRY_FORM = /* groq */ `
   invalidEmailMessage
 `
 
+// The Contact page form: page head, image and every form string; the privacy link resolves like the pop-up's.
+const CONTACT_FORM = /* groq */ `
+  breadcrumbHomeLabel,
+  breadcrumbLabel,
+  heading[]{ _key, style, children[]{ _key, text } },
+  standfirst,
+  image{ ${IMAGE} },
+  firstNameLabel,
+  lastNameLabel,
+  emailLabel,
+  phoneLabel,
+  companyLabel,
+  messageLabel,
+  optionalMarker,
+  consentText,
+  privacyLinkLabel,
+  privacyLink{ ${LINK_TARGET} },
+  submitLabel,
+  firstNameError,
+  lastNameError,
+  emailMissingError,
+  emailInvalidError,
+  messageError,
+  consentError,
+  successMessage,
+  returnLabel
+`
+
 const SUBSCRIBE_BANNER = /* groq */ `
   heading[]{ _key, style, children[]{ _key, text } },
   description,
@@ -607,6 +635,7 @@ export const BLOCKS_PROJECTION = /* groq */ `
   _type == "benefitPanel" => { ${BENEFIT_PANEL} },
   _type == "opportunityCards" => { ${OPPORTUNITY_CARDS} },
   _type == "enquiryForm" => { ${ENQUIRY_FORM} },
+  _type == "contactForm" => { ${CONTACT_FORM} },
   _type == "splitLayout" => {
     "main": main[]{ _key, _type, ${MAIN_COLUMN_BLOCKS} },
     "aside": aside[]{ _key, _type, ${ASIDE_BLOCKS} }

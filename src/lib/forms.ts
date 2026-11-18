@@ -10,8 +10,8 @@ import { HONEYPOT_FIELD } from './honeypot'
 
 export type FormResult = { status: 'idle' } | { status: 'success' } | { status: 'error'; reason: 'invalid-email' | 'failed' }
 
-// Something@something.something, no spaces, as in the client check. Brevo has the final word.
-const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+// Something@something.xx (2+ characters after the last dot), no spaces, as in the client check. Brevo has the final word.
+const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/
 
 export const isEmail = (value: FormDataEntryValue | null): value is string =>
   typeof value === 'string' && EMAIL_PATTERN.test(value.trim())

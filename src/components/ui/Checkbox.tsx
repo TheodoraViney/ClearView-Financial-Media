@@ -24,6 +24,15 @@ const SIZES = {
 
 type CheckboxSize = keyof typeof SIZES
 
+// Opt-in touch target: `tall` keeps the row at least 44 high at every width, the text and box at its top (2px down,
+// as the shared-shell checkbox), instead of the size's own row (`sm` is 24 high from md). Contact form consent.
+const TARGETS = {
+  default: null,
+  tall: 'min-h-11 items-start pt-0.5',
+}
+
+type CheckboxTarget = keyof typeof TARGETS
+
 // Native checkbox kept for forms and a11y; the visible box follows it through peer-checked.
 export function Checkbox({
   label,
@@ -35,6 +44,7 @@ export function Checkbox({
   marker,
   // Box and tick easing, see motion.ts.
   motion = 'smooth',
+  target = 'default',
   className,
   ...props
 }: {
@@ -43,6 +53,7 @@ export function Checkbox({
   locked?: boolean
   marker?: ReactNode
   motion?: Motion
+  target?: CheckboxTarget
 } & Omit<ComponentProps<'input'>, 'type' | 'size'>) {
   const look = SIZES[size]
 
@@ -51,7 +62,7 @@ export function Checkbox({
       className={cx(
         'group relative flex gap-3',
         locked ? 'cursor-default' : 'cursor-pointer',
-        look.row,
+        TARGETS[target] ?? look.row,
         className,
       )}
     >

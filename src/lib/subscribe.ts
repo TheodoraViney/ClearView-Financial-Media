@@ -57,9 +57,9 @@ export const SUBSCRIBE_MAX_LENGTH = {
   jobTitle: 200,
 } as const
 
-// Something@something.something, no spaces, at most the input's maxLength, as the server checks it. Brevo has the final
+// Something@something.xx (2+ characters after the last dot), no spaces, at most the input's maxLength, as the server checks it. Brevo has the final
 // word.
-const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/
 
 export const isEmailAddress = (value: unknown): value is string =>
   typeof value === 'string' && value.trim().length <= SUBSCRIBE_MAX_LENGTH.email && EMAIL_PATTERN.test(value.trim())

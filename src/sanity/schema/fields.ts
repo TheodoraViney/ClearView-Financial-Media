@@ -3,6 +3,7 @@ import {
   type FieldDefinition,
   type Path,
   type SlugIsUniqueValidator,
+  type StringRule,
   type ValidationContext,
   defineArrayMember,
   defineField,
@@ -10,6 +11,7 @@ import {
 
 import { HEADING_LEVELS, type HeadingLevel, isHeadingLevel } from '@/lib/headings'
 import { ANCHOR_ID, LINK_HUBS, LINKABLE_TYPES, isAllowedLinkTarget } from '@/lib/links'
+import { CONSENT_LINK_TOKEN } from '@/lib/subscribe'
 
 /**
  * Alternative text for an image.
@@ -115,6 +117,17 @@ export const imageField = (
     fields: [altField, ...(options.fields ?? [])],
     validation: options.required ? (Rule) => Rule.required() : undefined,
   })
+
+/**
+ * A consent text with the Privacy Policy link token: required, and `{link}` exactly once, where the link goes. The
+ * subscribe pop-up and the Contact form share it, with a `privacyLinkLabel` text and a `privacyLink` link beside it.
+ */
+export const consentTextValidation = (Rule: StringRule) =>
+  Rule.required().custom((value: string | undefined) =>
+    !value || value.split(CONSENT_LINK_TOKEN).length === 2
+      ? true
+      : `Use ${CONSENT_LINK_TOKEN} exactly once, where the Privacy Policy link goes`,
+  )
 
 /**
  * Editor-facing name for a block, shown in Studio previews to tell similar
