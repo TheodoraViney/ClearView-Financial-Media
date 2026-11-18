@@ -54,6 +54,12 @@ export const AWARDS_PROGRAMME_PAGE_ID = 'awards-programme-page'
 /** Id of the one "Event page" document: the conference event template's labels. ClearView only. */
 export const EVENT_PAGE_ID = 'event-page'
 
+/**
+ * Id of the one "Research report page" document: the labels of the research report page and its Executive Summary
+ * page. ClearView only.
+ */
+export const RESEARCH_REPORT_PAGE_ID = 'research-report-page'
+
 /** Id of the one subscribe form settings document, shared by every brand: the Brevo list and confirmation email. */
 export const SUBSCRIBE_FORM_SETTINGS_ID = 'subscribe-form-settings'
 

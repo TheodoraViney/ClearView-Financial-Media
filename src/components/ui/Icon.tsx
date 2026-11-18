@@ -12,6 +12,7 @@ import { CloseSmIcon } from './icons/close-sm'
 import { CommentIcon } from './icons/comment'
 import { DocumentIcon } from './icons/document'
 import { DownloadIcon } from './icons/download'
+import { DownloadTrayIcon } from './icons/download-tray'
 import { DropdownChevronIcon } from './icons/dropdown-chevron'
 import { GlassesIcon } from './icons/glasses'
 import { LinkIcon } from './icons/link'
@@ -46,6 +47,7 @@ export const iconMap = {
   menu: MenuIcon,
   'menu-close': MenuCloseIcon,
   download: DownloadIcon,
+  'download-tray': DownloadTrayIcon,
   check: CheckIcon,
   'check-sm': CheckSmIcon,
   'select-chevron': SelectChevronIcon,

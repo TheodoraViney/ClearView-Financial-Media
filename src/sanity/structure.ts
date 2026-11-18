@@ -27,6 +27,7 @@ import {
   BRAND_KEYS,
   BRANDS,
   EVENT_PAGE_ID,
+  RESEARCH_REPORT_PAGE_ID,
   SIGNUP_NOTIFICATION_SETTINGS_ID,
   SUBSCRIBE_FORM_SETTINGS_ID,
   articlePageDocumentId,
@@ -40,6 +41,7 @@ import {
 } from '@/brands'
 import { BRIEF_SETTINGS_ID } from '@/lib/brief-prompt'
 import { INFOGRAPHIC_SETTINGS_ID } from '@/lib/infographic-prompt'
+import { RESEARCH_GENERATION_SETTINGS_ID } from '@/lib/research-generation-prompt'
 
 export const structure: StructureResolver = (S) =>
   S.list()
@@ -115,8 +117,8 @@ export const structure: StructureResolver = (S) =>
                         .child(S.document().schemaType('articlePage').documentId(articlePageDocumentId(key))),
                     ]
                   : []),
-                // The awards programme, event and award category pages live on ClearView Publishing only, like the other
-                // shared records.
+                // The awards programme, event, research report and award category pages live on ClearView Publishing only,
+                // like the other shared records.
                 ...(key === 'clearview'
                   ? [
                       S.listItem()
@@ -127,6 +129,10 @@ export const structure: StructureResolver = (S) =>
                         .title('Event page')
                         .icon(CalendarIcon)
                         .child(S.document().schemaType('eventPage').documentId(EVENT_PAGE_ID)),
+                      S.listItem()
+                        .title('Research report page')
+                        .icon(DocumentPdfIcon)
+                        .child(S.document().schemaType('researchReportPage').documentId(RESEARCH_REPORT_PAGE_ID)),
                       S.listItem()
                         .title('Award category page')
                         .icon(TagIcon)
@@ -146,7 +152,8 @@ export const structure: StructureResolver = (S) =>
       ),
       S.divider(),
       S.documentTypeListItem('post').title('All Posts').icon(DocumentTextIcon),
-      // How posts are classified and who wrote them, and what the infographic and brief generators are told, shared by every brand.
+      // How posts are classified and who wrote them, and what the infographic, brief and research report generators are
+      // told, shared by every brand.
       S.listItem()
         .title('Articles')
         .icon(FolderIcon)
@@ -167,6 +174,12 @@ export const structure: StructureResolver = (S) =>
                 .title('Brief instructions')
                 .icon(SparklesIcon)
                 .child(S.document().schemaType('briefSettings').documentId(BRIEF_SETTINGS_ID)),
+              S.listItem()
+                .title('Research generation instructions')
+                .icon(SparklesIcon)
+                .child(
+                  S.document().schemaType('researchGenerationSettings').documentId(RESEARCH_GENERATION_SETTINGS_ID),
+                ),
             ]),
         ),
       // What every subscribe form shares: the Brevo list and the confirmation email; and who hears about new signups.
@@ -213,6 +226,7 @@ export const structure: StructureResolver = (S) =>
         ),
       S.documentTypeListItem('conferenceEvent').title('Events').icon(CalendarIcon),
       S.documentTypeListItem('resource').title('Resources').icon(DocumentPdfIcon),
+      S.documentTypeListItem('researchSummary').title('Executive summaries').icon(DocumentTextIcon),
       S.divider(),
       S.documentTypeListItem('company').title('Companies').icon(CaseIcon),
       S.documentTypeListItem('person').title('People').icon(UserIcon),

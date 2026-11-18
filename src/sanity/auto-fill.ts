@@ -18,6 +18,7 @@ import { countryName } from '@/lib/countries'
 import { formatDateRange } from '@/lib/dates'
 import { RELATED_EVENTS_COUNT, relatedEventItems } from '@/lib/event-page'
 import { countOr, picksThenFill, present, topStoriesSplit } from '@/lib/picks'
+import { RELATED_RESEARCH_COUNT, relatedResearchItems } from '@/lib/research-report'
 
 import {
   ANY_EDITORIAL_POST_PICK,
@@ -31,6 +32,8 @@ import {
   RECORD_FILL_BRANCHES,
   RELATED_EVENT,
   RELATED_EVENTS_FILL,
+  RELATED_RESEARCH,
+  RELATED_RESEARCH_FILL,
   TOP_PICKS_FILL_OLDER,
   TOP_PICKS_FILL_RECENT,
   TOP_STORIES_FILL,
@@ -211,6 +214,42 @@ const relatedEventsSpec: AutoFillSpec = {
   max: () => RELATED_EVENTS_COUNT,
 }
 
+type RelatedReport = {
+  _id: string
+  title: string | null
+  publishedAt: string | null
+  downloadThumbnail: { asset?: { _ref?: string } | null } | null
+}
+type RelatedResearchResult = { picks: (RelatedReport | null)[] | null; fill: RelatedReport[] | null }
+
+/**
+ * A resource's own "Related research" list (research report page). The field sits on the resource, so `$block` is the
+ * whole document and its id is the report the site leaves out of its own list.
+ */
+const relatedResearchSpec: AutoFillSpec = {
+  query: /* groq */ `$block{
+    "picks": relatedResearch[]->{ ${RELATED_RESEARCH} },
+    "fill": ${RELATED_RESEARCH_FILL}
+  }`,
+  brand: 'clearview',
+  hint: 'Fills the empty places on the site with the latest research reports. Published reports only. This report never appears in its own list.',
+  select: (result, block) => {
+    const { picks, fill } = result as unknown as RelatedResearchResult
+    const excludeId = typeof block._id === 'string' ? block._id : null
+
+    return relatedResearchItems(picks, fill ?? [], { excludeId })
+      .filter((item) => !item.picked)
+      .map(({ report }) => ({
+        _id: report._id,
+        _type: 'resource',
+        title: report.title,
+        publishedAt: report.publishedAt,
+        image: report.downloadThumbnail?.asset?._ref ?? null,
+      }))
+  },
+  max: () => RELATED_RESEARCH_COUNT,
+}
+
 const SPECS: Record<string, AutoFillSpec> = {
   'topStories.slides': {
     query: /* groq */ `$block{
@@ -309,6 +348,7 @@ const SPECS: Record<string, AutoFillSpec> = {
     "Fills the empty places on the site. Published editions only. On a programme's own category pages, its edition is replaced by the next one.",
   ),
   'eventPage.relatedEvents': relatedEventsSpec,
+  'resource.relatedResearch': relatedResearchSpec,
   'awardsProgrammePage.otherProgrammes': otherProgrammesSpec(
     "Fills the empty places on the site. Published editions only. On a programme's own edition pages, its edition is replaced by the next one.",
   ),
