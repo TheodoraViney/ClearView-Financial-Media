@@ -7,6 +7,7 @@ import { Suspense } from 'react'
 import { AWARDS_PROGRAMME_PAGE_ID, brandOrigin, EVENT_PAGE_ID } from '@/brands'
 import { AwardsProgrammePage } from '@/components/sections/awards/AwardsProgrammePage'
 import { EventPage } from '@/components/sections/events/EventPage'
+import { CurrentNavSection } from '@/components/sections/header/nav-section.client'
 import { isSvg } from '@/components/ui/Media'
 import { sharedRecordHref } from '@/lib/links'
 import { editionDescription, toAwardsProgrammeView } from '@/sanity/awards-programme-view'
@@ -144,7 +145,12 @@ async function CachedEvent({ slug, perspective, variant, stega }: { slug: string
 
   const embedConsent = { text: copy.videoConsentText ?? '', button: copy.videoConsentButton ?? '' }
 
-  return <AwardsProgrammePage view={toAwardsProgrammeView({ edition: data, others, copy, ads, today, embedConsent })} />
+  return (
+    <>
+      <CurrentNavSection section="awards" />
+      <AwardsProgrammePage view={toAwardsProgrammeView({ edition: data, others, copy, ads, today, embedConsent })} />
+    </>
+  )
 }
 
 async function ConferenceEvent({ event, options }: { event: ConferenceEventData; options: DynamicFetchOptions }) {
@@ -160,5 +166,10 @@ async function ConferenceEvent({ event, options }: { event: ConferenceEventData;
     notFound()
   }
 
-  return <EventPage view={toEventPageView({ event, others, copy, ads, today })} />
+  return (
+    <>
+      <CurrentNavSection section="events" />
+      <EventPage view={toEventPageView({ event, others, copy, ads, today })} />
+    </>
+  )
 }

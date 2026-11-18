@@ -1,7 +1,9 @@
 import Link from 'next/link'
+import { type ReactNode, Suspense } from 'react'
 
 import { Container } from '@/components/ui/Container'
 
+import { CurrentLink } from './CurrentLink.client'
 import { HeaderLogo } from './HeaderLogo'
 import { HeaderStateProvider } from './HeaderState.client'
 import { MenuGroup, MenuTrigger, MobileMenu } from './MobileMenu.client'
@@ -9,11 +11,32 @@ import { NavDropdown } from './NavDropdown.client'
 import { SearchControl } from './SearchControl.client'
 import type { HeaderProps } from './types'
 
+const NAV_LINK =
+  'flex items-center text-sm leading-none whitespace-nowrap text-foreground transition-colors duration-180 ease-smooth hover:text-grey current:font-medium current:text-accent current:inset-shadow-bar'
+
 const MENU_ROW =
-  'flex min-h-12 items-center border-b border-border text-base leading-none font-medium text-foreground transition-colors duration-180 ease-out hover:text-grey'
+  'flex min-h-12 items-center border-b border-border text-base leading-none font-medium text-foreground transition-colors duration-180 ease-out hover:text-grey current:text-accent'
+
+/** A menu link marked as current while its section is open; until the pathname resolves, the plain link renders. */
+function NavLink({ href, className, children }: { href: string; className: string; children: ReactNode }) {
+  return (
+    <Suspense
+      fallback={
+        <Link href={href} className={className}>
+          {children}
+        </Link>
+      }
+    >
+      <CurrentLink href={href} className={className}>
+        {children}
+      </CurrentLink>
+    </Suspense>
+  )
+}
 
 /**
- * ClearView group header: links and dropdown groups, no current-page state. On desktop (the
+ * ClearView group header: links and dropdown groups; a link is marked as current while its section is open
+ * (for example Awards on /events-category/awards), as on the publication headers. On desktop (the
  * `header` breakpoint) the logo and search sit in cells at the page edge with 24px padding, not
  * on the page gutter, and the menu is centred between them. Below it: logo, search and the menu
  * button, with groups as accordions in the menu panel.
@@ -32,12 +55,9 @@ export function GroupHeader({ logo, homeHref, items, searchPlaceholder, searchLa
                 {items.map((item) => (
                   <li key={item.key} className="flex">
                     {item.kind === 'link' ? (
-                      <Link
-                        href={item.href}
-                        className="flex items-center text-sm leading-none whitespace-nowrap text-foreground transition-colors duration-180 ease-smooth hover:text-grey"
-                      >
+                      <NavLink href={item.href} className={NAV_LINK}>
                         {item.label}
-                      </Link>
+                      </NavLink>
                     ) : (
                       <NavDropdown label={item.label} links={item.links} />
                     )}
@@ -57,9 +77,9 @@ export function GroupHeader({ logo, homeHref, items, searchPlaceholder, searchLa
               {items.map((item) => (
                 <li key={item.key}>
                   {item.kind === 'link' ? (
-                    <Link href={item.href} className={MENU_ROW}>
+                    <NavLink href={item.href} className={MENU_ROW}>
                       {item.label}
-                    </Link>
+                    </NavLink>
                   ) : (
                     <MenuGroup label={item.label} links={item.links} />
                   )}
