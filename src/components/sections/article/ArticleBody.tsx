@@ -252,6 +252,17 @@ const smallRichTextComponents: PortableTextComponents = {
   },
 }
 
+// `lg`: paragraphs 20/28 (research Executive Summary lead); the rest as the article body.
+const largeRichTextComponents: PortableTextComponents = {
+  ...richTextComponents,
+  block: {
+    ...blocks,
+    normal: ({ children }) => <p className="text-title-lg leading-7 text-pretty">{children}</p>,
+  },
+}
+
+const SIZE_COMPONENTS = { base: richTextComponents, sm: smallRichTextComponents, lg: largeRichTextComponents }
+
 /**
  * A `richText` field outside an article (a shared record's introduction, a judge's biography): the body members
  * without the article banner. Spacing between members comes from `.article-flow`. Paragraphs take the text colour
@@ -260,15 +271,18 @@ const smallRichTextComponents: PortableTextComponents = {
 export function RichText({
   value,
   size = 'base',
+  spacing = 'default',
   className,
 }: {
   value: PortableTextProps['value']
-  size?: 'base' | 'sm'
+  size?: 'base' | 'sm' | 'lg'
+  /** Opt-in `tight`: 16px between every member (research Executive Summary, split-editorial-section). */
+  spacing?: 'default' | 'tight'
   className?: string
 }) {
   return (
-    <div className={cx('article-flow min-w-0', className)}>
-      <PortableText value={value} components={size === 'sm' ? smallRichTextComponents : richTextComponents} />
+    <div className={cx('article-flow min-w-0', spacing === 'tight' && 'article-flow-tight', className)}>
+      <PortableText value={value} components={SIZE_COMPONENTS[size]} />
     </div>
   )
 }

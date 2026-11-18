@@ -12,14 +12,34 @@ const eventLocations = defineLocations({
     doc?.slug ? { locations: [{ title: doc.title ?? 'Untitled', href: `/events/${doc.slug}` }] } : null,
 })
 
+// A research report: its page and its Executive Summary page (/resource/{slug}/{summary slug}) on ClearView. The
+// summary page exists only while its document has content, but the location is listed whenever the report points at a
+// summary with a slug, so the editor can open it once it is filled. The summary document itself lists no locations:
+// the report that uses it is a reverse lookup, which `defineLocations` cannot select.
+const resourceLocations = defineLocations({
+  select: { title: 'title', slug: 'slug.current', summarySlug: 'executiveSummaryPage.slug.current' },
+  resolve: (doc) =>
+    doc?.slug
+      ? {
+          locations: [
+            { title: doc.title ?? 'Untitled', href: `/resource/${doc.slug}` },
+            ...(doc.summarySlug
+              ? [{ title: 'Executive Summary', href: `/resource/${doc.slug}/${encodeURIComponent(doc.summarySlug)}` }]
+              : []),
+          ],
+        }
+      : null,
+})
+
 // The shared listings page's routes on ClearView: one `page` document with three tabs, never served at its slug.
-// Summits, briefings and webinars all open the Events tab.
+// Summits, briefings and webinars all open the Events tab; bare /resource opens the Research tab.
 const SHARED_LISTINGS_ROUTES = [
   { title: 'Awards', href: '/events-category/awards' },
   { title: 'Events', href: '/events-category/summits' },
   { title: 'Events (briefings)', href: '/events-category/briefings' },
   { title: 'Events (webinars)', href: '/events-category/webinar' },
   { title: 'Research', href: '/resource-categories/research' },
+  { title: 'Research (/resource)', href: '/resource' },
 ]
 
 export const presentationTools: PluginOptions[] = BRAND_KEYS.map((key) =>
@@ -58,6 +78,17 @@ export const presentationTools: PluginOptions[] = BRAND_KEYS.map((key) =>
                 route: '/events/:slug',
                 filter: '_type in ["awardsProgramme", "conferenceEvent"] && slug.current == $slug',
               },
+              // A research report, and its Executive Summary page: the summary document the report points at. The
+              // report's own fields on that page (title, details, key takeaways) stay click-to-edit.
+              {
+                route: '/resource/:slug',
+                filter: '_type == "resource" && slug.current == $slug',
+              },
+              {
+                route: '/resource/:slug/:summary',
+                filter:
+                  '_type == "researchSummary" && slug.current == $summary && _id in *[_type == "resource" && slug.current == $slug].executiveSummaryPage._ref',
+              },
               // The listing rows are the records' own; the blocks (hero, listing labels, sidebar) are the shared listings
               // page document's.
               ...SHARED_LISTINGS_ROUTES.map(({ href }) => ({
@@ -74,8 +105,8 @@ export const presentationTools: PluginOptions[] = BRAND_KEYS.map((key) =>
         },
       ]),
       locations: {
-        // Awards editions and conference events are shared records, served on ClearView only.
-        ...(key === 'clearview' ? { awardsProgramme: eventLocations, conferenceEvent: eventLocations } : {}),
+        // Awards editions, conference events and research reports are shared records, served on ClearView only.
+        ...(key === 'clearview' ? { awardsProgramme: eventLocations, conferenceEvent: eventLocations, resource: resourceLocations } : {}),
         page: defineLocations({
           select: {
             id: '_id',

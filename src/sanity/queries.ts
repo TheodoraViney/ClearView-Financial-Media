@@ -13,6 +13,8 @@ import {
   OTHER_AWARDS_FILL,
   RELATED_EVENT,
   RELATED_EVENTS_FILL,
+  RELATED_RESEARCH,
+  RELATED_RESEARCH_FILL,
   SUBSCRIBE_MODAL,
 } from './fragments'
 
@@ -186,6 +188,17 @@ export const MOST_READ_LATEST_QUERY = defineQuery(`
     && $brand in brands
     && defined(slug.current)
     && slug.current != $slug
+  ] | order(publishedAt desc)[0...$limit]{ ${ARTICLE_CARD} }
+`)
+
+// Most read on a ClearView page (the research report sidebar): ClearView runs no posts of its own, so the latest posts
+// of the editorial publications (`$brands`: EDITORIAL_BRAND_KEYS), as the ClearView Top stories fill. mostReadGroupFill
+// in most-read.ts is the swap point for a measured source.
+export const MOST_READ_GROUP_LATEST_QUERY = defineQuery(`
+  *[
+    _type == "post"
+    && defined(slug.current)
+    && count(brands[@ in $brands]) > 0
   ] | order(publishedAt desc)[0...$limit]{ ${ARTICLE_CARD} }
 `)
 
@@ -746,5 +759,88 @@ export const SHARED_LISTINGS_PAGE_QUERY = defineQuery(`
       "slug": slug.current,
       publishedAt
     }
+  }
+`)
+
+// A research report at /resource/{slug} and its Executive Summary page (/resource/{slug}/{summary slug}, the report's
+// `executiveSummaryPage` document), ClearView only. Everything both pages show: the legacy `body` has no place in the
+// design (wb-g-research-report v1.1) and only feeds the metadata description as plain text, as do the rich text
+// summary, lead and introduction (pt::text). A field still holding a plain string from before the rich text change
+// reads as null. Authors and the partner company dereference in the request's perspective, so a person or company
+// unpublished after picking drops out (null) on the live site. The related research picks and fill go through
+// relatedResearchItems (src/lib/research-report.ts), shared with the Studio panel.
+export const RESEARCH_REPORT_QUERY = defineQuery(`
+  *[_type == "resource" && slug.current == $slug][0]{
+    _id,
+    _type,
+    title,
+    "slug": slug.current,
+    publishedAt,
+    edition,
+    standfirst,
+    summary[]{ ${ARTICLE_BODY} },
+    "summaryText": pt::text(summary),
+    "bodyText": pt::text(body),
+    "featuredImage": featuredImage{ ${IMAGE} },
+    "downloadThumbnail": downloadThumbnail{ ${IMAGE} },
+    downloadUrl,
+    "downloadFileUrl": downloadFile.asset->url,
+    keyFindings[]{ _key, value, text, note },
+    methodologyIntro[]{ ${ARTICLE_BODY} },
+    methodology[]{ _key, label, value },
+    charts[]{ _key, title, note, gauges[]{ _key, label, value, percent, current } },
+    insights,
+    "authors": authors[]->{ _id, title },
+    researchPartner{
+      description,
+      "company": company->{ _id, title, "logo": logo{ ${IMAGE} }, websiteUrl }
+    },
+    "executiveSummaryPage": executiveSummaryPage->{
+      _id,
+      _type,
+      "slug": slug.current,
+      lead[]{ ${ARTICLE_BODY} },
+      "leadText": pt::text(lead),
+      intro[]{ ${ARTICLE_BODY} },
+      "introText": pt::text(intro),
+      sections[]{ _key, heading, body[]{ ${ARTICLE_BODY} } }
+    },
+    "relatedResearch": relatedResearch[]->{ ${RELATED_RESEARCH} },
+    "relatedResearchFill": ${RELATED_RESEARCH_FILL}
+  }
+`)
+
+// The research report pages' labels and headings (`$id` is RESEARCH_REPORT_PAGE_ID), one cached result for every
+// report. The pages 404 until the document is published.
+export const RESEARCH_REPORT_PAGE_QUERY = defineQuery(`
+  *[_id == $id && _type == "researchReportPage"][0]{
+    breadcrumbHomeLabel,
+    breadcrumbResearchLabel,
+    typeLabel,
+    downloadLabel,
+    readFullSummaryLabel,
+    companyProfileLabel,
+    navExecutiveSummaryLabel,
+    navKeyFindingsLabel,
+    navMethodologyLabel,
+    navInsightsLabel,
+    navResearchPartnerLabel,
+    navRelatedResearchLabel,
+    summaryBreadcrumbLabel,
+    summaryTitle,
+    summaryReportLabel,
+    summaryEditionLabel,
+    summaryDateLabel,
+    summaryPartnerLabel,
+    backToReportLabel,
+    executiveSummaryHeading[]{ _key, style, children[]{ _key, text } },
+    keyFindingsHeading[]{ _key, style, children[]{ _key, text } },
+    methodologyHeading[]{ _key, style, children[]{ _key, text } },
+    insightsHeading[]{ _key, style, children[]{ _key, text } },
+    selectedInsightsHeading[]{ _key, style, children[]{ _key, text } },
+    researchPartnerHeading[]{ _key, style, children[]{ _key, text } },
+    relatedResearchHeading[]{ _key, style, children[]{ _key, text } },
+    keyTakeawaysHeading[]{ _key, style, children[]{ _key, text } },
+    mostReadHeading[]{ _key, style, children[]{ _key, text } }
   }
 `)

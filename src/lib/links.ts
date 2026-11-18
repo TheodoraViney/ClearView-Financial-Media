@@ -213,6 +213,12 @@ export const EVENT_LISTING_PATHS = {
  */
 export const RESEARCH_LISTING_PATH = '/resource-categories/research'
 
+/**
+ * Bare `/resource`, the reports' own prefix: a legacy clearviewpublishing.com URL in the redirect baseline. It shows
+ * the same Research tab, its canonical pointing at RESEARCH_LISTING_PATH, as /events-category/briefings does at summits.
+ */
+export const RESEARCH_PREFIX_LISTING_PATH = '/resource'
+
 export type EventType = keyof typeof EVENT_LISTING_PATHS
 
 export const isEventType = (value: unknown): value is EventType =>

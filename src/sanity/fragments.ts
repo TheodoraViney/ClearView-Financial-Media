@@ -662,3 +662,26 @@ export const RELATED_EVENTS_FILL = /* groq */ `
     ] | order(startDate desc)[0...6]{ ${RELATED_EVENT} }
   ]
 `
+
+/** A report in the research report page's "Related research" list. */
+export const RELATED_RESEARCH = /* groq */ `
+  _id,
+  _type,
+  title,
+  "slug": slug.current,
+  publishedAt,
+  "downloadThumbnail": downloadThumbnail{ ${IMAGE} }
+`
+
+// The research report page's "Related research" fill: research reports newest first, in the Research listing's order
+// (undated ones last). It does not leave out the page's own report: the adapter (relatedResearchItems in
+// src/lib/research-report.ts) skips it and the picked ones, so the query is the same on every report page and in the
+// Studio panel "Shown automatically now" (src/sanity/auto-fill.ts). It fetches the list's size plus the most it can
+// skip: RELATED_RESEARCH_COUNT picks and the page's own report (3 + 3 + 1).
+export const RELATED_RESEARCH_FILL = /* groq */ `
+  *[
+    _type == "resource"
+    && category == "research"
+    && defined(slug.current)
+  ] | order(defined(publishedAt) desc, publishedAt desc, legacyWpId desc)[0...7]{ ${RELATED_RESEARCH} }
+`
