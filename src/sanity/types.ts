@@ -28,6 +28,26 @@ export type PageReference = {
   [internalGroqTypeReferenceTo]?: "page";
 };
 
+export type Link = {
+  kind?: "internal" | "external" | "hub";
+  internal?: PageReference;
+  external?: string;
+  hub?: "awards" | "events" | "research";
+};
+
+export type SearchLabels = {
+  articles?: string;
+  events?: string;
+  awards?: string;
+  resources?: string;
+  nothingFound?: string;
+};
+
+export type CtaLink = {
+  label?: string;
+  href?: string;
+};
+
 export type PostReference = {
   _ref: string;
   _type: "reference";
@@ -54,31 +74,6 @@ export type ResourceReference = {
   _type: "reference";
   _weak?: boolean;
   [internalGroqTypeReferenceTo]?: "resource";
-};
-
-export type Link = {
-  kind?: "internal" | "external" | "hub";
-  internal?:
-    | PageReference
-    | PostReference
-    | ConferenceEventReference
-    | AwardsProgrammeReference
-    | ResourceReference;
-  external?: string;
-  hub?: "awards" | "events" | "research";
-};
-
-export type SearchLabels = {
-  articles?: string;
-  events?: string;
-  awards?: string;
-  resources?: string;
-  nothingFound?: string;
-};
-
-export type CtaLink = {
-  label?: string;
-  href?: string;
 };
 
 export type SponsoredContentLink = {
@@ -3615,13 +3610,13 @@ export type Geopoint = {
 
 export type AllSanitySchemaTypes =
   | PageReference
+  | Link
+  | SearchLabels
+  | CtaLink
   | PostReference
   | ConferenceEventReference
   | AwardsProgrammeReference
   | ResourceReference
-  | Link
-  | SearchLabels
-  | CtaLink
   | SponsoredContentLink
   | PostCardsLink
   | PostBriefsLink
@@ -3767,43 +3762,17 @@ export type SHELL_QUERY_RESULT = {
                   kind: "external" | "hub" | "internal" | null;
                   external: string | null;
                   hub: "awards" | "events" | "research" | null;
-                  internal:
-                    | {
-                        _type: "awardsProgramme";
-                        slug: string | null;
-                        brand: null;
-                        brands: null;
-                      }
-                    | {
-                        _type: "conferenceEvent";
-                        slug: string | null;
-                        brand: null;
-                        brands: null;
-                      }
-                    | {
-                        _type: "page";
-                        slug: string | null;
-                        brand:
-                          | "clearview"
-                          | "familywealthreport"
-                          | "wealthbriefing"
-                          | "wealthbriefingasia"
-                          | null;
-                        brands: null;
-                      }
-                    | {
-                        _type: "post";
-                        slug: string | null;
-                        brand: null;
-                        brands: Array<string> | null;
-                      }
-                    | {
-                        _type: "resource";
-                        slug: string | null;
-                        brand: null;
-                        brands: null;
-                      }
-                    | null;
+                  internal: {
+                    _type: "page";
+                    slug: string | null;
+                    brand:
+                      | "clearview"
+                      | "familywealthreport"
+                      | "wealthbriefing"
+                      | "wealthbriefingasia"
+                      | null;
+                    brands: null;
+                  } | null;
                 } | null;
               }> | null;
             }
@@ -3815,43 +3784,17 @@ export type SHELL_QUERY_RESULT = {
                 kind: "external" | "hub" | "internal" | null;
                 external: string | null;
                 hub: "awards" | "events" | "research" | null;
-                internal:
-                  | {
-                      _type: "awardsProgramme";
-                      slug: string | null;
-                      brand: null;
-                      brands: null;
-                    }
-                  | {
-                      _type: "conferenceEvent";
-                      slug: string | null;
-                      brand: null;
-                      brands: null;
-                    }
-                  | {
-                      _type: "page";
-                      slug: string | null;
-                      brand:
-                        | "clearview"
-                        | "familywealthreport"
-                        | "wealthbriefing"
-                        | "wealthbriefingasia"
-                        | null;
-                      brands: null;
-                    }
-                  | {
-                      _type: "post";
-                      slug: string | null;
-                      brand: null;
-                      brands: Array<string> | null;
-                    }
-                  | {
-                      _type: "resource";
-                      slug: string | null;
-                      brand: null;
-                      brands: null;
-                    }
-                  | null;
+                internal: {
+                  _type: "page";
+                  slug: string | null;
+                  brand:
+                    | "clearview"
+                    | "familywealthreport"
+                    | "wealthbriefing"
+                    | "wealthbriefingasia"
+                    | null;
+                  brands: null;
+                } | null;
               } | null;
               links: null;
             }
@@ -3871,43 +3814,17 @@ export type SHELL_QUERY_RESULT = {
             kind: "external" | "hub" | "internal" | null;
             external: string | null;
             hub: "awards" | "events" | "research" | null;
-            internal:
-              | {
-                  _type: "awardsProgramme";
-                  slug: string | null;
-                  brand: null;
-                  brands: null;
-                }
-              | {
-                  _type: "conferenceEvent";
-                  slug: string | null;
-                  brand: null;
-                  brands: null;
-                }
-              | {
-                  _type: "page";
-                  slug: string | null;
-                  brand:
-                    | "clearview"
-                    | "familywealthreport"
-                    | "wealthbriefing"
-                    | "wealthbriefingasia"
-                    | null;
-                  brands: null;
-                }
-              | {
-                  _type: "post";
-                  slug: string | null;
-                  brand: null;
-                  brands: Array<string> | null;
-                }
-              | {
-                  _type: "resource";
-                  slug: string | null;
-                  brand: null;
-                  brands: null;
-                }
-              | null;
+            internal: {
+              _type: "page";
+              slug: string | null;
+              brand:
+                | "clearview"
+                | "familywealthreport"
+                | "wealthbriefing"
+                | "wealthbriefingasia"
+                | null;
+              brands: null;
+            } | null;
           } | null;
           links: null;
         }> | null;
@@ -3974,43 +3891,17 @@ export type SHELL_QUERY_RESULT = {
               kind: "external" | "hub" | "internal" | null;
               external: string | null;
               hub: "awards" | "events" | "research" | null;
-              internal:
-                | {
-                    _type: "awardsProgramme";
-                    slug: string | null;
-                    brand: null;
-                    brands: null;
-                  }
-                | {
-                    _type: "conferenceEvent";
-                    slug: string | null;
-                    brand: null;
-                    brands: null;
-                  }
-                | {
-                    _type: "page";
-                    slug: string | null;
-                    brand:
-                      | "clearview"
-                      | "familywealthreport"
-                      | "wealthbriefing"
-                      | "wealthbriefingasia"
-                      | null;
-                    brands: null;
-                  }
-                | {
-                    _type: "post";
-                    slug: string | null;
-                    brand: null;
-                    brands: Array<string> | null;
-                  }
-                | {
-                    _type: "resource";
-                    slug: string | null;
-                    brand: null;
-                    brands: null;
-                  }
-                | null;
+              internal: {
+                _type: "page";
+                slug: string | null;
+                brand:
+                  | "clearview"
+                  | "familywealthreport"
+                  | "wealthbriefing"
+                  | "wealthbriefingasia"
+                  | null;
+                brands: null;
+              } | null;
             } | null;
           }> | null;
         }> | null;
@@ -4042,43 +3933,17 @@ export type SHELL_QUERY_RESULT = {
               kind: "external" | "hub" | "internal" | null;
               external: string | null;
               hub: "awards" | "events" | "research" | null;
-              internal:
-                | {
-                    _type: "awardsProgramme";
-                    slug: string | null;
-                    brand: null;
-                    brands: null;
-                  }
-                | {
-                    _type: "conferenceEvent";
-                    slug: string | null;
-                    brand: null;
-                    brands: null;
-                  }
-                | {
-                    _type: "page";
-                    slug: string | null;
-                    brand:
-                      | "clearview"
-                      | "familywealthreport"
-                      | "wealthbriefing"
-                      | "wealthbriefingasia"
-                      | null;
-                    brands: null;
-                  }
-                | {
-                    _type: "post";
-                    slug: string | null;
-                    brand: null;
-                    brands: Array<string> | null;
-                  }
-                | {
-                    _type: "resource";
-                    slug: string | null;
-                    brand: null;
-                    brands: null;
-                  }
-                | null;
+              internal: {
+                _type: "page";
+                slug: string | null;
+                brand:
+                  | "clearview"
+                  | "familywealthreport"
+                  | "wealthbriefing"
+                  | "wealthbriefingasia"
+                  | null;
+                brands: null;
+              } | null;
             } | null;
           }> | null;
         }> | null;
