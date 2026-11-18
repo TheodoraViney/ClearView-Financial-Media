@@ -9,7 +9,7 @@ import {
 } from 'sanity'
 
 import { HEADING_LEVELS, type HeadingLevel, isHeadingLevel } from '@/lib/headings'
-import { ANCHOR_ID, LINKABLE_TYPES, isAllowedLinkTarget } from '@/lib/links'
+import { ANCHOR_ID, LINK_HUBS, LINKABLE_TYPES, isAllowedLinkTarget } from '@/lib/links'
 
 /**
  * Alternative text for an image.
@@ -130,21 +130,23 @@ export const adminLabelField = defineField({
 
 const ANCHOR_HREF = new RegExp(`^#${ANCHOR_ID.source.slice(1)}`)
 
-type LinkKind = 'internal' | 'external'
+type LinkKind = 'internal' | 'external' | 'hub'
 
-type LinkValue = { kind?: LinkKind; internal?: { _ref?: string }; external?: string; label?: string }
+type LinkValue = { kind?: LinkKind; internal?: { _ref?: string }; external?: string; hub?: string; label?: string }
 
 /** What `requiredWhen` gets: the document and the path of the link object itself. */
 export type LinkRequiredContext = { document: ValidationContext['document']; path: Path }
 
 /**
- * A link to a document in the dataset or to an allowlisted address.
+ * A link to a document in the dataset, to an allowlisted address, or to the ClearView listing of all awards, events or research.
  *
  * `internal` references a routable document and resolves to a path at render
  * time, so a renamed slug never leaves a stale href behind. `external` accepts
  * http(s), mailto, tel and site-relative paths only, the same rule the runtime
  * guard in `src/lib/links.ts` applies, because API writes skip this
- * validation.
+ * validation. `hub` ("All awards, events or research") picks Awards, Events or Research, the
+ * ClearView listings in `LINK_HUBS`, resolved per host: relative on ClearView,
+ * absolute to the ClearView origin of the current environment elsewhere.
  *
  * `required` makes the link and its target mandatory always; `requiredWhen`
  * does the same only while it returns true, for a link whose need depends on
@@ -152,7 +154,7 @@ export type LinkRequiredContext = { document: ValidationContext['document']; pat
  *
  * An optional link left half-filled is an error ("… or clear the link"), but
  * only once the editor has acted on it: a label typed, or the type switched to
- * Web address. A new block gets `{ kind: 'internal' }` from the nested initial
+ * Web address or a listing page (All awards, events or research). A new block gets `{ kind: 'internal' }` from the nested initial
  * values without anyone touching the link, and that alone must not block
  * publishing.
  */
@@ -216,6 +218,7 @@ export const linkField = (
           list: [
             { title: 'Page or document', value: 'internal' },
             { title: 'Web address', value: 'external' },
+            { title: 'All awards, events or research', value: 'hub' },
           ],
           layout: 'radio',
           direction: 'horizontal',
@@ -273,6 +276,28 @@ export const linkField = (
               : allowAnchor
                 ? 'Use https://, http://, mailto:, tel:, a path starting with a single / or #id'
                 : 'Use https://, http://, mailto:, tel: or a path starting with a single /'
+          }),
+      }),
+      defineField({
+        name: 'hub',
+        title: 'Page',
+        type: 'string',
+        description:
+          'Opens the page listing all awards, events or research on ClearView Publishing. Works from every publication.',
+        options: {
+          list: LINK_HUBS.map(({ value, title }) => ({ value, title })),
+          layout: 'radio',
+          direction: 'horizontal',
+        },
+        hidden: ({ parent }) => kindOf(parent) !== 'hub',
+        validation: (Rule) =>
+          Rule.custom((value, context) => {
+            if (kindOf(context.parent) !== 'hub' || value) {
+              return true
+            }
+
+            // The listing kind is never the initial value: the editor chose it.
+            return subFieldRequired(context) ? 'Choose awards, events or research' : 'Choose awards, events or research, or clear the link'
           }),
       }),
       ...(withLabel

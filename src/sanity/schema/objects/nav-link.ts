@@ -1,6 +1,8 @@
 import { LinkIcon } from '@sanity/icons/Link'
 import { defineField, defineType } from 'sanity'
 
+import { LINK_HUBS } from '@/lib/links'
+
 import { linkField } from '../fields'
 
 /** One header menu item: visible text plus where it goes. */
@@ -25,10 +27,16 @@ export const navLink = defineType({
       label: 'label',
       kind: 'link.kind',
       external: 'link.external',
+      hub: 'link.hub',
       internalTitle: 'link.internal.title',
     },
-    prepare({ label, kind, external, internalTitle }) {
-      const target = kind === 'external' ? external : internalTitle
+    prepare({ label, kind, external, hub, internalTitle }) {
+      const target =
+        kind === 'external'
+          ? external
+          : kind === 'hub'
+            ? LINK_HUBS.find((candidate) => candidate.value === hub)?.title
+            : internalTitle
 
       return {
         title: label || 'Untitled link',

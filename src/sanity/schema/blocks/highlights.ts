@@ -81,7 +81,7 @@ type PromoValue = {
   title?: string
   description?: string
   image?: { asset?: Ref }
-  link?: { internal?: Ref; external?: string }
+  link?: { internal?: Ref; external?: string; hub?: string }
 }
 
 /** The page brand of the document the block sits in. */
@@ -106,7 +106,8 @@ const promoRequired = (source: unknown, promo: PromoValue | undefined, document:
       promo?.description?.trim() ||
       promo?.image?.asset?._ref ||
       promo?.link?.internal?._ref ||
-      promo?.link?.external?.trim(),
+      promo?.link?.external?.trim() ||
+      promo?.link?.hub,
   )
 
 /** promoRequired for a field inside the promo: the path ends at promo.<field>, and the parent is the promo. */

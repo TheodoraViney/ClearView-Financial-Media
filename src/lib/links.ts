@@ -76,6 +76,7 @@ export function researchDownloadHref(report: {
 export type ResolvableLink = {
   kind?: string | null
   external?: string | null
+  hub?: string | null
   internal?: {
     _type: string
     slug?: string | null
@@ -112,8 +113,14 @@ export function resolveHref(
     return null
   }
 
-  if (stegaClean(link.kind) === 'external') {
+  const kind = stegaClean(link.kind)
+
+  if (kind === 'external') {
     return safeHref(link.external)
+  }
+
+  if (kind === 'hub') {
+    return hubHref(link.hub, currentBrand)
   }
 
   const target = link.internal
@@ -231,6 +238,33 @@ export const RESEARCH_LISTING_PATH = '/resource-categories/research'
 export const RESEARCH_PREFIX_LISTING_PATH = '/resource'
 
 export type EventType = keyof typeof EVENT_LISTING_PATHS
+
+/**
+ * The ClearView sections a link can point at with the "All awards, events or research" link type (linkField kind `hub`), in the
+ * order Studio lists them. Events opens the summits listing, the Events tab that lists every conference event.
+ */
+export const LINK_HUBS = [
+  { value: 'awards', title: 'Awards', path: AWARDS_LISTING_PATH },
+  { value: 'events', title: 'Events', path: EVENT_LISTING_PATHS.summit },
+  { value: 'research', title: 'Research', path: RESEARCH_LISTING_PATH },
+] as const
+
+export type LinkHub = (typeof LINK_HUBS)[number]['value']
+
+/**
+ * Href of a ClearView section link. Shared record rules as `sharedRecordHref`: relative on the ClearView host,
+ * absolute to the ClearView origin on every other brand host. Null for an unknown or empty value.
+ */
+export function hubHref(hub: string | null | undefined, currentBrand: BrandKey): string | null {
+  const value = stegaClean(hub)
+  const path = LINK_HUBS.find((candidate) => candidate.value === value)?.path
+
+  if (!path) {
+    return null
+  }
+
+  return currentBrand === 'clearview' ? path : `${brandOrigin('clearview')}${path}`
+}
 
 export const isEventType = (value: unknown): value is EventType =>
   typeof value === 'string' && Object.hasOwn(EVENT_LISTING_PATHS, value)
