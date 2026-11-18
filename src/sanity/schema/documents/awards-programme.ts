@@ -30,10 +30,12 @@ export const awardsProgramme = defineType({
     { name: 'schedule', title: 'Date and time' },
     { name: 'judges', title: 'Judges' },
     { name: 'nominations', title: 'Nominations and winners' },
-    { name: 'sponsors', title: 'Sponsors' },
+    // Legacy WordPress fields only, all hidden: tab hidden in the Studio. Remove before launch if unused.
+    { name: 'sponsors', title: 'Sponsors', hidden: true },
     { name: 'media', title: 'Media' },
     { name: 'registration', title: 'Registration' },
-    { name: 'extra', title: 'Extra tabs' },
+    // Legacy WordPress fields only, all hidden: tab hidden in the Studio. Remove before launch if unused.
+    { name: 'extra', title: 'Extra tabs', hidden: true },
   ],
   fields: [
     defineField({
@@ -103,6 +105,8 @@ export const awardsProgramme = defineType({
       title: 'Key dates',
       type: 'richText',
       group: 'details',
+      // Legacy WordPress field, not in the new design: hidden in the Studio, data kept. Remove before launch if unused.
+      hidden: true,
     }),
 
     defineField({
@@ -135,6 +139,8 @@ export const awardsProgramme = defineType({
       title: 'Timezone code',
       type: 'string',
       group: 'schedule',
+      // Legacy WordPress field, not in the new design: hidden in the Studio, data kept. Remove before launch if unused.
+      hidden: true,
       description: 'Free text in the source, for example "EST".',
     }),
     defineField({
@@ -187,12 +193,16 @@ export const awardsProgramme = defineType({
       title: 'Winners announcement date',
       type: 'date',
       group: 'nominations',
+      // Legacy WordPress field, not in the new design: hidden in the Studio, data kept. Remove before launch if unused.
+      hidden: true,
     }),
     defineField({
       name: 'categoriesContent',
       title: 'Categories and entry process',
       type: 'richText',
       group: 'nominations',
+      // Legacy WordPress field, not in the new design: hidden in the Studio, data kept. Remove before launch if unused.
+      hidden: true,
       description:
         'The prose "Categories" tab from the source. The typed categories are the Winners rows below.',
     }),
@@ -227,12 +237,16 @@ export const awardsProgramme = defineType({
       title: 'Finalists',
       type: 'richText',
       group: 'nominations',
+      // Legacy WordPress field, not in the new design: hidden in the Studio, data kept. Remove before launch if unused.
+      hidden: true,
     }),
     defineField({
       name: 'previousWinners',
       title: 'Previous winners',
       type: 'richText',
       group: 'nominations',
+      // Legacy WordPress field, not in the new design: hidden in the Studio, data kept. Remove before launch if unused.
+      hidden: true,
       description: 'Prose in the source and kept as prose. Only the current edition is typed.',
     }),
     defineField({
@@ -240,6 +254,8 @@ export const awardsProgramme = defineType({
       title: 'Award winners supplement',
       type: 'richText',
       group: 'nominations',
+      // Legacy WordPress field, not in the new design: hidden in the Studio, data kept. Remove before launch if unused.
+      hidden: true,
     }),
     defineField({
       name: 'acclaim',
@@ -253,6 +269,8 @@ export const awardsProgramme = defineType({
       title: 'Charity partners',
       type: 'array',
       group: 'nominations',
+      // Legacy WordPress field, not in the new design: hidden in the Studio, data kept. Remove before launch if unused.
+      hidden: true,
       of: [defineArrayMember({ type: 'reference', to: [{ type: 'company' }] })],
       validation: (Rule) => Rule.unique(),
     }),
@@ -262,6 +280,8 @@ export const awardsProgramme = defineType({
       title: 'Sponsor tiers',
       type: 'array',
       group: 'sponsors',
+      // Legacy WordPress field, not in the new design: hidden in the Studio, data kept. Remove before launch if unused.
+      hidden: true,
       of: [defineArrayMember({ type: 'companyGroup' })],
     }),
     defineField({
@@ -269,12 +289,16 @@ export const awardsProgramme = defineType({
       title: 'Sponsor benefits',
       type: 'richText',
       group: 'sponsors',
+      // Legacy WordPress field, not in the new design: hidden in the Studio, data kept. Remove before launch if unused.
+      hidden: true,
     }),
     defineField({
       name: 'sponsorVideos',
       title: 'Sponsor videos',
       type: 'videoGallery',
       group: 'sponsors',
+      // Legacy WordPress field, not in the new design: hidden in the Studio, data kept. Remove before launch if unused.
+      hidden: true,
     }),
 
     defineField({
@@ -282,6 +306,8 @@ export const awardsProgramme = defineType({
       title: 'Winner videos',
       type: 'videoGallery',
       group: 'media',
+      // Legacy WordPress field, not in the new design: hidden in the Studio, data kept. Remove before launch if unused.
+      hidden: true,
     }),
     defineField({
       name: 'highlightsVideoId',
@@ -352,6 +378,8 @@ export const awardsProgramme = defineType({
       title: 'Registration details',
       type: 'richText',
       group: 'registration',
+      // Legacy WordPress field, not in the new design: hidden in the Studio, data kept. Remove before launch if unused.
+      hidden: true,
     }),
 
     defineField({
@@ -359,12 +387,16 @@ export const awardsProgramme = defineType({
       title: 'Frequently asked questions',
       type: 'richText',
       group: 'extra',
+      // Legacy WordPress field, not in the new design: hidden in the Studio, data kept. Remove before launch if unused.
+      hidden: true,
     }),
     defineField({
       name: 'customTabs',
       title: 'Custom tabs',
       type: 'array',
       group: 'extra',
+      // Legacy WordPress field, not in the new design: hidden in the Studio, data kept. Remove before launch if unused.
+      hidden: true,
       of: [defineArrayMember({ type: 'customTab' })],
     }),
     legacyWpIdField,
