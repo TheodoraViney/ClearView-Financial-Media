@@ -63,6 +63,8 @@ export type AutoFillItem = {
   publishedAt?: string | null
   startDate?: string | null
   endDate?: string | null
+  /** "Hide the date and time on the page" on an event or awards edition: the panel leaves the date out too. */
+  hideDateTime?: boolean | null
   image?: string | null
   sponsored?: boolean | null
   /** A line under the title in place of the date, when the list has more to say (awards sidebar: status, country, dates). */
@@ -118,7 +120,7 @@ const ofType = <T extends { _type?: string }>(items: (T | null)[] | null | undef
 
 const recordType = (source: unknown) => highlightsSourceOf(source)?.type
 
-type SidebarEdition = SidebarEditionFields & { endDate: string | null; country: string | null }
+type SidebarEdition = SidebarEditionFields & { endDate: string | null; hideDateTime: boolean | null; country: string | null }
 type OtherProgrammesResult = {
   picks: { title: string | null; edition: SidebarEdition | null }[] | null
   fill: SidebarEdition[] | null
@@ -161,7 +163,11 @@ const otherProgrammesSpec = (hint: string): AutoFillSpec => ({
           title,
           startDate: edition.startDate,
           endDate: edition.endDate,
-          subtitle: [label || null, countryName(edition.country), formatDateRange(edition.startDate, edition.endDate)]
+          subtitle: [
+            label || null,
+            countryName(edition.country),
+            edition.hideDateTime ? null : formatDateRange(edition.startDate, edition.endDate),
+          ]
             .filter(Boolean)
             .join(' · '),
         }

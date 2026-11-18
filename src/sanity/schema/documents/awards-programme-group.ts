@@ -39,11 +39,15 @@ export const awardsProgrammeGroup = defineType({
       name: 'description',
       title: 'Description',
       type: 'richText',
+      // Legacy WordPress field, not in the new design: hidden in the Studio, data kept. Remove before launch if unused.
+      hidden: true,
     }),
     defineField({
       name: 'logo',
       title: 'Logo',
       type: 'image',
+      // Legacy WordPress field, not in the new design: hidden in the Studio, data kept. Remove before launch if unused.
+      hidden: true,
       options: { hotspot: true },
       fields: [altField],
     }),

@@ -4,7 +4,7 @@ import { isBrandKey } from '@/brands'
 import type { ArticleCardView } from '@/lib/article'
 import { formatLongDate } from '@/lib/dates'
 import type { AdUnits } from '@/lib/gam'
-import { RESEARCH_LISTING_PATH, resolveHref, safeHref, sharedRecordHref } from '@/lib/links'
+import { RESEARCH_LISTING_PATH, researchDownloadHref, resolveHref, safeHref, sharedRecordHref } from '@/lib/links'
 import type { ResearchChart } from '@/components/ui/ResearchChartCard'
 import {
   RESEARCH_CHART_GAUGES_MAX,
@@ -83,11 +83,6 @@ function withAlt<I extends { alt: string }>(image: I | null, fallback: string | 
 /** The share image: the banner, else the report cover. */
 export const researchReportShareImage = (report: ResearchReportData) =>
   toImage(report.featuredImage) ?? toImage(report.downloadThumbnail)
-
-/** The download button's target: the form or Issuu link first, the PDF only without one. */
-function downloadHref(report: ResearchReportData): string | null {
-  return safeHref(report.downloadUrl) ?? safeHref(report.downloadFileUrl)
-}
 
 const keyFindings = (report: ResearchReportData) =>
   (report.keyFindings ?? []).flatMap((item) =>
@@ -175,7 +170,7 @@ export function toResearchReportView({
   const copy = toCopy(rawCopy)
   const summaryPath = executiveSummaryPagePath(report)
   const summaryText = blocksOrNull(report.summary)
-  const href = downloadHref(report)
+  const href = researchDownloadHref(report)
   const publishedAt = stegaClean(report.publishedAt) ?? null
   const findings = keyFindings(report)
   const rows = (report.methodology ?? []).flatMap((row) =>

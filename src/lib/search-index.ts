@@ -139,8 +139,9 @@ export type CmsSearchSource = {
   /** ISO 3166-1 alpha-2 code of an event or awards edition. */
   country?: string | null
   eventType?: string | null
-  /** A post's image, a resource's download thumbnail, or the first photograph of an event or awards edition. */
+  /** A post's image or a resource's download thumbnail. Null on an event or awards edition. */
   image?: CmsSearchImage | null
+  /** The logo of an event or awards edition, always its thumbnail. */
   logo?: CmsSearchImage | null
 }
 
@@ -154,21 +155,18 @@ function searchImage(image: CmsSearchImage): SearchImage | null {
   return value ? { src: value.src, width: value.width, height: value.height, ...(alt ? { alt } : {}) } : null
 }
 
-/** The thumbnail: posts and events crop to fill, a resource cover and an event logo show whole. */
+/**
+ * The thumbnail: a post image crops to fill, a resource cover shows whole, and an event or awards edition always
+ * shows its logo whole, never a gallery photograph.
+ */
 function cmsImage(doc: CmsSearchSource, kind: SearchRecord['kind']): Pick<SearchRecord, 'image' | 'imageFit'> {
-  const image = searchImage(doc.image)
-
-  if (kind === 'resource') {
-    return image ? { image, imageFit: 'contain' } : { image: null }
+  if (kind === 'post') {
+    return { image: searchImage(doc.image) }
   }
 
-  if (image || kind === 'post') {
-    return { image }
-  }
+  const image = searchImage(kind === 'resource' ? doc.image : doc.logo)
 
-  const logo = searchImage(doc.logo)
-
-  return logo ? { image: logo, imageFit: 'contain' } : { image: null }
+  return image ? { image, imageFit: 'contain' } : { image: null }
 }
 
 /** "summit" → "Summit": the option titles of the event type field are its values capitalised. */

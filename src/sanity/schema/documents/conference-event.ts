@@ -29,7 +29,8 @@ export const conferenceEvent = defineType({
     { name: 'speakers', title: 'Speakers' },
     { name: 'agenda', title: 'Agenda' },
     { name: 'sponsors', title: 'Sponsors' },
-    { name: 'media', title: 'Media' },
+    // Legacy WordPress fields only, all hidden: tab hidden in the Studio. Remove before launch if unused.
+    { name: 'media', title: 'Media', hidden: true },
     // Legacy WordPress fields only, all hidden: tab hidden in the Studio. Remove before launch if unused.
     { name: 'registration', title: 'Registration', hidden: true },
     // Legacy WordPress fields only, all hidden: tab hidden in the Studio. Remove before launch if unused.
@@ -305,6 +306,8 @@ export const conferenceEvent = defineType({
       title: 'Photographs',
       type: 'array',
       group: 'media',
+      // Legacy WordPress field, not in the new design: hidden in the Studio, data kept. Remove before launch if unused.
+      hidden: true,
       of: [
         defineArrayMember({
           type: 'image',
