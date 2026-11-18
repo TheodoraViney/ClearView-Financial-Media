@@ -30,8 +30,10 @@ export const conferenceEvent = defineType({
     { name: 'agenda', title: 'Agenda' },
     { name: 'sponsors', title: 'Sponsors' },
     { name: 'media', title: 'Media' },
-    { name: 'registration', title: 'Registration' },
-    { name: 'extra', title: 'Extra tabs' },
+    // Legacy WordPress fields only, all hidden: tab hidden in the Studio. Remove before launch if unused.
+    { name: 'registration', title: 'Registration', hidden: true },
+    // Legacy WordPress fields only, all hidden: tab hidden in the Studio. Remove before launch if unused.
+    { name: 'extra', title: 'Extra tabs', hidden: true },
   ],
   fields: [
     defineField({
@@ -238,6 +240,8 @@ export const conferenceEvent = defineType({
       title: 'Technology demos',
       type: 'array',
       group: 'agenda',
+      // Legacy WordPress field, not in the new design: hidden in the Studio, data kept. Remove before launch if unused.
+      hidden: true,
       of: [
         defineArrayMember({
           name: 'techDemo',
@@ -284,12 +288,16 @@ export const conferenceEvent = defineType({
       title: 'Sponsor benefits',
       type: 'richText',
       group: 'sponsors',
+      // Legacy WordPress field, not in the new design: hidden in the Studio, data kept. Remove before launch if unused.
+      hidden: true,
     }),
     defineField({
       name: 'sponsorVideos',
       title: 'Sponsor videos',
       type: 'videoGallery',
       group: 'sponsors',
+      // Legacy WordPress field, not in the new design: hidden in the Studio, data kept. Remove before launch if unused.
+      hidden: true,
     }),
 
     defineField({
@@ -312,6 +320,8 @@ export const conferenceEvent = defineType({
       title: 'Register now button link',
       type: 'url',
       group: 'registration',
+      // Legacy WordPress field, not in the new design: hidden in the Studio, data kept. Remove before launch if unused.
+      hidden: true,
       validation: (Rule) => Rule.uri({ scheme: ['http', 'https'] }),
     }),
     defineField({
@@ -319,6 +329,8 @@ export const conferenceEvent = defineType({
       title: 'Registration details',
       type: 'richText',
       group: 'registration',
+      // Legacy WordPress field, not in the new design: hidden in the Studio, data kept. Remove before launch if unused.
+      hidden: true,
     }),
 
     defineField({
@@ -326,12 +338,16 @@ export const conferenceEvent = defineType({
       title: 'Frequently asked questions',
       type: 'richText',
       group: 'extra',
+      // Legacy WordPress field, not in the new design: hidden in the Studio, data kept. Remove before launch if unused.
+      hidden: true,
     }),
     defineField({
       name: 'customTabs',
       title: 'Custom tabs',
       type: 'array',
       group: 'extra',
+      // Legacy WordPress field, not in the new design: hidden in the Studio, data kept. Remove before launch if unused.
+      hidden: true,
       of: [defineArrayMember({ type: 'customTab' })],
     }),
     legacyWpIdField,

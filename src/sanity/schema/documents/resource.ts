@@ -383,6 +383,8 @@ export const resource = defineType({
       title: 'Partners (from WordPress)',
       type: 'array',
       group: 'page',
+      // Legacy WordPress field, not in the new design: hidden in the Studio, data kept. Remove before launch if unused.
+      hidden: true,
       description: 'Migrated from WordPress. Not shown on the site: the report page shows the Research partner above.',
       of: [defineArrayMember({ type: 'companyGroup' })],
     }),
