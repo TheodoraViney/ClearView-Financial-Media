@@ -5,6 +5,7 @@ import { PageBlocksInput } from '@/sanity/components/page-blocks-input'
 import { articleListing } from './article-listing'
 import { awardsWinners } from './awards-winners'
 import { benefitPanel } from './benefit-panel'
+import { contactForm } from './contact-form'
 import { cta } from './cta'
 import { enquiryForm } from './enquiry-form'
 import { exploreGrid } from './explore-grid'
@@ -58,6 +59,7 @@ export const blockTypes = [
   benefitPanel,
   opportunityCards,
   enquiryForm,
+  contactForm,
 ]
 
 const COLUMN_ONLY_BLOCK_TYPES: readonly (typeof blockTypes)[number][] = [
@@ -92,7 +94,7 @@ const INSERT_MENU_GROUPS = [
   {
     name: 'landing',
     title: 'Landing page',
-    of: [imageHero.name, numberedList.name, benefitPanel.name, opportunityCards.name, enquiryForm.name],
+    of: [imageHero.name, numberedList.name, benefitPanel.name, opportunityCards.name, enquiryForm.name, contactForm.name],
   },
   { name: 'other', title: 'Other', of: [publications.name, statsBar.name, cta.name] },
 ]

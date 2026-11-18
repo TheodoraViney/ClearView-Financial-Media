@@ -3,7 +3,8 @@ import { stegaClean } from 'next-sanity'
 import type { BrandKey } from '@/brands'
 import type { SubscribeModalData, SubscribeModalText } from '@/components/sections/subscribe/types'
 import { resolveHref } from '@/lib/links'
-import { CONSENT_LINK_TOKEN, SUBSCRIBE_MODAL_TEXT_FIELDS } from '@/lib/subscribe'
+import { splitConsentText } from '@/lib/consent-text'
+import { SUBSCRIBE_MODAL_TEXT_FIELDS } from '@/lib/subscribe'
 import type { SubscribeOptions } from '@/lib/subscribe-options'
 
 import { isPresent, type ShellData } from './shell'
@@ -26,11 +27,7 @@ export function toSubscribeModal(data: ShellData, brand: BrandKey, options: Subs
   text.countryPlaceholder = stegaClean(text.countryPlaceholder)
   text.industryPlaceholder = stegaClean(text.industryPlaceholder)
 
-  // The token is matched on the cleaned text; stega sits at the end of the string, so it stays in `after`. Without the
-  // token the link follows the text.
-  const [before, ...rest] = stegaClean(text.consentText).includes(CONSENT_LINK_TOKEN)
-    ? text.consentText.split(CONSENT_LINK_TOKEN)
-    : [`${text.consentText} `]
+  const { before, after } = splitConsentText(text.consentText)
 
   // ClearView offers a free choice: nothing is locked there, and its boxes start as the document ticks them. On a
   // publication the always ticked interests start ticked and the rest start empty.
@@ -61,7 +58,7 @@ export function toSubscribeModal(data: ShellData, brand: BrandKey, options: Subs
 
   return {
     text,
-    consent: { before, after: rest.join(CONSENT_LINK_TOKEN), href: resolveHref(doc.privacyLink, brand) },
+    consent: { before, after, href: resolveHref(doc.privacyLink, brand) },
     interests,
     chooseAny,
     countries: toOptions(options.countries),

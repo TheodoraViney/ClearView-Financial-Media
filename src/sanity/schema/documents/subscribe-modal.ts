@@ -5,7 +5,7 @@ import { type ConditionalProperty, type StringRule, defineArrayMember, defineFie
 import { BRANDS, isBrandKey } from '@/brands'
 import { CONSENT_LINK_TOKEN, SUBSCRIBE_INTERESTS_MAX, type SubscribeModalTextField } from '@/lib/subscribe'
 
-import { brevoAttributeField, linkField } from '../fields'
+import { brevoAttributeField, consentTextValidation, linkField } from '../fields'
 
 /*
  * The subscribe pop-up's copy and interests, one document per brand with the fixed id
@@ -115,12 +115,7 @@ export const subscribeModal = defineType({
     text('industryPlaceholder', 'Industry placeholder', 'Shown in the industry list until an industry is chosen.', 'form'),
     text('optionalMarker', 'Optional marker', 'Shown beside the label of every optional field.', 'form'),
     text('consentText', 'Consent text', `Text beside the consent box. ${CONSENT_LINK_TOKEN} is replaced with the Privacy Policy link.`, 'form', {
-      validation: (Rule) =>
-        Rule.required().custom((value: string | undefined) =>
-          !value || value.split(CONSENT_LINK_TOKEN).length === 2
-            ? true
-            : `Use ${CONSENT_LINK_TOKEN} exactly once, where the Privacy Policy link goes`,
-        ),
+      validation: consentTextValidation,
     }),
     text('privacyLinkLabel', 'Privacy link text', `The link text that replaces ${CONSENT_LINK_TOKEN} in the consent text.`, 'form'),
     linkField({

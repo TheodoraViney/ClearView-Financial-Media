@@ -5,7 +5,7 @@ import { useEffect } from 'react'
 /**
  * Links to `#{targetId}` on this page scroll smoothly to the target and then focus it (instant under reduced
  * motion), as the design's primary button does. The scroll lands below the sticky header through the page's
- * `scroll-margin-top` rule. The URL is left unchanged (Roman). Renders nothing.
+ * `scroll-margin-top` rule. The URL is left unchanged. Renders nothing.
  *
  * The click is taken in the capture phase, before React: a prevented native event makes next/link skip its own
  * navigation, which would jump without moving focus.

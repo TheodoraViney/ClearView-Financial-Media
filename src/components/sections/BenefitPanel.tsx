@@ -14,7 +14,7 @@ const levelBelow = (level: HeadingLevel | undefined): HeadingLevel =>
  * A panel over a decorative photo (alt=""), on `dark-blue-grey` while it loads: 64 / 80 above, padding 24 / 40, at least
  * 560 high on tablet and 640 from 1200. Heading at the top, benefits pinned to the bottom (spacer at least 40) in a
  * grid of 1 / 2 / 4 columns, gap 24 / 32.
- * Dividers in white/10 (the design's white/20 → the existing token, Roman): a right rule between columns from 1200, on
+ * Dividers in white/10 (the design's white/20 → the existing token): a right rule between columns from 1200, on
  * the left column on tablet, and a top rule between rows on mobile. Benefit text is white/50 as designed.
  */
 export function BenefitPanel({

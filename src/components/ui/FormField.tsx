@@ -10,13 +10,24 @@ type FormFieldControlProps = {
   'aria-required': true | undefined
 }
 
+// Where the marker sits: at the label's right edge (default: subscribe pop-up, Enquiry form) or right after the label
+// text, 8px away (`inline`: Contact form, as the shared-shell form-label).
+const MARKER_PLACEMENTS = {
+  end: 'justify-between',
+  inline: 'flex-wrap',
+}
+
+export type FormFieldMarkerPlacement = keyof typeof MARKER_PLACEMENTS
+
 /**
- * A labelled form control: label (500 14/14) with an optional marker at its right edge ("Optional"), 8px, the
- * control, and the error (13, `role="alert"`) once there is one. The control is rendered by `children` with the ids.
+ * A labelled form control: label (500 14/14) with an optional marker ("Optional") at its right edge or, with
+ * `markerPlacement="inline"`, beside the label text; 8px, the control, and the error (13, `role="alert"`) once there
+ * is one. The control is rendered by `children` with the ids.
  */
 export function FormField({
   label,
   marker,
+  markerPlacement = 'end',
   required = false,
   error,
   className,
@@ -24,6 +35,7 @@ export function FormField({
 }: {
   label: ReactNode
   marker?: ReactNode
+  markerPlacement?: FormFieldMarkerPlacement
   required?: boolean
   // The error text; the control is invalid while it is set.
   error?: ReactNode
@@ -38,7 +50,11 @@ export function FormField({
     <div className={cx('flex min-w-0 flex-col gap-2', className)}>
       <label
         htmlFor={id}
-        className="flex items-baseline justify-between gap-2 text-sm leading-none font-medium text-foreground"
+        className={cx(
+          'flex items-baseline',
+          MARKER_PLACEMENTS[markerPlacement],
+          'gap-2 text-sm leading-none font-medium text-foreground',
+        )}
       >
         {label}
         {marker && <span className="text-caption leading-none font-normal text-grey">{marker}</span>}
