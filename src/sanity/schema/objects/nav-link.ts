@@ -19,8 +19,10 @@ export const navLink = defineType({
       description: 'Menu text.',
       validation: (Rule) => Rule.required(),
     }),
-    // `label` above is the visible text, so the link carries no label of its own.
-    linkField({ required: true, withLabel: false }),
+    // `label` above is the visible text, so the link carries no label of its own. Header and footer menus link to
+    // pages only, which keeps the document search short (one Contact page per brand, no events or awards that
+    // mention the word); the listings have their own link type and anything else takes a web address.
+    linkField({ required: true, withLabel: false, documentTypes: ['page'] }),
   ],
   preview: {
     select: {

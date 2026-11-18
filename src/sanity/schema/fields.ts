@@ -172,6 +172,8 @@ export const linkField = (
     labelRequired?: boolean
     /** Web address may also be an anchor on the same page, `#id`, e.g. a button that scrolls to a form block. */
     allowAnchor?: boolean
+    /** The document types the link may point at; every routable type (`LINKABLE_TYPES`) when left out. */
+    documentTypes?: readonly string[]
     hidden?: ConditionalProperty
   } = {},
 ) => {
@@ -185,6 +187,7 @@ export const linkField = (
     withLabel = true,
     labelRequired = false,
     allowAnchor = false,
+    documentTypes = LINKABLE_TYPES,
     hidden,
   } = options
   const kindOf = (parent: unknown): LinkKind | undefined => (parent as LinkValue | undefined)?.kind
@@ -230,7 +233,7 @@ export const linkField = (
         name: 'internal',
         title: 'Document',
         type: 'reference',
-        to: LINKABLE_TYPES.map((type) => ({ type })),
+        to: documentTypes.map((type) => ({ type })),
         hidden: ({ parent }) => kindOf(parent) !== 'internal',
         validation: (Rule) =>
           Rule.custom((value, context) => {
