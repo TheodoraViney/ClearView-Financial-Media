@@ -12,7 +12,7 @@ import {
 import { AutoFillPicksInput } from '@/sanity/components/auto-fill-picks-input'
 import { ResearchGenerateInput } from '@/sanity/components/research-generate-input'
 
-import { altField, imageField, legacyWpIdField } from '../fields'
+import { altField, imageField, keyFindingMember, legacyWpIdField } from '../fields'
 import { paragraphsBlock } from '../objects/rich-text'
 
 /** Characters of plain text in a block array. */
@@ -168,38 +168,7 @@ export const resource = defineType({
       type: 'array',
       group: 'page',
       description: `Optional. Up to ${KEY_FINDINGS_MAX} figures. Shown as Key findings on the report page and as Key takeaways on the Executive Summary page. Hidden when empty.`,
-      of: [
-        defineArrayMember({
-          type: 'object',
-          name: 'keyFinding',
-          title: 'Finding',
-          fields: [
-            defineField({
-              name: 'value',
-              title: 'Figure',
-              type: 'string',
-              description: 'The large figure, for example "72%" or "5.3 / 7".',
-              validation: (Rule) => Rule.required(),
-            }),
-            defineField({
-              name: 'text',
-              title: 'Text',
-              type: 'string',
-              description: 'What the figure measures, for example "Automation momentum (65% previous year)".',
-              validation: (Rule) => Rule.required(),
-            }),
-            defineField({
-              name: 'note',
-              title: 'Note',
-              type: 'string',
-              description: 'Optional. A short line under the text, for example "Momentum rose year on year."',
-            }),
-          ],
-          preview: {
-            select: { title: 'value', subtitle: 'text' },
-          },
-        }),
-      ],
+      of: [keyFindingMember({ withNote: true })],
       validation: (Rule) => Rule.max(KEY_FINDINGS_MAX),
     }),
     defineField({

@@ -24,12 +24,19 @@ export function KeyFindings({
   items,
   label,
   headingAs,
+  variant = 'default',
 }: {
   items: KeyFinding[]
   label?: string
   /** The level of the section heading above the grid; null or absent when the section has none. */
   headingAs?: HeadingLevel | null
+  /** `metrics`: the partner profile At a glance row (key-findings-group `profile-metrics`), see ProfileMetrics. */
+  variant?: 'default' | 'metrics'
 }) {
+  if (variant === 'metrics') {
+    return <ProfileMetrics items={items} label={label} />
+  }
+
   const notes = items.some((item) => item.note)
   const TextTag = headingAs ? HEADING_LEVELS[Math.min(HEADING_LEVELS.indexOf(headingAs) + 1, HEADING_LEVELS.length - 1)] : 'p'
 
@@ -54,6 +61,30 @@ export function KeyFindings({
               <p className="mt-4 min-h-finding-note text-caption text-pretty text-grey">{item.note}</p>
             </>
           )}
+        </li>
+      ))}
+    </ol>
+  )
+}
+
+/**
+ * key-findings-group `profile-metrics` (partner profile At a glance): 5 columns from the header breakpoint, 3 from md, 1
+ * below, in a bordered box. Each cell: the figure (40/48 500 accent), at least 24px of space, then its text (13/18.2
+ * grey) under a rule, at the cell's foot; padding 16 / 20 / 24. The rules between cells are each cell's left and top
+ * `shadow-cell-rule`, clipped at the box edge, so a short last row leaves the rest of the box white (the default
+ * variant's 1px gap over a grey ground would fill it). The figures do not wrap, as in the design.
+ */
+function ProfileMetrics({ items, label }: { items: KeyFinding[]; label?: string }) {
+  return (
+    <ol
+      aria-label={label}
+      className="grid min-w-0 overflow-hidden rounded-sm bg-white inset-ring inset-ring-border md:grid-cols-3 header:grid-cols-5"
+    >
+      {items.map((item) => (
+        <li key={item.key} className="flex min-w-0 flex-col p-4 shadow-cell-rule md:p-5 header:p-6">
+          <span className="text-finding font-medium whitespace-nowrap text-accent">{item.value}</span>
+          <span aria-hidden="true" className="block shrink-0 grow basis-6" />
+          <p className="border-t border-border pt-4 text-caption text-pretty text-grey">{item.text}</p>
         </li>
       ))}
     </ol>

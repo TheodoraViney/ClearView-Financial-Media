@@ -31,6 +31,16 @@ const resourceLocations = defineLocations({
       : null,
 })
 
+// A company's partner profile on ClearView. The page exists only while an awards edition, an event or a post names the
+// company (COMPANY_HAS_PROFILE); the location is listed for any company with a slug, so the editor can open it.
+const companyLocations = defineLocations({
+  select: { title: 'title', slug: 'slug.current' },
+  resolve: (doc) =>
+    doc?.slug
+      ? { locations: [{ title: doc.title ?? 'Untitled', href: `/companies/${encodeURIComponent(doc.slug)}` }] }
+      : null,
+})
+
 // The shared listings page's routes on ClearView: one `page` document with three tabs, never served at its slug.
 // Summits, briefings and webinars all open the Events tab; bare /resource opens the Research tab.
 const SHARED_LISTINGS_ROUTES = [
@@ -89,6 +99,11 @@ export const presentationTools: PluginOptions[] = BRAND_KEYS.map((key) =>
                 filter:
                   '_type == "researchSummary" && slug.current == $summary && _id in *[_type == "resource" && slug.current == $slug].executiveSummaryPage._ref',
               },
+              // A partner profile: the company's own fields. The labels are the Partner profile page document's.
+              {
+                route: '/companies/:slug',
+                filter: '_type == "company" && slug.current == $slug',
+              },
               // The listing rows are the records' own; the blocks (hero, listing labels, sidebar) are the shared listings
               // page document's.
               ...SHARED_LISTINGS_ROUTES.map(({ href }) => ({
@@ -105,8 +120,16 @@ export const presentationTools: PluginOptions[] = BRAND_KEYS.map((key) =>
         },
       ]),
       locations: {
-        // Awards editions, conference events and research reports are shared records, served on ClearView only.
-        ...(key === 'clearview' ? { awardsProgramme: eventLocations, conferenceEvent: eventLocations, resource: resourceLocations } : {}),
+        // Awards editions, conference events, research reports and company profiles are shared records, served on
+        // ClearView only.
+        ...(key === 'clearview'
+          ? {
+              awardsProgramme: eventLocations,
+              conferenceEvent: eventLocations,
+              resource: resourceLocations,
+              company: companyLocations,
+            }
+          : {}),
         page: defineLocations({
           select: {
             id: '_id',

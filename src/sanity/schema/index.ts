@@ -22,6 +22,7 @@ import { page } from './documents/page'
 import { person } from './documents/person'
 import { post } from './documents/post'
 import { researchGenerationSettings } from './documents/research-generation-settings'
+import { partnerProfilePage } from './documents/partner-profile-page'
 import { researchReportPage } from './documents/research-report-page'
 import { researchSummary } from './documents/research-summary'
 import { resource } from './documents/resource'
@@ -50,6 +51,7 @@ export const documentTypes = [
   awardsProgrammePage,
   eventPage,
   researchReportPage,
+  partnerProfilePage,
   infographicSettings,
   briefSettings,
   researchGenerationSettings,
