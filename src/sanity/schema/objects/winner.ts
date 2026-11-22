@@ -2,7 +2,8 @@ import { StarIcon } from '@sanity/icons/Star'
 import { defineField, defineType } from 'sanity'
 
 /**
- * One AwardCategory to one Company, inside an AwardsProgramme.
+ * One AwardCategory to one Company, inside an AwardsProgramme. Optional people name the individuals who won (one item per
+ * person), and an optional display name overrides the company title on the site (the name a merged firm won under).
  *
  * 2,981 pairs were parsed out of the `cyph_winners` wysiwyg blob across 45
  * events. Winner is a row, not a document: template 07 gives AwardCategory its
@@ -36,16 +37,34 @@ export const winner = defineType({
       to: [{ type: 'company' }],
       validation: (Rule) => Rule.required(),
     }),
+    defineField({
+      name: 'people',
+      title: 'People',
+      type: 'array',
+      of: [{ type: 'string' }],
+      description: 'Optional. The people who won, for awards given to individuals. Add one item per person.',
+    }),
+    defineField({
+      name: 'displayName',
+      title: 'Name shown on site',
+      type: 'string',
+      description:
+        'Optional. Shown instead of the company name for this award only, for example the name the firm traded under when it won. Leave empty to show the company name. The logo and the profile link still come from the company.',
+    }),
   ],
   preview: {
     select: {
       category: 'category.title',
       company: 'company.title',
+      displayName: 'displayName',
+      people: 'people',
       group: 'categoryGroup',
     },
-    prepare({ category, company, group }) {
+    prepare({ category, company, displayName, people, group }) {
+      const name = [...(Array.isArray(people) ? people : []), displayName || company].filter(Boolean).join(', ')
+
       return {
-        title: [company, category].filter(Boolean).join(' — ') || 'Incomplete winner',
+        title: [name, category].filter(Boolean).join(' — ') || 'Incomplete winner',
         subtitle: group || undefined,
       }
     },
