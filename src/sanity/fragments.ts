@@ -537,9 +537,16 @@ const ENQUIRY_FORM = /* groq */ `
   companyLabel,
   jobTitleLabel,
   messageLabel,
+  consentText,
+  privacyLinkLabel,
+  privacyLink{ ${LINK_TARGET} },
+  consentError,
   submitLabel,
   requiredMessage,
-  invalidEmailMessage
+  invalidEmailMessage,
+  sendErrorMessage,
+  successMessage,
+  returnLabel
 `
 
 // The Contact page form: page head, image and every form string; the privacy link resolves like the pop-up's.
@@ -551,9 +558,10 @@ const CONTACT_FORM = /* groq */ `
   image{ ${IMAGE} },
   firstNameLabel,
   lastNameLabel,
+  jobTitleLabel,
+  companyLabel,
   emailLabel,
   phoneLabel,
-  companyLabel,
   messageLabel,
   optionalMarker,
   consentText,
@@ -562,10 +570,13 @@ const CONTACT_FORM = /* groq */ `
   submitLabel,
   firstNameError,
   lastNameError,
+  jobTitleError,
+  companyError,
   emailMissingError,
   emailInvalidError,
   messageError,
   consentError,
+  sendErrorMessage,
   successMessage,
   returnLabel
 `

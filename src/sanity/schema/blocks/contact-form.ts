@@ -22,7 +22,8 @@ const copy = (name: string, title: string, description: string, initialValue: st
  * The Contact page (design wb-g-contact v1.2): breadcrumb (Home / this page), the H1, a standfirst and the contact
  * form beside an image; after sending, a message and a button back to the form. The block owns the page's H1, so
  * the page template prints no title of its own. The fields are fixed in code (`CONTACT_FORM_FIELDS`); every visible
- * string is here. The form sends nothing yet: submissions will go to a form service whose links come later.
+ * string is here. Submissions go to the client's Jotform form, chosen in code, and its notification recipients in
+ * Jotform get an email.
  */
 export const contactForm = defineType({
   name: 'contactForm',
@@ -98,6 +99,8 @@ export const contactForm = defineType({
     copy('submitLabel', 'Submit button label', 'Button that sends the form.', 'Send', 'labels'),
     copy('firstNameError', 'First name missing', 'Shown when the first name is empty.', 'Enter your first name.', 'messages'),
     copy('lastNameError', 'Last name missing', 'Shown when the last name is empty.', 'Enter your last name.', 'messages'),
+    copy('jobTitleError', 'Job title missing', 'Shown when the job title is empty.', 'Enter your job title.', 'messages'),
+    copy('companyError', 'Company missing', 'Shown when the company is empty.', 'Enter your company.', 'messages'),
     copy('emailMissingError', 'Email missing', 'Shown when the email address is empty.', 'Enter your email address.', 'messages'),
     copy(
       'emailInvalidError',
@@ -112,6 +115,13 @@ export const contactForm = defineType({
       'Consent missing',
       'Shown when the consent box is not ticked.',
       'Please agree to the Privacy Policy to continue.',
+      'messages',
+    ),
+    copy(
+      'sendErrorMessage',
+      'Sending failed',
+      'Shown above the button when the message could not be sent. What the visitor typed stays in the form.',
+      "Something went wrong and your message wasn't sent. Please try again.",
       'messages',
     ),
     defineField({

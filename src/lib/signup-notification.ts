@@ -25,26 +25,40 @@ export type SignupNotificationTargets = {
  * the public API, so this read needs the read token; without it this throws rather than answering null.
  */
 export async function getSignupNotificationSettings(): Promise<SignupNotificationTargets | null> {
-  const token = process.env.SANITY_API_READ_TOKEN
-
-  if (!token) {
-    throw new Error('Missing environment variable: SANITY_API_READ_TOKEN')
-  }
-
-  const settings = await client
-    .withConfig({ token, useCdn: false, stega: false })
-    .fetch(
-      SIGNUP_NOTIFICATION_SETTINGS_QUERY,
-      { id: SIGNUP_NOTIFICATION_SETTINGS_ID },
-      { perspective: 'published', cache: 'no-store' },
-    )
-
+  const settings = await readSettings()
   const recipients = [
     ...new Set((settings?.notifyEmails ?? []).map((email) => email.trim().toLowerCase()).filter(Boolean)),
   ]
   const senderId = settings?.senderId
 
   return recipients.length > 0 && typeof senderId === 'number' ? { recipients, senderId } : null
+}
+
+/**
+ * The Brevo sender of the team's notification emails, from the same settings document: the enquiry notification
+ * (src/lib/enquiry-server.ts) comes from it too. Null when none is set. Throws without the read token.
+ */
+export async function getNotificationSenderId(): Promise<number | null> {
+  const senderId = (await readSettings())?.senderId
+
+  return typeof senderId === 'number' ? senderId : null
+}
+
+/** The settings document, published and uncached, read with the read token (its id is dotted). */
+async function readSettings() {
+  const token = process.env.SANITY_API_READ_TOKEN
+
+  if (!token) {
+    throw new Error('Missing environment variable: SANITY_API_READ_TOKEN')
+  }
+
+  return client
+    .withConfig({ token, useCdn: false, stega: false })
+    .fetch(
+      SIGNUP_NOTIFICATION_SETTINGS_QUERY,
+      { id: SIGNUP_NOTIFICATION_SETTINGS_ID },
+      { perspective: 'published', cache: 'no-store' },
+    )
 }
 
 /** A confirmed signup to tell the team about. `contact` is as Brevo holds it after the signup. */
