@@ -1,6 +1,8 @@
 import { BookmarkIcon } from '@sanity/icons/Bookmark'
 import { defineField, defineType } from 'sanity'
 
+import { REGION_TITLES, REGIONS } from '@/lib/regions'
+
 import { altField } from '../fields'
 
 /**
@@ -33,6 +35,15 @@ export const awardsProgrammeGroup = defineType({
       title: 'Slug',
       type: 'slug',
       options: { source: 'title', maxLength: 96 },
+      validation: (Rule) => Rule.required(),
+    }),
+    defineField({
+      name: 'region',
+      title: 'Region',
+      type: 'string',
+      description:
+        'Region of every edition of this programme on the awards list and its Region filter, whatever the venue country. Global filters on its own.',
+      options: { list: REGIONS.map((value) => ({ title: REGION_TITLES[value], value })), layout: 'radio' },
       validation: (Rule) => Rule.required(),
     }),
     defineField({

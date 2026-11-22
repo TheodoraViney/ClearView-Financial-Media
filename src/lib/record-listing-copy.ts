@@ -15,6 +15,7 @@ export const RECORD_LISTING_COPY_KEYS = [
   'regionMenaLabel',
   'regionAsiaLabel',
   'regionNorthAmericaLabel',
+  'regionGlobalLabel',
   'yearFilterLabel',
   'statusFilterLabel',
   'allOptionLabel',

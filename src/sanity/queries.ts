@@ -742,6 +742,7 @@ export const SHARED_LISTINGS_PAGE_QUERY = defineQuery(`
       nominationsOpeningDate,
       nominationsClosingDate,
       country,
+      "programmeRegion": programme->region,
       "hasWinners": count(winners[defined(category->title) && defined(company->title)]) > 0
     },
     "events": *[$tab == "events" && _type == "conferenceEvent" && defined(slug.current)]{
