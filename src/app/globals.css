@@ -225,6 +225,13 @@ main [data-section-anchor] {
   /* ClearView footer brand column basis on desktop (410.667px in the clearview-footer master) */
   --spacing-footer-brand: 25.6667rem;
 
+  /*
+   * Contact page left column from 1200 (intro, 40, image): the height of the form column with no errors showing
+   * (16 top padding + the form, 629px). Fixed, so error messages and a growing message box lengthen the form only and
+   * never resize the image beside it.
+   */
+  --spacing-contact-row: 39.3125rem;
+
   --ease-smooth: cubic-bezier(0.2, 0.65, 0.3, 1);
 
   --leading-heading: 1.2;
