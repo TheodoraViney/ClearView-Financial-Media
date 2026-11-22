@@ -1,7 +1,7 @@
 import { stegaClean, type StegaBranded } from 'next-sanity'
 
 import type { EmbedConsentCopy } from '@/components/ui/ConsentEmbed.client'
-import { categoryGroupLabel } from '@/lib/award-category'
+import { categoryGroupLabel, winnerName } from '@/lib/award-category'
 import type {
   AwardsProgrammeSectionId,
   AwardsProgrammeView,
@@ -143,7 +143,8 @@ function toWinnerGroups(edition: EditionData): WinnersGroupView[] {
       key: row._key,
       category,
       categoryHref: programmeSlug ? awardCategoryHref(programmeSlug, row.category?.slug, 'clearview') : null,
-      company,
+      name: winnerName(row) ?? company,
+      organisation: filled(row.displayName) ? row.displayName : company,
       logo: toImage(row.company?.logo),
     })
     groups.set(key, group)

@@ -1,3 +1,5 @@
+import { stegaClean } from 'next-sanity'
+
 import type { BreadcrumbItem } from '@/components/ui/Breadcrumb'
 import type { Definition } from '@/components/ui/DefinitionList'
 import type { MediaImage } from '@/components/ui/Media'
@@ -96,6 +98,28 @@ export function otherProgrammeEditions<E extends SidebarEditionFields>(
   }
 
   return items
+}
+
+const filled = (value: string | null | undefined): value is string => Boolean(stegaClean(value)?.trim())
+
+/**
+ * A winner row's name as shown everywhere a winner appears: the people joined with ", ", then the company, as in
+ * "Wei Tu (China), Joanna Jiang (Lulu), Stephenson Harwood". The row's display name ("Name shown on site", the name a
+ * merged firm won under) replaces the company title; the logo and profile link stay the company's.
+ * Values keep their stega for click-to-edit. Null when neither a display name nor a company title is there.
+ */
+export function winnerName(row: {
+  people?: (string | null)[] | null
+  displayName?: string | null
+  company?: { title?: string | null } | null
+}): string | null {
+  const organisation = filled(row.displayName) ? row.displayName : row.company?.title
+
+  if (!filled(organisation)) {
+    return null
+  }
+
+  return [...(row.people ?? []).filter(filled), organisation].join(', ')
 }
 
 /** Abbreviations and brand spellings kept as written when an all-capitals group is recased. */

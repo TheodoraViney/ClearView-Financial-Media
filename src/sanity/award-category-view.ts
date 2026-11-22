@@ -4,6 +4,7 @@ import type { Definition } from '@/components/ui/DefinitionList'
 import {
   categoryGroupLabel,
   otherProgrammeEditions,
+  winnerName,
   type AwardCategoryView,
   type AwardYearView,
   type OtherProgrammeView,
@@ -89,7 +90,7 @@ function toYears(editions: Edition[], template: string): AwardYearView[] {
       label: winnerLabel(template, year),
       winners: winners.map((row) => ({
         key: row._key,
-        name: row.company?.title ?? '',
+        name: winnerName(row) ?? row.company?.title ?? '',
         href: sharedRecordHref('company', row.company?.slug, 'clearview'),
         logo: toImage(row.company?.logo),
         note: groups.size > 1 && filled(row.categoryGroup) ? categoryGroupLabel(row.categoryGroup) : null,

@@ -15,12 +15,15 @@ export function AwardWinnerGalleryCard({
   categoryHref,
   name,
   organisation,
+  wordmark,
   logo,
 }: {
   category: string
   categoryHref?: string | null
   name: string
   organisation?: string | null
+  /** The wordmark when there is no logo, e.g. the company of a person's award; defaults to the organisation or name. */
+  wordmark?: string | null
   logo?: MediaImage | null
 }) {
   return (
@@ -45,7 +48,7 @@ export function AwardWinnerGalleryCard({
             aria-hidden="true"
             className="max-w-full text-center text-headline font-medium tracking-wordmark text-balance text-foreground wrap-anywhere line-clamp-3"
           >
-            {organisation || name}
+            {wordmark || organisation || name}
           </span>
         )}
       </div>

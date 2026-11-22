@@ -42,7 +42,10 @@ export type ProgrammeWinnerView = {
   category: string
   /** The award category page, when the edition belongs to a programme. */
   categoryHref: string | null
-  company: string
+  /** The winner as shown (winnerName): "Person, Company", or the company alone. */
+  name: string
+  /** The company as shown (display name or company title), the wordmark when there is no logo. */
+  organisation: string
   logo: MediaImage | null
 }
 

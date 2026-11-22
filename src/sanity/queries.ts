@@ -488,6 +488,8 @@ export const AWARD_CATEGORY_QUERY = defineQuery(`
       "winners": winners[category._ref == ^.^._id]{
         _key,
         categoryGroup,
+        people,
+        displayName,
         "company": company->{ title, "slug": slug.current, "logo": logo{ ${IMAGE} } }
       }
     }
@@ -567,6 +569,8 @@ export const AWARDS_PROGRAMME_QUERY = defineQuery(`
         _key,
         categoryGroup,
         "category": category->{ title, "slug": slug.current },
+        people,
+        displayName,
         "company": company->{ title, "logo": logo{ ${IMAGE} } }
       },
       entryCategories,

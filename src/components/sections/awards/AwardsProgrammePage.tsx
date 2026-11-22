@@ -370,7 +370,8 @@ function WinnersGroup({ group }: { group: WinnersGroupView }) {
             <AwardWinnerGalleryCard
               category={winner.category}
               categoryHref={winner.categoryHref}
-              name={winner.company}
+              name={winner.name}
+              wordmark={winner.organisation}
               logo={winner.logo}
             />
           </li>
