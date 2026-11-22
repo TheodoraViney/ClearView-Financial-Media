@@ -292,6 +292,7 @@ const RECORD_LISTING = /* groq */ `
   regionMenaLabel,
   regionAsiaLabel,
   regionNorthAmericaLabel,
+  regionGlobalLabel,
   yearFilterLabel,
   statusFilterLabel,
   allOptionLabel,

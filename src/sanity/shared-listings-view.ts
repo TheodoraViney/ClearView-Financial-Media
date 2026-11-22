@@ -116,7 +116,7 @@ function toRecords(tab: SharedListingsTab, data: SharedListingsData, today: stri
     case 'awards':
       return data.awards.map((edition) => {
         const startDate = stegaClean(edition.startDate)
-        const region = regionOf(stegaClean(edition.country))
+        const region = regionOf(stegaClean(edition.country), stegaClean(edition.programmeRegion))
         const status = editionStatus(
           {
             nominationsOpeningDate: stegaClean(edition.nominationsOpeningDate),
