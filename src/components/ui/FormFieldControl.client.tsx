@@ -3,7 +3,11 @@
 import { useState, type FormEvent, type ReactNode } from 'react'
 
 import type { FormFieldSpec } from '@/lib/enquiry-form'
+import { HONEYPOT_FIELD } from '@/lib/honeypot'
 
+import { buttonClasses } from './Button'
+import { Checkbox } from './Checkbox'
+import { cx } from './cx'
 import { FormField, type FormFieldMarkerPlacement } from './FormField'
 import { Input } from './Input'
 import type { Motion } from './motion'
@@ -152,6 +156,7 @@ export function FormFieldControl({
             autoGrow={autoGrow}
             name={field.name}
             autoComplete={field.autoComplete}
+            maxLength={field.maxLength}
           />
         ) : (
           <Input
@@ -162,9 +167,100 @@ export function FormFieldControl({
             name={field.name}
             type={field.type}
             autoComplete={field.autoComplete}
+            maxLength={field.maxLength}
           />
         )
       }
     </FormField>
+  )
+}
+
+/** A form's consent text split around the Privacy Policy link (src/lib/consent-text.ts); `href` null without a route. */
+export type FormConsent = { before: string; after: string; linkLabel: string; href: string | null }
+
+/**
+ * The required consent box (name `consent`) under a rule, with the Privacy Policy link in its text and its error
+ * below. The link opens in a new tab, so the form keeps what was typed. `errorId` must be unique on the page.
+ */
+export function ConsentField({
+  consent,
+  error,
+  errorId,
+  motion,
+}: {
+  consent: FormConsent
+  error?: string
+  errorId: string
+  motion: Motion
+}) {
+  return (
+    <div className="flex flex-col gap-2 border-t border-border pt-6">
+      <Checkbox
+        size="sm"
+        target="tall"
+        motion={motion}
+        name="consent"
+        aria-required
+        aria-invalid={Boolean(error)}
+        aria-describedby={error ? errorId : undefined}
+        label={
+          <>
+            {consent.before}
+            {consent.href ? (
+              <a
+                href={consent.href}
+                target="_blank"
+                rel="noopener"
+                className="text-accent underline underline-offset-2 transition-colors duration-180 ease-out hover:text-accent-hover"
+              >
+                {consent.linkLabel}
+              </a>
+            ) : (
+              consent.linkLabel
+            )}
+            {consent.after}
+          </>
+        }
+      />
+      {error && (
+        <p id={errorId} role="alert" className="text-caption text-error">
+          {error}
+        </p>
+      )}
+    </div>
+  )
+}
+
+/** The hidden honeypot input, as in the subscribe pop-up: bots fill every input; people never see this one. */
+export function HoneypotField() {
+  return (
+    <div aria-hidden="true" className="sr-only">
+      <input type="text" name={HONEYPOT_FIELD} tabIndex={-1} autoComplete="off" />
+    </div>
+  )
+}
+
+/**
+ * The submit button, full width on mobile. While `pending` it is aria-disabled rather than disabled, as in the
+ * subscribe pop-up, so the focused button keeps focus; the form ignores a second submit itself.
+ */
+export function SubmitButton({ pending, motion, children }: { pending: boolean; motion: Motion; children: ReactNode }) {
+  return (
+    <button
+      type="submit"
+      aria-disabled={pending}
+      className={buttonClasses({ motion, className: cx('w-full md:w-auto', pending && 'cursor-progress opacity-70') })}
+    >
+      {children}
+    </button>
+  )
+}
+
+/** The message shown above the submit button when sending failed, announced at once. */
+export function SendError({ children }: { children: ReactNode }) {
+  return (
+    <p role="alert" className="text-caption text-error">
+      {children}
+    </p>
   )
 }

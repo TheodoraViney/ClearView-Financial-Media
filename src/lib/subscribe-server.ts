@@ -4,8 +4,6 @@ import { after, type NextRequest } from 'next/server'
 
 import {
   brandOrigin,
-  fallbackBrand,
-  resolveBrandFromHost,
   SUBSCRIBE_FORM_SETTINGS_ID,
   subscribeModalDocumentId,
   type BrandKey,
@@ -23,6 +21,7 @@ import {
   type BrevoAttributes,
   type BrevoContact,
 } from './brevo'
+import { isFilled, isSameOrigin, MAX_FORM_BODY_BYTES, readJsonBody, resolveRequestBrand } from './form-request'
 import { HONEYPOT_FIELD } from './honeypot'
 import { notifySignup } from './signup-notification'
 import { createSignupToken, readSignupToken, signupNotifySecret, type SignupToken } from './signup-token'
@@ -58,9 +57,6 @@ const SIGNUP_SOURCE = 'Newsletter Signup'
 
 /** Where Brevo sends the reader after the confirmation click; the route is src/app/api/subscribe/confirmed. */
 const CONFIRMED_PATH = '/api/subscribe/confirmed'
-
-/** Largest body accepted. The form sends well under 2 KB. */
-const MAX_BODY_BYTES = 16_384
 
 // Longest Sanity `_key` accepted; the text fields' limits are SUBSCRIBE_MAX_LENGTH.
 const MAX_KEY_LENGTH = 128
@@ -142,9 +138,7 @@ function log(brand: BrandKey | null, context: string, error?: unknown) {
 
 /** `POST /api/subscribe`. Always answers JSON shaped as SubscribeResponse, never cached. */
 export async function handleSubscribe(request: NextRequest, deps: SubscribeDeps = DEFAULT_DEPS): Promise<Response> {
-  const host = request.headers.get('host') ?? ''
-  const hostBrand = resolveBrandFromHost(host)
-  const brand = hostBrand ?? fallbackBrand(request.cookies.get('brand')?.value)
+  const { host, hostBrand, brand } = resolveRequestBrand(request)
 
   if (!brand) {
     return respond(genericFailure(404))
@@ -174,94 +168,6 @@ export async function handleSubscribe(request: NextRequest, deps: SubscribeDeps 
 
   return respond(await subscribe(brand, body, deps))
 }
-
-/**
- * The Origin of a same-site form post. On a brand host any host of the same brand passes (apex, www, staging,
- * localhost); on a host that maps to no brand (a preview) only that very host. Browsers send Origin on every POST.
- */
-function isSameOrigin(origin: string | null, host: string, hostBrand: BrandKey | null) {
-  if (!origin) {
-    return false
-  }
-
-  let originHost: string
-
-  try {
-    originHost = new URL(origin).host
-  } catch {
-    return false
-  }
-
-  return hostBrand ? resolveBrandFromHost(originHost) === hostBrand : originHost.toLowerCase() === host.toLowerCase()
-}
-
-/** The JSON object body, or null when it is not JSON, not an object, or too large. */
-async function readJsonBody(request: NextRequest): Promise<Record<string, unknown> | null> {
-  if (!request.headers.get('content-type')?.toLowerCase().startsWith('application/json')) {
-    return null
-  }
-
-  if (Number(request.headers.get('content-length') ?? 0) > MAX_BODY_BYTES) {
-    return null
-  }
-
-  const text = await readCapped(request.body, MAX_BODY_BYTES).catch(() => null)
-
-  if (!text) {
-    return null
-  }
-
-  try {
-    const value: unknown = JSON.parse(text)
-
-    return value && typeof value === 'object' && !Array.isArray(value) ? (value as Record<string, unknown>) : null
-  } catch {
-    return null
-  }
-}
-
-/**
- * The stream as UTF-8 text, or null once it passes `max` bytes: reading stops there, so a body without a
- * content-length, or with a false one, is never read in full.
- */
-async function readCapped(stream: ReadableStream<Uint8Array> | null, max: number): Promise<string | null> {
-  if (!stream) {
-    return null
-  }
-
-  const reader = stream.getReader()
-  const chunks: Uint8Array[] = []
-  let size = 0
-
-  for (;;) {
-    const { done, value } = await reader.read()
-
-    if (done) {
-      break
-    }
-
-    size += value.byteLength
-
-    if (size > max) {
-      await reader.cancel().catch(() => undefined)
-      return null
-    }
-
-    chunks.push(value)
-  }
-
-  const bytes = new Uint8Array(size)
-  let offset = 0
-
-  for (const chunk of chunks) {
-    bytes.set(chunk, offset)
-    offset += chunk.byteLength
-  }
-
-  return new TextDecoder().decode(bytes)
-}
-
-const isFilled = (value: unknown) => typeof value === 'string' && value.trim() !== ''
 
 /** A form text: trimmed, without control characters; '' when absent; null when not a string or over `max`. */
 function readText(value: unknown, max: number): string | null {
@@ -318,7 +224,7 @@ function parseRequest(body: Record<string, unknown>): SignupRequest | null {
   const firstName = readText(body.firstName, SUBSCRIBE_MAX_LENGTH.firstName)
   const lastName = readText(body.lastName, SUBSCRIBE_MAX_LENGTH.lastName)
   // Not capped here: an over-long address is the email error, from isEmailAddress, not a malformed body.
-  const email = readText(body.email, MAX_BODY_BYTES)
+  const email = readText(body.email, MAX_FORM_BODY_BYTES)
   const company = readText(body.company, SUBSCRIBE_MAX_LENGTH.company)
   const jobTitle = readText(body.jobTitle, SUBSCRIBE_MAX_LENGTH.jobTitle)
   const country = readText(body.country, MAX_OPTION_LENGTH)
@@ -673,7 +579,7 @@ function shouldNotifyConfirmed(
  */
 export function handleSubscribeConfirmed(request: NextRequest, deps: SubscribeDeps = DEFAULT_DEPS): Response {
   const home = new Response(null, { status: 303, headers: { Location: '/', 'Cache-Control': 'no-store' } })
-  const brand = resolveBrandFromHost(request.headers.get('host') ?? '') ?? fallbackBrand(request.cookies.get('brand')?.value)
+  const { brand } = resolveRequestBrand(request)
   const secret = signupNotifySecret()
   const value = request.nextUrl.searchParams.get('t')
 

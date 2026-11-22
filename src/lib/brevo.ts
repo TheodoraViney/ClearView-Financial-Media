@@ -151,22 +151,31 @@ export async function upsertContact({
 
 /**
  * Sends one transactional email, outside any campaign or template: for the team's own notifications, never readers.
- * The sender is one of the account's senders by id. Every address in `to` sees the others. 201 with the message id.
+ * The sender is one of the account's senders by id. Every address in `to` sees the others. `replyTo` (optional) is
+ * where a reply goes, e.g. the visitor who sent an enquiry. 201 with the message id.
  */
 export async function sendTransactionalEmail({
   senderId,
   to,
   subject,
   htmlContent,
+  replyTo,
 }: {
   senderId: number
   to: string[]
   subject: string
   htmlContent: string
+  replyTo?: string
 }): Promise<void> {
   await brevoFetch('/smtp/email', {
     method: 'POST',
-    body: { sender: { id: senderId }, to: to.map((email) => ({ email })), subject, htmlContent },
+    body: {
+      sender: { id: senderId },
+      to: to.map((email) => ({ email })),
+      subject,
+      htmlContent,
+      ...(replyTo && { replyTo: { email: replyTo } }),
+    },
   })
 }
 

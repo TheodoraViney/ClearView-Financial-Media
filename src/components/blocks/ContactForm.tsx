@@ -33,11 +33,14 @@ export function ContactForm({ block, brand }: BlockProps<'contactForm'>) {
       errors={{
         firstName: block.firstNameError ?? '',
         lastName: block.lastNameError ?? '',
+        jobTitle: block.jobTitleError ?? '',
+        company: block.companyError ?? '',
         emailMissing: block.emailMissingError ?? '',
         emailInvalid: block.emailInvalidError ?? '',
         message: block.messageError ?? '',
         consent: block.consentError ?? '',
       }}
+      sendError={block.sendErrorMessage ?? ''}
       successMessage={block.successMessage ?? ''}
       returnLabel={block.returnLabel ?? ''}
     />
