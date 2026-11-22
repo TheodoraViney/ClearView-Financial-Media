@@ -5,6 +5,7 @@ import {
   ARTICLE_BODY,
   ARTICLE_CARD,
   BLOCKS_PROJECTION,
+  COMPANY_HAS_PROFILE,
   IMAGE,
   LINK,
   LINK_TARGET,
@@ -847,5 +848,74 @@ export const RESEARCH_REPORT_PAGE_QUERY = defineQuery(`
     relatedResearchHeading[]{ _key, style, children[]{ _key, text } },
     keyTakeawaysHeading[]{ _key, style, children[]{ _key, text } },
     mostReadHeading[]{ _key, style, children[]{ _key, text } }
+  }
+`)
+
+// A partner profile at /companies/{slug}: one company, ClearView only. Companies carry no brand: the page is served on
+// ClearView only, which the route checks (404 on the other hosts), like the other shared records. A company that no
+// awards edition, event or post references (COMPANY_HAS_PROFILE) matches nothing, so the route 404s for it too.
+// `about` is richText and uses the article body projection; `aboutText` feeds the metadata description.
+// Activity and recognition are derived, not typed: `sponsorships` are the editions and events that list the company in
+// a sponsor tier, `recognition` the editions where it won, each with the categories it won there and the people who
+// won when the award went to individuals (`^.^` inside the winner filter is the company; the row's display name is
+// left out, as the profile already names the company). Both newest first. The programme title names an edition that belongs to a programme;
+// an edition without one falls back to its own title in the adapter. Sponsor interviews and official links are rows
+// typed on the company (label plus linkField target); the awards archive titles are plain strings, not links.
+export const PARTNER_PROFILE_QUERY = defineQuery(`
+  *[_type == "company" && slug.current == $slug && ${COMPANY_HAS_PROFILE}][0]{
+    _id,
+    title,
+    "slug": slug.current,
+    "logo": logo{ ${IMAGE} },
+    "profileImage": profileImage{ ${IMAGE} },
+    about[]{ ${ARTICLE_BODY} },
+    "aboutText": pt::text(about),
+    websiteUrl,
+    profileMetrics[]{ _key, value, text },
+    profileFields[]{ _key, label, values },
+    "sponsorships": *[
+      _type in ["awardsProgramme", "conferenceEvent"]
+      && ^._id in sponsorTypes[].companies[]._ref
+    ] | order(startDate desc){
+      _id,
+      _type,
+      title,
+      startDate,
+      "programme": programme->title
+    },
+    "recognition": *[
+      _type == "awardsProgramme"
+      && ^._id in winners[].company._ref
+    ] | order(startDate desc){
+      _id,
+      title,
+      startDate,
+      "programme": programme->title,
+      "wins": winners[company._ref == ^.^._id && defined(category->title)]{ _key, "category": category->title, people }
+    },
+    sponsorInterviews[]{ _key, label, link{ ${LINK_TARGET} } },
+    awardsArchiveTitles,
+    officialLinks[]{ _key, label, link{ ${LINK_TARGET} } }
+  }
+`)
+
+// The partner profile page's labels and headings (`$id` is PARTNER_PROFILE_PAGE_ID), one cached result for every
+// company. The page 404s until the document is published.
+export const PARTNER_PROFILE_PAGE_QUERY = defineQuery(`
+  *[_id == $id && _type == "partnerProfilePage"][0]{
+    breadcrumbHomeLabel,
+    breadcrumbProfileLabel,
+    typeLabel,
+    websiteLinkLabel,
+    atAGlanceLabel,
+    sponsorActivityText,
+    fieldsHeading[]{ _key, style, children[]{ _key, text } },
+    activityHeading[]{ _key, style, children[]{ _key, text } },
+    sponsorActivityHeading[]{ _key, style, children[]{ _key, text } },
+    recognitionHeading[]{ _key, style, children[]{ _key, text } },
+    coverageHeading[]{ _key, style, children[]{ _key, text } },
+    sponsorInterviewsHeading[]{ _key, style, children[]{ _key, text } },
+    archiveCoverageHeading[]{ _key, style, children[]{ _key, text } },
+    officialLinksHeading[]{ _key, style, children[]{ _key, text } }
   }
 `)

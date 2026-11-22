@@ -119,6 +119,75 @@ export const imageField = (
   })
 
 /**
+ * One cell of a key-findings-group: a large figure and what it measures, read by `ui/KeyFindings`. The research report's
+ * Key findings add an optional note under the text (`withNote`); a company's At a glance figures have none.
+ */
+export const keyFindingMember = (options: { withNote?: boolean; textExample?: string } = {}) =>
+  defineArrayMember({
+    type: 'object',
+    name: 'keyFinding',
+    title: 'Finding',
+    fields: [
+      defineField({
+        name: 'value',
+        title: 'Figure',
+        type: 'string',
+        description: 'The large figure, for example "72%" or "5.3 / 7".',
+        validation: (Rule) => Rule.required(),
+      }),
+      defineField({
+        name: 'text',
+        title: 'Text',
+        type: 'string',
+        description: `What the figure measures, for example "${options.textExample ?? 'Automation momentum (65% previous year)'}".`,
+        validation: (Rule) => Rule.required(),
+      }),
+      ...(options.withNote
+        ? [
+            defineField({
+              name: 'note',
+              title: 'Note',
+              type: 'string',
+              description: 'Optional. A short line under the text, for example "Momentum rose year on year."',
+            }),
+          ]
+        : []),
+    ],
+    preview: {
+      select: { title: 'value', subtitle: 'text' },
+    },
+  })
+
+/**
+ * A labelled link row (ui/LinkRow): the visible text plus where it goes, any routable document or an allowlisted
+ * address (linkField). Used by lists of links typed on a record, such as a company's sponsor interviews.
+ */
+export const linkRowMember = (options: { title: string; labelDescription: string }) =>
+  defineArrayMember({
+    type: 'object',
+    name: 'linkRow',
+    title: options.title,
+    fields: [
+      defineField({
+        name: 'label',
+        title: 'Label',
+        type: 'string',
+        description: options.labelDescription,
+        validation: (Rule) => Rule.required(),
+      }),
+      linkField({ required: true, withLabel: false }),
+    ],
+    preview: {
+      select: { title: 'label', kind: 'link.kind', external: 'link.external', internalTitle: 'link.internal.title' },
+      prepare({ title, kind, external, internalTitle }) {
+        const target = kind === 'external' ? external : kind === 'internal' ? internalTitle : undefined
+
+        return { title: title || 'Untitled link', subtitle: target ? `→ ${target}` : undefined }
+      },
+    },
+  })
+
+/**
  * A consent text with the Privacy Policy link token: required, and `{link}` exactly once, where the link goes. The
  * subscribe pop-up and the Contact form share it, with a `privacyLinkLabel` text and a `privacyLink` link beside it.
  */

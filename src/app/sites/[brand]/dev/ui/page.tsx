@@ -22,6 +22,7 @@ import { Heading } from '@/components/ui/Heading'
 import { Icon, iconMap, type IconName } from '@/components/ui/Icon'
 import { IconButton } from '@/components/ui/IconButton'
 import { Input } from '@/components/ui/Input'
+import { KeyFindings } from '@/components/ui/KeyFindings'
 import { ListLink } from '@/components/ui/ListLink'
 import { Media } from '@/components/ui/Media'
 import { Meta } from '@/components/ui/Meta'
@@ -576,6 +577,31 @@ export default async function UiPage({
             items={[
               { key: 'audience', label: 'Audience', value: 'Ultra-high-net-worth individuals, entrepreneurs and family offices' },
               { key: 'market', label: 'Market', value: 'Nordic wealth management' },
+            ]}
+          />
+        </Group>
+
+        <Group title="Partner profile: KeyFindings metrics, DefinitionList fields">
+          <p className="text-base text-grey">
+            Whole page with the design sample: <a className="text-accent" href="/dev/partner-profile">/dev/partner-profile</a>{' '}
+            (<code>?record=essential</code>, <code>?panel=logo|lockup</code>).
+          </p>
+          <KeyFindings
+            variant="metrics"
+            label="At a glance"
+            items={[
+              ['120', 'clients in 26 countries'],
+              ['3,000+', 'users representing 120+ B CHF AuM'],
+              ['250+', 'custodian connectors'],
+              ['30+', 'trading rooms'],
+              ['50+', 'employees in 4 offices'],
+            ].map(([value, text]) => ({ key: value, value, text, note: null }))}
+          />
+          <DefinitionList
+            variant="fields"
+            items={[
+              { key: 'clients', label: 'Client types', values: ['Family offices', 'Private banks', 'Pension funds'] },
+              { key: 'platform', label: 'Platform areas', values: ['Portfolio management', 'Client reporting'] },
             ]}
           />
         </Group>

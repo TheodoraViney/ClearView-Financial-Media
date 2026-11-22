@@ -327,6 +327,8 @@ main [data-section-anchor] {
   /* Key finding text and note minimum heights: three lines of 16/22.4 and two of 13/18.2 (key-finding-card) */
   --spacing-finding-text: 4.2rem;
   --spacing-finding-note: 2.275rem;
+  /* Partner profile At a glance (key-findings-group profile-metrics): each cell's left and top rule, clipped at the box */
+  --shadow-cell-rule: -1px 0 0 var(--color-border), 0 -1px 0 var(--color-border);
   /* Research report cover in the hero (report-cover-image) */
   --shadow-cover-lg: 0 14px 28px rgb(31 43 50 / 0.18);
   /* Report cover in a related research card at rest (related-research-card); the hover shadow is brand-tinted, below */

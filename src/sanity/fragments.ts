@@ -731,3 +731,12 @@ export const RELATED_RESEARCH_FILL = /* groq */ `
     && defined(slug.current)
   ] | order(defined(publishedAt) desc, publishedAt desc, legacyWpId desc)[0...7]{ ${RELATED_RESEARCH} }
 `
+
+// For a filter or projection on a company document (the inner query's `^`): whether it has a public partner
+// profile at /companies/{slug}: some awards edition, conference event or post references it. Venue, sponsor, winner,
+// technology demonstrator and charity partner all count, as do sponsored posts on any brand; person and resource
+// references do not. There is no manual flag. Used by the profile route query, and by any card that links a company
+// (only link when this holds, or the link 404s).
+export const COMPANY_HAS_PROFILE = /* groq */ `
+  count(*[_type in ["awardsProgramme", "conferenceEvent", "post"] && references(^._id)]) > 0
+`

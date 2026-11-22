@@ -2,6 +2,9 @@ import { cx } from './cx'
 
 export type Definition = { key: string; label: string; value: string }
 
+/** A label with a list of values, one per line (partner profile Clients and platform). */
+export type DefinitionValues = { key: string; label: string; values: string[] }
+
 const DIVIDED = 'border-t border-border first:border-t-0 first:pt-0'
 
 const VARIANTS = {
@@ -20,6 +23,14 @@ const VARIANTS = {
     label: 'text-base leading-title font-medium text-foreground',
     value: 'max-w-160 text-base leading-copy text-grey',
   },
+  // Partner profile Clients and platform (partner-profile-fields): 16/20.8 500 label, the values a list 8px apart in
+  // 16/22.4 dark, two equal columns 32px apart from md, stacked 12px apart below; 24px rows.
+  fields: {
+    list: undefined,
+    row: cx(DIVIDED, 'gap-3 py-6 md:grid-cols-2 md:gap-x-8'),
+    label: 'text-base leading-title font-medium text-foreground',
+    value: 'text-base leading-copy text-foreground',
+  },
   // Event venue and practical information (shared-shell event-info-block `plain`): one column at every breakpoint, no
   // rules, 20px between items; 13/13 grey label 8px above the 16/22.4 dark value.
   plain: {
@@ -30,13 +41,13 @@ const VARIANTS = {
   },
 }
 
-// Label / value rows divided by rules. Stacked on mobile, side by side from md.
+// Label / value rows divided by rules. Stacked on mobile, side by side from md. A row with `values` lists them.
 export function DefinitionList({
   items,
   variant = 'default',
   className,
 }: {
-  items: Definition[]
+  items: (Definition | DefinitionValues)[]
   variant?: keyof typeof VARIANTS
   className?: string
 }) {
@@ -50,7 +61,19 @@ export function DefinitionList({
           className={cx('grid min-w-0 grid-cols-1', look.row)}
         >
           <dt className={cx('min-w-0 break-words', look.label)}>{item.label}</dt>
-          <dd className={cx('m-0 min-w-0 break-words whitespace-pre-line text-pretty', look.value)}>{item.value}</dd>
+          <dd className={cx('m-0 min-w-0 break-words whitespace-pre-line text-pretty', look.value)}>
+            {'values' in item ? (
+              <ul className="flex flex-col gap-2">
+                {item.values.map((value, index) => (
+                  <li key={index} className="min-w-0">
+                    {value}
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              item.value
+            )}
+          </dd>
         </div>
       ))}
     </dl>
