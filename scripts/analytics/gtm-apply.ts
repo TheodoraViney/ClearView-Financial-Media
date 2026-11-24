@@ -7,6 +7,7 @@
  *
  *   --plan --snapshot <file>  compare with a saved ContainerVersion JSON (API shape) instead of the API, offline
  *   --verbose                 also list unchanged entities
+ *   --apply --no-version      write the workspace only, create no version
  *
  * --plan reads the "focusreactive-analytics" workspace when it exists, otherwise the live (published) version.
  * --apply writes only into that workspace, creating it when absent, then creates a container VERSION from it. It never
@@ -16,6 +17,10 @@
  * place; a same-named entity without the marker is reported as a conflict and left alone. The client's existing
  * Google tag and Crazy Egg tag are matched by type and only get the listed parameters and consent added. Nothing is
  * ever deleted, except the workspace this run created when there turned out to be nothing to change.
+ *
+ * Creating a GA4 event tag for a measurement id makes GTM add a destination tag (dest_ga) and container gtag_config
+ * settings by itself. --apply re-reads the workspace after the tags and patches those in a second pass: the
+ * destination tags get consent and the blocking trigger, the automatic events and user-provided data are switched off.
  *
  * Requests are throttled (GTM_MIN_INTERVAL_MS, default 4000) to stay inside the GTM API default quota.
  */
@@ -36,6 +41,7 @@ import {
   type DesiredTag,
   type DesiredTrigger,
   type DesiredVariable,
+  type GtagConfigPatch,
   type Param,
   type TagPatch,
 } from './config'
@@ -76,22 +82,35 @@ interface LiveVariable extends Entity {
   variableId: string
 }
 
+/** Container-level Google tag setting. Has no name. */
+interface LiveGtagConfig {
+  path?: string
+  gtagConfigId: string
+  type: string
+  parameter?: Param[]
+  [field: string]: unknown
+}
+
+/** What `describe` compares: any entity, named or not. */
+type Fields = { parameter?: Param[]; [field: string]: unknown }
+
 interface Snapshot {
   source: string
   tags: LiveTag[]
   triggers: LiveTrigger[]
   variables: LiveVariable[]
   builtIns: string[]
+  gtagConfigs: LiveGtagConfig[]
 }
 
-type Kind = 'builtIn' | 'variable' | 'trigger' | 'tag'
+type Kind = 'builtIn' | 'variable' | 'trigger' | 'tag' | 'gtagConfig'
 
 interface Action {
   op: 'create' | 'update' | 'same' | 'conflict' | 'missing'
   kind: Kind
   label: string
   /** Request body for create/update. */
-  body?: Entity
+  body?: Fields
   /** Resource path for update. */
   path?: string
   detail: string[]
@@ -180,7 +199,7 @@ const showParam = (param?: Param): string => {
 }
 
 /** Human-readable differences between a live entity and its intended body. */
-function describe(before: Entity | undefined, after: Entity): string[] {
+function describe(before: Fields | undefined, after: Fields): string[] {
   const lines: string[] = []
   const params = new Set([...(before?.parameter ?? []), ...(after.parameter ?? [])].map((p) => p.key ?? ''))
 
@@ -290,18 +309,39 @@ function patchActions(snapshot: Snapshot, patch: TagPatch): Action[] {
   const matches = findPatched(snapshot.tags, patch)
 
   if (!matches.length) {
-    return [{ op: 'missing', kind: 'tag', label: patch.label, detail: ['no matching tag in the container; not created'] }]
+    return patch.optional
+      ? [{ op: 'same', kind: 'tag', label: patch.label, detail: ['not in the container yet; GTM creates it'] }]
+      : [{ op: 'missing', kind: 'tag', label: patch.label, detail: ['no matching tag in the container; not created'] }]
   }
+
+  const triggerIds = new Map(snapshot.triggers.map((t) => [t.name, t.triggerId]))
+  const blocking = (patch.blocking ?? []).map((name) => triggerIds.get(name) ?? `<new: ${name}>`)
 
   return matches.map((tag) => {
     const body: LiveTag = {
       ...tag,
       parameter: mergeParams(tag.parameter, patch.parameter),
       consentSettings: mergeConsent(tag.consentSettings, patch.consentSettings),
+      ...(blocking.length && { blockingTriggerId: [...new Set([...(tag.blockingTriggerId ?? []), ...blocking])] }),
     }
     const detail = describe(tag, body)
 
     return { op: detail.length ? 'update' : 'same', kind: 'tag', label: `${patch.label} "${tag.name}"`, body, path: tag.path, detail }
+  })
+}
+
+function gtagConfigActions(snapshot: Snapshot, patch: GtagConfigPatch): Action[] {
+  const matches = snapshot.gtagConfigs.filter((config) => config.type === patch.match.type)
+
+  if (!matches.length) {
+    return [{ op: 'same', kind: 'gtagConfig', label: patch.label, detail: ['not in the container yet; GTM creates it'] }]
+  }
+
+  return matches.map((config) => {
+    const body: LiveGtagConfig = { ...config, parameter: mergeParams(config.parameter, patch.parameter) }
+    const detail = describe(config, body)
+
+    return { op: detail.length ? 'update' : 'same', kind: 'gtagConfig', label: `${patch.label} ${config.gtagConfigId}`, body, path: config.path, detail }
   })
 }
 
@@ -321,9 +361,23 @@ function planBefore(plan: ContainerPlan, snapshot: Snapshot): Action[] {
 function planTags(plan: ContainerPlan, snapshot: Snapshot): Action[] {
   return [
     ...plan.tags.map((tag) => upsert('tag', snapshot.tags, tagBody(tag, snapshot, plan))),
-    ...plan.patches.flatMap((patch) => patchActions(snapshot, patch)),
+    ...plan.patches.filter((patch) => !patch.optional).flatMap((patch) => patchActions(snapshot, patch)),
   ]
 }
+
+/** What GTM creates by itself once the tags exist: destination tags and gtag_config settings. */
+function planAfter(plan: ContainerPlan, snapshot: Snapshot): Action[] {
+  return [
+    ...plan.patches.filter((patch) => patch.optional).flatMap((patch) => patchActions(snapshot, patch)),
+    ...plan.gtagConfigs.flatMap((patch) => gtagConfigActions(snapshot, patch)),
+  ]
+}
+
+const planAll = (plan: ContainerPlan, snapshot: Snapshot) => [
+  ...planBefore(plan, snapshot),
+  ...planTags(plan, snapshot),
+  ...planAfter(plan, snapshot),
+]
 
 const SYMBOL: Record<Action['op'], string> = { create: '+', update: '~', same: '=', conflict: '!', missing: '?' }
 
@@ -366,6 +420,7 @@ interface ContainerVersion {
   trigger?: LiveTrigger[]
   variable?: LiveVariable[]
   builtInVariable?: { type: string }[]
+  gtagConfig?: LiveGtagConfig[]
 }
 
 let containers: Container[] | undefined
@@ -400,6 +455,7 @@ async function readWorkspace(gtm: GoogleClient, workspace: Workspace): Promise<S
     triggers: await gtm.list<LiveTrigger>(`${workspace.path}/triggers`, 'trigger'),
     variables: await gtm.list<LiveVariable>(`${workspace.path}/variables`, 'variable'),
     builtIns: (await gtm.list<{ type: string }>(`${workspace.path}/built_in_variables`, 'builtInVariable')).map((b) => b.type),
+    gtagConfigs: await gtm.list<LiveGtagConfig>(`${workspace.path}/gtag_config`, 'gtagConfig'),
   }
 }
 
@@ -424,11 +480,18 @@ function fromVersion(version: ContainerVersion, source: string): Snapshot {
     triggers: version.trigger ?? [],
     variables: version.variable ?? [],
     builtIns: (version.builtInVariable ?? []).map((b) => b.type),
+    gtagConfigs: version.gtagConfig ?? [],
   }
 }
 
 async function execute(gtm: GoogleClient, workspace: Workspace, action: Action) {
-  const collection = { variable: 'variables', trigger: 'triggers', tag: 'tags', builtIn: 'built_in_variables' }[action.kind]
+  const collection = {
+    variable: 'variables',
+    trigger: 'triggers',
+    tag: 'tags',
+    builtIn: 'built_in_variables',
+    gtagConfig: 'gtag_config',
+  }[action.kind]
 
   if (action.op === 'create' && action.kind === 'builtIn') {
     await gtm.post(`${workspace.path}/built_in_variables`, undefined, { type: action.label })
@@ -443,7 +506,7 @@ async function execute(gtm: GoogleClient, workspace: Workspace, action: Action) 
   console.log(`  ${SYMBOL[action.op]} ${action.kind} ${action.label}`)
 }
 
-async function applyContainer(gtm: GoogleClient, plan: ContainerPlan) {
+async function applyContainer(gtm: GoogleClient, plan: ContainerPlan, noVersion: boolean) {
   const container = await findContainer(gtm, plan.gtmPublicId)
   let workspace = await findWorkspace(gtm, container)
   const created = !workspace
@@ -481,7 +544,20 @@ async function applyContainer(gtm: GoogleClient, plan: ContainerPlan) {
     await execute(gtm, workspace, action)
   }
 
-  const actions = [...before, ...tags]
+  // GTM adds destination tags and gtag_config settings as a side effect of the GA4 event tags: read them back.
+  snapshot = {
+    ...snapshot,
+    tags: await gtm.list<LiveTag>(`${workspace.path}/tags`, 'tag'),
+    gtagConfigs: await gtm.list<LiveGtagConfig>(`${workspace.path}/gtag_config`, 'gtagConfig'),
+  }
+
+  const after = planAfter(plan, snapshot)
+
+  for (const action of after) {
+    await execute(gtm, workspace, action)
+  }
+
+  const actions = [...before, ...tags, ...after]
 
   for (const action of actions.filter((a) => a.op === 'conflict' || a.op === 'missing')) {
     console.log(`  ${SYMBOL[action.op]} ${action.kind} ${action.label}: ${action.detail.join('; ')}`)
@@ -500,29 +576,60 @@ async function applyContainer(gtm: GoogleClient, plan: ContainerPlan) {
     return
   }
 
-  const changed = actions.filter((a) => a.op === 'create' || a.op === 'update')
-  const version = await gtm.post<{ containerVersion?: { containerVersionId: string; path: string }; compilerError?: boolean }>(
-    `${workspace.path}:create_version`,
-    {
-      name: `Analytics ${new Date().toISOString().slice(0, 10)}`,
-      notes: [
-        `Created by scripts/analytics/gtm-apply.ts from workspace "${WORKSPACE_NAME}". Not published.`,
-        ...changed.map((a) => `${SYMBOL[a.op]} ${a.kind} ${a.label}`),
-      ].join('\n'),
-    },
-  )
+  const preview = await gtm.post<{ compilerError?: boolean }>(`${workspace.path}:quick_preview`)
 
-  if (version.compilerError) {
-    throw new Error('GTM reported a compiler error creating the version. Open the workspace in the GTM UI.')
+  console.log(`  quick preview: compilerError ${preview.compilerError ?? false}`)
+
+  if (noVersion) {
+    console.log(`  --no-version: workspace "${WORKSPACE_NAME}" updated, no version created`)
+
+    return
   }
 
-  console.log(`  created version ${version.containerVersion?.containerVersionId} (NOT published; publish it in the GTM UI)`)
+  const changed = actions.filter((a) => a.op === 'create' || a.op === 'update')
+  const body = {
+    name: `Analytics ${new Date().toISOString().slice(0, 10)}`,
+    notes: [
+      `Created by scripts/analytics/gtm-apply.ts from workspace "${WORKSPACE_NAME}". Not published.`,
+      ...changed.map((a) => `${SYMBOL[a.op]} ${a.kind} ${a.label}`),
+    ].join('\n'),
+  }
+
+  // The API gives no detail on a compiler error, and one has been seen to clear on its own: retry once.
+  for (let attempt = 1; ; attempt++) {
+    let failure: unknown
+
+    try {
+      const version = await gtm.post<{ containerVersion?: { containerVersionId: string }; compilerError?: boolean }>(
+        `${workspace.path}:create_version`,
+        body,
+      )
+
+      if (!version.compilerError) {
+        console.log(`  created version ${version.containerVersion?.containerVersionId} (NOT published; publish it in the GTM UI)`)
+
+        return
+      }
+
+      failure = version
+    } catch (error) {
+      failure = error instanceof Error ? error.message : error
+    }
+
+    console.error(`  create_version failed (attempt ${attempt}):\n${typeof failure === 'string' ? failure : JSON.stringify(failure, null, 2)}`)
+
+    if (attempt >= 2) {
+      throw new Error(`Could not create a version. Workspace "${WORKSPACE_NAME}" is written: create the version in the GTM UI.`)
+    }
+
+    await new Promise((done) => setTimeout(done, 5000))
+  }
 }
 
 // ─── CLI ────────────────────────────────────────────────────────────────────────────────────────────────────────────
 
 function dryRun(plan: ContainerPlan) {
-  const empty: Snapshot = { source: 'empty', tags: [], triggers: [], variables: [], builtIns: [] }
+  const empty: Snapshot = { source: 'empty', tags: [], triggers: [], variables: [], builtIns: [], gtagConfigs: [] }
   const show = (entity: Entity) => console.log(`    ${canonical(entity)}`)
 
   console.log(`  built-in variables: ${plan.builtInVariables.join(', ')}`)
@@ -535,7 +642,15 @@ function dryRun(plan: ContainerPlan) {
   console.log(`  patches to existing tags (${plan.patches.length}):`)
 
   for (const patch of plan.patches) {
-    console.log(`    ${patch.label}: match ${canonical(patch.match)}; set ${canonical({ parameter: patch.parameter, consentSettings: patch.consentSettings })}`)
+    console.log(
+      `    ${patch.label}: match ${canonical(patch.match)}; set ${canonical({ parameter: patch.parameter, consentSettings: patch.consentSettings, blocking: patch.blocking })}`,
+    )
+  }
+
+  console.log(`  patches to gtag_config settings (${plan.gtagConfigs.length}):`)
+
+  for (const patch of plan.gtagConfigs) {
+    console.log(`    ${patch.label}: match ${canonical(patch.match)}; set ${canonical(patch.parameter)}`)
   }
 }
 
@@ -544,7 +659,7 @@ async function main() {
   const brand = option('brand')
 
   if (!mode) {
-    console.error('Usage: gtm-apply.ts --dry-run | --plan | --apply [--brand <key>]')
+    console.error('Usage: gtm-apply.ts --dry-run | --plan | --apply [--no-version] [--brand <key>]')
     process.exit(1)
   }
 
@@ -571,7 +686,7 @@ async function main() {
     }
 
     if (mode === 'apply') {
-      await applyContainer(gtm, plan)
+      await applyContainer(gtm, plan, flag('no-version'))
       continue
     }
 
@@ -581,7 +696,7 @@ async function main() {
       const version = JSON.parse(readFileSync(fixture, 'utf8')) as ContainerVersion
 
       console.log(`  compared with ${fixture}`)
-      printActions([...planBefore(plan, fromVersion(version, fixture)), ...planTags(plan, fromVersion(version, fixture))], flag('verbose'))
+      printActions(planAll(plan, fromVersion(version, fixture)), flag('verbose'))
       continue
     }
 
@@ -590,7 +705,7 @@ async function main() {
     const snapshot = workspace ? await readWorkspace(gtm, workspace) : await readLive(gtm, container)
 
     console.log(`  ${container.path} "${container.name}", compared with ${snapshot.source}`)
-    printActions([...planBefore(plan, snapshot), ...planTags(plan, snapshot)], flag('verbose'))
+    printActions(planAll(plan, snapshot), flag('verbose'))
   }
 }
 
