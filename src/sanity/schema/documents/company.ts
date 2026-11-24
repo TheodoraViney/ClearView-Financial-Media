@@ -18,8 +18,8 @@ import { altField, imageField, keyFindingMember, legacyWpIdField, linkRowMember 
  * screens: all 1,548 pairs on the company side are also present on the person
  * side. Storing it twice would mean keeping two lists in sync by hand.
  *
- * Partner profile: a company referenced by an awards edition, an event or a post has a public page at /companies/{slug}
- * on ClearView Publishing (COMPANY_HAS_PROFILE in src/sanity/fragments.ts). The "Profile page" fields are optional by
+ * Company profile: a company referenced by an awards edition, an event or a post has a public page at /companies/{slug}
+ * on ClearView Publishing (COMPANY_HAS_PROFILE in src/sanity/fragments.ts). The "Company profile page" fields are optional by
  * design, most companies have no such content: each section of the page is hidden when its field is empty. The page
  * also shows the name, logo, About and website from the main fields, and derives its activity and recognition from the
  * editions and events that name the company, so those have no field here.
@@ -29,7 +29,7 @@ export const company = defineType({
   title: 'Company',
   type: 'document',
   icon: CaseIcon,
-  groups: [{ name: 'profile', title: 'Profile page' }],
+  groups: [{ name: 'profile', title: 'Company profile page' }],
   fields: [
     defineField({
       name: 'title',
@@ -43,7 +43,7 @@ export const company = defineType({
       type: 'slug',
       options: { source: 'title', maxLength: 96 },
       description:
-        'Address of the partner profile page, /companies/{slug} on ClearView Publishing. The page exists only while an awards edition, an event or a post names the company.',
+        'Address of the company profile page, /companies/{slug} on ClearView Publishing. The page exists only while an awards edition, an event or a post names the company.',
     }),
     defineField({
       name: 'logo',
@@ -62,7 +62,7 @@ export const company = defineType({
       name: 'about',
       title: 'About',
       type: 'richText',
-      description: 'Shown as the description beside the image on the partner profile page.',
+      description: 'Shown as the description beside the image on the company profile page.',
     }),
     defineField({
       name: 'address',
@@ -94,7 +94,7 @@ export const company = defineType({
     imageField('profileImage', {
       title: 'Profile image',
       group: 'profile',
-      description: 'Optional. Large image in the header of the partner profile page. Without it the logo is shown there, and without a logo the name.',
+      description: 'Optional. Large image in the header of the company profile page. Without it the logo is shown there, and without a logo the name.',
     }),
     defineField({
       name: 'profileMetrics',

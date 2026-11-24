@@ -8,8 +8,8 @@ import type { HeadingView } from './awards-programme'
 import type { AdUnitView } from './gam'
 
 /*
- * The partner profile page (/companies/{slug} on ClearView Publishing) as plain props, built by
- * src/sanity/partner-profile-view.ts. Every section is null when it has nothing to show, and the page leaves it out.
+ * The partner profile page, "Company profile" to editors and readers (/companies/{slug} on ClearView Publishing), as
+ * plain props built by src/sanity/partner-profile-view.ts. Every section is null when it has nothing to show, and the page leaves it out.
  * Pure: no Sanity or Next imports beyond types.
  */
 
@@ -51,7 +51,8 @@ export type PartnerProfileView = {
   coverage: {
     heading: HeadingView
     interviews: { heading: HeadingView; items: LinkView[] } | null
-    archive: { heading: HeadingView; titles: string[] } | null
+    /** `link`: the labels document's awards archive link, null without a target. */
+    archive: { heading: HeadingView; titles: string[]; link: { label: string; href: string } | null } | null
   } | null
   officialLinks: { heading: HeadingView; items: LinkView[] } | null
   ads: { top: AdUnitView | null; side: AdUnitView | null }

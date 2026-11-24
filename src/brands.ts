@@ -60,7 +60,7 @@ export const EVENT_PAGE_ID = 'event-page'
  */
 export const RESEARCH_REPORT_PAGE_ID = 'research-report-page'
 
-/** Id of the one "Partner profile page" document: the company profile template's labels. ClearView only. */
+/** Id of the one "Company profile page" document: the company profile template's labels. ClearView only. */
 export const PARTNER_PROFILE_PAGE_ID = 'partner-profile-page'
 
 /** Id of the one subscribe form settings document, shared by every brand: the Brevo list and confirmation email. */

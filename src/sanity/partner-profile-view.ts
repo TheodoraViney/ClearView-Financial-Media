@@ -86,7 +86,7 @@ function recognition(company: PartnerProfileData): RecognitionView[] {
   })
 }
 
-/** The partner profile page as plain props, from the company, the labels document and the ads. */
+/** The partner profile ("Company profile") page as plain props, from the company, the labels document and the ads. */
 export function toPartnerProfileView({
   company,
   copy: rawCopy,
@@ -123,11 +123,18 @@ export function toPartnerProfileView({
   const interviews = linkRows(company.sponsorInterviews)
   const archiveTitles = (company.awardsArchiveTitles ?? []).filter(filled)
   const officialLinks = linkRows(company.officialLinks)
+  // The section link of the breadcrumb and the awards archive link: optional targets on the labels document.
+  const profileHref = resolveHref(rawCopy.breadcrumbProfileLink, 'clearview')
+  const archiveHref = resolveHref(rawCopy.archiveLink, 'clearview')
 
   return {
     name,
-    // The middle item is plain text until a companies listing exists.
-    breadcrumb: [{ label: copy.breadcrumbHomeLabel, href: '/' }, { label: copy.breadcrumbProfileLabel, muted: true }, { label: name }],
+    // The middle item links where the labels document says, and is grey plain text without a link.
+    breadcrumb: [
+      { label: copy.breadcrumbHomeLabel, href: '/' },
+      profileHref ? { label: copy.breadcrumbProfileLabel, href: profileHref } : { label: copy.breadcrumbProfileLabel, muted: true },
+      { label: name },
+    ],
     typeLabel: copy.typeLabel,
     description: blocksOrNull(company.about),
     website:
@@ -157,7 +164,11 @@ export function toPartnerProfileView({
               interviews.length > 0 ? { heading: toHeading(rawCopy.sponsorInterviewsHeading), items: interviews } : null,
             archive:
               archiveTitles.length > 0
-                ? { heading: toHeading(rawCopy.archiveCoverageHeading), titles: archiveTitles }
+                ? {
+                    heading: toHeading(rawCopy.archiveCoverageHeading),
+                    titles: archiveTitles,
+                    link: archiveHref && filled(copy.archiveLinkLabel) ? { label: copy.archiveLinkLabel, href: archiveHref } : null,
+                  }
                 : null,
           }
         : null,

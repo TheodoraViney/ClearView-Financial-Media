@@ -581,7 +581,7 @@ export default async function UiPage({
           />
         </Group>
 
-        <Group title="Partner profile: KeyFindings metrics, DefinitionList fields">
+        <Group title="Company profile: KeyFindings metrics, DefinitionList fields">
           <p className="text-base text-grey">
             Whole page with the design sample: <a className="text-accent" href="/dev/partner-profile">/dev/partner-profile</a>{' '}
             (<code>?record=essential</code>, <code>?panel=logo|lockup</code>).

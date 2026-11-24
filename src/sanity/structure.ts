@@ -118,7 +118,7 @@ export const structure: StructureResolver = (S) =>
                         .child(S.document().schemaType('articlePage').documentId(articlePageDocumentId(key))),
                     ]
                   : []),
-                // The awards programme, event, research report, award category and partner profile pages live on
+                // The awards programme, event, research report, award category and company profile pages live on
                 // ClearView Publishing only, like the other shared records.
                 ...(key === 'clearview'
                   ? [
@@ -139,7 +139,7 @@ export const structure: StructureResolver = (S) =>
                         .icon(TagIcon)
                         .child(S.document().schemaType('awardCategoryPage').documentId(AWARD_CATEGORY_PAGE_ID)),
                       S.listItem()
-                        .title('Partner profile page')
+                        .title('Company profile page')
                         .icon(CaseIcon)
                         .child(S.document().schemaType('partnerProfilePage').documentId(PARTNER_PROFILE_PAGE_ID)),
                     ]
