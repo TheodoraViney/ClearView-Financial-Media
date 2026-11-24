@@ -11,6 +11,7 @@ import {
 } from '@/brands'
 import { ArticleBody } from '@/components/sections/article/ArticleBody'
 import { ArticlePage } from '@/components/sections/article/ArticlePage'
+import { ArticleViewEvent } from '@/components/ui/AnalyticsEvents.client'
 import { fromPost, toEmbedConsentCopy } from '@/sanity/article-view'
 import { fetchAdUnits } from '@/sanity/brand-title'
 import {
@@ -79,6 +80,7 @@ export default async function PostPage({
       slug={slug}
       perspective="published"
       stega={false}
+      live
     />
   )
 }
@@ -103,7 +105,8 @@ async function CachedPost({
   perspective,
   variant,
   stega,
-}: { brand: EditorialBrandKey; slug: string } & DynamicFetchOptions) {
+  live = false,
+}: { brand: EditorialBrandKey; slug: string; live?: boolean } & DynamicFetchOptions) {
   const [{ data: post }, { data: mostRead }, mostReadFill, { data: copy }, ads] = await Promise.all([
     cachedSanity({
       query: POST_QUERY,
@@ -151,5 +154,11 @@ async function CachedPost({
     ),
   })
 
-  return <ArticlePage article={article} />
+  // `article_view` on the live site only: a preview is not a read.
+  return (
+    <>
+      <ArticlePage article={article} />
+      {live && <ArticleViewEvent source="cms" id={post._id} />}
+    </>
+  )
 }

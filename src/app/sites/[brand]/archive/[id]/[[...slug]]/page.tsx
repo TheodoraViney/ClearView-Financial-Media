@@ -1,4 +1,5 @@
 import type { Metadata } from 'next'
+import { draftMode } from 'next/headers'
 import { notFound, permanentRedirect } from 'next/navigation'
 import { connection } from 'next/server'
 
@@ -8,6 +9,7 @@ import { articlePageDocumentId, brandOrigin, isEditorialBrandKey, mostReadDocume
 import { toLogo } from '@/components/blocks/shell'
 import { ArchiveBody } from '@/components/sections/article/ArchiveBody'
 import { ArticlePage } from '@/components/sections/article/ArticlePage'
+import { ArticleViewEvent } from '@/components/ui/AnalyticsEvents.client'
 import {
   archiveArticlePath,
   archiveCanonicalUrl,
@@ -117,13 +119,14 @@ export default async function ArchiveArticlePage({ params }: { params: Params })
     permanentRedirect(archiveArticlePath(record))
   }
 
-  const [{ data: shell }, { data: mostRead }, mostReadFill, { data: copy }, ads] = await Promise.all([
+  const [{ data: shell }, { data: mostRead }, mostReadFill, { data: copy }, ads, { isEnabled: isDraftMode }] = await Promise.all([
     fetchShell(brand, PUBLISHED),
     cachedSanity({ query: MOST_READ_QUERY, params: { brand, id: mostReadDocumentId(brand) }, ...PUBLISHED }),
     // No post is being read: an empty slug excludes none.
     mostReadAutoFill({ brand, slug: '', ...PUBLISHED }),
     cachedSanity({ query: ARTICLE_PAGE_QUERY, params: { id: articlePageDocumentId(brand) }, ...PUBLISHED }),
     fetchAdUnits(brand, 'other', PUBLISHED),
+    draftMode(),
   ])
 
   const article = fromArchiveRecord({
@@ -145,5 +148,11 @@ export default async function ArchiveArticlePage({ params }: { params: Params })
     ),
   })
 
-  return <ArticlePage article={article} />
+  // `article_view` outside draft mode, as on CMS posts: an editor browsing with draft mode on is not a reader.
+  return (
+    <>
+      <ArticlePage article={article} />
+      {!isDraftMode && <ArticleViewEvent source="archive" id={String(record.id)} />}
+    </>
+  )
 }

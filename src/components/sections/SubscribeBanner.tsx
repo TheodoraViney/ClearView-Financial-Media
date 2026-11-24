@@ -31,6 +31,7 @@ export function SubscribeBanner({ heading, description, buttonLabel }: Subscribe
         {description && <p className="max-w-130 min-w-0 text-base text-pretty text-grey">{description}</p>}
         {buttonLabel && (
           <SubscribeButton
+            location="banner"
             size="compact"
             motion="out"
             className="max-w-full min-w-0 px-4.5 text-center font-medium md:justify-self-start header:justify-self-end"

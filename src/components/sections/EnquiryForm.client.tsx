@@ -15,6 +15,7 @@ import {
   type FieldErrors,
   type FormConsent,
 } from '@/components/ui/FormFieldControl.client'
+import { track } from '@/lib/analytics'
 import { ENQUIRY_FORM_FIELDS, sendEnquiry, type EnquiryFormField, type EnquiryFormFieldName } from '@/lib/enquiry-form'
 
 export type EnquiryFormFieldsProps = {
@@ -104,6 +105,7 @@ export function EnquiryFormFields({
     setPending(false)
 
     if (ok) {
+      track('sponsorship_enquiry')
       focusAfterSwap.current = 'message'
       setSent(true)
     } else {

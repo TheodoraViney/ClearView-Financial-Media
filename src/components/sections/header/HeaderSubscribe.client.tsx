@@ -22,11 +22,12 @@ export function HeaderSubscribe({ placement, children }: { placement: 'bar' | 'm
   }
 
   return placement === 'bar' ? (
-    <SubscribeButton onBeforeOpen={closeHeader} className="px-4.5 font-medium">
+    <SubscribeButton location="header" onBeforeOpen={closeHeader} className="px-4.5 font-medium">
       {children}
     </SubscribeButton>
   ) : (
     <SubscribeButton
+      location="header"
       onBeforeOpen={closeHeader}
       variant="outline-accent"
       size="lg"

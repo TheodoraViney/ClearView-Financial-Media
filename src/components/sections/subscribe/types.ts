@@ -1,4 +1,5 @@
 import type { SelectOption } from '@/components/ui/Select'
+import type { SignupLocation } from '@/lib/analytics'
 import type { SubscribeModalTextField } from '@/lib/subscribe'
 
 /** The copy fields of the pop-up as the page gets them, from its document. */
@@ -32,4 +33,6 @@ export type SubscribeOpenOptions = {
   // Where focus goes when the pop-up closes; else the element focused before it opened.
   returnFocus?: HTMLElement | null
   prefill?: SubscribePrefill
+  // The opener, sent with `newsletter_signup` on success.
+  location?: SignupLocation
 }

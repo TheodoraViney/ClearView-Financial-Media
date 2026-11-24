@@ -1,3 +1,4 @@
+import { stegaClean } from 'next-sanity'
 import { type ReactNode } from 'react'
 
 import { RichText } from '@/components/sections/article/ArticleBody'
@@ -14,6 +15,7 @@ import { Media } from '@/components/ui/Media'
 import { Meta } from '@/components/ui/Meta'
 import { SectionNav } from '@/components/ui/SectionNav.client'
 import { SpeakerCard } from '@/components/ui/SpeakerCard'
+import { trackAttributes } from '@/lib/analytics'
 import type { AwardsProgrammeView, HeadingView, JudgesPanelView, WinnersGroupView } from '@/lib/awards-programme'
 import { adPositionLabel } from '@/lib/gam'
 
@@ -100,7 +102,13 @@ export function AwardsProgrammePage({ view }: { view: AwardsProgrammeView }) {
             // Mobile: stacked, the button full width. From md one row, 32 apart.
             <div className="flex flex-col gap-4 pt-2 md:flex-row md:flex-wrap md:items-center md:gap-x-8">
               {view.register && (
-                <Button href={view.register.href} size="compact" motion="out" className="px-5">
+                <Button
+                  href={view.register.href}
+                  track={trackAttributes('award_entry_click', { programme: stegaClean(view.title) })}
+                  size="compact"
+                  motion="out"
+                  className="px-5"
+                >
                   {view.register.label}
                 </Button>
               )}

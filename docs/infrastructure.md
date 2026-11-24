@@ -91,6 +91,7 @@ Environment variables, set once for the project:
 - `SANITY_API_WRITE_TOKEN`
 - `DEFAULT_BRAND`
 - `NEXT_PUBLIC_SITE_ENV`
+- `NEXT_PUBLIC_GTM_ENABLED`, `true` in Production only. It loads each brand's GTM container, which sends to the client's live GA4.
 
 Function region: `lhr1`, set in project settings.
 This overrides the Vercel default of `iad1`.

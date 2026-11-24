@@ -10,6 +10,7 @@ import { Dialog } from '@/components/ui/Dialog.client'
 import { FormField } from '@/components/ui/FormField'
 import { Input } from '@/components/ui/Input'
 import { Select } from '@/components/ui/Select'
+import { track, type SignupLocation } from '@/lib/analytics'
 import { HONEYPOT_FIELD } from '@/lib/honeypot'
 import {
   isEmailAddress,
@@ -57,12 +58,14 @@ export function SubscribeModal({
   data,
   open,
   prefill,
+  location,
   returnFocus,
   onClose,
 }: {
   data: SubscribeModalData
   open: boolean
   prefill?: SubscribePrefill
+  location?: SignupLocation
   returnFocus?: HTMLElement | null
   onClose: () => void
 }) {
@@ -152,6 +155,7 @@ export function SubscribeModal({
     }
 
     if (answer?.status === 'success') {
+      track('newsletter_signup', location ? { signup_location: location } : undefined)
       setStatus({ kind: 'done' })
       return
     }

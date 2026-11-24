@@ -58,6 +58,7 @@ export function NewsletterForm({
 
     subscribe?.open({
       returnFocus: submitter instanceof HTMLElement ? submitter : null,
+      location: 'stay_informed',
       prefill: {
         email: String(data.get('email') ?? '').trim(),
         interests: options.flatMap((option) => (option.interestKey && ticked.includes(option.key) ? [option.interestKey] : [])),

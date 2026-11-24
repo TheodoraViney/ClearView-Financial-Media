@@ -61,3 +61,7 @@ schema.json
 # and every asset - 791 MB for this migration, well past GitHub's 100 MB ceiling,
 # and it carries the same personal data as .migration-source/.
 *.tar.gz
+
+# Google OAuth for scripts/analytics: the cached refresh token and the Desktop app client secret
+.google-token.json
+.google-oauth-client.json
