@@ -281,19 +281,21 @@ export function AwardsProgrammePage({ view }: { view: AwardsProgrammeView }) {
           {/* Left-aligned below the header breakpoint, as the design. */}
           <AdSlot size="mpu" align="start" unit={view.ads.side} label={adPositionLabel('side')} />
         </div>
-        {openProgrammes.allAwards && (
-          <ArrowLink href={openProgrammes.allAwards.href} variant="accent" hover="fade">
-            {openProgrammes.allAwards.label}
-          </ArrowLink>
-        )}
-        {/* Every open programme, so the list is long: it scrolls with the page instead of sticking. */}
-        <OtherProgrammes
-          heading={openProgrammes.heading}
-          items={openProgrammes.items}
-          emptyText={openProgrammes.emptyText}
-          spacing="default"
-          className="w-full header:w-75"
-        />
+        {/* View all awards and the open programmes stick under the header on desktop, as on the award category page. */}
+        <div className="flex w-full flex-col items-start gap-8 header:sticky header:top-rail header:w-75">
+          {openProgrammes.allAwards && (
+            <ArrowLink href={openProgrammes.allAwards.href} variant="accent" hover="fade">
+              {openProgrammes.allAwards.label}
+            </ArrowLink>
+          )}
+          <OtherProgrammes
+            heading={openProgrammes.heading}
+            items={openProgrammes.items}
+            emptyText={openProgrammes.emptyText}
+            spacing="default"
+            className="w-full"
+          />
+        </div>
       </aside>
     </main>
   )
