@@ -31,7 +31,7 @@ const resourceLocations = defineLocations({
       : null,
 })
 
-// A company's partner profile on ClearView. The page exists only while an awards edition, an event or a post names the
+// A company's profile page on ClearView. The page exists only while an awards edition, an event or a post names the
 // company (COMPANY_HAS_PROFILE); the location is listed for any company with a slug, so the editor can open it.
 const companyLocations = defineLocations({
   select: { title: 'title', slug: 'slug.current' },
@@ -99,7 +99,7 @@ export const presentationTools: PluginOptions[] = BRAND_KEYS.map((key) =>
                 filter:
                   '_type == "researchSummary" && slug.current == $summary && _id in *[_type == "resource" && slug.current == $slug].executiveSummaryPage._ref',
               },
-              // A partner profile: the company's own fields. The labels are the Partner profile page document's.
+              // A company profile: the company's own fields. The labels are the Company profile page document's.
               {
                 route: '/companies/:slug',
                 filter: '_type == "company" && slug.current == $slug',

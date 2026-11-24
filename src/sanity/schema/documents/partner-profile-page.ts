@@ -8,10 +8,10 @@ import {
   SPONSOR_TITLE_TOKEN,
 } from '@/lib/partner-profile-copy'
 
-import { headingField } from '../fields'
+import { headingField, linkField } from '../fields'
 
 /*
- * The partner profile template's labels: one document with the fixed id PARTNER_PROFILE_PAGE_ID from `src/brands.ts`,
+ * The company profile template's labels (the user-facing name; partner profile stays the technical one): one document with the fixed id PARTNER_PROFILE_PAGE_ID from `src/brands.ts`,
  * opened from the ClearView folder in the Studio, because company pages (/companies/{slug}) live on ClearView
  * Publishing only. The company's own content (image, description, figures, rows, links) lives on the company document;
  * its activity and recognition come from the awards editions and events that name it. The design texts are the fields'
@@ -47,13 +47,24 @@ const HIDDEN = 'Hidden when the company has none.'
 
 export const partnerProfilePage = defineType({
   name: 'partnerProfilePage',
-  title: 'Partner profile page',
+  title: 'Company profile page',
   type: 'document',
   icon: CaseIcon,
   fields: [
     label('breadcrumbHomeLabel', 'Breadcrumb home label', 'First item of the breadcrumb, linking to the home page.', 'Home'),
-    label('breadcrumbProfileLabel', 'Breadcrumb section label', 'Second item of the breadcrumb.', 'Partner profile'),
-    label('typeLabel', 'Type label', 'Shown above the company name.', 'Partner profile'),
+    label(
+      'breadcrumbProfileLabel',
+      'Breadcrumb section label',
+      'Second item of the breadcrumb, between the home page and the company name.',
+      'Industry Engagement',
+    ),
+    linkField({
+      name: 'breadcrumbProfileLink',
+      title: 'Breadcrumb section link',
+      description: 'Optional. Where the second item of the breadcrumb links to. Without a link it shows as grey text.',
+      withLabel: false,
+    }),
+    label('typeLabel', 'Type label', 'Shown above the company name.', 'Company profile'),
     label(
       'websiteLinkLabel',
       'Website link label',
@@ -109,11 +120,24 @@ export const partnerProfilePage = defineType({
       'Awards archive coverage',
       'h3',
     ),
+    label(
+      'archiveLinkLabel',
+      'Awards archive link label',
+      'Text of the link under the awards archive titles.',
+      'WealthBriefing Awards archive',
+    ),
+    linkField({
+      name: 'archiveLink',
+      title: 'Awards archive link',
+      description:
+        'Optional. Where the link under the awards archive titles goes, a page or a web address. Shown only with a link set, on companies with awards archive titles.',
+      withLabel: false,
+    }),
     heading('officialLinksHeading', 'Official links heading', `Heading above the company's own links. ${HIDDEN}`, 'Official links'),
   ],
   preview: {
     prepare() {
-      return { title: 'Partner profile page', media: CaseIcon }
+      return { title: 'Company profile page', media: CaseIcon }
     },
   },
 })

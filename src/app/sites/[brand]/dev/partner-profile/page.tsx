@@ -6,10 +6,10 @@ import type { PartnerHeroPanel, PartnerProfileView } from '@/lib/partner-profile
 import { fetchAdUnits } from '@/sanity/brand-title'
 import { toImage } from '@/sanity/image'
 
-// Temporary review page, like /dev/ui (404 when NEXT_PUBLIC_SITE_ENV=production): the partner profile page with the
+// Temporary review page, like /dev/ui (404 when NEXT_PUBLIC_SITE_ENV=production): the company profile page with the
 // design's sample record (Claude Design wb-g-partner-profile v1.0), before the labels document and the WIZE profile
 // fields exist in the dataset. `?record=essential` shows the design's essential-only record; `?panel=logo|lockup`
-// switches the header panel fallback. The design's hero image (wize-cover-1.jpg) is not available as a file, so the
+// switches the header panel fallback; `?breadcrumb=linked` links the breadcrumb's middle item, grey text without it. The design's hero image (wize-cover-1.jpg) is not available as a file, so the
 // image panel shows a stand-in from the dataset. Delete together with /dev/ui.
 
 const LOGO = toImage({ asset: { _ref: 'image-08cfd576da4a199810a1caa889dd53ca89250354-1900x1344-png' }, alt: 'WIZE logo' })
@@ -32,8 +32,8 @@ const ARCHIVE = 'https://wealthbriefing.com/archive'
 
 const COMPLETE: Omit<PartnerProfileView, 'panel'> = {
   name: 'WIZE by TeamWork',
-  breadcrumb: [{ label: 'Home', href: '/' }, { label: 'Partner profile', muted: true }, { label: 'WIZE by TeamWork' }],
-  typeLabel: 'Partner profile',
+  breadcrumb: [{ label: 'Home', href: '/' }, { label: 'Industry Engagement', muted: true }, { label: 'WIZE by TeamWork' }],
+  typeLabel: 'Company profile',
   description: [block('WIZE is the all-in-one Wealth & Asset management IT platform.')],
   website: { label: 'Visit WIZE website', href: 'http://www.wize.net/' },
   metrics: {
@@ -137,6 +137,7 @@ const COMPLETE: Omit<PartnerProfileView, 'panel'> = {
         'Client Communications, Compliance Solutions Skills From WIZE',
         'Wize By Teamwork Wins EAM Platform, Offering',
       ],
+      link: { label: 'WealthBriefing Awards archive', href: ARCHIVE },
     },
   },
   officialLinks: {
@@ -179,10 +180,26 @@ async function Fixture({ searchParams }: { searchParams: Promise<Record<string, 
   const units = await fetchAdUnits('clearview', 'other', { perspective: 'published', stega: false })
   const panel = panelOf(typeof query.panel === 'string' ? query.panel : undefined)
   const ads = { top: units.top, side: units.side }
+  // A stand-in target: the Industry Engagement catalog page is not built yet.
+  const breadcrumb =
+    query.breadcrumb === 'linked'
+      ? COMPLETE.breadcrumb.map((item, index) => (index === 1 ? { label: item.label, href: '/' } : item))
+      : COMPLETE.breadcrumb
   const view: PartnerProfileView =
     query.record === 'essential'
-      ? { ...COMPLETE, panel, ads, website: null, metrics: null, fields: null, activity: null, coverage: null, officialLinks: null }
-      : { ...COMPLETE, panel, ads }
+      ? {
+          ...COMPLETE,
+          breadcrumb,
+          panel,
+          ads,
+          website: null,
+          metrics: null,
+          fields: null,
+          activity: null,
+          coverage: null,
+          officialLinks: null,
+        }
+      : { ...COMPLETE, breadcrumb, panel, ads }
 
   return <PartnerProfilePage view={view} />
 }

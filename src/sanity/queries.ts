@@ -901,16 +901,19 @@ export const PARTNER_PROFILE_QUERY = defineQuery(`
   }
 `)
 
-// The partner profile page's labels and headings (`$id` is PARTNER_PROFILE_PAGE_ID), one cached result for every
-// company. The page 404s until the document is published.
+// The partner profile page's labels, headings and the two optional links (breadcrumb section, awards archive), `$id` is
+// PARTNER_PROFILE_PAGE_ID, one cached result for every company. The page 404s until the document is published.
 export const PARTNER_PROFILE_PAGE_QUERY = defineQuery(`
   *[_id == $id && _type == "partnerProfilePage"][0]{
     breadcrumbHomeLabel,
     breadcrumbProfileLabel,
+    breadcrumbProfileLink{ ${LINK_TARGET} },
     typeLabel,
     websiteLinkLabel,
     atAGlanceLabel,
     sponsorActivityText,
+    archiveLinkLabel,
+    archiveLink{ ${LINK_TARGET} },
     fieldsHeading[]{ _key, style, children[]{ _key, text } },
     activityHeading[]{ _key, style, children[]{ _key, text } },
     sponsorActivityHeading[]{ _key, style, children[]{ _key, text } },

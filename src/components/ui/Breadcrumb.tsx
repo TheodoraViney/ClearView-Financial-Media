@@ -5,7 +5,7 @@ import { cx } from './cx'
 export type BreadcrumbItem = {
   label: string
   href?: string | null
-  /** An item without href in the trail's grey instead of dark (partner profile "Partner profile", no target yet). */
+  /** An item without href in the trail's grey instead of dark (company profile "Industry Engagement" without a link). */
   muted?: boolean
 }
 

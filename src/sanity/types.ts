@@ -1532,6 +1532,17 @@ export type PartnerProfilePage = {
   _rev: string;
   breadcrumbHomeLabel?: string;
   breadcrumbProfileLabel?: string;
+  breadcrumbProfileLink?: {
+    kind?: "internal" | "external" | "hub";
+    internal?:
+      | PageReference
+      | PostReference
+      | ConferenceEventReference
+      | AwardsProgrammeReference
+      | ResourceReference;
+    external?: string;
+    hub?: "awards" | "events" | "research";
+  };
   typeLabel?: string;
   websiteLinkLabel?: string;
   atAGlanceLabel?: string;
@@ -1634,6 +1645,18 @@ export type PartnerProfilePage = {
     _type: "block";
     _key: string;
   }>;
+  archiveLinkLabel?: string;
+  archiveLink?: {
+    kind?: "internal" | "external" | "hub";
+    internal?:
+      | PageReference
+      | PostReference
+      | ConferenceEventReference
+      | AwardsProgrammeReference
+      | ResourceReference;
+    external?: string;
+    hub?: "awards" | "events" | "research";
+  };
   officialLinksHeading?: Array<{
     children?: Array<{
       marks?: Array<string>;
@@ -41410,14 +41433,99 @@ export type PARTNER_PROFILE_QUERY_RESULT = {
 
 // Source: src/sanity/queries.ts
 // Variable: PARTNER_PROFILE_PAGE_QUERY
-// Query: *[_id == $id && _type == "partnerProfilePage"][0]{    breadcrumbHomeLabel,    breadcrumbProfileLabel,    typeLabel,    websiteLinkLabel,    atAGlanceLabel,    sponsorActivityText,    fieldsHeading[]{ _key, style, children[]{ _key, text } },    activityHeading[]{ _key, style, children[]{ _key, text } },    sponsorActivityHeading[]{ _key, style, children[]{ _key, text } },    recognitionHeading[]{ _key, style, children[]{ _key, text } },    coverageHeading[]{ _key, style, children[]{ _key, text } },    sponsorInterviewsHeading[]{ _key, style, children[]{ _key, text } },    archiveCoverageHeading[]{ _key, style, children[]{ _key, text } },    officialLinksHeading[]{ _key, style, children[]{ _key, text } }  }
+// Query: *[_id == $id && _type == "partnerProfilePage"][0]{    breadcrumbHomeLabel,    breadcrumbProfileLabel,    breadcrumbProfileLink{   kind,  external,  hub,  internal->{    _type,    "slug": slug.current,    brand,    brands  } },    typeLabel,    websiteLinkLabel,    atAGlanceLabel,    sponsorActivityText,    archiveLinkLabel,    archiveLink{   kind,  external,  hub,  internal->{    _type,    "slug": slug.current,    brand,    brands  } },    fieldsHeading[]{ _key, style, children[]{ _key, text } },    activityHeading[]{ _key, style, children[]{ _key, text } },    sponsorActivityHeading[]{ _key, style, children[]{ _key, text } },    recognitionHeading[]{ _key, style, children[]{ _key, text } },    coverageHeading[]{ _key, style, children[]{ _key, text } },    sponsorInterviewsHeading[]{ _key, style, children[]{ _key, text } },    archiveCoverageHeading[]{ _key, style, children[]{ _key, text } },    officialLinksHeading[]{ _key, style, children[]{ _key, text } }  }
 export type PARTNER_PROFILE_PAGE_QUERY_RESULT = {
   breadcrumbHomeLabel: string | null;
   breadcrumbProfileLabel: string | null;
+  breadcrumbProfileLink: {
+    kind: "external" | "hub" | "internal" | null;
+    external: string | null;
+    hub: "awards" | "events" | "research" | null;
+    internal:
+      | {
+          _type: "awardsProgramme";
+          slug: string | null;
+          brand: null;
+          brands: null;
+        }
+      | {
+          _type: "conferenceEvent";
+          slug: string | null;
+          brand: null;
+          brands: null;
+        }
+      | {
+          _type: "page";
+          slug: string | null;
+          brand:
+            | "clearview"
+            | "familywealthreport"
+            | "wealthbriefing"
+            | "wealthbriefingasia"
+            | null;
+          brands: null;
+        }
+      | {
+          _type: "post";
+          slug: string | null;
+          brand: null;
+          brands: Array<string> | null;
+        }
+      | {
+          _type: "resource";
+          slug: string | null;
+          brand: null;
+          brands: null;
+        }
+      | null;
+  } | null;
   typeLabel: string | null;
   websiteLinkLabel: string | null;
   atAGlanceLabel: string | null;
   sponsorActivityText: string | null;
+  archiveLinkLabel: string | null;
+  archiveLink: {
+    kind: "external" | "hub" | "internal" | null;
+    external: string | null;
+    hub: "awards" | "events" | "research" | null;
+    internal:
+      | {
+          _type: "awardsProgramme";
+          slug: string | null;
+          brand: null;
+          brands: null;
+        }
+      | {
+          _type: "conferenceEvent";
+          slug: string | null;
+          brand: null;
+          brands: null;
+        }
+      | {
+          _type: "page";
+          slug: string | null;
+          brand:
+            | "clearview"
+            | "familywealthreport"
+            | "wealthbriefing"
+            | "wealthbriefingasia"
+            | null;
+          brands: null;
+        }
+      | {
+          _type: "post";
+          slug: string | null;
+          brand: null;
+          brands: Array<string> | null;
+        }
+      | {
+          _type: "resource";
+          slug: string | null;
+          brand: null;
+          brands: null;
+        }
+      | null;
+  } | null;
   fieldsHeading: Array<{
     _key: string;
     style: "h1" | "h2" | "h3" | "h4" | "h5" | "h6" | "normal" | null;
@@ -41524,7 +41632,7 @@ declare global {
     '\n  *[_type == "resource" && slug.current == $slug][0]{\n    _id,\n    _type,\n    title,\n    "slug": slug.current,\n    publishedAt,\n    edition,\n    standfirst,\n    summary[]{ \n  _type != "infographic" => { ... },\n  _type == "infographic" => { _key, _type, eyebrow, title, description, wide, narrow },\n  _type == "image" => { "alt": coalesce(alt, asset->altText) },\n  _type == "videoFile" => { "url": asset->url, "mimeType": asset->mimeType }\n },\n    "summaryText": pt::text(summary),\n    "bodyText": pt::text(body),\n    "featuredImage": featuredImage{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n    "downloadThumbnail": downloadThumbnail{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n    downloadUrl,\n    "downloadFileUrl": downloadFile.asset->url,\n    keyFindings[]{ _key, value, text, note },\n    methodologyIntro[]{ \n  _type != "infographic" => { ... },\n  _type == "infographic" => { _key, _type, eyebrow, title, description, wide, narrow },\n  _type == "image" => { "alt": coalesce(alt, asset->altText) },\n  _type == "videoFile" => { "url": asset->url, "mimeType": asset->mimeType }\n },\n    methodology[]{ _key, label, value },\n    charts[]{ _key, title, note, gauges[]{ _key, label, value, percent, current } },\n    insights,\n    "authors": authors[]->{ _id, title },\n    researchPartner{\n      description,\n      "company": company->{ _id, title, "logo": logo{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n }, websiteUrl }\n    },\n    "executiveSummaryPage": executiveSummaryPage->{\n      _id,\n      _type,\n      "slug": slug.current,\n      lead[]{ \n  _type != "infographic" => { ... },\n  _type == "infographic" => { _key, _type, eyebrow, title, description, wide, narrow },\n  _type == "image" => { "alt": coalesce(alt, asset->altText) },\n  _type == "videoFile" => { "url": asset->url, "mimeType": asset->mimeType }\n },\n      "leadText": pt::text(lead),\n      intro[]{ \n  _type != "infographic" => { ... },\n  _type == "infographic" => { _key, _type, eyebrow, title, description, wide, narrow },\n  _type == "image" => { "alt": coalesce(alt, asset->altText) },\n  _type == "videoFile" => { "url": asset->url, "mimeType": asset->mimeType }\n },\n      "introText": pt::text(intro),\n      sections[]{ _key, heading, body[]{ \n  _type != "infographic" => { ... },\n  _type == "infographic" => { _key, _type, eyebrow, title, description, wide, narrow },\n  _type == "image" => { "alt": coalesce(alt, asset->altText) },\n  _type == "videoFile" => { "url": asset->url, "mimeType": asset->mimeType }\n } }\n    },\n    "relatedResearch": relatedResearch[]->{ \n  _id,\n  _type,\n  title,\n  "slug": slug.current,\n  publishedAt,\n  "downloadThumbnail": downloadThumbnail{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n }\n },\n    "relatedResearchFill": \n  *[\n    _type == "resource"\n    && category == "research"\n    && defined(slug.current)\n  ] | order(defined(publishedAt) desc, publishedAt desc, legacyWpId desc)[0...7]{ \n  _id,\n  _type,\n  title,\n  "slug": slug.current,\n  publishedAt,\n  "downloadThumbnail": downloadThumbnail{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n }\n }\n\n  }\n': RESEARCH_REPORT_QUERY_RESULT;
     '\n  *[_id == $id && _type == "researchReportPage"][0]{\n    breadcrumbHomeLabel,\n    breadcrumbResearchLabel,\n    typeLabel,\n    downloadLabel,\n    readFullSummaryLabel,\n    companyProfileLabel,\n    navExecutiveSummaryLabel,\n    navKeyFindingsLabel,\n    navMethodologyLabel,\n    navInsightsLabel,\n    navResearchPartnerLabel,\n    navRelatedResearchLabel,\n    summaryBreadcrumbLabel,\n    summaryTitle,\n    summaryReportLabel,\n    summaryEditionLabel,\n    summaryDateLabel,\n    summaryPartnerLabel,\n    backToReportLabel,\n    executiveSummaryHeading[]{ _key, style, children[]{ _key, text } },\n    keyFindingsHeading[]{ _key, style, children[]{ _key, text } },\n    methodologyHeading[]{ _key, style, children[]{ _key, text } },\n    insightsHeading[]{ _key, style, children[]{ _key, text } },\n    selectedInsightsHeading[]{ _key, style, children[]{ _key, text } },\n    researchPartnerHeading[]{ _key, style, children[]{ _key, text } },\n    relatedResearchHeading[]{ _key, style, children[]{ _key, text } },\n    keyTakeawaysHeading[]{ _key, style, children[]{ _key, text } },\n    mostReadHeading[]{ _key, style, children[]{ _key, text } }\n  }\n': RESEARCH_REPORT_PAGE_QUERY_RESULT;
     '\n  *[_type == "company" && slug.current == $slug && \n  count(*[_type in ["awardsProgramme", "conferenceEvent", "post"] && references(^._id)]) > 0\n][0]{\n    _id,\n    title,\n    "slug": slug.current,\n    "logo": logo{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n    "profileImage": profileImage{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n    about[]{ \n  _type != "infographic" => { ... },\n  _type == "infographic" => { _key, _type, eyebrow, title, description, wide, narrow },\n  _type == "image" => { "alt": coalesce(alt, asset->altText) },\n  _type == "videoFile" => { "url": asset->url, "mimeType": asset->mimeType }\n },\n    "aboutText": pt::text(about),\n    websiteUrl,\n    profileMetrics[]{ _key, value, text },\n    profileFields[]{ _key, label, values },\n    "sponsorships": *[\n      _type in ["awardsProgramme", "conferenceEvent"]\n      && ^._id in sponsorTypes[].companies[]._ref\n    ] | order(startDate desc){\n      _id,\n      _type,\n      title,\n      startDate,\n      "programme": programme->title\n    },\n    "recognition": *[\n      _type == "awardsProgramme"\n      && ^._id in winners[].company._ref\n    ] | order(startDate desc){\n      _id,\n      title,\n      startDate,\n      "programme": programme->title,\n      "wins": winners[company._ref == ^.^._id && defined(category->title)]{ _key, "category": category->title, people }\n    },\n    sponsorInterviews[]{ _key, label, link{ \n  kind,\n  external,\n  hub,\n  internal->{\n    _type,\n    "slug": slug.current,\n    brand,\n    brands\n  }\n } },\n    awardsArchiveTitles,\n    officialLinks[]{ _key, label, link{ \n  kind,\n  external,\n  hub,\n  internal->{\n    _type,\n    "slug": slug.current,\n    brand,\n    brands\n  }\n } }\n  }\n': PARTNER_PROFILE_QUERY_RESULT;
-    '\n  *[_id == $id && _type == "partnerProfilePage"][0]{\n    breadcrumbHomeLabel,\n    breadcrumbProfileLabel,\n    typeLabel,\n    websiteLinkLabel,\n    atAGlanceLabel,\n    sponsorActivityText,\n    fieldsHeading[]{ _key, style, children[]{ _key, text } },\n    activityHeading[]{ _key, style, children[]{ _key, text } },\n    sponsorActivityHeading[]{ _key, style, children[]{ _key, text } },\n    recognitionHeading[]{ _key, style, children[]{ _key, text } },\n    coverageHeading[]{ _key, style, children[]{ _key, text } },\n    sponsorInterviewsHeading[]{ _key, style, children[]{ _key, text } },\n    archiveCoverageHeading[]{ _key, style, children[]{ _key, text } },\n    officialLinksHeading[]{ _key, style, children[]{ _key, text } }\n  }\n': PARTNER_PROFILE_PAGE_QUERY_RESULT;
+    '\n  *[_id == $id && _type == "partnerProfilePage"][0]{\n    breadcrumbHomeLabel,\n    breadcrumbProfileLabel,\n    breadcrumbProfileLink{ \n  kind,\n  external,\n  hub,\n  internal->{\n    _type,\n    "slug": slug.current,\n    brand,\n    brands\n  }\n },\n    typeLabel,\n    websiteLinkLabel,\n    atAGlanceLabel,\n    sponsorActivityText,\n    archiveLinkLabel,\n    archiveLink{ \n  kind,\n  external,\n  hub,\n  internal->{\n    _type,\n    "slug": slug.current,\n    brand,\n    brands\n  }\n },\n    fieldsHeading[]{ _key, style, children[]{ _key, text } },\n    activityHeading[]{ _key, style, children[]{ _key, text } },\n    sponsorActivityHeading[]{ _key, style, children[]{ _key, text } },\n    recognitionHeading[]{ _key, style, children[]{ _key, text } },\n    coverageHeading[]{ _key, style, children[]{ _key, text } },\n    sponsorInterviewsHeading[]{ _key, style, children[]{ _key, text } },\n    archiveCoverageHeading[]{ _key, style, children[]{ _key, text } },\n    officialLinksHeading[]{ _key, style, children[]{ _key, text } }\n  }\n': PARTNER_PROFILE_PAGE_QUERY_RESULT;
   }
 }
 // Lets @sanity/client releases that predate the global registry read it too

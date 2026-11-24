@@ -125,6 +125,12 @@ export function PartnerProfilePage({ view }: { view: PartnerProfileView }) {
                       </li>
                     ))}
                   </ul>
+                  {/* 8px more above the link than between the titles. */}
+                  {coverage.archive.link && (
+                    <div className="pt-2">
+                      <LinkRow href={coverage.archive.link.href} label={coverage.archive.link.label} />
+                    </div>
+                  )}
                 </SubSection>
               )}
             </Columns>
