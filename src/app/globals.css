@@ -263,6 +263,9 @@ main [data-section-anchor] {
   /* Hero with image below the header breakpoint: the image box is 752 / 400 */
   --aspect-hero: 752 / 400;
 
+  /* AWARDS-LIST-VARIANTS (temporary): an awards edition wordmark logo, about 3.4:1 (Awards `?view=icon`) */
+  --aspect-wordmark: 17 / 5;
+
   /* Active publication nav item: 2px bar drawn inside the bottom edge, in the text colour */
   --inset-shadow-bar: inset 0 -2px 0 currentColor;
 

@@ -1,3 +1,6 @@
+import type { MediaImage } from '@/components/ui/Media' // AWARDS-LIST-VARIANTS (temporary)
+
+import type { AwardsListView } from './awards-list-view' // AWARDS-LIST-VARIANTS (temporary)
 import type { EditionStatus } from './awards-status'
 import { AWARDS_LISTING_PATH, EVENT_LISTING_PATHS, RESEARCH_LISTING_PATH } from './links'
 import { REGIONS, type Region } from './regions'
@@ -80,8 +83,13 @@ export type ListingRecord<T> = {
   date: string | null
   region: Region | null
   status: ListingStatus | null
-  /** Ranked first, by date ascending: an edition not yet past its winners, an upcoming event. */
-  open: boolean
+  /** The record's group in the order (LISTING_GROUPS). */
+  group: ListingGroup
+  /**
+   * The ISO date it is ranked by within its group: an edition open for submissions by its nominations closing date,
+   * everything else by `date`.
+   */
+  rankDate: string | null
   item: T
 }
 
@@ -112,40 +120,64 @@ const yearOf = (date: string | null): string | null => {
   return year && YEAR_PATTERN.test(year) ? year : null
 }
 
-/** Whether an awards edition counts as open: it has a status, and the status is not "winners announced". */
-export const isOpenEdition = (status: EditionStatus | null): boolean => status !== null && status !== 'winnersAnnounced'
+/**
+ * The groups of the order, in order, and the direction of each one's dates:
+ * - `open`: an awards edition open for submissions, soonest deadline first;
+ * - `upcoming`: an edition whose ceremony is still ahead (ceremony due, launching soon) or an upcoming event, soonest first;
+ * - `past`: every other edition (winners announced or no status), every past event and every report, latest first.
+ */
+const LISTING_GROUPS = { open: 1, upcoming: 1, past: -1 } as const satisfies Record<string, 1 | -1>
 
-type Ranked = { id: string; title: string; date: string | null }
+export type ListingGroup = keyof typeof LISTING_GROUPS
+
+/** The group of an awards edition, from its status. */
+export function editionGroup(status: EditionStatus | null): ListingGroup {
+  switch (status) {
+    case 'submissionsOpen':
+      return 'open'
+    case 'launchingSoon':
+    case 'ceremonyDue':
+      return 'upcoming'
+    default:
+      return 'past'
+  }
+}
+
+type Ranked = { id: string; title: string; date: string | null; rankDate: string | null }
 
 // Titles A to Z ignoring case and accents, numbers by value ("Awards 2026" before "Awards 2027").
 const byTitle = new Intl.Collator('en', { sensitivity: 'base', numeric: true }).compare
 
+/** Two ISO dates ascending or descending, undated last either way; 0 when equal. ISO dates compare as strings. */
+const compareDates = (a: string | null, b: string | null, direction: 1 | -1): number => {
+  if (a === b) return 0
+  if (!a) return 1
+  if (!b) return -1
+  return (a < b ? -1 : 1) * direction
+}
+
 /**
- * Dates ascending or descending, undated last either way; on the same date (or both undated) by title, then by id, so
- * the order and the pages are stable between requests. ISO dates compare as strings.
+ * By rank date, then by date, ascending or descending, undated last either way; then by title, then by id, so the
+ * order and the pages are stable between requests.
  */
 const byDate =
   (direction: 1 | -1) =>
-  (a: Ranked, b: Ranked): number => {
-    if (a.date !== b.date) {
-      if (!a.date) return 1
-      if (!b.date) return -1
-      return (a.date < b.date ? -1 : 1) * direction
-    }
-
-    return byTitle(a.title, b.title) || (a.id < b.id ? -1 : a.id > b.id ? 1 : 0)
-  }
+  (a: Ranked, b: Ranked): number =>
+    compareDates(a.rankDate, b.rankDate, direction) ||
+    compareDates(a.date, b.date, direction) ||
+    byTitle(a.title, b.title) ||
+    (a.id < b.id ? -1 : a.id > b.id ? 1 : 0)
 
 /**
- * The tab's order: open records first by date ascending (soonest first), then the rest by date descending (latest
- * first). The Research tab has no open records, so it is newest first. Undated records go last in each group. Records
- * on the same date run by title A to Z, then by id.
+ * The tab's order, group by group (LISTING_GROUPS). Awards: editions open for submissions by nominations closing date
+ * (soonest deadline first), then editions whose ceremony is still ahead by start date ascending, then past editions by
+ * start date descending. Events: upcoming events by start date ascending (soonest first), then past events by start
+ * date descending. Research: newest first. Undated records go last in each group; records on the same date run by title A to Z, then by id.
  */
 export function rankListing<T>(records: ListingRecord<T>[]): ListingRecord<T>[] {
-  return [
-    ...records.filter((record) => record.open).sort(byDate(1)),
-    ...records.filter((record) => !record.open).sort(byDate(-1)),
-  ]
+  return (Object.keys(LISTING_GROUPS) as ListingGroup[]).flatMap((group) =>
+    records.filter((record) => record.group === group).sort(byDate(LISTING_GROUPS[group])),
+  )
 }
 
 /** The filter options of a tab, from its records. */
@@ -281,6 +313,7 @@ export type ListingRowView = {
   /** The region label; null for a country outside the table, a record without one, and every report. */
   region: string | null
   status: { label: string; highlight: boolean } | null
+  logo?: MediaImage | null // AWARDS-LIST-VARIANTS (temporary): awards only, the edition logo, else its programme's
 }
 
 /** The record listing block's props: tabs, filters, the page's records (or the empty state) and the pagination. */
@@ -296,6 +329,7 @@ export type RecordListingView = {
   }
   /** The current page's rows. */
   rows: ListingRowView[]
+  awardsView: AwardsListView // AWARDS-LIST-VARIANTS (temporary)
   /** Records matching the filters, on every page: for the screen reader count. */
   total: number
   /** Shown instead of the list when no record matches. */
