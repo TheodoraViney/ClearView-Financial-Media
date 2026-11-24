@@ -101,6 +101,8 @@ interface BrandDefaults {
   stagingHost: string
   /** The brand's site id in CookieYes, from the script address in CookieYes → Installation. */
   cookieYesId: string
+  /** The brand's Google Tag Manager container, owned by the client. Loaded only when `NEXT_PUBLIC_GTM_ENABLED=true`. */
+  gtmId: string
   /** Schema type of this brand's header document. */
   headerType: HeaderType
   /** Schema type of this brand's footer document. */
@@ -134,6 +136,7 @@ export const BRANDS: Record<BrandKey, BrandDefaults> = {
     },
     stagingHost: 'wealthbriefing.vercel.app',
     cookieYesId: 'e545f25d435d3b4467bbf46d',
+    gtmId: 'GTM-N289V7M',
     headerType: 'publicationHeader',
     footerType: 'publicationFooter',
   },
@@ -150,6 +153,7 @@ export const BRANDS: Record<BrandKey, BrandDefaults> = {
     },
     stagingHost: 'wealthbriefingasia.vercel.app',
     cookieYesId: '03381813954b133e7cdf2450',
+    gtmId: 'GTM-TL59BQC',
     headerType: 'publicationHeader',
     footerType: 'publicationFooter',
   },
@@ -166,6 +170,7 @@ export const BRANDS: Record<BrandKey, BrandDefaults> = {
     },
     stagingHost: 'familywealthreport.vercel.app',
     cookieYesId: '78deb00b8c3da427e1870c0c',
+    gtmId: 'GTM-MCCMFH8',
     headerType: 'publicationHeader',
     footerType: 'publicationFooter',
     // Forums and Summits (events) keep their "date | place" line.
@@ -184,6 +189,7 @@ export const BRANDS: Record<BrandKey, BrandDefaults> = {
     },
     stagingHost: 'clear-view-financial-media.vercel.app',
     cookieYesId: '5dc9e72922a775e9ef2c609f',
+    gtmId: 'GTM-N9LBW5C',
     headerType: 'clearviewHeader',
     footerType: 'clearviewFooter',
   },

@@ -10,6 +10,7 @@ import { Footer } from '@/components/blocks/Footer'
 import { Header } from '@/components/blocks/Header'
 import { toSubscribeModal } from '@/components/blocks/subscribe-modal'
 import { SubscribeModalProvider } from '@/components/sections/subscribe/SubscribeModalProvider.client'
+import { AnalyticsEvents } from '@/components/ui/AnalyticsEvents.client'
 import { CookieConsent } from '@/components/ui/CookieConsent'
 import { InPageDialogs } from '@/components/ui/Dialog.client'
 import { GptLoader } from '@/components/ui/Gpt.client'
@@ -82,6 +83,8 @@ export default async function BrandLayout({
       <SanityLive includeDrafts={false} />
       {/* Ads on the live site only: in draft mode and Presentation the slots stay placeholders. */}
       {GAM_NETWORK_CODE && <GptLoader publication={brand} />}
+      {/* Conversion events to the dataLayer, live site only: editors' clicks and previews are not conversions. */}
+      <AnalyticsEvents />
     </>
   )
 }

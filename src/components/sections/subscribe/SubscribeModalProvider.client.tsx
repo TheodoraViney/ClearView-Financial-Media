@@ -42,6 +42,7 @@ export function SubscribeModalProvider({ data, children }: { data: SubscribeModa
         data={data}
         open={state.open}
         prefill={state.options.prefill}
+        location={state.options.location}
         returnFocus={state.options.returnFocus}
         onClose={() => setState((current) => ({ ...current, open: false }))}
       />

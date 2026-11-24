@@ -1,4 +1,5 @@
 import Image from 'next/image'
+import { stegaClean } from 'next-sanity'
 import { type ReactNode } from 'react'
 
 import { RichText } from '@/components/sections/article/ArticleBody'
@@ -19,6 +20,7 @@ import { ResearchChartCard } from '@/components/ui/ResearchChartCard'
 import { ResearchPartnerCard } from '@/components/ui/ResearchPartnerCard'
 import { SectionNav } from '@/components/ui/SectionNav.client'
 import { SplitSection } from '@/components/ui/SplitSection'
+import { trackAttributes } from '@/lib/analytics'
 import type { HeadingView } from '@/lib/awards-programme'
 import { adPositionLabel } from '@/lib/gam'
 import type { ResearchReportView } from '@/lib/research-report'
@@ -110,6 +112,7 @@ export function ResearchReportPage({ view }: { view: ResearchReportView }) {
                       <Button
                         href={view.download.href}
                         newTab
+                        track={trackAttributes('report_download', { report: stegaClean(view.title) })}
                         icon="download-tray"
                         padding="wide"
                         size="compact"

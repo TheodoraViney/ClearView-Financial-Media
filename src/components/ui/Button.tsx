@@ -1,6 +1,8 @@
 import Link from 'next/link'
 import { type ReactNode } from 'react'
 
+import type { TrackAttributes } from '@/lib/analytics'
+
 import { cx } from './cx'
 import { Icon, type IconName } from './Icon'
 import { CHEVRON, EASE, type Motion } from './motion'
@@ -76,6 +78,8 @@ type ButtonProps = {
   icon?: IconName
   /** Opt-in: 20px side padding instead of 16. */
   padding?: ButtonPadding
+  /** Opt-in, with href: the analytics event the link sends when clicked, from `trackAttributes`. */
+  track?: TrackAttributes
   className?: string
   children: ReactNode
 } & (
@@ -92,6 +96,7 @@ export function Button({
   motion = 'smooth',
   icon,
   padding = 'default',
+  track,
   className,
   children,
   ...rest
@@ -110,7 +115,7 @@ export function Button({
 
   if (rest.href !== undefined && rest.newTab) {
     return (
-      <a href={rest.href} target="_blank" rel="noopener" className={classes}>
+      <a href={rest.href} target="_blank" rel="noopener" className={classes} {...track}>
         {content}
         <span className="sr-only">{NEW_TAB_TEXT}</span>
       </a>
@@ -119,7 +124,7 @@ export function Button({
 
   if (rest.href !== undefined) {
     return (
-      <Link href={rest.href} className={classes}>
+      <Link href={rest.href} className={classes} {...track}>
         {content}
       </Link>
     )

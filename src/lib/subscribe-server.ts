@@ -12,6 +12,7 @@ import { client } from '@/sanity/client'
 import { SUBSCRIBE_CONFIG_QUERY } from '@/sanity/queries'
 import type { SUBSCRIBE_CONFIG_QUERY_RESULT } from '@/sanity/types'
 
+import { SUBSCRIBED_PARAM } from './analytics'
 import {
   BrevoError,
   getContact,
@@ -575,10 +576,12 @@ function shouldNotifyConfirmed(
  * `GET /api/subscribe/confirmed?t=`, where Brevo sends the reader after the confirmation click. Reads the token and
  * answers 303 to the brand home at once, never cached and never saying why nothing was sent. After the response it
  * checks the contact as Brevo holds it, a few times while Brevo catches up, and emails the team. The brand comes from
- * the Host, as for the signup, and must be the one the token was made on.
+ * the Host, as for the signup, and must be the one the token was made on. A click past every check below lands on
+ * `/?subscribed=1` for analytics; a refused, empty or repeated token on the plain home.
  */
 export function handleSubscribeConfirmed(request: NextRequest, deps: SubscribeDeps = DEFAULT_DEPS): Response {
-  const home = new Response(null, { status: 303, headers: { Location: '/', 'Cache-Control': 'no-store' } })
+  const redirect = (location: string) => new Response(null, { status: 303, headers: { Location: location, 'Cache-Control': 'no-store' } })
+  const home = redirect('/')
   const { brand } = resolveRequestBrand(request)
   const secret = signupNotifySecret()
   const value = request.nextUrl.searchParams.get('t')
@@ -618,5 +621,6 @@ export function handleSubscribeConfirmed(request: NextRequest, deps: SubscribeDe
     }
   })
 
-  return home
+  // The confirmation as far as the click can tell, so the home page sends `newsletter_confirm` (AnalyticsEvents).
+  return redirect(`/?${SUBSCRIBED_PARAM}=1`)
 }

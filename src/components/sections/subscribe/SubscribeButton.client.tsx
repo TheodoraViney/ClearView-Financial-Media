@@ -4,6 +4,7 @@ import { type ReactNode } from 'react'
 
 import { buttonClasses, type ButtonSize, type ButtonVariant } from '@/components/ui/Button'
 import { type Motion } from '@/components/ui/motion'
+import type { SignupLocation } from '@/lib/analytics'
 
 import { useSubscribeModal } from './SubscribeModalProvider.client'
 
@@ -16,6 +17,7 @@ export function SubscribeButton({
   size = 'md',
   fullWidth = false,
   motion = 'smooth',
+  location,
   onBeforeOpen,
   className,
   children,
@@ -24,6 +26,8 @@ export function SubscribeButton({
   size?: ButtonSize
   fullWidth?: boolean
   motion?: Motion
+  // Where the button sits, for the `newsletter_signup` event.
+  location: SignupLocation
   // Returns the element focus goes back to on close, when it is not this button.
   onBeforeOpen?: () => HTMLElement | null | void
   className?: string
@@ -43,7 +47,7 @@ export function SubscribeButton({
         const button = event.currentTarget
         const returnFocus = onBeforeOpen?.() || button
 
-        modal.open({ returnFocus })
+        modal.open({ returnFocus, location })
       }}
       className={buttonClasses({ variant, size, fullWidth, motion, className })}
     >

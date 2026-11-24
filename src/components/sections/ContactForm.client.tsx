@@ -15,6 +15,7 @@ import {
   type FieldErrors,
   type FormConsent,
 } from '@/components/ui/FormFieldControl.client'
+import { track } from '@/lib/analytics'
 import { CONTACT_FORM_FIELDS, sendEnquiry, type ContactFormFieldName } from '@/lib/enquiry-form'
 
 export type ContactFormFieldsProps = {
@@ -128,6 +129,7 @@ export function ContactFormFields({
     setPending(false)
 
     if (ok) {
+      track('contact_enquiry')
       focusAfterSwap.current = 'message'
       setSent(true)
     } else {
