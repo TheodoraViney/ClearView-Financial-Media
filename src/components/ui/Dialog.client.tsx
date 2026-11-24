@@ -64,6 +64,11 @@ function handleInPageKeys(event: KeyboardEvent<HTMLDialogElement>, onClose: () =
  * `variant="media"` is a lightbox (awards programme highlight video): a darker overlay (foreground/72, padding 16 / 40
  * from md), no card; a column up to 960 wide, centred, with a row of `title` (white text, the caller gives it the
  * `labelledBy` id) and a white round × above the children (the player). Same behaviour otherwise.
+ *
+ * `variant="panel"` (shared-shell speaker-card `bio-display="modal"`): the `media` overlay (foreground/72, padding 16 /
+ * 40 from md) around a white card up to 720 wide and at most the overlay's height, shadow `modal`; its content scrolls
+ * inside the card and the caller pads it. A white round × sits over the card's top right corner (8 / 16 from md). It
+ * fades in and rises 8px over 180ms ease-out (`@starting-style`; none with reduced motion).
  */
 export function Dialog({
   open,
@@ -84,7 +89,7 @@ export function Dialog({
   // Accessible name of the × button.
   closeLabel: string
   returnFocus?: HTMLElement | null
-  variant?: 'card' | 'media'
+  variant?: 'card' | 'media' | 'panel'
   /** `media` only: the text beside the × button. */
   title?: ReactNode
   children: ReactNode
@@ -180,7 +185,8 @@ export function Dialog({
       }}
       className={cx(
         'fixed inset-0 m-0 size-full max-h-none max-w-none items-start overflow-y-auto overscroll-contain border-0 p-4 text-foreground outline-none backdrop:bg-transparent open:flex',
-        variant === 'media' ? 'bg-foreground/72 md:p-10' : 'bg-foreground/48 md:p-8',
+        variant === 'card' ? 'bg-foreground/48 md:p-8' : 'bg-foreground/72 md:p-10',
+        variant === 'panel' && 'transition-opacity duration-180 ease-out starting:opacity-0',
         inPage && 'z-50',
       )}
     >
@@ -198,6 +204,18 @@ export function Dialog({
             />
           </div>
           {children}
+        </div>
+      ) : variant === 'panel' ? (
+        <div className="relative m-auto flex max-h-full w-full max-w-180 flex-col overflow-hidden rounded-sm bg-white shadow-modal transition duration-180 ease-out starting:translate-y-2 starting:opacity-0">
+          <IconButton
+            icon="close"
+            label={closeLabel}
+            variant="surface-round"
+            motion="out"
+            onClick={onClose}
+            className="absolute top-2 right-2 z-10 md:top-4 md:right-4"
+          />
+          <div className="min-h-0 overflow-y-auto overscroll-contain">{children}</div>
         </div>
       ) : (
         <div className="relative m-auto flex w-full max-w-130 flex-col gap-6 rounded-sm border border-border bg-white p-6 md:p-8">

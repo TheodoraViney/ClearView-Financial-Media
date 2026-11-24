@@ -19,7 +19,7 @@ import {
   AWARDS_PROGRAMME_PAGE_QUERY,
   AWARDS_PROGRAMME_QUERY,
   EVENT_PAGE_QUERY,
-  OTHER_AWARDS_QUERY,
+  OPEN_AWARDS_QUERY,
   RELATED_EVENTS_QUERY,
 } from '@/sanity/queries'
 import { PLACEHOLDER_SLUG } from '@/sanity/static-params'
@@ -129,11 +129,9 @@ async function CachedEvent({ slug, perspective, variant, stega }: { slug: string
   }
 
   const today = await cachedUkToday()
-  // The sidebar lists upcoming editions of other programmes, so it leaves out editions of this edition's programme.
-  // An edition without a programme passes '', which leaves out the other editions that have no programme either.
-  const programme = stegaClean(data.programme?.slug) ?? ''
-  const [{ data: others }, { data: copy }, ads] = await Promise.all([
-    cachedSanity({ query: OTHER_AWARDS_QUERY, params: { programme, today }, ...options }),
+  // "Open awards programmes": editions of every programme whose nominations are open, without this edition.
+  const [{ data: open }, { data: copy }, ads] = await Promise.all([
+    cachedSanity({ query: OPEN_AWARDS_QUERY, params: { editionId: data._id, today }, ...options }),
     cachedSanity({ query: AWARDS_PROGRAMME_PAGE_QUERY, params: { id: AWARDS_PROGRAMME_PAGE_ID }, ...options }),
     fetchAdUnits('clearview', 'other', options),
   ])
@@ -148,7 +146,7 @@ async function CachedEvent({ slug, perspective, variant, stega }: { slug: string
   return (
     <>
       <CurrentNavSection section="awards" />
-      <AwardsProgrammePage view={toAwardsProgrammeView({ edition: data, others, copy, ads, today, embedConsent })} />
+      <AwardsProgrammePage view={toAwardsProgrammeView({ edition: data, open, copy, ads, today, embedConsent })} />
     </>
   )
 }

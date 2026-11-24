@@ -682,6 +682,20 @@ export const OTHER_AWARDS_FILL = /* groq */ `
   ]
 `
 
+// The awards programme page's "Other awards programmes" rail list (design v1.11): every edition of every programme and
+// publication whose nominations close today or later, closing soonest first, without the page's own edition
+// (`$editionId`). No limit: the page lists them all. The adapter (openProgrammeEditions) puts the editor's pins first.
+// `$today` is the UK date (cachedUkToday), so the list changes once a day.
+// The Studio panel "Shown automatically now" runs it too (src/sanity/auto-fill.ts).
+export const OPEN_AWARDS_FILL = /* groq */ `
+  *[
+    _type == "awardsProgramme"
+    && defined(slug.current)
+    && nominationsClosingDate >= $today
+    && _id != $editionId
+  ] | order(nominationsClosingDate asc){ ${OTHER_AWARDS_EDITION} }
+`
+
 // One event in the event page's "Related events" sidebar: what its row shows (title, date unless hidden, venue).
 export const RELATED_EVENT = /* groq */ `
   _id, title, "slug": slug.current, startDate, endDate, hideDateTime, "venue": venue->title

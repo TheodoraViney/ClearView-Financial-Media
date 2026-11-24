@@ -100,6 +100,60 @@ export function otherProgrammeEditions<E extends SidebarEditionFields>(
   return items
 }
 
+/** The most editions an editor can pin to the awards programme page's "Other awards programmes" list. */
+export const OPEN_PROGRAMMES_PINS = 4
+
+/**
+ * The awards programme page's "Other awards programmes" rail list (design v1.11), every open edition with no limit,
+ * shared by the site and the Studio panel:
+ * - the editor's picks first, in their order, while their nominations close today or later (a pick past its deadline
+ *   is hidden). The page's own edition (`excludeEdition`; null in the Studio), a repeated edition, or an unpublished
+ *   one is skipped. The title override wins over the edition's title;
+ * - then `open` (OPEN_AWARDS_FILL, nominations closing soonest first, every publication), skipping the picked and the
+ *   page's own edition. No one-per-programme rule.
+ * `clean` strips stega from a string before it is compared (identity outside draft mode).
+ */
+export function openProgrammeEditions<E extends SidebarEditionFields>(
+  picks: SidebarPickFields<E>[] | null | undefined,
+  open: E[],
+  {
+    today,
+    excludeEdition,
+    clean = (value) => value,
+  }: { today: string; excludeEdition: string | null; clean?: (value: string) => string },
+): { edition: E; title: string; picked: boolean }[] {
+  const isOpen = (edition: E) => {
+    const closing = edition.nominationsClosingDate === null ? null : clean(edition.nominationsClosingDate)
+
+    return Boolean(closing && closing >= today)
+  }
+  const seen = new Set<string>(excludeEdition ? [excludeEdition] : [])
+  const items: { edition: E; title: string; picked: boolean }[] = []
+
+  for (const pick of picks ?? []) {
+    const edition = pick.edition
+    const title = pick.title && clean(pick.title).trim() ? pick.title : edition?.title
+
+    if (!edition || !title || seen.has(edition._id) || !isOpen(edition)) {
+      continue
+    }
+
+    seen.add(edition._id)
+    items.push({ edition, title, picked: true })
+  }
+
+  for (const edition of open) {
+    if (!edition.title || seen.has(edition._id) || !isOpen(edition)) {
+      continue
+    }
+
+    seen.add(edition._id)
+    items.push({ edition, title: edition.title, picked: false })
+  }
+
+  return items
+}
+
 const filled = (value: string | null | undefined): value is string => Boolean(stegaClean(value)?.trim())
 
 /**

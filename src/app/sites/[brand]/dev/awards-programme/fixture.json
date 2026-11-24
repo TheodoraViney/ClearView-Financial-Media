@@ -1,0 +1,2448 @@
+{
+ "note": "Post-migration values from the scripts/migrate-awards-v1-10.mjs dry runs (2026-11-24), plus the v1.11 rail labels, for /dev/awards-programme only.",
+ "page": {
+  "videoDialogTitle": "Programme highlight video",
+  "registrationOpenIntro": "Nominations are open. Follow these steps to enter.",
+  "registrationClosedLabel": "nominations closed",
+  "registrationClosedIntro": "The entry window is closed. These steps explain how submissions were made for this programme.",
+  "registrationFaqLinkLabel": "Read the FAQ",
+  "openProgrammesEmptyText": "No programmes are currently open for submissions.",
+  "deadlineLabel": "Deadline",
+  "navVideoLabel": "Highlight Video",
+  "navSponsorsLabel": "Sponsors",
+  "navFaqLabel": "FAQ",
+  "sponsorsHeading": [
+   {
+    "_type": "block",
+    "_key": "sponsorsHeading-0",
+    "style": "h2",
+    "markDefs": [],
+    "children": [
+     {
+      "_type": "span",
+      "_key": "span",
+      "text": "Sponsors",
+      "marks": []
+     }
+    ]
+   }
+  ],
+  "faqHeading": [
+   {
+    "_type": "block",
+    "_key": "faqHeading-0",
+    "style": "h2",
+    "markDefs": [],
+    "children": [
+     {
+      "_type": "span",
+      "_key": "span",
+      "text": "FAQ",
+      "marks": []
+     }
+    ]
+   }
+  ],
+  "sponsorLink": {
+   "label": "Become a Sponsoring Partner",
+   "kind": "internal",
+   "external": null,
+   "hub": null,
+   "internal": {
+    "_type": "page",
+    "slug": "sponsorship",
+    "brand": "clearview",
+    "brands": null
+   }
+  },
+  "allAwardsLink": {
+   "kind": "hub",
+   "hub": "awards",
+   "label": "View all awards",
+   "external": null,
+   "internal": null
+  },
+  "navOverviewLabel": "Overview",
+  "navCategoriesLabel": "Categories and Registration",
+  "navJudgesLabel": "Judging Panel",
+  "navMarketingKitLabel": "Acclaim",
+  "overviewHeading": [
+   {
+    "_key": "overviewHeading-0",
+    "_type": "block",
+    "children": [
+     {
+      "_key": "span",
+      "_type": "span",
+      "marks": [],
+      "text": "Programme Overview"
+     }
+    ],
+    "markDefs": [],
+    "style": "h2"
+   }
+  ],
+  "videoHeading": [
+   {
+    "_key": "videoHeading-0",
+    "_type": "block",
+    "children": [
+     {
+      "_key": "span",
+      "_type": "span",
+      "marks": [],
+      "text": "Highlight video"
+     }
+    ],
+    "markDefs": [],
+    "style": "h2"
+   }
+  ],
+  "categoriesHeading": [
+   {
+    "_key": "categoriesHeading-0",
+    "_type": "block",
+    "children": [
+     {
+      "_key": "span",
+      "_type": "span",
+      "marks": [],
+      "text": "Categories and Registration"
+     }
+    ],
+    "markDefs": [],
+    "style": "h2"
+   }
+  ],
+  "marketingKitHeading": [
+   {
+    "_key": "marketingKitHeading-0",
+    "_type": "block",
+    "children": [
+     {
+      "_key": "span",
+      "_type": "span",
+      "marks": [],
+      "text": "Acclaim"
+     }
+    ],
+    "markDefs": [],
+    "style": "h2"
+   }
+  ],
+  "otherProgrammesHeading": [
+   {
+    "_key": "otherProgrammesHeading-0",
+    "_type": "block",
+    "style": "h2",
+    "markDefs": [],
+    "children": [
+     {
+      "_key": "span",
+      "_type": "span",
+      "marks": [],
+      "text": "Other awards programmes"
+     }
+    ]
+   }
+  ]
+ },
+ "editions": {
+  "event-wp-45458": {
+   "set": {
+    "faq": [
+     {
+      "_type": "faqItem",
+      "_key": "fca760b5ef51",
+      "question": "Does the entering firm or individual need to be a subscriber to WealthBriefing?",
+      "answer": [
+       {
+        "_key": "b1",
+        "_type": "block",
+        "children": [
+         {
+          "_key": "b1s0",
+          "_type": "span",
+          "marks": [],
+          "text": "No, this program is open to all firms and individuals active in wealth management or the family office sectors."
+         }
+        ],
+        "markDefs": [],
+        "style": "normal"
+       }
+      ]
+     },
+     {
+      "_type": "faqItem",
+      "_key": "e6fa4e1ea7d2",
+      "question": "Can my firm enter more than one category?",
+      "answer": [
+       {
+        "_key": "b3",
+        "_type": "block",
+        "children": [
+         {
+          "_key": "b3s0",
+          "_type": "span",
+          "marks": [],
+          "text": "Yes, we encourage firms to enter as many awards that are applicable to their business."
+         }
+        ],
+        "markDefs": [],
+        "style": "normal"
+       }
+      ]
+     },
+     {
+      "_type": "faqItem",
+      "_key": "504c75f44d53",
+      "question": "Do I need to use the submission form provided?",
+      "answer": [
+       {
+        "_key": "b5",
+        "_type": "block",
+        "children": [
+         {
+          "_key": "b5s0",
+          "_type": "span",
+          "marks": [],
+          "text": "Yes, submissions shall only be accepted when using this document."
+         }
+        ],
+        "markDefs": [],
+        "style": "normal"
+       }
+      ]
+     },
+     {
+      "_type": "faqItem",
+      "_key": "d7f4a0c3ce9f",
+      "question": "Is there any upfront cost to enter?",
+      "answer": [
+       {
+        "_key": "b7",
+        "_type": "block",
+        "children": [
+         {
+          "_key": "b7s0",
+          "_type": "span",
+          "marks": [],
+          "text": "No, there is no upfront cost to enter, but you will be offered the chance to purchase a winner’s marketing package should you be successful. The judging process is completely independent of the commercial arrangements between the participants and the organizers. However, it is expected that when the results are made public, winners will engage with the organizers to promote their win."
+         }
+        ],
+        "markDefs": [],
+        "style": "normal"
+       }
+      ]
+     },
+     {
+      "_type": "faqItem",
+      "_key": "97f01cf0ae95",
+      "question": "Is the process open to firms that are not currently active within the USA, Canada, Latin America or Mexico regions?",
+      "answer": [
+       {
+        "_key": "b9",
+        "_type": "block",
+        "children": [
+         {
+          "_key": "b9s0",
+          "_type": "span",
+          "marks": [],
+          "text": "The judges will only consider submissions from firms that are demonstrably active in the region. Please see an overview of our global awards programmes "
+         },
+         {
+          "_key": "b9s1",
+          "_type": "span",
+          "marks": [
+           "strong",
+           "b9l0"
+          ],
+          "text": "here."
+         }
+        ],
+        "markDefs": [
+         {
+          "_key": "b9l0",
+          "_type": "link",
+          "href": "https://clearviewpublishing.com/events-category/awards/"
+         }
+        ],
+        "style": "normal"
+       }
+      ]
+     },
+     {
+      "_type": "faqItem",
+      "_key": "a8e7324a3ed0",
+      "question": "How do you ensure that the judging process is independent and impartial?",
+      "answer": [
+       {
+        "_key": "b11",
+        "_type": "block",
+        "children": [
+         {
+          "_key": "b11s0",
+          "_type": "span",
+          "marks": [],
+          "text": "The judges are independent of the award organizers ensuring they are divided into separate panels to avoid conflicts of interest."
+         }
+        ],
+        "markDefs": [],
+        "style": "normal"
+       }
+      ]
+     },
+     {
+      "_type": "faqItem",
+      "_key": "2712851765b8",
+      "question": "Can you assure me that any details that I submit will be treated with confidentiality?",
+      "answer": [
+       {
+        "_key": "b13",
+        "_type": "block",
+        "children": [
+         {
+          "_key": "b13s0",
+          "_type": "span",
+          "marks": [],
+          "text": "We only share submissions with the panel responsible for judging those particular categories. Furthermore, our experienced team ensures that there is no conflict of interest before they share an entrant’s submission with anyone. All our judges have signed a Non-Disclosure Agreement."
+         }
+        ],
+        "markDefs": [],
+        "style": "normal"
+       }
+      ]
+     },
+     {
+      "_type": "faqItem",
+      "_key": "56cfab2da16e",
+      "question": "My submission is likely to be longer than the 1,000-word max limit. Would this disadvantage me?",
+      "answer": [
+       {
+        "_key": "b15",
+        "_type": "block",
+        "children": [
+         {
+          "_key": "b15s0",
+          "_type": "span",
+          "marks": [],
+          "text": "We have set the limit out of respect to the judges and we are keen to maintain this to ensure that there is a level playing field between competing submissions. Judges reserve the right to refuse to review submissions that do not comply. We also discourage adding attachments to the submissions."
+         }
+        ],
+        "markDefs": [],
+        "style": "normal"
+       }
+      ]
+     },
+     {
+      "_type": "faqItem",
+      "_key": "5587747452b1",
+      "question": "Do I need to submit a separate submission for each category?",
+      "answer": [
+       {
+        "_key": "b17",
+        "_type": "block",
+        "children": [
+         {
+          "_key": "b17s0",
+          "_type": "span",
+          "marks": [],
+          "text": "You will need to do a new form for each submission and you should also ensure that this specifically relates to the category for which you are entering. If you are using the same answers for multiple submissions this could result in your entry being marked down by the judging panel."
+         }
+        ],
+        "markDefs": [],
+        "style": "normal"
+       }
+      ]
+     },
+     {
+      "_type": "faqItem",
+      "_key": "03748a3b0be6",
+      "question": "Where is the winner’s announcement shared?",
+      "answer": [
+       {
+        "_key": "b19",
+        "_type": "block",
+        "children": [
+         {
+          "_key": "b19s0",
+          "_type": "span",
+          "marks": [],
+          "text": "A public announcement will be made across "
+         },
+         {
+          "_key": "b19s1",
+          "_type": "span",
+          "marks": [
+           "em"
+          ],
+          "text": "WealthBriefing’s"
+         },
+         {
+          "_key": "b19s2",
+          "_type": "span",
+          "marks": [],
+          "text": " editorial platforms, website, and social media channels."
+         }
+        ],
+        "markDefs": [],
+        "style": "normal"
+       }
+      ]
+     },
+     {
+      "_type": "faqItem",
+      "_key": "b5152ca8a22a",
+      "question": "Can I speak to anyone on the team about my entry?",
+      "answer": [
+       {
+        "_key": "b21",
+        "_type": "block",
+        "children": [
+         {
+          "_key": "b21s0",
+          "_type": "span",
+          "marks": [],
+          "text": "Yes, our experienced team is always available to assist you with preparation of your submission/s and any aspects of the process from start to finish. For any questions please contact "
+         },
+         {
+          "_key": "b21s1",
+          "_type": "span",
+          "marks": [
+           "strong",
+           "b21l0"
+          ],
+          "text": "jenna.maybery@clearviewpublishing.com"
+         }
+        ],
+        "markDefs": [
+         {
+          "_key": "b21l0",
+          "_type": "link",
+          "href": "mailto:jenna.maybery@clearviewpublishing.com"
+         }
+        ],
+        "style": "normal"
+       }
+      ]
+     }
+    ],
+    "registrationSteps": [
+     {
+      "_type": "registrationStep",
+      "_key": "d19603eec169",
+      "text": [
+       {
+        "_type": "block",
+        "_key": "b1l0p",
+        "style": "normal",
+        "markDefs": [
+         {
+          "_key": "b1l0",
+          "_type": "link",
+          "href": "https://clearviewpublishing.jotform.com/261863243293965"
+         }
+        ],
+        "children": [
+         {
+          "_type": "span",
+          "_key": "ec6f398cad00",
+          "text": "Register.",
+          "marks": [
+           "strong"
+          ]
+         },
+         {
+          "_type": "span",
+          "_key": "f6dbbea12997",
+          "text": " ",
+          "marks": []
+         },
+         {
+          "_key": "b1s1",
+          "_type": "span",
+          "marks": [],
+          "text": "Begin your journey by registering "
+         },
+         {
+          "_key": "b1s2",
+          "_type": "span",
+          "marks": [
+           "strong",
+           "b1l0"
+          ],
+          "text": "here"
+         },
+         {
+          "_key": "b1s3",
+          "_type": "span",
+          "marks": [],
+          "text": " for the "
+         },
+         {
+          "_key": "b1s4",
+          "_type": "span",
+          "marks": [
+           "em"
+          ],
+          "text": "WealthBriefing WealthTech Americas"
+         },
+         {
+          "_key": "b1s5",
+          "_type": "span",
+          "marks": [],
+          "text": " Awards 2027."
+         }
+        ]
+       }
+      ]
+     },
+     {
+      "_type": "registrationStep",
+      "_key": "c9c70f8b4c0f",
+      "text": [
+       {
+        "_type": "block",
+        "_key": "b2l0p",
+        "style": "normal",
+        "markDefs": [],
+        "children": [
+         {
+          "_type": "span",
+          "_key": "72393e0c38c9",
+          "text": "Select your categories.",
+          "marks": [
+           "strong"
+          ]
+         },
+         {
+          "_type": "span",
+          "_key": "3ef2c5854e84",
+          "text": " ",
+          "marks": []
+         },
+         {
+          "_key": "b2s1",
+          "_type": "span",
+          "marks": [],
+          "text": "Complete your details and choose the award categories you wish to enter."
+         }
+        ]
+       }
+      ]
+     },
+     {
+      "_type": "registrationStep",
+      "_key": "bc9ba2af52ad",
+      "text": [
+       {
+        "_type": "block",
+        "_key": "b3l0p",
+        "style": "normal",
+        "markDefs": [],
+        "children": [
+         {
+          "_type": "span",
+          "_key": "8e40407ea24d",
+          "text": "Complete your nomination form.",
+          "marks": [
+           "strong"
+          ]
+         },
+         {
+          "_type": "span",
+          "_key": "999e115d8ecd",
+          "text": " ",
+          "marks": []
+         },
+         {
+          "_key": "b3s1",
+          "_type": "span",
+          "marks": [],
+          "text": "After submitting the registration form, you will receive a confirmation email containing a downloadable nomination form."
+         }
+        ]
+       },
+       {
+        "_type": "block",
+        "_key": "b3l2",
+        "style": "normal",
+        "markDefs": [],
+        "children": [
+         {
+          "_key": "b3s1x",
+          "_type": "span",
+          "marks": [],
+          "text": "Please:"
+         }
+        ]
+       },
+       {
+        "_key": "b4",
+        "_type": "block",
+        "children": [
+         {
+          "_key": "b4s0",
+          "_type": "span",
+          "marks": [],
+          "text": "Provide the name of your firm or individual, exactly as you would like it to appear in all award-related communications."
+         }
+        ],
+        "level": 1,
+        "listItem": "bullet",
+        "markDefs": [],
+        "style": "normal"
+       },
+       {
+        "_key": "b5",
+        "_type": "block",
+        "children": [
+         {
+          "_key": "b5s0",
+          "_type": "span",
+          "marks": [],
+          "text": "Answer all questions within the form (total word count must not exceed "
+         },
+         {
+          "_key": "b5s1",
+          "_type": "span",
+          "marks": [
+           "strong"
+          ],
+          "text": "1,000 words or 1,500 for individual awards"
+         },
+         {
+          "_key": "b5s2",
+          "_type": "span",
+          "marks": [],
+          "text": ")."
+         }
+        ],
+        "level": 1,
+        "listItem": "bullet",
+        "markDefs": [],
+        "style": "normal"
+       },
+       {
+        "_key": "b6",
+        "_type": "block",
+        "children": [
+         {
+          "_key": "b6s0",
+          "_type": "span",
+          "marks": [],
+          "text": "You may include up to "
+         },
+         {
+          "_key": "b6s1",
+          "_type": "span",
+          "marks": [
+           "strong"
+          ],
+          "text": "3 relevant examples"
+         },
+         {
+          "_key": "b6s2",
+          "_type": "span",
+          "marks": [],
+          "text": " via active links to PDFs, audio, or video files."
+         }
+        ],
+        "level": 1,
+        "listItem": "bullet",
+        "markDefs": [],
+        "style": "normal"
+       }
+      ]
+     },
+     {
+      "_type": "registrationStep",
+      "_key": "35e725d709cb",
+      "text": [
+       {
+        "_type": "block",
+        "_key": "b7l0p",
+        "style": "normal",
+        "markDefs": [],
+        "children": [
+         {
+          "_type": "span",
+          "_key": "d4c34b6bda16",
+          "text": "Submit your entry.",
+          "marks": [
+           "strong"
+          ]
+         },
+         {
+          "_type": "span",
+          "_key": "bbfb499957b3",
+          "text": " ",
+          "marks": []
+         },
+         {
+          "_key": "b7s0x",
+          "_type": "span",
+          "marks": [
+           "strong"
+          ],
+          "text": "Submission deadline: 16th October 2026"
+         }
+        ]
+       },
+       {
+        "_type": "block",
+        "_key": "b7l1",
+        "style": "normal",
+        "markDefs": [],
+        "children": [
+         {
+          "_key": "b7s1",
+          "_type": "span",
+          "marks": [],
+          "text": "Email your completed nomination form(s) to:"
+         }
+        ]
+       },
+       {
+        "_type": "block",
+        "_key": "b7l2",
+        "style": "normal",
+        "markDefs": [
+         {
+          "_key": "b7l0",
+          "_type": "link",
+          "href": "mailto:sophie.page@clearviewpublishing.com"
+         }
+        ],
+        "children": [
+         {
+          "_key": "b7s2",
+          "_type": "span",
+          "marks": [
+           "strong"
+          ],
+          "text": "📧 "
+         },
+         {
+          "_key": "b7s3",
+          "_type": "span",
+          "marks": [
+           "strong",
+           "b7l0"
+          ],
+          "text": "Sophie.Page@clearviewpublishing.com"
+         }
+        ]
+       }
+      ]
+     },
+     {
+      "_type": "registrationStep",
+      "_key": "0e28ecc8152f",
+      "text": [
+       {
+        "_type": "block",
+        "_key": "b8l0p",
+        "style": "normal",
+        "markDefs": [],
+        "children": [
+         {
+          "_type": "span",
+          "_key": "bd80012d3221",
+          "text": "Notification.",
+          "marks": [
+           "strong"
+          ]
+         },
+         {
+          "_type": "span",
+          "_key": "41f086d88000",
+          "text": " ",
+          "marks": []
+         },
+         {
+          "_key": "b8s1",
+          "_type": "span",
+          "marks": [],
+          "text": "Winners and commended firms and individuals will be notified in December 2026."
+         }
+        ]
+       }
+      ]
+     },
+     {
+      "_type": "registrationStep",
+      "_key": "2067c3c25b50",
+      "text": [
+       {
+        "_type": "block",
+        "_key": "b9l0p",
+        "style": "normal",
+        "markDefs": [],
+        "children": [
+         {
+          "_type": "span",
+          "_key": "710506f88362",
+          "text": "Awards announcement & promotion.",
+          "marks": [
+           "strong"
+          ]
+         },
+         {
+          "_type": "span",
+          "_key": "5b6f791c68a9",
+          "text": " ",
+          "marks": []
+         },
+         {
+          "_key": "b9s1",
+          "_type": "span",
+          "marks": [],
+          "text": "Winners will be officially announced in February 2027, and results will be published across "
+         },
+         {
+          "_key": "b9s2",
+          "_type": "span",
+          "marks": [
+           "em"
+          ],
+          "text": "WealthBriefing and Family Wealth Report’s"
+         },
+         {
+          "_key": "b9s3",
+          "_type": "span",
+          "marks": [],
+          "text": " editorial, website, and social media channels."
+         }
+        ]
+       }
+      ]
+     }
+    ]
+   },
+   "unset": [
+    "faqs",
+    "categoriesContent",
+    "entryCategories"
+   ],
+   "ops": [
+    {
+     "op": "insertAfter",
+     "path": "body[_key==\"b4\"]",
+     "items": [
+      {
+       "_key": "b5",
+       "_type": "block",
+       "children": [
+        {
+         "_key": "b5s0",
+         "_type": "span",
+         "marks": [],
+         "text": "Categories"
+        }
+       ],
+       "markDefs": [],
+       "style": "h4"
+      },
+      {
+       "_key": "b6",
+       "_type": "block",
+       "children": [
+        {
+         "_key": "b6s0",
+         "_type": "span",
+         "marks": [],
+         "text": "For those new to the "
+        },
+        {
+         "_key": "b6s1",
+         "_type": "span",
+         "marks": [
+          "em",
+          "strong"
+         ],
+         "text": "WealthBriefing"
+        },
+        {
+         "_key": "b6s2",
+         "_type": "span",
+         "marks": [],
+         "text": " awards, the "
+        },
+        {
+         "_key": "b6s3",
+         "_type": "span",
+         "marks": [
+          "b6l0",
+          "strong"
+         ],
+         "text": "categories"
+        },
+        {
+         "_key": "b6s4",
+         "_type": "span",
+         "marks": [],
+         "text": " are designed around three core areas that reflect an outstanding client experience:"
+        }
+       ],
+       "markDefs": [
+        {
+         "_key": "b6l0",
+         "_type": "link",
+         "href": "https://clearviewpublishing.jotform.com/261863243293965"
+        }
+       ],
+       "style": "normal"
+      },
+      {
+       "_key": "b7",
+       "_type": "block",
+       "children": [
+        {
+         "_key": "b7s0",
+         "_type": "span",
+         "marks": [
+          "strong"
+         ],
+         "text": "Experts"
+        },
+        {
+         "_key": "b7s1",
+         "_type": "span",
+         "marks": [],
+         "text": " – recognizing exceptional individuals and teams"
+        }
+       ],
+       "level": 1,
+       "listItem": "bullet",
+       "markDefs": [],
+       "style": "normal"
+      },
+      {
+       "_key": "b8",
+       "_type": "block",
+       "children": [
+        {
+         "_key": "b8s0",
+         "_type": "span",
+         "marks": [
+          "strong"
+         ],
+         "text": "Products"
+        },
+        {
+         "_key": "b8s1",
+         "_type": "span",
+         "marks": [],
+         "text": " – highlighting innovative and high-performing offerings"
+        }
+       ],
+       "level": 1,
+       "listItem": "bullet",
+       "markDefs": [],
+       "style": "normal"
+      },
+      {
+       "_key": "b9",
+       "_type": "block",
+       "children": [
+        {
+         "_key": "b9s0",
+         "_type": "span",
+         "marks": [
+          "strong"
+         ],
+         "text": "Services"
+        },
+        {
+         "_key": "b9s1",
+         "_type": "span",
+         "marks": [],
+         "text": " – rewarding excellence in client delivery and support"
+        }
+       ],
+       "level": 1,
+       "listItem": "bullet",
+       "markDefs": [],
+       "style": "normal"
+      }
+     ]
+    }
+   ]
+  },
+  "event-wp-46721": {
+   "set": {
+    "faq": [
+     {
+      "_type": "faqItem",
+      "_key": "83f762ce3a79",
+      "question": "Does the entering firm or individual need to be a subscriber to WealthBriefingAsia?",
+      "answer": [
+       {
+        "_key": "b1",
+        "_type": "block",
+        "children": [
+         {
+          "_key": "b1s1",
+          "_type": "span",
+          "marks": [],
+          "text": "No, this program is open to all firms and individuals active in wealth management or the family office sectors."
+         }
+        ],
+        "markDefs": [],
+        "style": "normal"
+       }
+      ]
+     },
+     {
+      "_type": "faqItem",
+      "_key": "6df3fded1696",
+      "question": "Can my firm enter more than one category?",
+      "answer": [
+       {
+        "_key": "b3",
+        "_type": "block",
+        "children": [
+         {
+          "_key": "b3s1",
+          "_type": "span",
+          "marks": [],
+          "text": "Yes, we encourage firms to enter as many awards that are applicable to their business."
+         }
+        ],
+        "markDefs": [],
+        "style": "normal"
+       }
+      ]
+     },
+     {
+      "_type": "faqItem",
+      "_key": "a9ba8e3ea499",
+      "question": "Do I need to use the submission form provided?",
+      "answer": [
+       {
+        "_key": "b5",
+        "_type": "block",
+        "children": [
+         {
+          "_key": "b5s1",
+          "_type": "span",
+          "marks": [],
+          "text": "Yes, submissions shall only be accepted when using this document."
+         }
+        ],
+        "markDefs": [],
+        "style": "normal"
+       }
+      ]
+     },
+     {
+      "_type": "faqItem",
+      "_key": "12cca799e387",
+      "question": "Is there any upfront cost to enter?",
+      "answer": [
+       {
+        "_key": "b7",
+        "_type": "block",
+        "children": [
+         {
+          "_key": "b7s1",
+          "_type": "span",
+          "marks": [],
+          "text": "No, there is no upfront cost to enter, but you will be offered the chance to purchase a winner’s marketing package should you be successful. The judging process is completely independent of the commercial arrangements between the participants and the organisers. However, it is expected that when the results are made public, winners will engage with the organisers to promote their win and also attend the awards ceremony to accept their trophy."
+         }
+        ],
+        "markDefs": [],
+        "style": "normal"
+       }
+      ]
+     },
+     {
+      "_type": "faqItem",
+      "_key": "c934baa22b6c",
+      "question": "Is the process open to firms that are not currently active within the Asia region?",
+      "answer": [
+       {
+        "_key": "b9",
+        "_type": "block",
+        "children": [
+         {
+          "_key": "b9s1",
+          "_type": "span",
+          "marks": [],
+          "text": "The judges will only consider submissions from firms that are demonstrably active in the region. Please see an overview of our global awards programmes "
+         },
+         {
+          "_key": "b9s2",
+          "_type": "span",
+          "marks": [
+           "strong",
+           "b9l0"
+          ],
+          "text": "here."
+         }
+        ],
+        "markDefs": [
+         {
+          "_key": "b9l0",
+          "_type": "link",
+          "href": "https://clearviewpublishing.com/events-category/awards/"
+         }
+        ],
+        "style": "normal"
+       }
+      ]
+     },
+     {
+      "_type": "faqItem",
+      "_key": "11d7dcd535c8",
+      "question": "How do you ensure that the judging process is independent and impartial?",
+      "answer": [
+       {
+        "_key": "b11",
+        "_type": "block",
+        "children": [
+         {
+          "_key": "b11s1",
+          "_type": "span",
+          "marks": [],
+          "text": "The judges are independent of the award organisers ensuring they are divided into separate panels to avoid conflicts of interest."
+         }
+        ],
+        "markDefs": [],
+        "style": "normal"
+       }
+      ]
+     },
+     {
+      "_type": "faqItem",
+      "_key": "7de505f1eb55",
+      "question": "Can you assure me that any details that I submit will be treated with confidentiality?",
+      "answer": [
+       {
+        "_key": "b13",
+        "_type": "block",
+        "children": [
+         {
+          "_key": "b13s1",
+          "_type": "span",
+          "marks": [],
+          "text": "We only share submissions with the panel responsible for judging those particular categories. Furthermore, our experienced team ensures that there is no conflict of interest before they share an entrant’s submission with anyone. All our judges have signed a Non-Disclosure Agreement."
+         }
+        ],
+        "markDefs": [],
+        "style": "normal"
+       }
+      ]
+     },
+     {
+      "_type": "faqItem",
+      "_key": "9f052b51feed",
+      "question": "My submission is likely to be longer than the 1,000-word max limit. Would this disadvantage me?",
+      "answer": [
+       {
+        "_key": "b15",
+        "_type": "block",
+        "children": [
+         {
+          "_key": "b15s1",
+          "_type": "span",
+          "marks": [],
+          "text": "We have set the limit out of respect to the judges and we are keen to maintain this to ensure that there is a level playing field between competing submissions. Judges reserve the right to refuse to review submissions that do not comply. We also discourage adding attachments to the submissions."
+         }
+        ],
+        "markDefs": [],
+        "style": "normal"
+       }
+      ]
+     },
+     {
+      "_type": "faqItem",
+      "_key": "3dcb44ea7f0a",
+      "question": "Do I need to submit a separate submission for each category?",
+      "answer": [
+       {
+        "_key": "b17",
+        "_type": "block",
+        "children": [
+         {
+          "_key": "b17s1",
+          "_type": "span",
+          "marks": [],
+          "text": "You will need to do a new form for each submission and you should also ensure that this specifically relates to the category for which you are entering. If you are using the same answers for multiple submissions this could result in your entry being marked down by the judging panel."
+         }
+        ],
+        "markDefs": [],
+        "style": "normal"
+       }
+      ]
+     },
+     {
+      "_type": "faqItem",
+      "_key": "256ca1321dcc",
+      "question": "Where is the winner’s announcement shared?",
+      "answer": [
+       {
+        "_key": "b19",
+        "_type": "block",
+        "children": [
+         {
+          "_key": "b19s1",
+          "_type": "span",
+          "marks": [],
+          "text": "The winners are announced publicly the day after the official awards celebration and this is via our editorial and social media platforms."
+         }
+        ],
+        "markDefs": [],
+        "style": "normal"
+       }
+      ]
+     },
+     {
+      "_type": "faqItem",
+      "_key": "edcc6bf8260e",
+      "question": "Can I speak to anyone on the team about my entry?",
+      "answer": [
+       {
+        "_key": "b21",
+        "_type": "block",
+        "children": [
+         {
+          "_key": "b21s1",
+          "_type": "span",
+          "marks": [],
+          "text": "Yes, our experienced team is always available to assist you with preparation of your submission/s and any aspects of the process from start to finish. For any questions please contact "
+         },
+         {
+          "_key": "b21s2",
+          "_type": "span",
+          "marks": [
+           "strong",
+           "b21l0"
+          ],
+          "text": "rachel.fokes@clearviewpublishing.com"
+         }
+        ],
+        "markDefs": [
+         {
+          "_key": "b21l0",
+          "_type": "link",
+          "href": "mailto:rachel.fokes@clearviewpublishing.com"
+         }
+        ],
+        "style": "normal"
+       }
+      ]
+     }
+    ],
+    "registrationSteps": [
+     {
+      "_type": "registrationStep",
+      "_key": "7298e10edda5",
+      "text": [
+       {
+        "_type": "block",
+        "_key": "b1l0p",
+        "style": "normal",
+        "markDefs": [
+         {
+          "_key": "b1l0",
+          "_type": "link",
+          "href": "https://clearviewpublishing.jotform.com/262171872636967"
+         }
+        ],
+        "children": [
+         {
+          "_type": "span",
+          "_key": "de0029f6ca3a",
+          "text": "Register.",
+          "marks": [
+           "strong"
+          ]
+         },
+         {
+          "_type": "span",
+          "_key": "55b2bfdb55eb",
+          "text": " ",
+          "marks": []
+         },
+         {
+          "_key": "b1s1",
+          "_type": "span",
+          "marks": [],
+          "text": "Begin your journey by registering "
+         },
+         {
+          "_key": "b1s2",
+          "_type": "span",
+          "marks": [
+           "strong",
+           "b1l0"
+          ],
+          "text": "here"
+         },
+         {
+          "_key": "b1s3",
+          "_type": "span",
+          "marks": [],
+          "text": " for the "
+         },
+         {
+          "_key": "b1s4",
+          "_type": "span",
+          "marks": [
+           "em"
+          ],
+          "text": "WealthBriefingAsia"
+         },
+         {
+          "_key": "b1s5",
+          "_type": "span",
+          "marks": [],
+          "text": " Awards 2027."
+         }
+        ]
+       }
+      ]
+     },
+     {
+      "_type": "registrationStep",
+      "_key": "63fcb08b39e2",
+      "text": [
+       {
+        "_type": "block",
+        "_key": "b2l0p",
+        "style": "normal",
+        "markDefs": [],
+        "children": [
+         {
+          "_type": "span",
+          "_key": "2b221fa4b632",
+          "text": "Select your categories.",
+          "marks": [
+           "strong"
+          ]
+         },
+         {
+          "_type": "span",
+          "_key": "380d74bcd371",
+          "text": " ",
+          "marks": []
+         },
+         {
+          "_key": "b2s1",
+          "_type": "span",
+          "marks": [],
+          "text": "Complete your details and choose the award categories you wish to enter."
+         }
+        ]
+       }
+      ]
+     },
+     {
+      "_type": "registrationStep",
+      "_key": "405983a41e13",
+      "text": [
+       {
+        "_type": "block",
+        "_key": "b3l0p",
+        "style": "normal",
+        "markDefs": [],
+        "children": [
+         {
+          "_type": "span",
+          "_key": "ee850dd1ecbd",
+          "text": "Complete your nomination form.",
+          "marks": [
+           "strong"
+          ]
+         },
+         {
+          "_type": "span",
+          "_key": "59f9f1df1f9e",
+          "text": " ",
+          "marks": []
+         },
+         {
+          "_key": "b3s1",
+          "_type": "span",
+          "marks": [],
+          "text": "After submitting the registration form, you will receive a confirmation email containing a downloadable nomination form."
+         }
+        ]
+       },
+       {
+        "_type": "block",
+        "_key": "b3l2",
+        "style": "normal",
+        "markDefs": [],
+        "children": [
+         {
+          "_key": "b3s1x",
+          "_type": "span",
+          "marks": [],
+          "text": "Please:"
+         }
+        ]
+       },
+       {
+        "_key": "b4",
+        "_type": "block",
+        "children": [
+         {
+          "_key": "b4s0",
+          "_type": "span",
+          "marks": [],
+          "text": "Provide the name of your firm or individual, exactly as you would like it to appear in all award-related communications."
+         }
+        ],
+        "level": 1,
+        "listItem": "bullet",
+        "markDefs": [],
+        "style": "normal"
+       },
+       {
+        "_key": "b5",
+        "_type": "block",
+        "children": [
+         {
+          "_key": "b5s0",
+          "_type": "span",
+          "marks": [],
+          "text": "Answer all questions within the form (total word count must not exceed "
+         },
+         {
+          "_key": "b5s1",
+          "_type": "span",
+          "marks": [
+           "strong"
+          ],
+          "text": "1,000 words"
+         },
+         {
+          "_key": "b5s2",
+          "_type": "span",
+          "marks": [],
+          "text": ")."
+         }
+        ],
+        "level": 1,
+        "listItem": "bullet",
+        "markDefs": [],
+        "style": "normal"
+       },
+       {
+        "_key": "b6",
+        "_type": "block",
+        "children": [
+         {
+          "_key": "b6s0",
+          "_type": "span",
+          "marks": [],
+          "text": "You may include up to "
+         },
+         {
+          "_key": "b6s1",
+          "_type": "span",
+          "marks": [
+           "strong"
+          ],
+          "text": "3 relevant examples"
+         },
+         {
+          "_key": "b6s2",
+          "_type": "span",
+          "marks": [],
+          "text": " via active links to PDFs, audio, or video files."
+         }
+        ],
+        "level": 1,
+        "listItem": "bullet",
+        "markDefs": [],
+        "style": "normal"
+       }
+      ]
+     },
+     {
+      "_type": "registrationStep",
+      "_key": "2f34c4e9d904",
+      "text": [
+       {
+        "_type": "block",
+        "_key": "b7l0p",
+        "style": "normal",
+        "markDefs": [],
+        "children": [
+         {
+          "_type": "span",
+          "_key": "d408d483fe71",
+          "text": "Submit your entry.",
+          "marks": [
+           "strong"
+          ]
+         },
+         {
+          "_type": "span",
+          "_key": "7f428956ad7d",
+          "text": " ",
+          "marks": []
+         },
+         {
+          "_key": "b7s0x",
+          "_type": "span",
+          "marks": [
+           "strong"
+          ],
+          "text": "Submission deadline: 1st April 2027"
+         }
+        ]
+       },
+       {
+        "_type": "block",
+        "_key": "b7l1",
+        "style": "normal",
+        "markDefs": [],
+        "children": [
+         {
+          "_key": "b7s1",
+          "_type": "span",
+          "marks": [],
+          "text": "Email your completed nomination form(s) to:"
+         }
+        ]
+       },
+       {
+        "_type": "block",
+        "_key": "b7l2",
+        "style": "normal",
+        "markDefs": [
+         {
+          "_key": "b7l0",
+          "_type": "link",
+          "href": "mailto:jenna.maybery@clearviewpublishing.com"
+         },
+         {
+          "_key": "b7l1",
+          "_type": "link",
+          "href": "mailto:Becky.newman@clearviewpublishing.com"
+         }
+        ],
+        "children": [
+         {
+          "_key": "b7s2",
+          "_type": "span",
+          "marks": [
+           "strong"
+          ],
+          "text": "📧 "
+         },
+         {
+          "_key": "b7s3",
+          "_type": "span",
+          "marks": [
+           "strong",
+           "b7l0"
+          ],
+          "text": "Jenna.maybery@clearviewpublishing.com"
+         },
+         {
+          "_key": "b7s4",
+          "_type": "span",
+          "marks": [
+           "strong"
+          ],
+          "text": " or "
+         },
+         {
+          "_key": "b7s5",
+          "_type": "span",
+          "marks": [
+           "strong",
+           "b7l1"
+          ],
+          "text": "Becky.newman@clearviewpublishing.com"
+         }
+        ]
+       }
+      ]
+     },
+     {
+      "_type": "registrationStep",
+      "_key": "9838aa9bb7d0",
+      "text": [
+       {
+        "_type": "block",
+        "_key": "b8l0p",
+        "style": "normal",
+        "markDefs": [],
+        "children": [
+         {
+          "_type": "span",
+          "_key": "42c9e5eee224",
+          "text": "Notification & ceremony preparation.",
+          "marks": [
+           "strong"
+          ]
+         },
+         {
+          "_type": "span",
+          "_key": "ae17d72ac45c",
+          "text": " ",
+          "marks": []
+         },
+         {
+          "_key": "b8s1",
+          "_type": "span",
+          "marks": [],
+          "text": "Winners and commended firms/individuals will be notified in May 2027."
+         }
+        ]
+       },
+       {
+        "_type": "block",
+        "_key": "b8l2",
+        "style": "normal",
+        "markDefs": [],
+        "children": [
+         {
+          "_key": "b8s1x",
+          "_type": "span",
+          "marks": [],
+          "text": "They will be offered the opportunity to purchase marketing packages and tickets for the awards ceremony in July 2027."
+         }
+        ]
+       }
+      ]
+     },
+     {
+      "_type": "registrationStep",
+      "_key": "3cb4e5bc989c",
+      "text": [
+       {
+        "_type": "block",
+        "_key": "b9l0p",
+        "style": "normal",
+        "markDefs": [],
+        "children": [
+         {
+          "_type": "span",
+          "_key": "d4c790044c12",
+          "text": "Awards announcement & promotion.",
+          "marks": [
+           "strong"
+          ]
+         },
+         {
+          "_type": "span",
+          "_key": "01d743d9963c",
+          "text": " ",
+          "marks": []
+         },
+         {
+          "_key": "b9s1",
+          "_type": "span",
+          "marks": [],
+          "text": "Winners will be officially announced at the awards ceremony on the 1st July 2027, and results will be published across "
+         },
+         {
+          "_key": "b9s2",
+          "_type": "span",
+          "marks": [
+           "em"
+          ],
+          "text": "WealthBriefingAsia's"
+         },
+         {
+          "_key": "b9s3",
+          "_type": "span",
+          "marks": [],
+          "text": " editorial channels, website, and social media the following day."
+         }
+        ]
+       }
+      ]
+     }
+    ]
+   },
+   "unset": [
+    "faqs",
+    "categoriesContent"
+   ],
+   "ops": [
+    {
+     "op": "append",
+     "path": "body",
+     "items": [
+      {
+       "_key": "cc-b10",
+       "_type": "block",
+       "children": [
+        {
+         "_key": "b10s0",
+         "_type": "span",
+         "marks": [
+          "strong",
+          "em"
+         ],
+         "text": "Please note: While the judging process is completely independent of any commercial relationships, all winners are expected to enter into a financial arrangement with the organisers to support the promotion of their award(s). This promotional commitment is separate from — and not conditional upon — attendance at the awards ceremony."
+        }
+       ],
+       "markDefs": [],
+       "style": "blockquote"
+      }
+     ]
+    }
+   ]
+  },
+  "event-wp-46584": {
+   "set": {
+    "faq": [
+     {
+      "_type": "faqItem",
+      "_key": "3daece837521",
+      "question": "Does the entering firm or individual need to be a subscriber to The Family Wealth Report network?",
+      "answer": [
+       {
+        "_key": "b1",
+        "_type": "block",
+        "children": [
+         {
+          "_key": "b1s0",
+          "_type": "span",
+          "marks": [],
+          "text": "No, this program is open to all firms and individuals active in wealth management or the family office sectors."
+         }
+        ],
+        "markDefs": [],
+        "style": "normal"
+       }
+      ]
+     },
+     {
+      "_type": "faqItem",
+      "_key": "33ec14e90357",
+      "question": "Can my firm enter more than one category?",
+      "answer": [
+       {
+        "_key": "b3",
+        "_type": "block",
+        "children": [
+         {
+          "_key": "b3s0",
+          "_type": "span",
+          "marks": [],
+          "text": "Yes, we encourage firms to enter as many awards that are applicable to their business."
+         }
+        ],
+        "markDefs": [],
+        "style": "normal"
+       }
+      ]
+     },
+     {
+      "_type": "faqItem",
+      "_key": "650cdf3e6778",
+      "question": "Do I need to use the submission form provided?",
+      "answer": [
+       {
+        "_key": "b5",
+        "_type": "block",
+        "children": [
+         {
+          "_key": "b5s0",
+          "_type": "span",
+          "marks": [],
+          "text": "Yes, submissions shall only be accepted when using this document."
+         }
+        ],
+        "markDefs": [],
+        "style": "normal"
+       }
+      ]
+     },
+     {
+      "_type": "faqItem",
+      "_key": "365810f4dc50",
+      "question": "Is there any upfront cost to enter?",
+      "answer": [
+       {
+        "_key": "b7",
+        "_type": "block",
+        "children": [
+         {
+          "_key": "b7s0",
+          "_type": "span",
+          "marks": [],
+          "text": "No, there is no upfront cost to enter, but you will be offered the chance to purchase a winner’s marketing package should you be successful. The judging process is completely independent of the commercial arrangements between the participants and the organisers. However it is expected that when the results are made public, winners will engage with the organisers to promote their win and also attend the awards ceremony to accept their trophy."
+         }
+        ],
+        "markDefs": [],
+        "style": "normal"
+       }
+      ]
+     },
+     {
+      "_type": "faqItem",
+      "_key": "dc255617cfd4",
+      "question": "Is the process open to firms that are not currently active within the North American region?",
+      "answer": [
+       {
+        "_key": "b9",
+        "_type": "block",
+        "children": [
+         {
+          "_key": "b9s0",
+          "_type": "span",
+          "marks": [],
+          "text": "The judges will only consider submissions from firms that are demonstrably active in the region. Please see "
+         },
+         {
+          "_key": "b9s1",
+          "_type": "span",
+          "marks": [
+           "b9l0",
+           "strong"
+          ],
+          "text": "here"
+         },
+         {
+          "_key": "b9s2",
+          "_type": "span",
+          "marks": [],
+          "text": " an overview of our global awards programmes."
+         }
+        ],
+        "markDefs": [
+         {
+          "_key": "b9l0",
+          "_type": "link",
+          "href": "https://clearviewpublishing.com/events-category/awards/"
+         }
+        ],
+        "style": "normal"
+       }
+      ]
+     },
+     {
+      "_type": "faqItem",
+      "_key": "f8b3d245b72b",
+      "question": "How do you ensure that the judging process is independent and impartial?",
+      "answer": [
+       {
+        "_key": "b11",
+        "_type": "block",
+        "children": [
+         {
+          "_key": "b11s0",
+          "_type": "span",
+          "marks": [],
+          "text": "The Judges are independent of the award organisers ensuring they are divided into separate panels to avoid conflicts of interest."
+         }
+        ],
+        "markDefs": [],
+        "style": "normal"
+       }
+      ]
+     },
+     {
+      "_type": "faqItem",
+      "_key": "f0500a55984b",
+      "question": "Can you assure me that any details that I submit will be treated with confidentiality.",
+      "answer": [
+       {
+        "_key": "b13",
+        "_type": "block",
+        "children": [
+         {
+          "_key": "b13s0",
+          "_type": "span",
+          "marks": [],
+          "text": "We only share submissions with the panel responsible for judging those particular categories. Furthermore, our experienced team ensures that there is no conflict of interest before they share an entrant’s submission with anyone. All our judges have signed a Non-Disclosure Agreement."
+         }
+        ],
+        "markDefs": [],
+        "style": "normal"
+       }
+      ]
+     },
+     {
+      "_type": "faqItem",
+      "_key": "6906b0e18a3c",
+      "question": "My submission is likely to be longer than the 1,000-word max limit. Would this disadvantage me?",
+      "answer": [
+       {
+        "_key": "b15",
+        "_type": "block",
+        "children": [
+         {
+          "_key": "b15s0",
+          "_type": "span",
+          "marks": [],
+          "text": "We have set the limit out of respect to the judges and we are keen to maintain this to ensure that there is a level playing field between competing submissions. Judges reserve the right to refuse to review submissions that do not comply. We also encourage against attachments to the submissions."
+         }
+        ],
+        "markDefs": [],
+        "style": "normal"
+       }
+      ]
+     },
+     {
+      "_type": "faqItem",
+      "_key": "15b669854f75",
+      "question": "Do I need to submit a separate submission for each category?",
+      "answer": [
+       {
+        "_key": "b17",
+        "_type": "block",
+        "children": [
+         {
+          "_key": "b17s0",
+          "_type": "span",
+          "marks": [],
+          "text": "You will need to do a new form for each submission and you should also ensure that this specifically relates to the category for which you are entering. If you are using the same answers for multiple submissions this could result in your entry being marked down by the judging panel."
+         }
+        ],
+        "markDefs": [],
+        "style": "normal"
+       }
+      ]
+     },
+     {
+      "_type": "faqItem",
+      "_key": "a3431ebd0185",
+      "question": "Where is the winner’s announcement shared?",
+      "answer": [
+       {
+        "_key": "b19",
+        "_type": "block",
+        "children": [
+         {
+          "_key": "b19s0",
+          "_type": "span",
+          "marks": [],
+          "text": "The winners are announced publicly the day after the official awards celebration and this is via our editorial and social media platforms."
+         }
+        ],
+        "markDefs": [],
+        "style": "normal"
+       }
+      ]
+     },
+     {
+      "_type": "faqItem",
+      "_key": "5a932a886f6f",
+      "question": "Can I speak to anyone on the team about my entry?",
+      "answer": [
+       {
+        "_key": "b21",
+        "_type": "block",
+        "children": [
+         {
+          "_key": "b21s0",
+          "_type": "span",
+          "marks": [],
+          "text": "Yes, our experienced team is always available to assist you with preparation of your submission/s and any aspects of the process from start to finish. For any questions please contact either "
+         },
+         {
+          "_key": "b21s1",
+          "_type": "span",
+          "marks": [
+           "strong",
+           "b21l0"
+          ],
+          "text": "rachel.fokes@clearviewpublishing.com"
+         },
+         {
+          "_key": "b21s2",
+          "_type": "span",
+          "marks": [],
+          "text": " or "
+         },
+         {
+          "_key": "b21s3",
+          "_type": "span",
+          "marks": [
+           "strong",
+           "b21l1"
+          ],
+          "text": "jenna.maybery@clearviewpublishing.com"
+         }
+        ],
+        "markDefs": [
+         {
+          "_key": "b21l0",
+          "_type": "link",
+          "href": "mailto:rachel.fokes@clearviewpublishing.com"
+         },
+         {
+          "_key": "b21l1",
+          "_type": "link",
+          "href": "mailto:jenna.maybery@clearviewpublishing.com"
+         }
+        ],
+        "style": "normal"
+       }
+      ]
+     }
+    ],
+    "registrationSteps": [
+     {
+      "_type": "registrationStep",
+      "_key": "1f6da1647c20",
+      "text": [
+       {
+        "_type": "block",
+        "_key": "b1l0p",
+        "style": "normal",
+        "markDefs": [
+         {
+          "_key": "b1l0",
+          "_type": "link",
+          "href": "https://clearviewpublishing.jotform.com/261874569296981"
+         }
+        ],
+        "children": [
+         {
+          "_type": "span",
+          "_key": "4e37aa3b0abb",
+          "text": "Register.",
+          "marks": [
+           "strong"
+          ]
+         },
+         {
+          "_type": "span",
+          "_key": "65dbb8cfa2cb",
+          "text": " ",
+          "marks": []
+         },
+         {
+          "_key": "b1s1",
+          "_type": "span",
+          "marks": [],
+          "text": "Begin your journey by registering "
+         },
+         {
+          "_key": "b1s2",
+          "_type": "span",
+          "marks": [
+           "strong",
+           "b1l0"
+          ],
+          "text": "here"
+         },
+         {
+          "_key": "b1s3",
+          "_type": "span",
+          "marks": [],
+          "text": " for the "
+         },
+         {
+          "_key": "b1s4",
+          "_type": "span",
+          "marks": [
+           "em"
+          ],
+          "text": "Family Wealth Report"
+         },
+         {
+          "_key": "b1s5",
+          "_type": "span",
+          "marks": [],
+          "text": " Awards 2027."
+         }
+        ]
+       }
+      ]
+     },
+     {
+      "_type": "registrationStep",
+      "_key": "e482006ae9f4",
+      "text": [
+       {
+        "_type": "block",
+        "_key": "b2l0p",
+        "style": "normal",
+        "markDefs": [],
+        "children": [
+         {
+          "_type": "span",
+          "_key": "100e8e1b45de",
+          "text": "Select your categories.",
+          "marks": [
+           "strong"
+          ]
+         },
+         {
+          "_type": "span",
+          "_key": "7921901ea48e",
+          "text": " ",
+          "marks": []
+         },
+         {
+          "_key": "b2s1",
+          "_type": "span",
+          "marks": [],
+          "text": "Complete your details and choose the award categories you wish to enter."
+         }
+        ]
+       }
+      ]
+     },
+     {
+      "_type": "registrationStep",
+      "_key": "38d6b3592053",
+      "text": [
+       {
+        "_type": "block",
+        "_key": "b3l0p",
+        "style": "normal",
+        "markDefs": [],
+        "children": [
+         {
+          "_type": "span",
+          "_key": "e2089dfb2ae4",
+          "text": "Complete your nomination form.",
+          "marks": [
+           "strong"
+          ]
+         },
+         {
+          "_type": "span",
+          "_key": "b62612ee83ea",
+          "text": " ",
+          "marks": []
+         },
+         {
+          "_key": "b3s1",
+          "_type": "span",
+          "marks": [],
+          "text": "After submitting the registration form, you will receive a confirmation email containing a downloadable nomination form."
+         }
+        ]
+       },
+       {
+        "_type": "block",
+        "_key": "b3l2",
+        "style": "normal",
+        "markDefs": [],
+        "children": [
+         {
+          "_key": "b3s1x",
+          "_type": "span",
+          "marks": [],
+          "text": "Please:"
+         }
+        ]
+       },
+       {
+        "_key": "b4",
+        "_type": "block",
+        "children": [
+         {
+          "_key": "b4s0",
+          "_type": "span",
+          "marks": [],
+          "text": "Provide the name of your firm or individual, exactly as you would like it to appear in all award-related communications."
+         }
+        ],
+        "level": 1,
+        "listItem": "bullet",
+        "markDefs": [],
+        "style": "normal"
+       },
+       {
+        "_key": "b5",
+        "_type": "block",
+        "children": [
+         {
+          "_key": "b5s0",
+          "_type": "span",
+          "marks": [],
+          "text": "Answer all questions within the form (total word count must not exceed "
+         },
+         {
+          "_key": "b5s1",
+          "_type": "span",
+          "marks": [
+           "strong"
+          ],
+          "text": "1,000 words or 1,500 words for individual submissions"
+         },
+         {
+          "_key": "b5s2",
+          "_type": "span",
+          "marks": [],
+          "text": ")."
+         }
+        ],
+        "level": 1,
+        "listItem": "bullet",
+        "markDefs": [],
+        "style": "normal"
+       },
+       {
+        "_key": "b6",
+        "_type": "block",
+        "children": [
+         {
+          "_key": "b6s0",
+          "_type": "span",
+          "marks": [],
+          "text": "You may include up to "
+         },
+         {
+          "_key": "b6s1",
+          "_type": "span",
+          "marks": [
+           "strong"
+          ],
+          "text": "3 relevant examples"
+         },
+         {
+          "_key": "b6s2",
+          "_type": "span",
+          "marks": [],
+          "text": " via active links to PDFs, audio, or video files."
+         }
+        ],
+        "level": 1,
+        "listItem": "bullet",
+        "markDefs": [],
+        "style": "normal"
+       }
+      ]
+     },
+     {
+      "_type": "registrationStep",
+      "_key": "d3f790d03016",
+      "text": [
+       {
+        "_type": "block",
+        "_key": "b7l0p",
+        "style": "normal",
+        "markDefs": [],
+        "children": [
+         {
+          "_type": "span",
+          "_key": "b01ef8af9ab4",
+          "text": "Submit your entry.",
+          "marks": [
+           "strong"
+          ]
+         },
+         {
+          "_type": "span",
+          "_key": "d2a91c1b30e0",
+          "text": " ",
+          "marks": []
+         },
+         {
+          "_key": "b7s0x",
+          "_type": "span",
+          "marks": [
+           "strong"
+          ],
+          "text": "Submission deadline: 3 December 2026"
+         }
+        ]
+       },
+       {
+        "_type": "block",
+        "_key": "b7l1",
+        "style": "normal",
+        "markDefs": [],
+        "children": [
+         {
+          "_key": "b7s1",
+          "_type": "span",
+          "marks": [],
+          "text": "Email your completed nomination form(s) to:"
+         }
+        ]
+       },
+       {
+        "_type": "block",
+        "_key": "b7l2",
+        "style": "normal",
+        "markDefs": [
+         {
+          "_key": "b7l0",
+          "_type": "link",
+          "href": "mailto:jenna.maybery@clearviewpublishing.com"
+         },
+         {
+          "_key": "b7l1",
+          "_type": "link",
+          "href": "mailto:Georgia.fitzpatrick@clearviewpublishing.com"
+         }
+        ],
+        "children": [
+         {
+          "_key": "b7s2",
+          "_type": "span",
+          "marks": [
+           "strong"
+          ],
+          "text": "📧 "
+         },
+         {
+          "_key": "b7s3",
+          "_type": "span",
+          "marks": [
+           "strong",
+           "b7l0"
+          ],
+          "text": "Jenna.maybery@clearviewpublishing.com"
+         },
+         {
+          "_key": "b7s4",
+          "_type": "span",
+          "marks": [
+           "strong"
+          ],
+          "text": " or 📧 "
+         },
+         {
+          "_key": "b7s5",
+          "_type": "span",
+          "marks": [
+           "strong",
+           "b7l1"
+          ],
+          "text": "Georgia.fitzpatrick@clearviewpublishing.com"
+         }
+        ]
+       }
+      ]
+     },
+     {
+      "_type": "registrationStep",
+      "_key": "e8cf89d2c451",
+      "text": [
+       {
+        "_type": "block",
+        "_key": "b8l0p",
+        "style": "normal",
+        "markDefs": [],
+        "children": [
+         {
+          "_type": "span",
+          "_key": "95b835595630",
+          "text": "Notification.",
+          "marks": [
+           "strong"
+          ]
+         },
+         {
+          "_type": "span",
+          "_key": "4b03ca74e8b2",
+          "text": " ",
+          "marks": []
+         },
+         {
+          "_key": "b8s1x",
+          "_type": "span",
+          "marks": [],
+          "text": "Shortlisted firms and individuals will be notified in February 2027."
+         }
+        ]
+       }
+      ]
+     },
+     {
+      "_type": "registrationStep",
+      "_key": "1a3fbd263620",
+      "text": [
+       {
+        "_type": "block",
+        "_key": "b9l0p",
+        "style": "normal",
+        "markDefs": [],
+        "children": [
+         {
+          "_type": "span",
+          "_key": "221ae5f8b865",
+          "text": "Awards announcement & promotion.",
+          "marks": [
+           "strong"
+          ]
+         },
+         {
+          "_type": "span",
+          "_key": "bbbd0d635484",
+          "text": " ",
+          "marks": []
+         },
+         {
+          "_key": "b9s1",
+          "_type": "span",
+          "marks": [],
+          "text": "Winners will be officially announced across "
+         },
+         {
+          "_key": "b9s2",
+          "_type": "span",
+          "marks": [
+           "em"
+          ],
+          "text": "Family Wealth Report"
+         },
+         {
+          "_key": "b9s3",
+          "_type": "span",
+          "marks": [],
+          "text": "'"
+         },
+         {
+          "_key": "b9s4",
+          "_type": "span",
+          "marks": [
+           "em"
+          ],
+          "text": "s"
+         },
+         {
+          "_key": "b9s5",
+          "_type": "span",
+          "marks": [],
+          "text": " editorial channels, website, and social media the following day."
+         }
+        ]
+       }
+      ]
+     }
+    ]
+   },
+   "unset": [
+    "faqs",
+    "categoriesContent"
+   ],
+   "ops": [
+    {
+     "op": "append",
+     "path": "body",
+     "items": [
+      {
+       "_key": "cc-b10",
+       "_type": "block",
+       "children": [
+        {
+         "_key": "b10s0",
+         "_type": "span",
+         "marks": [
+          "strong",
+          "em"
+         ],
+         "text": "Please note: While the judging process is completely independent of any commercial relationships, all winners are expected to enter into a financial arrangement with the organisers to support the promotion of their award(s). This promotional commitment is separate from — and not conditional upon — attendance at the awards ceremony."
+        }
+       ],
+       "markDefs": [],
+       "style": "blockquote"
+      }
+     ]
+    }
+   ]
+  }
+ }
+}

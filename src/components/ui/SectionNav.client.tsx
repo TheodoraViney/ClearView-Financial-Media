@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState, type KeyboardEvent, type MouseEvent } from 'react'
 
 import { cx } from './cx'
-import { TAB_CURRENT, TAB_IDLE, TAB_ITEM, TAB_ROW } from './tab-classes'
+import { TAB_CURRENT, TAB_IDLE, TAB_ITEM, TAB_ITEM_LOOK, TAB_ROW } from './tab-classes'
 
 export type SectionNavItem = { id: string; label: string }
 
@@ -24,8 +24,12 @@ const reducedMotion = () => window.matchMedia('(prefers-reduced-motion: reduce)'
  * motion), below the sticky header and this nav (the sections carry `data-section-anchor`, see globals.css), and
  * puts its id in the address. Scrollspy: the last section whose top has passed the nav, the last one at the page end.
  * Without JavaScript the links are plain anchors. The caller makes it sticky.
+ *
+ * `wrap` (opt-in, awards programme page v1.10, `overflow-mode="wrap"`): the items wrap onto more rows instead of
+ * scrolling, 44px high and 24 apart. The nav's height then varies, so it writes it to `--section-nav-h` on the root,
+ * which the sections' scroll margin reads (globals.css), and removes it when it unmounts.
  */
-export function SectionNav({ items, label }: { items: SectionNavItem[]; label: string }) {
+export function SectionNav({ items, label, wrap = false }: { items: SectionNavItem[]; label: string; wrap?: boolean }) {
   const [current, setCurrent] = useState<string | undefined>(items[0]?.id)
   const nav = useRef<HTMLElement>(null)
   const row = useRef<HTMLUListElement>(null)
@@ -65,6 +69,26 @@ export function SectionNav({ items, label }: { items: SectionNavItem[]; label: s
       window.removeEventListener('resize', spy)
     }
   }, [items])
+
+  useEffect(() => {
+    const element = nav.current
+
+    if (!wrap || !element) {
+      return
+    }
+
+    const root = document.documentElement
+    const observer = new ResizeObserver(() => {
+      root.style.setProperty('--section-nav-h', `${element.offsetHeight}px`)
+    })
+
+    observer.observe(element)
+
+    return () => {
+      observer.disconnect()
+      root.style.removeProperty('--section-nav-h')
+    }
+  }, [wrap])
 
   // Keep the current item in view inside the sideways-scrolling row (16px before it), smoothly after the first time.
   useEffect(() => {
@@ -129,14 +153,18 @@ export function SectionNav({ items, label }: { items: SectionNavItem[]; label: s
 
   return (
     <nav ref={nav} aria-label={label} className="relative w-full min-w-0 border-b border-border">
-      <ul ref={row} onKeyDown={onKeyDown} className={cx(TAB_ROW, 'gap-8 px-0.5')}>
+      <ul
+        ref={row}
+        onKeyDown={onKeyDown}
+        className={wrap ? 'flex flex-wrap gap-x-6 px-0.5' : cx(TAB_ROW, 'gap-8 px-0.5')}
+      >
         {items.map((item) => (
           <li key={item.id} className="flex shrink-0">
             <a
               href={`#${item.id}`}
               aria-current={item.id === current ? 'true' : undefined}
               onClick={(event) => go(event, item.id)}
-              className={cx(TAB_ITEM, item.id === current ? TAB_CURRENT : TAB_IDLE)}
+              className={cx(wrap ? `h-11 ${TAB_ITEM_LOOK}` : TAB_ITEM, item.id === current ? TAB_CURRENT : TAB_IDLE)}
             >
               {item.label}
             </a>

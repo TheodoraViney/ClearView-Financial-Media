@@ -24,7 +24,7 @@ export function HighlightVideo({
   closeLabel,
   className,
 }: {
-  /** The section heading, repeated above the player. Without it the dialog's name is for screen readers only. */
+  /** The title above the player. Without it the dialog's name is for screen readers only. */
   title: string | null
   /** The player's accessible name. */
   name: string
@@ -53,9 +53,9 @@ export function HighlightVideo({
         )}
       >
         {thumbnail && (
-          // From the header breakpoint 4 of 12 columns of the main column (~295), below it at most 360.
+          // Half the main column beside the text (~460) once it is 872 wide; the full column below that (at most ~960).
           <span className="absolute inset-0">
-            <Media image={{ ...thumbnail, alt: '' }} sizes="360px" className="size-full" />
+            <Media image={{ ...thumbnail, alt: '' }} sizes="(min-width: 75rem) 480px, 100vw" className="size-full" />
           </span>
         )}
         <span aria-hidden="true" className="absolute inset-0 bg-foreground/24" />

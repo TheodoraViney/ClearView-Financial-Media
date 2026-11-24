@@ -261,7 +261,21 @@ const largeRichTextComponents: PortableTextComponents = {
   },
 }
 
-const SIZE_COMPONENTS = { base: richTextComponents, sm: smallRichTextComponents, lg: largeRichTextComponents }
+// `loose`: paragraphs 16/24 (shared-shell speaker-card biography dialog); the rest as the article body.
+const looseRichTextComponents: PortableTextComponents = {
+  ...richTextComponents,
+  block: {
+    ...blocks,
+    normal: ({ children }) => <p className="text-base leading-6 text-pretty">{children}</p>,
+  },
+}
+
+const SIZE_COMPONENTS = {
+  base: richTextComponents,
+  sm: smallRichTextComponents,
+  lg: largeRichTextComponents,
+  loose: looseRichTextComponents,
+}
 
 /**
  * A `richText` field outside an article (a shared record's introduction, a judge's biography): the body members
@@ -275,7 +289,7 @@ export function RichText({
   className,
 }: {
   value: PortableTextProps['value']
-  size?: 'base' | 'sm' | 'lg'
+  size?: keyof typeof SIZE_COMPONENTS
   /** Opt-in `tight`: 16px between every member (research Executive Summary, split-editorial-section). */
   spacing?: 'default' | 'tight'
   className?: string

@@ -11,11 +11,17 @@
  * - counts and the picks-then-fill merge are the site's (schema constants, src/lib/picks.ts).
  */
 import { AWARDS_PROGRAMME_PAGE_ID } from '@/brands'
-import { OTHER_PROGRAMMES_COUNT, otherProgrammeEditions, type SidebarEditionFields } from '@/lib/award-category'
+import {
+  OPEN_PROGRAMMES_PINS,
+  openProgrammeEditions,
+  OTHER_PROGRAMMES_COUNT,
+  otherProgrammeEditions,
+  type SidebarEditionFields,
+} from '@/lib/award-category'
 import { EDITION_STATUS_COPY_KEYS, type EditionStatusCopyKey } from '@/lib/awards-programme-copy'
 import { EDITION_STATUS_LABELS, editionStatus } from '@/lib/awards-status'
 import { countryName } from '@/lib/countries'
-import { formatDateRange } from '@/lib/dates'
+import { formatDateRange, formatLongDate } from '@/lib/dates'
 import { RELATED_EVENTS_COUNT, relatedEventItems } from '@/lib/event-page'
 import { countOr, picksThenFill, present, topStoriesSplit } from '@/lib/picks'
 import { RELATED_RESEARCH_COUNT, relatedResearchItems } from '@/lib/research-report'
@@ -27,6 +33,7 @@ import {
   EXPLORE_POSTS_FILL,
   OTHER_AWARDS_EDITION,
   OTHER_AWARDS_FILL,
+  OPEN_AWARDS_FILL,
   POST_BRIEFS_FILL,
   POST_LIST_FILL,
   RECORD_FILL_BRANCHES,
@@ -175,6 +182,44 @@ const otherProgrammesSpec = (hint: string): AutoFillSpec => ({
   },
   max: () => OTHER_PROGRAMMES_COUNT,
 })
+
+/**
+ * The awards programme page's "Open awards programmes" list. The Studio has no edition page, so no edition is left out:
+ * GROQ compares `$editionId` with each edition's id, and an id never holds a NUL character.
+ */
+const NO_EDITION = '\u0000'
+
+const openProgrammesSpec: AutoFillSpec = {
+  query: /* groq */ `$block{
+    "picks": otherProgrammes[]{ title, "edition": edition->{ ${OTHER_AWARDS_EDITION} } },
+    "fill": ${OPEN_AWARDS_FILL},
+    "statuses": *[_id == $statusesId][0]{ ${EDITION_STATUS_COPY_KEYS.join(', ')} }
+  }`,
+  params: { editionId: NO_EDITION, statusesId: AWARDS_PROGRAMME_PAGE_ID },
+  brand: 'clearview',
+  pin: { type: 'otherProgrammePick', field: 'edition' },
+  hint: "Listed on the site after the picks: every edition whose nominations are open, closing soonest first, from every publication. Published editions only. A pick past its deadline is hidden. On an edition's own page, that edition is skipped.",
+  select: (result, _block, _brand, today) => {
+    const { picks, fill, statuses } = result as unknown as OtherProgrammesResult
+
+    return openProgrammeEditions(picks, fill ?? [], { today, excludeEdition: null })
+      .filter((item) => !item.picked)
+      .map(({ edition, title }) => {
+        const status = editionStatus({ ...edition, hasWinners: false }, today)
+        const label = status ? statuses?.[EDITION_STATUS_LABELS[status]] : null
+
+        return {
+          _id: edition._id,
+          _type: 'awardsProgramme',
+          title,
+          startDate: edition.startDate,
+          endDate: edition.endDate,
+          subtitle: [label || null, formatLongDate(edition.nominationsClosingDate)].filter(Boolean).join(' · '),
+        }
+      })
+  },
+  max: () => OPEN_PROGRAMMES_PINS,
+}
 
 type RelatedEvent = {
   _id: string
@@ -355,9 +400,7 @@ const SPECS: Record<string, AutoFillSpec> = {
   ),
   'eventPage.relatedEvents': relatedEventsSpec,
   'resource.relatedResearch': relatedResearchSpec,
-  'awardsProgrammePage.otherProgrammes': otherProgrammesSpec(
-    "Fills the empty places on the site. Published editions only. On a programme's own edition pages, its edition is replaced by the next one.",
-  ),
+  'awardsProgrammePage.otherProgrammes': openProgrammesSpec,
 }
 
 /** The spec for a picks field (`blockType.fieldName`), or null when the field has no automatic fill. */
