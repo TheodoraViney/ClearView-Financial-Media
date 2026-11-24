@@ -8,7 +8,11 @@ import { EmptyState } from '@/components/ui/EmptyState'
 import { ListingRecord } from '@/components/ui/ListingRecord'
 import { Pagination } from '@/components/ui/Pagination'
 import { TabLinks } from '@/components/ui/TabLinks'
+import { AWARDS_LIST_VIEW_PARAM } from '@/lib/awards-list-view' // AWARDS-LIST-VARIANTS (temporary)
 import type { RecordListingView } from '@/lib/shared-listings'
+
+import { AwardsGrid } from './awards-variants/AwardsGrid' // AWARDS-LIST-VARIANTS (temporary)
+import { AwardsIconList } from './awards-variants/AwardsIconList' // AWARDS-LIST-VARIANTS (temporary)
 
 // Screen-reader-only text. Visible copy comes from the CMS.
 const TABS_LABEL = 'Listings'
@@ -41,6 +45,8 @@ export function RecordListing({ view }: { view: RecordListingView }) {
 
       {filters.fields.length > 0 && (
         <Form action={filters.action} scroll={false} prefetch={false} aria-label={FILTERS_LABEL} className="mt-6">
+          {/* AWARDS-LIST-VARIANTS (temporary): a filter change keeps the variant. */}
+          {view.awardsView && <input type="hidden" name={AWARDS_LIST_VIEW_PARAM} value={view.awardsView} />}
           {/* Four columns on desktop (gap 32), two on tablet (16 / 32), one on mobile (16). */}
           <div className="grid items-end gap-x-8 gap-y-4 md:grid-cols-2 header:grid-cols-4 noscript:items-start">
             {filters.fields.map((field) => (
@@ -99,20 +105,27 @@ export function RecordListing({ view }: { view: RecordListingView }) {
           />
         ) : (
           <>
-            <ul className="flex flex-col">
-              {view.rows.map((row) => (
-                <li key={row.key}>
-                  <ListingRecord
-                    href={row.href}
-                    title={row.title}
-                    meta={[row.date, row.region].filter((item): item is string => Boolean(item))}
-                    status={row.status?.label}
-                    statusLabel={STATUS_PREFIX}
-                    description={row.standfirst}
-                  />
-                </li>
-              ))}
-            </ul>
+            {/* AWARDS-LIST-VARIANTS (temporary): the Awards `?view=` variants, else the plain list. */}
+            {view.awardsView === 'grid' ? (
+              <AwardsGrid rows={view.rows} statusLabel={STATUS_PREFIX} />
+            ) : view.awardsView === 'icon' ? (
+              <AwardsIconList rows={view.rows} statusLabel={STATUS_PREFIX} />
+            ) : (
+              <ul className="flex flex-col">
+                {view.rows.map((row) => (
+                  <li key={row.key}>
+                    <ListingRecord
+                      href={row.href}
+                      title={row.title}
+                      meta={[row.date, row.region].filter((item): item is string => Boolean(item))}
+                      status={row.status?.label}
+                      statusLabel={STATUS_PREFIX}
+                      description={row.standfirst}
+                    />
+                  </li>
+                ))}
+              </ul>
+            )}
             <Pagination
               pages={view.pagination.pages}
               previousHref={view.pagination.previousHref}

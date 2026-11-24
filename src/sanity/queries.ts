@@ -748,6 +748,8 @@ export const SHARED_LISTINGS_PAGE_QUERY = defineQuery(`
       nominationsClosingDate,
       country,
       "programmeRegion": programme->region,
+      // AWARDS-LIST-VARIANTS (temporary): the edition logo, else its programme's.
+      "logo": select(defined(logo.asset) => logo{ ${IMAGE} }, programme->logo{ ${IMAGE} }),
       "hasWinners": count(winners[defined(category->title) && defined(company->title)]) > 0
     },
     "events": *[$tab == "events" && _type == "conferenceEvent" && defined(slug.current)]{

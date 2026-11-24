@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import { type ReactNode } from 'react' // AWARDS-LIST-VARIANTS (temporary)
 
 import { Meta } from './Meta'
 
@@ -15,6 +16,7 @@ export function ListingRecord({
   status,
   statusLabel,
   description,
+  media, // AWARDS-LIST-VARIANTS (temporary)
 }: {
   href: string | null
   title: string
@@ -23,9 +25,11 @@ export function ListingRecord({
   /** Screen-reader prefix of the status tag, e.g. "Status: ". */
   statusLabel?: string
   description?: string | null
+  /** AWARDS-LIST-VARIANTS (temporary): a box left of the text (the Awards `?view=icon` logo). */
+  media?: ReactNode
 }) {
-  return (
-    <article className="flex min-w-0 flex-col gap-3 border-t border-border py-6">
+  const content = (
+    <>
       {(meta.length > 0 || status) && (
         <Meta
           items={meta}
@@ -46,6 +50,18 @@ export function ListingRecord({
         )}
       </h3>
       {description && <p className="text-base leading-copy text-pretty text-grey">{description}</p>}
-    </article>
+    </>
   )
+
+  // AWARDS-LIST-VARIANTS (temporary): with media, the text sits in a column beside it.
+  if (media) {
+    return (
+      <article className="flex min-w-0 items-start gap-4 border-t border-border py-6">
+        {media}
+        <div className="flex min-w-0 flex-1 flex-col gap-3">{content}</div>
+      </article>
+    )
+  }
+
+  return <article className="flex min-w-0 flex-col gap-3 border-t border-border py-6">{content}</article>
 }
