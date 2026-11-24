@@ -8,6 +8,8 @@ import { CHEVRON, type Motion } from './motion'
 const VARIANTS = {
   accent: { base: 'text-accent', hover: 'hover:text-accent-hover' },
   default: { base: 'text-foreground', hover: '' },
+  // White on a dark ground (awards programme masthead "View previous year").
+  inverse: { base: 'text-white', hover: '' },
 }
 
 // `shift` (the default): the chevron moves on hover (`motion`), the colour changes unless `hoverColor` is false;
@@ -24,6 +26,8 @@ const HOVERS = {
   static: '',
   // `fade` that keeps its full 44px height in the layout (awards programme "View previous year" beside the button).
   'fade-tall': 'min-h-11 transition-opacity duration-180 ease-out hover:opacity-60',
+  // `fade-tall` to 70% (awards programme masthead "View previous year", white on dark).
+  'dim-tall': 'min-h-11 transition-opacity duration-180 ease-out hover:opacity-70',
 }
 
 // Renders as a span when the whole card is already the link.

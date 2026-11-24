@@ -7,10 +7,12 @@ const TEXT = {
   lg: 'text-title-lg',
 }
 
-// `md` 40 (default); `lg` 56 with the initials 16/16 500 grey on the neutral `surface-thumb` (shared-shell speaker-card).
+// `md` 40 (default); `xl` 80 / 112 from md; `lg` 56 with the initials 16/16 500 grey on the neutral `surface-thumb` (shared-shell speaker-card).
 const SIZES = {
   md: { box: 'size-10', thumb: 'sm', sizes: '40px', initials: 'bg-surface-hover text-accent ring-1 ring-accent-subtle ring-inset' },
   lg: { box: 'size-14', thumb: 'lg', sizes: '56px', initials: 'bg-surface-thumb text-base leading-none text-grey' },
+  // 80 / 112 from md with the initials 24/24 (shared-shell speaker-card biography dialog).
+  xl: { box: 'size-20 md:size-28', thumb: 'xl', sizes: '112px', initials: 'bg-surface-thumb text-2xl leading-none text-grey' },
 } as const
 
 export function initialsOf(name: string): string {

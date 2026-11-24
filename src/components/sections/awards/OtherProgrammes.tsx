@@ -14,13 +14,15 @@ const SPACING = {
  * Other awards programmes (shared-shell other-awards-programme-card): title, then status | place | date, the rows
  * divided by rules. A picked past edition has no status. The heading's tag comes from the CMS; the list shows without
  * it when it is empty. The award category page uses `relaxed`, the awards programme page `default` (as each design).
+ * `emptyText` (opt-in, awards programme page v1.11): with no items, this text (14/19.6 grey) instead of the list.
  */
 export function OtherProgrammes({
   heading,
   items,
   spacing,
+  emptyText,
   className,
-}: AwardCategoryView['otherProgrammes'] & { spacing: keyof typeof SPACING; className?: string }) {
+}: AwardCategoryView['otherProgrammes'] & { spacing: keyof typeof SPACING; emptyText?: string | null; className?: string }) {
   return (
     <section
       aria-labelledby={heading ? 'other-programmes-heading' : undefined}
@@ -31,7 +33,8 @@ export function OtherProgrammes({
           {heading.text}
         </Heading>
       )}
-      <ul className="flex flex-col border-t border-border">
+      {items.length === 0 && emptyText && <p className="text-sm leading-copy text-grey">{emptyText}</p>}
+      <ul className={cx('flex flex-col border-t border-border', items.length === 0 && 'hidden')}>
         {items.map((item) => (
           <li key={item.key} className="border-b border-border last:border-b-0">
             <ListLink

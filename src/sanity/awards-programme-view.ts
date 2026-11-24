@@ -1,32 +1,36 @@
 import { stegaClean, type StegaBranded } from 'next-sanity'
 
+import { toLinkProps } from '@/components/blocks/post-card'
 import type { EmbedConsentCopy } from '@/components/ui/ConsentEmbed.client'
-import { categoryGroupLabel, winnerName } from '@/lib/award-category'
+import { categoryGroupLabel, openProgrammeEditions, winnerName, type OtherProgrammeView } from '@/lib/award-category'
 import type {
   AwardsProgrammeSectionId,
   AwardsProgrammeView,
   JudgesPanelView,
+  SponsorTierView,
   WinnersGroupView,
 } from '@/lib/awards-programme'
 import {
   AWARDS_PROGRAMME_PAGE_COPY_KEYS,
   type AwardsProgrammePageCopy,
   type AwardsProgrammePageCopyKey,
+  type EditionStatusCopy,
 } from '@/lib/awards-programme-copy'
 import { EDITION_STATUS_LABELS, editionStatus } from '@/lib/awards-status'
 import { countryName } from '@/lib/countries'
-import { formatWeekdayDate } from '@/lib/dates'
+import { formatLongDate, formatWeekdayDate } from '@/lib/dates'
 import type { AdUnits } from '@/lib/gam'
 import { acclaimHref, AWARDS_LISTING_PATH, awardCategoryHref, safeHref, sharedRecordHref } from '@/lib/links'
 
-import { toOtherProgrammes, toStatuses } from './award-category-view'
+import { toStatuses } from './award-category-view'
 import { toHeading } from './heading'
 import { toImage } from './image'
-import type { AWARDS_PROGRAMME_PAGE_QUERY_RESULT, AWARDS_PROGRAMME_QUERY_RESULT, OTHER_AWARDS_QUERY_RESULT } from './types'
+import type { AWARDS_PROGRAMME_PAGE_QUERY_RESULT, AWARDS_PROGRAMME_QUERY_RESULT, OPEN_AWARDS_QUERY_RESULT } from './types'
 
 type RecordData = StegaBranded<AWARDS_PROGRAMME_QUERY_RESULT>
 type CopyData = StegaBranded<AWARDS_PROGRAMME_PAGE_QUERY_RESULT>
-type OthersData = StegaBranded<OTHER_AWARDS_QUERY_RESULT>
+type OpenData = StegaBranded<OPEN_AWARDS_QUERY_RESULT>
+type OpenEdition = OpenData[number]
 
 /** The awards edition branch of the /events/{slug} record (AWARDS_PROGRAMME_QUERY). */
 export type EditionData = Extract<NonNullable<RecordData>, { _type: 'awardsProgramme' }>
@@ -44,7 +48,8 @@ function toCopy(copy: NonNullable<CopyData>): AwardsProgrammePageCopy {
 }
 
 /** A Portable Text field with at least one member, else null. */
-const richText = (value: Body | null | undefined) => (value && value.length > 0 ? value : null)
+const richText = <T extends Body | readonly unknown[]>(value: T | null | undefined): T | null =>
+  value && value.length > 0 ? value : null
 
 type TextBlocks = readonly { _type: string; children?: readonly { text?: string | null }[] | null }[]
 
@@ -90,29 +95,27 @@ export function editionDescription(edition: EditionData): string | null {
 }
 
 function toPanels(edition: EditionData): JudgesPanelView[] {
-  const panels = (edition.judgesPanels ?? []).map((panel) => ({
-    key: panel._key,
-    name: panel.name,
-    // A person unpublished or deleted after picking dereferences to null.
-    people: (panel.people ?? []).flatMap((person) =>
-      person?.title
-        ? [
-            {
-              key: person._id,
-              name: person.title,
-              jobTitle: filled(person.jobTitle) ? person.jobTitle : null,
-              company: filled(person.company) ? person.company : null,
-              photo: toImage(person.photo),
-              bio: richText(person.bio),
-            },
-          ]
-        : [],
-    ),
-  }))
-  const shown = panels.filter((panel) => panel.people.length > 0)
-
-  // One panel needs no name above it: the section heading already says what it is.
-  return shown.map((panel) => ({ ...panel, name: shown.length > 1 && filled(panel.name) ? panel.name : null }))
+  return (edition.judgesPanels ?? [])
+    .map((panel) => ({
+      key: panel._key,
+      name: filled(panel.name) ? panel.name : null,
+      // A person unpublished or deleted after picking dereferences to null.
+      people: (panel.people ?? []).flatMap((person) =>
+        person?.title
+          ? [
+              {
+                key: person._id,
+                name: person.title,
+                jobTitle: filled(person.jobTitle) ? person.jobTitle : null,
+                company: filled(person.company) ? person.company : null,
+                photo: toImage(person.photo),
+                bio: richText(person.bio),
+              },
+            ]
+          : [],
+      ),
+    }))
+    .filter((panel) => panel.people.length > 0)
 }
 
 /**
@@ -153,17 +156,74 @@ function toWinnerGroups(edition: EditionData): WinnersGroupView[] {
   return [...groups.values()]
 }
 
-/** The awards programme page as plain props, from the awards edition, its page document and the sidebar fill. */
+/** The sponsor tiers in their stored order; a company unpublished or deleted after picking is dropped, then an empty tier. */
+function toSponsorTiers(edition: EditionData): SponsorTierView[] {
+  return (edition.sponsorTypes ?? [])
+    .map((tier) => ({
+      key: tier._key,
+      name: filled(tier.name) ? tier.name : null,
+      sponsors: (tier.companies ?? []).flatMap((company) =>
+        company?.title ? [{ key: company._id, name: company.title, logo: toImage(company.logo) }] : [],
+      ),
+    }))
+    .filter((tier) => tier.sponsors.length > 0)
+}
+
+/** The questions with both a question and an answer, in order. */
+function toFaq(edition: EditionData) {
+  return (edition.faq ?? []).flatMap((item) => {
+    const answer = richText(item.answer)
+
+    return filled(item.question) && answer ? [{ key: item._key, question: item.question, answer }] : []
+  })
+}
+
+/**
+ * One row of "Other awards programmes": title, then "{status} | {deadline label} {date}". The status is the CMS label
+ * of the edition's status, drawn in the accent as the design's submissions-open row.
+ */
+function toOpenProgramme(
+  edition: OpenEdition,
+  title: string,
+  statuses: EditionStatusCopy,
+  deadlineLabel: string,
+  today: string,
+): OtherProgrammeView {
+  const status = editionStatus(
+    {
+      nominationsOpeningDate: stegaClean(edition.nominationsOpeningDate),
+      nominationsClosingDate: stegaClean(edition.nominationsClosingDate),
+      startDate: stegaClean(edition.startDate),
+      hasWinners: false,
+    },
+    today,
+  )
+  const deadline = formatLongDate(stegaClean(edition.nominationsClosingDate))
+
+  return {
+    key: edition._id,
+    title,
+    href: sharedRecordHref('awardsProgramme', edition.slug, 'clearview'),
+    status: status ? statuses[EDITION_STATUS_LABELS[status]] || null : null,
+    highlight: true,
+    meta: deadline ? [`${deadlineLabel} ${deadline}`] : [],
+  }
+}
+
+/**
+ * The awards programme page as plain props (design v1.10), from the awards edition, its page document and the open
+ * programmes fill. Every section without content is null, which hides it and its navigation link.
+ */
 export function toAwardsProgrammeView({
   edition,
-  others,
+  open,
   copy: rawCopy,
   ads,
   today,
   embedConsent,
 }: {
   edition: EditionData
-  others: OthersData
+  open: OpenData
   copy: NonNullable<CopyData>
   ads: AdUnits
   today: string
@@ -172,24 +232,37 @@ export function toAwardsProgrammeView({
   const copy = toCopy(rawCopy)
   const statuses = toStatuses(rawCopy)
   const winnerGroups = toWinnerGroups(edition)
-  const winnersTotal = winnerGroups.reduce((total, group) => total + group.winners.length, 0)
   const status = editionStatus(
     {
       nominationsOpeningDate: stegaClean(edition.nominationsOpeningDate),
       nominationsClosingDate: stegaClean(edition.nominationsClosingDate),
       startDate: stegaClean(edition.startDate),
-      hasWinners: winnersTotal > 0,
+      hasWinners: winnerGroups.length > 0,
     },
     today,
   )
+  // Nominations are open (or about to open) while the closing date is today or later.
+  const nominationsOpen = status === 'submissionsOpen' || status === 'launchingSoon'
+  const statusLabel = status ? statuses[EDITION_STATUS_LABELS[status]] || null : null
+  const year = stegaClean(edition.startDate)?.slice(0, 4)
   const previousHref = edition.programme ? sharedRecordHref('awardsProgramme', edition.previous?.slug, 'clearview') : null
   const registerHref = safeHref(edition.registerButtonLink)
   const videoId = stegaClean(edition.highlightsVideoId)?.trim()
-  const marketingKitHref = acclaimHref(edition.acclaimSlug, 'clearview')
+  const acclaimLink = acclaimHref(edition.acclaimSlug, 'clearview')
   const body = richText(edition.body)
-  const logo = toImage(edition.logo)
   const panels = toPanels(edition)
-  const categories = (edition.entryCategories ?? []).filter(filled)
+  const sponsorTiers = toSponsorTiers(edition)
+  const faq = toFaq(edition)
+  const steps = (edition.registrationSteps ?? []).flatMap((step) => {
+    const text = richText(step.text)
+
+    return text ? [{ key: step._key, text }] : []
+  })
+  const openItems = openProgrammeEditions(rawCopy.otherProgrammes, open, {
+    today,
+    excludeEdition: edition._id,
+    clean: stegaClean,
+  }).map(({ edition: item, title }) => toOpenProgramme(item, title, statuses, copy.deadlineLabel, today))
 
   const view: Omit<AwardsProgrammeView, 'nav'> = {
     title: edition.title ?? '',
@@ -199,68 +272,83 @@ export function toAwardsProgrammeView({
       { label: edition.title ?? '' },
     ],
     standfirst: filled(edition.standfirst) ? edition.standfirst : null,
-    status: status ? { label: statuses[EDITION_STATUS_LABELS[status]], highlight: status === 'submissionsOpen' } : null,
+    logo: toImage(edition.logo),
+    status: statusLabel,
     date: stegaClean(edition.hideDateTime) ? null : formatWeekdayDate(stegaClean(edition.startDate), stegaClean(edition.endDate)),
     venue: filled(edition.venue) ? edition.venue : null,
     country: countryName(stegaClean(edition.country)),
     register: registerHref ? { label: copy.registerLabel, href: registerHref } : null,
+    sponsor: toLinkProps(rawCopy.sponsorLink, 'clearview'),
     previousYear: previousHref ? { label: copy.previousYearLabel, href: previousHref } : null,
-    overview: body || logo ? { heading: toHeading(rawCopy.overviewHeading), body, logo } : null,
+    overview: body ? { heading: toHeading(rawCopy.overviewHeading), body } : null,
     // The schema allows digits only; checked again because the Content API accepts writes that never ran validation.
     video:
       videoId && /^\d+$/.test(videoId)
         ? {
             heading: toHeading(rawCopy.videoHeading),
+            dialogTitle: copy.videoDialogTitle,
             description: filled(edition.highlightVideoDescription) ? edition.highlightVideoDescription : null,
             playerSrc: `https://player.vimeo.com/video/${videoId}`,
             consent: embedConsent,
             thumbnail: toImage(edition.highlightVideoThumbnail),
           }
         : null,
-    judges:
-      panels.length > 0
+    registration:
+      steps.length > 0
         ? {
-            heading: toHeading(rawCopy.judgesHeading),
-            intro: richText(edition.judgesIntro),
-            panels,
-            viewBiographyLabel: copy.viewBiographyLabel,
-            hideBiographyLabel: copy.hideBiographyLabel,
+            heading: toHeading(rawCopy.categoriesHeading),
+            // The year is the ceremony's (start date); the label after it comes from the CMS.
+            badge: nominationsOpen
+              ? statusLabel
+              : [year, copy.registrationClosedLabel].filter(Boolean).join(' ') || null,
+            intro: nominationsOpen ? copy.registrationOpenIntro : copy.registrationClosedIntro,
+            faqLink: faq.length > 0 ? copy.registrationFaqLinkLabel : null,
+            steps,
           }
         : null,
+    sponsors: sponsorTiers.length > 0 ? { heading: toHeading(rawCopy.sponsorsHeading), tiers: sponsorTiers } : null,
+    judges:
+      panels.length > 0 ? { heading: toHeading(rawCopy.judgesHeading), intro: richText(edition.judgesIntro), panels } : null,
     winners:
-      winnersTotal > 0
+      winnerGroups.length > 0
         ? {
             heading: toHeading(rawCopy.winnersHeading),
             previousYear: previousHref ? { label: copy.previousYearWinnersLabel, href: `${previousHref}#winners` } : null,
-            allLabel: copy.allCategoriesLabel,
-            total: winnersTotal,
             groups: winnerGroups,
           }
         : null,
-    categories: categories.length > 0 ? { heading: toHeading(rawCopy.categoriesHeading), items: categories } : null,
-    marketingKit: marketingKitHref
+    acclaim: acclaimLink
       ? {
           heading: toHeading(rawCopy.marketingKitHeading),
           text: copy.marketingKitText,
-          link: { label: copy.acclaimLinkLabel, href: marketingKitHref },
+          link: { label: copy.acclaimLinkLabel, href: acclaimLink },
         }
       : null,
-    otherProgrammes: {
+    faq: faq.length > 0 ? { heading: toHeading(rawCopy.faqHeading), items: faq } : null,
+    openProgrammes: {
+      allAwards: toLinkProps(rawCopy.allAwardsLink, 'clearview'),
       heading: toHeading(rawCopy.otherProgrammesHeading),
-      // An edition without a programme stands for itself, as otherProgrammeEditions keys it by its own id.
-      items: toOtherProgrammes(rawCopy.otherProgrammes, others, edition.programme?._id ?? edition._id, statuses, today),
+      items: openItems,
+      emptyText: copy.openProgrammesEmptyText,
     },
     ads: { top: ads.top, side: ads.side },
   }
 
-  // One link per section that has content, in page order.
+  // One link per section that has content and a label, in page order. A section whose label is empty still renders,
+  // without a link: an empty link would be a focusable stop with no name.
   const sections: [AwardsProgrammeSectionId, unknown, AwardsProgrammePageCopyKey][] = [
     ['overview', view.overview, 'navOverviewLabel'],
+    ['highlight-video', view.video, 'navVideoLabel'],
+    ['categories-and-registration', view.registration, 'navCategoriesLabel'],
+    ['sponsors', view.sponsors, 'navSponsorsLabel'],
     ['judging-panel', view.judges, 'navJudgesLabel'],
     ['winners', view.winners, 'navWinnersLabel'],
-    ['categories', view.categories, 'navCategoriesLabel'],
-    ['marketing-kit', view.marketingKit, 'navMarketingKitLabel'],
+    ['acclaim', view.acclaim, 'navMarketingKitLabel'],
+    ['faq', view.faq, 'navFaqLabel'],
   ]
 
-  return { ...view, nav: sections.flatMap(([id, section, label]) => (section ? [{ id, label: copy[label] }] : [])) }
+  return {
+    ...view,
+    nav: sections.flatMap(([id, section, label]) => (section && filled(copy[label]) ? [{ id, label: copy[label] }] : [])),
+  }
 }

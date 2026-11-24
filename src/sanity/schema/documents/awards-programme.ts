@@ -2,6 +2,7 @@ import { StarIcon } from '@sanity/icons/Star'
 import { defineArrayMember, defineField, defineType } from 'sanity'
 
 import { EVENT_COUNTRIES, altField, isUniqueEventSlug, legacyWpIdField, timeField } from '../fields'
+import { paragraphsBlock, paragraphsWithListsBlock } from '../objects/rich-text'
 
 /**
  * One yearly edition of an awards programme, for example "The Twelfth
@@ -30,10 +31,10 @@ export const awardsProgramme = defineType({
     { name: 'schedule', title: 'Date and time' },
     { name: 'judges', title: 'Judges' },
     { name: 'nominations', title: 'Nominations and winners' },
-    // Legacy WordPress fields only, all hidden: tab hidden in the Studio. Remove before launch if unused.
-    { name: 'sponsors', title: 'Sponsors', hidden: true },
+    { name: 'sponsors', title: 'Sponsors' },
     { name: 'media', title: 'Media' },
     { name: 'registration', title: 'Registration' },
+    { name: 'faq', title: 'FAQ' },
     // Legacy WordPress fields only, all hidden: tab hidden in the Studio. Remove before launch if unused.
     { name: 'extra', title: 'Extra tabs', hidden: true },
   ],
@@ -61,6 +62,7 @@ export const awardsProgramme = defineType({
       to: [{ type: 'awardsProgrammeGroup' }],
       group: 'details',
       description: 'The evergreen programme this edition belongs to.',
+      validation: (Rule) => Rule.required(),
     }),
     defineField({
       name: 'standfirst',
@@ -209,28 +211,11 @@ export const awardsProgramme = defineType({
       title: 'Categories and entry process',
       type: 'richText',
       group: 'nominations',
-      // Legacy WordPress field, not in the new design: hidden in the Studio, data kept. Remove before launch if unused.
+      // Legacy WordPress field, not in the new design: hidden in the Studio, data kept. A later script moves the
+      // entry steps of 12 editions into `registrationSteps`. Remove before launch if unused.
       hidden: true,
       description:
         'The prose "Categories" tab from the source. The typed categories are the Winners rows below.',
-    }),
-    defineField({
-      name: 'entryCategories',
-      title: 'Categories',
-      type: 'array',
-      group: 'nominations',
-      description:
-        'Optional. Entry areas shown as tags in the Categories section of the page, in this order, for example Private Banking, Technology. Any number. The section is hidden when empty.',
-      of: [
-        defineArrayMember({
-          type: 'string',
-          validation: (Rule) =>
-            Rule.required().custom((value: string | undefined) =>
-              value === undefined || value.trim() !== '' ? true : 'Type a category or remove the empty one',
-            ),
-        }),
-      ],
-      validation: (Rule) => Rule.unique(),
     }),
     defineField({
       name: 'winners',
@@ -285,12 +270,12 @@ export const awardsProgramme = defineType({
 
     defineField({
       name: 'sponsorTypes',
-      title: 'Sponsor tiers',
+      title: 'Sponsors',
       type: 'array',
       group: 'sponsors',
-      // Legacy WordPress field, not in the new design: hidden in the Studio, data kept. Remove before launch if unused.
-      hidden: true,
-      of: [defineArrayMember({ type: 'companyGroup' })],
+      description:
+        'Optional. Sponsors grouped by tier, for example "Headline Sponsor", in the order shown on the page. Each tier lists its companies in order; the logo comes from the company. The section is hidden when empty.',
+      of: [defineArrayMember({ type: 'companyGroup', title: 'Sponsor tier' })],
     }),
     defineField({
       name: 'sponsorBenefits',
@@ -386,6 +371,40 @@ export const awardsProgramme = defineType({
       validation: (Rule) => Rule.uri({ scheme: ['http', 'https'] }),
     }),
     defineField({
+      name: 'registrationSteps',
+      title: 'Registration steps',
+      type: 'array',
+      group: 'registration',
+      description:
+        'Optional. The numbered steps in the Categories and Registration section, in this order. The section is hidden when there are none.',
+      of: [
+        defineArrayMember({
+          type: 'object',
+          name: 'registrationStep',
+          title: 'Step',
+          fields: [
+            defineField({
+              name: 'text',
+              title: 'Text',
+              type: 'array',
+              description:
+                'The page numbers the steps. Start with the lead-in and bold it if you like, for example "Check eligibility." Then any text: paragraphs, lists, links, bold and italic.',
+              of: [paragraphsWithListsBlock],
+              validation: (Rule) => Rule.required(),
+            }),
+          ],
+          preview: {
+            select: { text: 'text' },
+            prepare({ text }: { text?: { children?: { text?: string }[] }[] }) {
+              const first = (text?.[0]?.children ?? []).map((span) => span.text ?? '').join('').split('\n')[0].trim()
+
+              return { title: first || 'Empty step' }
+            },
+          },
+        }),
+      ],
+    }),
+    defineField({
       name: 'register',
       title: 'Registration details',
       type: 'richText',
@@ -395,11 +414,47 @@ export const awardsProgramme = defineType({
     }),
 
     defineField({
-      name: 'faqs',
+      name: 'faq',
       title: 'Frequently asked questions',
+      type: 'array',
+      group: 'faq',
+      description: 'Optional. Questions and answers in the FAQ section, in this order. The section is hidden when empty.',
+      of: [
+        defineArrayMember({
+          type: 'object',
+          name: 'faqItem',
+          title: 'Question',
+          fields: [
+            defineField({
+              name: 'question',
+              title: 'Question',
+              type: 'string',
+              validation: (Rule) => Rule.required(),
+            }),
+            defineField({
+              name: 'answer',
+              title: 'Answer',
+              type: 'array',
+              description: 'Bold, italic and links only.',
+              of: [paragraphsBlock],
+              validation: (Rule) => Rule.required(),
+            }),
+          ],
+          preview: {
+            select: { title: 'question' },
+            prepare({ title }: { title?: string }) {
+              return { title: title || 'Untitled question' }
+            },
+          },
+        }),
+      ],
+    }),
+    defineField({
+      name: 'faqs',
+      title: 'Frequently asked questions (old)',
       type: 'richText',
       group: 'extra',
-      // Legacy WordPress field, not in the new design: hidden in the Studio, data kept. Remove before launch if unused.
+      // Legacy WordPress prose (Q) and A) paragraphs): a later script splits it into `faq`, then the field goes.
       hidden: true,
     }),
     defineField({

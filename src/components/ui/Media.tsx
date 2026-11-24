@@ -29,6 +29,8 @@ const THUMBS = {
   md: 'size-16 md:size-20',
   // 56px round portrait (Avatar size="lg": speaker card)
   lg: 'size-14',
+  // 80 / 112 from md round portrait (Avatar size="xl": judge biography dialog)
+  xl: 'size-20 md:size-28',
   report: 'h-10 w-7',
 }
 

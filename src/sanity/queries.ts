@@ -10,6 +10,7 @@ import {
   LINK,
   LINK_TARGET,
   LISTING_CARD,
+  OPEN_AWARDS_FILL,
   OTHER_AWARDS_EDITION,
   OTHER_AWARDS_FILL,
   RELATED_EVENT,
@@ -500,6 +501,10 @@ export const AWARD_CATEGORY_QUERY = defineQuery(`
 // The award category page's sidebar: OTHER_AWARDS_FILL (fragments.ts), shared with the Studio panel.
 export const OTHER_AWARDS_QUERY = defineQuery(`${OTHER_AWARDS_FILL}`)
 
+// The awards programme page's "Open awards programmes": OPEN_AWARDS_FILL (fragments.ts), shared with the Studio panel.
+// `$editionId` is the page's own edition, `$today` the UK date.
+export const OPEN_AWARDS_QUERY = defineQuery(`${OPEN_AWARDS_FILL}`)
+
 // The award category page labels and the editor's sidebar picks (`$id` is AWARD_CATEGORY_PAGE_ID), one cached result
 // for every category page. A pick whose edition is unpublished or deleted dereferences to a null edition and is dropped
 // by the adapter. The sidebar's status labels are shared with the awards programme page and come from its document
@@ -574,7 +579,13 @@ export const AWARDS_PROGRAMME_QUERY = defineQuery(`
         displayName,
         "company": company->{ title, "logo": logo{ ${IMAGE} } }
       },
-      entryCategories,
+      registrationSteps[]{ _key, text[]{ ${ARTICLE_BODY} } },
+      sponsorTypes[]{
+        _key,
+        name,
+        "companies": companies[]->{ _id, title, "logo": logo{ ${IMAGE} } }
+      },
+      faq[]{ _key, question, answer[]{ ${ARTICLE_BODY} } },
       "acclaimSlug": acclaim->slug.current,
       "previous": *[
         _type == "awardsProgramme"
@@ -636,7 +647,7 @@ export const AWARDS_PROGRAMME_QUERY = defineQuery(`
   }
 `)
 
-// The awards programme page labels, headings and the editor's sidebar picks (`$id` is AWARDS_PROGRAMME_PAGE_ID), one
+// The awards programme page labels, headings and the editor's pinned open programmes (`$id` is AWARDS_PROGRAMME_PAGE_ID), one
 // cached result for every edition page. Picks as on the award category page (AWARD_CATEGORY_PAGE_QUERY). The page
 // 404s until the document is published.
 export const AWARDS_PROGRAMME_PAGE_QUERY = defineQuery(`
@@ -646,18 +657,27 @@ export const AWARDS_PROGRAMME_PAGE_QUERY = defineQuery(`
     registerLabel,
     previousYearLabel,
     previousYearWinnersLabel,
-    allCategoriesLabel,
-    viewBiographyLabel,
-    hideBiographyLabel,
     marketingKitText,
     acclaimLinkLabel,
     videoConsentText,
     videoConsentButton,
+    videoDialogTitle,
+    registrationOpenIntro,
+    registrationClosedLabel,
+    registrationClosedIntro,
+    registrationFaqLinkLabel,
+    openProgrammesEmptyText,
+    deadlineLabel,
     navOverviewLabel,
+    navVideoLabel,
+    navCategoriesLabel,
+    navSponsorsLabel,
     navJudgesLabel,
     navWinnersLabel,
-    navCategoriesLabel,
     navMarketingKitLabel,
+    navFaqLabel,
+    sponsorLink{ ${LINK} },
+    allAwardsLink{ ${LINK} },
     launchingSoonLabel,
     submissionsOpenLabel,
     ceremonyDueLabel,
@@ -667,7 +687,9 @@ export const AWARDS_PROGRAMME_PAGE_QUERY = defineQuery(`
     judgesHeading[]{ _key, style, children[]{ _key, text } },
     winnersHeading[]{ _key, style, children[]{ _key, text } },
     categoriesHeading[]{ _key, style, children[]{ _key, text } },
+    sponsorsHeading[]{ _key, style, children[]{ _key, text } },
     marketingKitHeading[]{ _key, style, children[]{ _key, text } },
+    faqHeading[]{ _key, style, children[]{ _key, text } },
     otherProgrammesHeading[]{ _key, style, children[]{ _key, text } },
     "otherProgrammes": otherProgrammes[]{ _key, title, "edition": edition->{ ${OTHER_AWARDS_EDITION} } }
   }

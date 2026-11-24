@@ -5,11 +5,21 @@ import type { EmbedConsentCopy } from '@/components/ui/ConsentEmbed.client'
 import type { MediaImage } from '@/components/ui/Media'
 
 import type { OtherProgrammeView } from './award-category'
+
 import type { AdUnits } from './gam'
 import type { HeadingLevel } from './headings'
 
-/** The in-page sections the sticky navigation links to, by their anchor ids. */
-export const AWARDS_PROGRAMME_SECTIONS = ['overview', 'judging-panel', 'winners', 'categories', 'marketing-kit'] as const
+/** The in-page sections the sticky navigation links to, by their anchor ids, in page order (design v1.10). */
+export const AWARDS_PROGRAMME_SECTIONS = [
+  'overview',
+  'highlight-video',
+  'categories-and-registration',
+  'sponsors',
+  'judging-panel',
+  'winners',
+  'acclaim',
+  'faq',
+] as const
 
 export type AwardsProgrammeSectionId = (typeof AWARDS_PROGRAMME_SECTIONS)[number]
 
@@ -32,10 +42,17 @@ export type JudgeView = {
 
 export type JudgesPanelView = {
   key: string
-  /** Shown only when the edition has more than one panel. */
+  /** The panel name above its judges; null when the panel has none. */
   name: string | null
   people: JudgeView[]
 }
+
+export type SponsorView = { key: string; name: string; logo: MediaImage | null }
+
+/** One sponsor tier (a companyGroup of `sponsorTypes`): its name above its logos. */
+export type SponsorTierView = { key: string; name: string | null; sponsors: SponsorView[] }
+
+export type FaqItemView = { key: string; question: string; answer: RichTextValue }
 
 export type ProgrammeWinnerView = {
   key: string
@@ -51,7 +68,7 @@ export type ProgrammeWinnerView = {
 
 export type WinnersGroupView = {
   key: string
-  /** Anchor id of the group, the target of its filter. */
+  /** Anchor id of the group, which its heading labels. */
   id: string
   /** The category group as shown (categoryGroupLabel); null for rows without one. */
   label: string | null
@@ -62,19 +79,25 @@ export type AwardsProgrammeView = {
   title: string
   breadcrumb: BreadcrumbItem[]
   standfirst: string | null
+  /** The edition logo, in the masthead; null without one. */
+  logo: MediaImage | null
   /** The edition status (editionStatus); null for a past edition without winners. */
-  status: { label: string; highlight: boolean } | null
+  status: string | null
   /** The date range; null when the edition hides it. */
   date: string | null
   venue: string | null
   country: string | null
   register: LinkView | null
+  /** "Become a Sponsoring Partner": the page document's link, null when it does not resolve. */
+  sponsor: LinkView | null
   /** The programme's previous edition; null without a programme or an earlier edition. */
   previousYear: LinkView | null
   nav: { id: AwardsProgrammeSectionId; label: string }[]
-  overview: { heading: HeadingView; body: RichTextValue | null; logo: MediaImage | null } | null
+  overview: { heading: HeadingView; body: RichTextValue } | null
   video: {
     heading: HeadingView
+    /** The title above the player in the lightbox. */
+    dialogTitle: string
     description: string | null
     /** The Vimeo player, shown in the lightbox once the reader allows functional cookies. */
     playerSrc: string
@@ -82,22 +105,29 @@ export type AwardsProgrammeView = {
     consent: EmbedConsentCopy
     thumbnail: MediaImage | null
   } | null
-  judges: {
+  registration: {
     heading: HeadingView
-    intro: RichTextValue | null
-    panels: JudgesPanelView[]
-    viewBiographyLabel: string
-    hideBiographyLabel: string
+    /** "2026 nominations closed" once nominations have closed, else the open status ("Submissions open"). */
+    badge: string | null
+    intro: string
+    /** "Read the FAQ", to the FAQ section; null when the edition has no FAQ. */
+    faqLink: string | null
+    steps: { key: string; text: RichTextValue }[]
   } | null
-  winners: {
+  sponsors: { heading: HeadingView; tiers: SponsorTierView[] } | null
+  judges: { heading: HeadingView; intro: RichTextValue | null; panels: JudgesPanelView[] } | null
+  winners: { heading: HeadingView; previousYear: LinkView | null; groups: WinnersGroupView[] } | null
+  acclaim: { heading: HeadingView; text: string; link: LinkView } | null
+  faq: { heading: HeadingView; items: FaqItemView[] } | null
+  /**
+   * The right rail's "Other awards programmes" (design v1.11): every open edition, the editor's pins first; the
+   * "View all awards" link above it (null when the link does not resolve) and the text shown when nothing is open.
+   */
+  openProgrammes: {
+    allAwards: LinkView | null
     heading: HeadingView
-    previousYear: LinkView | null
-    allLabel: string
-    total: number
-    groups: WinnersGroupView[]
-  } | null
-  categories: { heading: HeadingView; items: string[] } | null
-  marketingKit: { heading: HeadingView; text: string; link: LinkView } | null
-  otherProgrammes: { heading: HeadingView; items: OtherProgrammeView[] }
+    items: OtherProgrammeView[]
+    emptyText: string
+  }
   ads: Pick<AdUnits, 'top' | 'side'>
 }

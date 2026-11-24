@@ -20,6 +20,8 @@ const VARIANTS = {
   none: '',
   // White round icon on a dark overlay, white/12 tint on hover (awards programme video lightbox close).
   inverse: 'rounded-full text-white hover:bg-white/12',
+  // Round, white over content, `surface-thumb` on hover (judge biography dialog close).
+  'surface-round': 'rounded-full bg-white text-foreground hover:bg-surface-thumb',
 }
 
 export function IconButton({

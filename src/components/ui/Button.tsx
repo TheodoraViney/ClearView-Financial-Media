@@ -21,6 +21,10 @@ const VARIANTS = {
   'outline-accent-tint': 'bg-white inset-ring inset-ring-accent text-accent hover:bg-surface-hover',
   // Thin neutral ring, accent ring and label on hover (article Share and Copy link).
   subtle: 'bg-white inset-ring inset-ring-border text-foreground hover:inset-ring-accent hover:text-accent',
+  // primary-button `filled-light`: white with a dark label, `border` grey on hover (awards programme masthead).
+  'filled-light': 'bg-white text-foreground hover:bg-border',
+  // primary-button `outline-on-dark`: white ring and label, white/10 on hover (awards programme masthead).
+  'outline-on-dark': 'inset-ring inset-ring-white text-white hover:bg-white/10',
 }
 
 // 44px is the minimum touch target; the stacked newsletter button is 48px.

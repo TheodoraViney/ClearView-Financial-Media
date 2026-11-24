@@ -1960,6 +1960,18 @@ export type AwardsProgrammePage = {
   breadcrumbHomeLabel?: string;
   breadcrumbAwardsLabel?: string;
   registerLabel?: string;
+  sponsorLink?: {
+    kind?: "internal" | "external" | "hub";
+    internal?:
+      | PageReference
+      | PostReference
+      | ConferenceEventReference
+      | AwardsProgrammeReference
+      | ResourceReference;
+    external?: string;
+    hub?: "awards" | "events" | "research";
+    label?: string;
+  };
   previousYearLabel?: string;
   previousYearWinnersLabel?: string;
   overviewHeading?: Array<{
@@ -1990,6 +2002,39 @@ export type AwardsProgrammePage = {
     _type: "block";
     _key: string;
   }>;
+  videoDialogTitle?: string;
+  categoriesHeading?: Array<{
+    children?: Array<{
+      marks?: Array<string>;
+      text?: string;
+      _type: "span";
+      _key: string;
+    }>;
+    style?: "normal" | "h1" | "h2" | "h3" | "h4" | "h5" | "h6";
+    listItem?: never;
+    markDefs?: null;
+    level?: number;
+    _type: "block";
+    _key: string;
+  }>;
+  registrationOpenIntro?: string;
+  registrationClosedLabel?: string;
+  registrationClosedIntro?: string;
+  registrationFaqLinkLabel?: string;
+  sponsorsHeading?: Array<{
+    children?: Array<{
+      marks?: Array<string>;
+      text?: string;
+      _type: "span";
+      _key: string;
+    }>;
+    style?: "normal" | "h1" | "h2" | "h3" | "h4" | "h5" | "h6";
+    listItem?: never;
+    markDefs?: null;
+    level?: number;
+    _type: "block";
+    _key: string;
+  }>;
   judgesHeading?: Array<{
     children?: Array<{
       marks?: Array<string>;
@@ -2004,24 +2049,7 @@ export type AwardsProgrammePage = {
     _type: "block";
     _key: string;
   }>;
-  viewBiographyLabel?: string;
-  hideBiographyLabel?: string;
   winnersHeading?: Array<{
-    children?: Array<{
-      marks?: Array<string>;
-      text?: string;
-      _type: "span";
-      _key: string;
-    }>;
-    style?: "normal" | "h1" | "h2" | "h3" | "h4" | "h5" | "h6";
-    listItem?: never;
-    markDefs?: null;
-    level?: number;
-    _type: "block";
-    _key: string;
-  }>;
-  allCategoriesLabel?: string;
-  categoriesHeading?: Array<{
     children?: Array<{
       marks?: Array<string>;
       text?: string;
@@ -2053,11 +2081,28 @@ export type AwardsProgrammePage = {
   acclaimLinkLabel?: string;
   videoConsentText?: string;
   videoConsentButton?: string;
+  faqHeading?: Array<{
+    children?: Array<{
+      marks?: Array<string>;
+      text?: string;
+      _type: "span";
+      _key: string;
+    }>;
+    style?: "normal" | "h1" | "h2" | "h3" | "h4" | "h5" | "h6";
+    listItem?: never;
+    markDefs?: null;
+    level?: number;
+    _type: "block";
+    _key: string;
+  }>;
   navOverviewLabel?: string;
+  navVideoLabel?: string;
+  navCategoriesLabel?: string;
+  navSponsorsLabel?: string;
   navJudgesLabel?: string;
   navWinnersLabel?: string;
-  navCategoriesLabel?: string;
   navMarketingKitLabel?: string;
+  navFaqLabel?: string;
   otherProgrammesHeading?: Array<{
     children?: Array<{
       marks?: Array<string>;
@@ -2072,6 +2117,20 @@ export type AwardsProgrammePage = {
     _type: "block";
     _key: string;
   }>;
+  allAwardsLink?: {
+    kind?: "internal" | "external" | "hub";
+    internal?:
+      | PageReference
+      | PostReference
+      | ConferenceEventReference
+      | AwardsProgrammeReference
+      | ResourceReference;
+    external?: string;
+    hub?: "awards" | "events" | "research";
+    label?: string;
+  };
+  openProgrammesEmptyText?: string;
+  deadlineLabel?: string;
   otherProgrammes?: Array<{
     edition?: AwardsProgrammeReference;
     title?: string;
@@ -3140,7 +3199,6 @@ export type AwardsProgramme = {
   nominationsClosingDate?: string;
   winnersAnnouncementDate?: string;
   categoriesContent?: RichText;
-  entryCategories?: Array<string>;
   winners?: Array<
     {
       _key: string;
@@ -3184,7 +3242,54 @@ export type AwardsProgramme = {
     _key: string;
   }>;
   registerButtonLink?: string;
+  registrationSteps?: Array<{
+    text?: Array<{
+      children?: Array<{
+        marks?: Array<string>;
+        text?: string;
+        _type: "span";
+        _key: string;
+      }>;
+      style?: "normal";
+      listItem?: "bullet" | "number";
+      markDefs?: Array<{
+        href?: string;
+        openInNewTab?: boolean;
+        _type: "link";
+        _key: string;
+      }>;
+      level?: number;
+      _type: "block";
+      _key: string;
+    }>;
+    _type: "registrationStep";
+    _key: string;
+  }>;
   register?: RichText;
+  faq?: Array<{
+    question?: string;
+    answer?: Array<{
+      children?: Array<{
+        marks?: Array<string>;
+        text?: string;
+        _type: "span";
+        _key: string;
+      }>;
+      style?: "normal";
+      listItem?: never;
+      markDefs?: Array<{
+        href?: string;
+        openInNewTab?: boolean;
+        _type: "link";
+        _key: string;
+      }>;
+      level?: number;
+      _type: "block";
+      _key: string;
+    }>;
+    _type: "faqItem";
+    _key: string;
+  }>;
   faqs?: RichText;
   customTabs?: Array<
     {
@@ -33254,6 +33359,272 @@ export type OTHER_AWARDS_QUERY_RESULT = Array<{
 }>;
 
 // Source: src/sanity/queries.ts
+// Variable: OPEN_AWARDS_QUERY
+// Query: *[    _type == "awardsProgramme"    && defined(slug.current)    && nominationsClosingDate >= $today    && _id != $editionId  ] | order(nominationsClosingDate asc){   _id, title, "slug": slug.current, "programmeId": programme._ref,  startDate, endDate, hideDateTime, country, nominationsOpeningDate, nominationsClosingDate }
+export type OPEN_AWARDS_QUERY_RESULT = Array<{
+  _id: string;
+  title: string | null;
+  slug: string | null;
+  programmeId: string | null;
+  startDate: string | null;
+  endDate: string | null;
+  hideDateTime: boolean | null;
+  country:
+    | "AD"
+    | "AE"
+    | "AF"
+    | "AG"
+    | "AI"
+    | "AL"
+    | "AM"
+    | "AO"
+    | "AQ"
+    | "AR"
+    | "AS"
+    | "AT"
+    | "AU"
+    | "AW"
+    | "AX"
+    | "AZ"
+    | "BA"
+    | "BB"
+    | "BD"
+    | "BE"
+    | "BF"
+    | "BG"
+    | "BH"
+    | "BI"
+    | "BJ"
+    | "BL"
+    | "BM"
+    | "BN"
+    | "BO"
+    | "BQ"
+    | "BR"
+    | "BS"
+    | "BT"
+    | "BV"
+    | "BW"
+    | "BY"
+    | "BZ"
+    | "CA"
+    | "CC"
+    | "CD"
+    | "CF"
+    | "CG"
+    | "CH"
+    | "CI"
+    | "CK"
+    | "CL"
+    | "CM"
+    | "CN"
+    | "CO"
+    | "CR"
+    | "CU"
+    | "CV"
+    | "CW"
+    | "CX"
+    | "CY"
+    | "CZ"
+    | "DE"
+    | "DJ"
+    | "DK"
+    | "DM"
+    | "DO"
+    | "DZ"
+    | "EC"
+    | "EE"
+    | "EG"
+    | "EH"
+    | "ER"
+    | "ES"
+    | "ET"
+    | "FI"
+    | "FJ"
+    | "FK"
+    | "FM"
+    | "FO"
+    | "FR"
+    | "GA"
+    | "GB"
+    | "GD"
+    | "GE"
+    | "GF"
+    | "GG"
+    | "GH"
+    | "GI"
+    | "GL"
+    | "GM"
+    | "GN"
+    | "GP"
+    | "GQ"
+    | "GR"
+    | "GS"
+    | "GT"
+    | "GU"
+    | "GW"
+    | "GY"
+    | "HK"
+    | "HM"
+    | "HN"
+    | "HR"
+    | "HT"
+    | "HU"
+    | "ID"
+    | "IE"
+    | "IL"
+    | "IM"
+    | "IN"
+    | "IO"
+    | "IQ"
+    | "IR"
+    | "IS"
+    | "IT"
+    | "JE"
+    | "JM"
+    | "JO"
+    | "JP"
+    | "KE"
+    | "KG"
+    | "KH"
+    | "KI"
+    | "KM"
+    | "KN"
+    | "KP"
+    | "KR"
+    | "KW"
+    | "KY"
+    | "KZ"
+    | "LA"
+    | "LB"
+    | "LC"
+    | "LI"
+    | "LK"
+    | "LR"
+    | "LS"
+    | "LT"
+    | "LU"
+    | "LV"
+    | "LY"
+    | "MA"
+    | "MC"
+    | "MD"
+    | "ME"
+    | "MF"
+    | "MG"
+    | "MH"
+    | "MK"
+    | "ML"
+    | "MM"
+    | "MN"
+    | "MO"
+    | "MP"
+    | "MQ"
+    | "MR"
+    | "MS"
+    | "MT"
+    | "MU"
+    | "MV"
+    | "MW"
+    | "MX"
+    | "MY"
+    | "MZ"
+    | "NA"
+    | "NC"
+    | "NE"
+    | "NF"
+    | "NG"
+    | "NI"
+    | "NL"
+    | "NO"
+    | "NP"
+    | "NR"
+    | "NU"
+    | "NZ"
+    | "OM"
+    | "PA"
+    | "PE"
+    | "PF"
+    | "PG"
+    | "PH"
+    | "PK"
+    | "PL"
+    | "PM"
+    | "PN"
+    | "PR"
+    | "PS"
+    | "PT"
+    | "PW"
+    | "PY"
+    | "QA"
+    | "RE"
+    | "RO"
+    | "RS"
+    | "RU"
+    | "RW"
+    | "SA"
+    | "SB"
+    | "SC"
+    | "SD"
+    | "SE"
+    | "SG"
+    | "SH"
+    | "SI"
+    | "SJ"
+    | "SK"
+    | "SL"
+    | "SM"
+    | "SN"
+    | "SO"
+    | "SR"
+    | "SS"
+    | "ST"
+    | "SV"
+    | "SX"
+    | "SY"
+    | "SZ"
+    | "TC"
+    | "TD"
+    | "TF"
+    | "TG"
+    | "TH"
+    | "TJ"
+    | "TK"
+    | "TL"
+    | "TM"
+    | "TN"
+    | "TO"
+    | "TR"
+    | "TT"
+    | "TV"
+    | "TW"
+    | "TZ"
+    | "UA"
+    | "UG"
+    | "UM"
+    | "US"
+    | "UY"
+    | "UZ"
+    | "VA"
+    | "VC"
+    | "VE"
+    | "VG"
+    | "VI"
+    | "VN"
+    | "VU"
+    | "WF"
+    | "WS"
+    | "YE"
+    | "YT"
+    | "ZA"
+    | "ZM"
+    | "ZW"
+    | null;
+  nominationsOpeningDate: string | null;
+  nominationsClosingDate: string | null;
+}>;
+
+// Source: src/sanity/queries.ts
 // Variable: AWARD_CATEGORY_PAGE_QUERY
 // Query: *[_id == $id && _type == "awardCategoryPage"][0]{    breadcrumbHomeLabel,    breadcrumbAwardsLabel,    detailsHeading,    eligibilityLabel,    recognisesLabel,    judgingLabel,    winnersHeading,    winnerLabel,    otherProgrammesHeading[]{ _key, style, children[]{ _key, text } },    "otherProgrammes": otherProgrammes[]{ _key, title, "edition": edition->{   _id, title, "slug": slug.current, "programmeId": programme._ref,  startDate, endDate, hideDateTime, country, nominationsOpeningDate, nominationsClosingDate } },    "statuses": *[_id == $statusesId && _type == "awardsProgrammePage"][0]{      launchingSoonLabel,      submissionsOpenLabel,      ceremonyDueLabel,      winnersAnnouncedLabel    }  }
 export type AWARD_CATEGORY_PAGE_QUERY_RESULT = {
@@ -33549,7 +33920,7 @@ export type AWARD_CATEGORY_PAGE_QUERY_RESULT = {
 
 // Source: src/sanity/queries.ts
 // Variable: AWARDS_PROGRAMME_QUERY
-// Query: *[_type in ["awardsProgramme", "conferenceEvent"] && slug.current == $slug][0]{    _type,    _type == "awardsProgramme" => {      _id,      title,      "slug": slug.current,      standfirst,      body[]{   _type != "infographic" => { ... },  _type == "infographic" => { _key, _type, eyebrow, title, description, wide, narrow },  _type == "image" => { "alt": coalesce(alt, asset->altText) },  _type == "videoFile" => { "url": asset->url, "mimeType": asset->mimeType } },      "logo": logo{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },      "programme": programme->{ _id, "slug": slug.current },      startDate,      endDate,      hideDateTime,      nominationsOpeningDate,      nominationsClosingDate,      country,      "venue": venue->title,      registerButtonLink,      highlightsVideoId,      "highlightVideoThumbnail": highlightVideoThumbnail{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },      highlightVideoDescription,      judgesIntro[]{   _type != "infographic" => { ... },  _type == "infographic" => { _key, _type, eyebrow, title, description, wide, narrow },  _type == "image" => { "alt": coalesce(alt, asset->altText) },  _type == "videoFile" => { "url": asset->url, "mimeType": asset->mimeType } },      judgesPanels[]{        _key,        name,        "people": people[]->{          _id,          title,          jobTitle,          "company": companies[0]->title,          "photo": photo{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },          bio[]{   _type != "infographic" => { ... },  _type == "infographic" => { _key, _type, eyebrow, title, description, wide, narrow },  _type == "image" => { "alt": coalesce(alt, asset->altText) },  _type == "videoFile" => { "url": asset->url, "mimeType": asset->mimeType } }        }      },      winners[]{        _key,        categoryGroup,        "category": category->{ title, "slug": slug.current },        people,        displayName,        "company": company->{ title, "logo": logo{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) } }      },      entryCategories,      "acclaimSlug": acclaim->slug.current,      "previous": *[        _type == "awardsProgramme"        && defined(^.programme._ref)        && programme._ref == ^.programme._ref        && startDate < ^.startDate      ] | order(startDate desc)[0]{ "slug": slug.current }    },    _type == "conferenceEvent" => {      _id,      title,      "slug": slug.current,      eventType,      body[]{   _type != "infographic" => { ... },  _type == "infographic" => { _key, _type, eyebrow, title, description, wide, narrow },  _type == "image" => { "alt": coalesce(alt, asset->altText) },  _type == "videoFile" => { "url": asset->url, "mimeType": asset->mimeType } },      "logo": logo{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },      startDate,      endDate,      startTime,      endTime,      timezoneCode,      hideDateTime,      country,      "venue": venue->{ title, address },      eventFormat,      whyAttend{ intro[]{   _type != "infographic" => { ... },  _type == "infographic" => { _key, _type, eyebrow, title, description, wide, narrow },  _type == "image" => { "alt": coalesce(alt, asset->altText) },  _type == "videoFile" => { "url": asset->url, "mimeType": asset->mimeType } }, points },      speakerTypes[]{        _key,        name,        "people": people[]->{          _id,          title,          jobTitle,          "company": companies[0]->title,          "photo": photo{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) }        }      },      "chairs": chairs[]->{ _id, title, jobTitle, "company": companies[0]->title, "photo": photo{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) } },      agenda[]{        _key,        title,        items[]{          _key,          time,          endTime,          sessionType,          title,          text[]{   _type != "infographic" => { ... },  _type == "infographic" => { _key, _type, eyebrow, title, description, wide, narrow },  _type == "image" => { "alt": coalesce(alt, asset->altText) },  _type == "videoFile" => { "url": asset->url, "mimeType": asset->mimeType } },          speakers[]{ _key, chair, "person": person->{ _id, title, jobTitle, "company": companies[0]->title, "photo": photo{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) } } }        }      },      agendaText[]{   _type != "infographic" => { ... },  _type == "infographic" => { _key, _type, eyebrow, title, description, wide, narrow },  _type == "image" => { "alt": coalesce(alt, asset->altText) },  _type == "videoFile" => { "url": asset->url, "mimeType": asset->mimeType } },      sponsorTypes[]{        _key,        name,        "companies": companies[]->{ _id, title, "logo": logo{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) }, websiteUrl, "about": pt::text(about) }      },      "relatedCoverage": relatedCoverage[]->{ _id, title, "slug": slug.current, brands }    }  }
+// Query: *[_type in ["awardsProgramme", "conferenceEvent"] && slug.current == $slug][0]{    _type,    _type == "awardsProgramme" => {      _id,      title,      "slug": slug.current,      standfirst,      body[]{   _type != "infographic" => { ... },  _type == "infographic" => { _key, _type, eyebrow, title, description, wide, narrow },  _type == "image" => { "alt": coalesce(alt, asset->altText) },  _type == "videoFile" => { "url": asset->url, "mimeType": asset->mimeType } },      "logo": logo{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },      "programme": programme->{ _id, "slug": slug.current },      startDate,      endDate,      hideDateTime,      nominationsOpeningDate,      nominationsClosingDate,      country,      "venue": venue->title,      registerButtonLink,      highlightsVideoId,      "highlightVideoThumbnail": highlightVideoThumbnail{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },      highlightVideoDescription,      judgesIntro[]{   _type != "infographic" => { ... },  _type == "infographic" => { _key, _type, eyebrow, title, description, wide, narrow },  _type == "image" => { "alt": coalesce(alt, asset->altText) },  _type == "videoFile" => { "url": asset->url, "mimeType": asset->mimeType } },      judgesPanels[]{        _key,        name,        "people": people[]->{          _id,          title,          jobTitle,          "company": companies[0]->title,          "photo": photo{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },          bio[]{   _type != "infographic" => { ... },  _type == "infographic" => { _key, _type, eyebrow, title, description, wide, narrow },  _type == "image" => { "alt": coalesce(alt, asset->altText) },  _type == "videoFile" => { "url": asset->url, "mimeType": asset->mimeType } }        }      },      winners[]{        _key,        categoryGroup,        "category": category->{ title, "slug": slug.current },        people,        displayName,        "company": company->{ title, "logo": logo{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) } }      },      registrationSteps[]{ _key, text[]{   _type != "infographic" => { ... },  _type == "infographic" => { _key, _type, eyebrow, title, description, wide, narrow },  _type == "image" => { "alt": coalesce(alt, asset->altText) },  _type == "videoFile" => { "url": asset->url, "mimeType": asset->mimeType } } },      sponsorTypes[]{        _key,        name,        "companies": companies[]->{ _id, title, "logo": logo{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) } }      },      faq[]{ _key, question, answer[]{   _type != "infographic" => { ... },  _type == "infographic" => { _key, _type, eyebrow, title, description, wide, narrow },  _type == "image" => { "alt": coalesce(alt, asset->altText) },  _type == "videoFile" => { "url": asset->url, "mimeType": asset->mimeType } } },      "acclaimSlug": acclaim->slug.current,      "previous": *[        _type == "awardsProgramme"        && defined(^.programme._ref)        && programme._ref == ^.programme._ref        && startDate < ^.startDate      ] | order(startDate desc)[0]{ "slug": slug.current }    },    _type == "conferenceEvent" => {      _id,      title,      "slug": slug.current,      eventType,      body[]{   _type != "infographic" => { ... },  _type == "infographic" => { _key, _type, eyebrow, title, description, wide, narrow },  _type == "image" => { "alt": coalesce(alt, asset->altText) },  _type == "videoFile" => { "url": asset->url, "mimeType": asset->mimeType } },      "logo": logo{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },      startDate,      endDate,      startTime,      endTime,      timezoneCode,      hideDateTime,      country,      "venue": venue->{ title, address },      eventFormat,      whyAttend{ intro[]{   _type != "infographic" => { ... },  _type == "infographic" => { _key, _type, eyebrow, title, description, wide, narrow },  _type == "image" => { "alt": coalesce(alt, asset->altText) },  _type == "videoFile" => { "url": asset->url, "mimeType": asset->mimeType } }, points },      speakerTypes[]{        _key,        name,        "people": people[]->{          _id,          title,          jobTitle,          "company": companies[0]->title,          "photo": photo{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) }        }      },      "chairs": chairs[]->{ _id, title, jobTitle, "company": companies[0]->title, "photo": photo{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) } },      agenda[]{        _key,        title,        items[]{          _key,          time,          endTime,          sessionType,          title,          text[]{   _type != "infographic" => { ... },  _type == "infographic" => { _key, _type, eyebrow, title, description, wide, narrow },  _type == "image" => { "alt": coalesce(alt, asset->altText) },  _type == "videoFile" => { "url": asset->url, "mimeType": asset->mimeType } },          speakers[]{ _key, chair, "person": person->{ _id, title, jobTitle, "company": companies[0]->title, "photo": photo{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) } } }        }      },      agendaText[]{   _type != "infographic" => { ... },  _type == "infographic" => { _key, _type, eyebrow, title, description, wide, narrow },  _type == "image" => { "alt": coalesce(alt, asset->altText) },  _type == "videoFile" => { "url": asset->url, "mimeType": asset->mimeType } },      sponsorTypes[]{        _key,        name,        "companies": companies[]->{ _id, title, "logo": logo{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) }, websiteUrl, "about": pt::text(about) }      },      "relatedCoverage": relatedCoverage[]->{ _id, title, "slug": slug.current, brands }    }  }
 export type AWARDS_PROGRAMME_QUERY_RESULT =
   | {
       _type: "awardsProgramme";
@@ -34009,7 +34380,65 @@ export type AWARDS_PROGRAMME_QUERY_RESULT =
           } | null;
         } | null;
       }> | null;
-      entryCategories: Array<string> | null;
+      registrationSteps: Array<{
+        _key: string;
+        text: Array<{
+          children?: Array<{
+            marks?: Array<string>;
+            text?: string;
+            _type: "span";
+            _key: string;
+          }>;
+          style?: "normal";
+          listItem?: "bullet" | "number";
+          markDefs?: Array<{
+            href?: string;
+            openInNewTab?: boolean;
+            _type: "link";
+            _key: string;
+          }>;
+          level?: number;
+          _type: "block";
+          _key: string;
+        }> | null;
+      }> | null;
+      sponsorTypes: Array<{
+        _key: string;
+        name: string | null;
+        companies: Array<{
+          _id: string;
+          title: string | null;
+          logo: {
+            asset: SanityImageAssetReference | null;
+            hotspot: SanityImageHotspot | null;
+            crop: SanityImageCrop | null;
+            alt: string | null;
+          } | null;
+        }> | null;
+      }> | null;
+      faq: Array<{
+        _key: string;
+        question: string | null;
+        answer: Array<{
+          children?: Array<{
+            marks?: Array<string>;
+            text?: string;
+            _type: "span";
+            _key: string;
+          }>;
+          style?: "normal";
+          listItem?: never;
+          markDefs?: Array<{
+            href?: string;
+            openInNewTab?: boolean;
+            _type: "link";
+            _key: string;
+          }>;
+          level?: number;
+          _type: "block";
+          _key: string;
+        }> | null;
+      }> | null;
       acclaimSlug: string | null;
       previous: {
         slug: string | null;
@@ -34543,25 +34972,118 @@ export type AWARDS_PROGRAMME_QUERY_RESULT =
 
 // Source: src/sanity/queries.ts
 // Variable: AWARDS_PROGRAMME_PAGE_QUERY
-// Query: *[_id == $id && _type == "awardsProgrammePage"][0]{    breadcrumbHomeLabel,    breadcrumbAwardsLabel,    registerLabel,    previousYearLabel,    previousYearWinnersLabel,    allCategoriesLabel,    viewBiographyLabel,    hideBiographyLabel,    marketingKitText,    acclaimLinkLabel,    videoConsentText,    videoConsentButton,    navOverviewLabel,    navJudgesLabel,    navWinnersLabel,    navCategoriesLabel,    navMarketingKitLabel,    launchingSoonLabel,    submissionsOpenLabel,    ceremonyDueLabel,    winnersAnnouncedLabel,    overviewHeading[]{ _key, style, children[]{ _key, text } },    videoHeading[]{ _key, style, children[]{ _key, text } },    judgesHeading[]{ _key, style, children[]{ _key, text } },    winnersHeading[]{ _key, style, children[]{ _key, text } },    categoriesHeading[]{ _key, style, children[]{ _key, text } },    marketingKitHeading[]{ _key, style, children[]{ _key, text } },    otherProgrammesHeading[]{ _key, style, children[]{ _key, text } },    "otherProgrammes": otherProgrammes[]{ _key, title, "edition": edition->{   _id, title, "slug": slug.current, "programmeId": programme._ref,  startDate, endDate, hideDateTime, country, nominationsOpeningDate, nominationsClosingDate } }  }
+// Query: *[_id == $id && _type == "awardsProgrammePage"][0]{    breadcrumbHomeLabel,    breadcrumbAwardsLabel,    registerLabel,    previousYearLabel,    previousYearWinnersLabel,    marketingKitText,    acclaimLinkLabel,    videoConsentText,    videoConsentButton,    videoDialogTitle,    registrationOpenIntro,    registrationClosedLabel,    registrationClosedIntro,    registrationFaqLinkLabel,    openProgrammesEmptyText,    deadlineLabel,    navOverviewLabel,    navVideoLabel,    navCategoriesLabel,    navSponsorsLabel,    navJudgesLabel,    navWinnersLabel,    navMarketingKitLabel,    navFaqLabel,    sponsorLink{   label,    kind,  external,  hub,  internal->{    _type,    "slug": slug.current,    brand,    brands  } },    allAwardsLink{   label,    kind,  external,  hub,  internal->{    _type,    "slug": slug.current,    brand,    brands  } },    launchingSoonLabel,    submissionsOpenLabel,    ceremonyDueLabel,    winnersAnnouncedLabel,    overviewHeading[]{ _key, style, children[]{ _key, text } },    videoHeading[]{ _key, style, children[]{ _key, text } },    judgesHeading[]{ _key, style, children[]{ _key, text } },    winnersHeading[]{ _key, style, children[]{ _key, text } },    categoriesHeading[]{ _key, style, children[]{ _key, text } },    sponsorsHeading[]{ _key, style, children[]{ _key, text } },    marketingKitHeading[]{ _key, style, children[]{ _key, text } },    faqHeading[]{ _key, style, children[]{ _key, text } },    otherProgrammesHeading[]{ _key, style, children[]{ _key, text } },    "otherProgrammes": otherProgrammes[]{ _key, title, "edition": edition->{   _id, title, "slug": slug.current, "programmeId": programme._ref,  startDate, endDate, hideDateTime, country, nominationsOpeningDate, nominationsClosingDate } }  }
 export type AWARDS_PROGRAMME_PAGE_QUERY_RESULT = {
   breadcrumbHomeLabel: string | null;
   breadcrumbAwardsLabel: string | null;
   registerLabel: string | null;
   previousYearLabel: string | null;
   previousYearWinnersLabel: string | null;
-  allCategoriesLabel: string | null;
-  viewBiographyLabel: string | null;
-  hideBiographyLabel: string | null;
   marketingKitText: string | null;
   acclaimLinkLabel: string | null;
   videoConsentText: string | null;
   videoConsentButton: string | null;
+  videoDialogTitle: string | null;
+  registrationOpenIntro: string | null;
+  registrationClosedLabel: string | null;
+  registrationClosedIntro: string | null;
+  registrationFaqLinkLabel: string | null;
+  openProgrammesEmptyText: string | null;
+  deadlineLabel: string | null;
   navOverviewLabel: string | null;
+  navVideoLabel: string | null;
+  navCategoriesLabel: string | null;
+  navSponsorsLabel: string | null;
   navJudgesLabel: string | null;
   navWinnersLabel: string | null;
-  navCategoriesLabel: string | null;
   navMarketingKitLabel: string | null;
+  navFaqLabel: string | null;
+  sponsorLink: {
+    label: string | null;
+    kind: "external" | "hub" | "internal" | null;
+    external: string | null;
+    hub: "awards" | "events" | "research" | null;
+    internal:
+      | {
+          _type: "awardsProgramme";
+          slug: string | null;
+          brand: null;
+          brands: null;
+        }
+      | {
+          _type: "conferenceEvent";
+          slug: string | null;
+          brand: null;
+          brands: null;
+        }
+      | {
+          _type: "page";
+          slug: string | null;
+          brand:
+            | "clearview"
+            | "familywealthreport"
+            | "wealthbriefing"
+            | "wealthbriefingasia"
+            | null;
+          brands: null;
+        }
+      | {
+          _type: "post";
+          slug: string | null;
+          brand: null;
+          brands: Array<string> | null;
+        }
+      | {
+          _type: "resource";
+          slug: string | null;
+          brand: null;
+          brands: null;
+        }
+      | null;
+  } | null;
+  allAwardsLink: {
+    label: string | null;
+    kind: "external" | "hub" | "internal" | null;
+    external: string | null;
+    hub: "awards" | "events" | "research" | null;
+    internal:
+      | {
+          _type: "awardsProgramme";
+          slug: string | null;
+          brand: null;
+          brands: null;
+        }
+      | {
+          _type: "conferenceEvent";
+          slug: string | null;
+          brand: null;
+          brands: null;
+        }
+      | {
+          _type: "page";
+          slug: string | null;
+          brand:
+            | "clearview"
+            | "familywealthreport"
+            | "wealthbriefing"
+            | "wealthbriefingasia"
+            | null;
+          brands: null;
+        }
+      | {
+          _type: "post";
+          slug: string | null;
+          brand: null;
+          brands: Array<string> | null;
+        }
+      | {
+          _type: "resource";
+          slug: string | null;
+          brand: null;
+          brands: null;
+        }
+      | null;
+  } | null;
   launchingSoonLabel: string | null;
   submissionsOpenLabel: string | null;
   ceremonyDueLabel: string | null;
@@ -34606,7 +35128,23 @@ export type AWARDS_PROGRAMME_PAGE_QUERY_RESULT = {
       text: string | null;
     }> | null;
   }> | null;
+  sponsorsHeading: Array<{
+    _key: string;
+    style: "h1" | "h2" | "h3" | "h4" | "h5" | "h6" | "normal" | null;
+    children: Array<{
+      _key: string;
+      text: string | null;
+    }> | null;
+  }> | null;
   marketingKitHeading: Array<{
+    _key: string;
+    style: "h1" | "h2" | "h3" | "h4" | "h5" | "h6" | "normal" | null;
+    children: Array<{
+      _key: string;
+      text: string | null;
+    }> | null;
+  }> | null;
+  faqHeading: Array<{
     _key: string;
     style: "h1" | "h2" | "h3" | "h4" | "h5" | "h6" | "normal" | null;
     children: Array<{
@@ -41501,9 +42039,10 @@ declare global {
     '\n  *[_type == "subscribeModal" && _id in $ids]{\n    _id,\n    interests[]{ label, "attribute": attribute.name }\n  }\n': SIGNUP_INTEREST_LABELS_QUERY_RESULT;
     '\n  *[_type == "awardCategory" && slug.current == $category][0]{\n    _id,\n    title,\n    "slug": slug.current,\n    categoryGroup,\n    description,\n    eligibility,\n    recognises,\n    judging,\n    "programme": *[_type == "awardsProgrammeGroup" && slug.current == $programme][0]{ _id, title, "slug": slug.current },\n    "editions": *[\n      _type == "awardsProgramme"\n      && programme->slug.current == $programme\n      && ^._id in winners[].category._ref\n    ] | order(startDate desc){\n      _id,\n      title,\n      "slug": slug.current,\n      startDate,\n      "winners": winners[category._ref == ^.^._id]{\n        _key,\n        categoryGroup,\n        people,\n        displayName,\n        "company": company->{ title, "slug": slug.current, "logo": logo{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n } }\n      }\n    }\n  }\n': AWARD_CATEGORY_QUERY_RESULT;
     '\n  [\n    ...*[\n      _type == "awardsProgramme"\n      && nominationsClosingDate >= $today\n      && coalesce(programme->slug.current, "") != $programme\n    ] | order(nominationsClosingDate asc)[0...12]{ \n  _id, title, "slug": slug.current, "programmeId": programme._ref,\n  startDate, endDate, hideDateTime, country, nominationsOpeningDate, nominationsClosingDate\n },\n    ...*[\n      _type == "awardsProgramme"\n      && !(defined(nominationsClosingDate) && nominationsClosingDate >= $today)\n      && startDate >= $today\n      && coalesce(programme->slug.current, "") != $programme\n    ] | order(startDate asc)[0...12]{ \n  _id, title, "slug": slug.current, "programmeId": programme._ref,\n  startDate, endDate, hideDateTime, country, nominationsOpeningDate, nominationsClosingDate\n }\n  ]\n': OTHER_AWARDS_QUERY_RESULT;
+    '\n  *[\n    _type == "awardsProgramme"\n    && defined(slug.current)\n    && nominationsClosingDate >= $today\n    && _id != $editionId\n  ] | order(nominationsClosingDate asc){ \n  _id, title, "slug": slug.current, "programmeId": programme._ref,\n  startDate, endDate, hideDateTime, country, nominationsOpeningDate, nominationsClosingDate\n }\n': OPEN_AWARDS_QUERY_RESULT;
     '\n  *[_id == $id && _type == "awardCategoryPage"][0]{\n    breadcrumbHomeLabel,\n    breadcrumbAwardsLabel,\n    detailsHeading,\n    eligibilityLabel,\n    recognisesLabel,\n    judgingLabel,\n    winnersHeading,\n    winnerLabel,\n    otherProgrammesHeading[]{ _key, style, children[]{ _key, text } },\n    "otherProgrammes": otherProgrammes[]{ _key, title, "edition": edition->{ \n  _id, title, "slug": slug.current, "programmeId": programme._ref,\n  startDate, endDate, hideDateTime, country, nominationsOpeningDate, nominationsClosingDate\n } },\n    "statuses": *[_id == $statusesId && _type == "awardsProgrammePage"][0]{\n      launchingSoonLabel,\n      submissionsOpenLabel,\n      ceremonyDueLabel,\n      winnersAnnouncedLabel\n    }\n  }\n': AWARD_CATEGORY_PAGE_QUERY_RESULT;
-    '\n  *[_type in ["awardsProgramme", "conferenceEvent"] && slug.current == $slug][0]{\n    _type,\n    _type == "awardsProgramme" => {\n      _id,\n      title,\n      "slug": slug.current,\n      standfirst,\n      body[]{ \n  _type != "infographic" => { ... },\n  _type == "infographic" => { _key, _type, eyebrow, title, description, wide, narrow },\n  _type == "image" => { "alt": coalesce(alt, asset->altText) },\n  _type == "videoFile" => { "url": asset->url, "mimeType": asset->mimeType }\n },\n      "logo": logo{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n      "programme": programme->{ _id, "slug": slug.current },\n      startDate,\n      endDate,\n      hideDateTime,\n      nominationsOpeningDate,\n      nominationsClosingDate,\n      country,\n      "venue": venue->title,\n      registerButtonLink,\n      highlightsVideoId,\n      "highlightVideoThumbnail": highlightVideoThumbnail{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n      highlightVideoDescription,\n      judgesIntro[]{ \n  _type != "infographic" => { ... },\n  _type == "infographic" => { _key, _type, eyebrow, title, description, wide, narrow },\n  _type == "image" => { "alt": coalesce(alt, asset->altText) },\n  _type == "videoFile" => { "url": asset->url, "mimeType": asset->mimeType }\n },\n      judgesPanels[]{\n        _key,\n        name,\n        "people": people[]->{\n          _id,\n          title,\n          jobTitle,\n          "company": companies[0]->title,\n          "photo": photo{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n          bio[]{ \n  _type != "infographic" => { ... },\n  _type == "infographic" => { _key, _type, eyebrow, title, description, wide, narrow },\n  _type == "image" => { "alt": coalesce(alt, asset->altText) },\n  _type == "videoFile" => { "url": asset->url, "mimeType": asset->mimeType }\n }\n        }\n      },\n      winners[]{\n        _key,\n        categoryGroup,\n        "category": category->{ title, "slug": slug.current },\n        people,\n        displayName,\n        "company": company->{ title, "logo": logo{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n } }\n      },\n      entryCategories,\n      "acclaimSlug": acclaim->slug.current,\n      "previous": *[\n        _type == "awardsProgramme"\n        && defined(^.programme._ref)\n        && programme._ref == ^.programme._ref\n        && startDate < ^.startDate\n      ] | order(startDate desc)[0]{ "slug": slug.current }\n    },\n    _type == "conferenceEvent" => {\n      _id,\n      title,\n      "slug": slug.current,\n      eventType,\n      body[]{ \n  _type != "infographic" => { ... },\n  _type == "infographic" => { _key, _type, eyebrow, title, description, wide, narrow },\n  _type == "image" => { "alt": coalesce(alt, asset->altText) },\n  _type == "videoFile" => { "url": asset->url, "mimeType": asset->mimeType }\n },\n      "logo": logo{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n      startDate,\n      endDate,\n      startTime,\n      endTime,\n      timezoneCode,\n      hideDateTime,\n      country,\n      "venue": venue->{ title, address },\n      eventFormat,\n      whyAttend{ intro[]{ \n  _type != "infographic" => { ... },\n  _type == "infographic" => { _key, _type, eyebrow, title, description, wide, narrow },\n  _type == "image" => { "alt": coalesce(alt, asset->altText) },\n  _type == "videoFile" => { "url": asset->url, "mimeType": asset->mimeType }\n }, points },\n      speakerTypes[]{\n        _key,\n        name,\n        "people": people[]->{\n          _id,\n          title,\n          jobTitle,\n          "company": companies[0]->title,\n          "photo": photo{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n }\n        }\n      },\n      "chairs": chairs[]->{ _id, title, jobTitle, "company": companies[0]->title, "photo": photo{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n } },\n      agenda[]{\n        _key,\n        title,\n        items[]{\n          _key,\n          time,\n          endTime,\n          sessionType,\n          title,\n          text[]{ \n  _type != "infographic" => { ... },\n  _type == "infographic" => { _key, _type, eyebrow, title, description, wide, narrow },\n  _type == "image" => { "alt": coalesce(alt, asset->altText) },\n  _type == "videoFile" => { "url": asset->url, "mimeType": asset->mimeType }\n },\n          speakers[]{ _key, chair, "person": person->{ _id, title, jobTitle, "company": companies[0]->title, "photo": photo{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n } } }\n        }\n      },\n      agendaText[]{ \n  _type != "infographic" => { ... },\n  _type == "infographic" => { _key, _type, eyebrow, title, description, wide, narrow },\n  _type == "image" => { "alt": coalesce(alt, asset->altText) },\n  _type == "videoFile" => { "url": asset->url, "mimeType": asset->mimeType }\n },\n      sponsorTypes[]{\n        _key,\n        name,\n        "companies": companies[]->{ _id, title, "logo": logo{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n }, websiteUrl, "about": pt::text(about) }\n      },\n      "relatedCoverage": relatedCoverage[]->{ _id, title, "slug": slug.current, brands }\n    }\n  }\n': AWARDS_PROGRAMME_QUERY_RESULT;
-    '\n  *[_id == $id && _type == "awardsProgrammePage"][0]{\n    breadcrumbHomeLabel,\n    breadcrumbAwardsLabel,\n    registerLabel,\n    previousYearLabel,\n    previousYearWinnersLabel,\n    allCategoriesLabel,\n    viewBiographyLabel,\n    hideBiographyLabel,\n    marketingKitText,\n    acclaimLinkLabel,\n    videoConsentText,\n    videoConsentButton,\n    navOverviewLabel,\n    navJudgesLabel,\n    navWinnersLabel,\n    navCategoriesLabel,\n    navMarketingKitLabel,\n    launchingSoonLabel,\n    submissionsOpenLabel,\n    ceremonyDueLabel,\n    winnersAnnouncedLabel,\n    overviewHeading[]{ _key, style, children[]{ _key, text } },\n    videoHeading[]{ _key, style, children[]{ _key, text } },\n    judgesHeading[]{ _key, style, children[]{ _key, text } },\n    winnersHeading[]{ _key, style, children[]{ _key, text } },\n    categoriesHeading[]{ _key, style, children[]{ _key, text } },\n    marketingKitHeading[]{ _key, style, children[]{ _key, text } },\n    otherProgrammesHeading[]{ _key, style, children[]{ _key, text } },\n    "otherProgrammes": otherProgrammes[]{ _key, title, "edition": edition->{ \n  _id, title, "slug": slug.current, "programmeId": programme._ref,\n  startDate, endDate, hideDateTime, country, nominationsOpeningDate, nominationsClosingDate\n } }\n  }\n': AWARDS_PROGRAMME_PAGE_QUERY_RESULT;
+    '\n  *[_type in ["awardsProgramme", "conferenceEvent"] && slug.current == $slug][0]{\n    _type,\n    _type == "awardsProgramme" => {\n      _id,\n      title,\n      "slug": slug.current,\n      standfirst,\n      body[]{ \n  _type != "infographic" => { ... },\n  _type == "infographic" => { _key, _type, eyebrow, title, description, wide, narrow },\n  _type == "image" => { "alt": coalesce(alt, asset->altText) },\n  _type == "videoFile" => { "url": asset->url, "mimeType": asset->mimeType }\n },\n      "logo": logo{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n      "programme": programme->{ _id, "slug": slug.current },\n      startDate,\n      endDate,\n      hideDateTime,\n      nominationsOpeningDate,\n      nominationsClosingDate,\n      country,\n      "venue": venue->title,\n      registerButtonLink,\n      highlightsVideoId,\n      "highlightVideoThumbnail": highlightVideoThumbnail{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n      highlightVideoDescription,\n      judgesIntro[]{ \n  _type != "infographic" => { ... },\n  _type == "infographic" => { _key, _type, eyebrow, title, description, wide, narrow },\n  _type == "image" => { "alt": coalesce(alt, asset->altText) },\n  _type == "videoFile" => { "url": asset->url, "mimeType": asset->mimeType }\n },\n      judgesPanels[]{\n        _key,\n        name,\n        "people": people[]->{\n          _id,\n          title,\n          jobTitle,\n          "company": companies[0]->title,\n          "photo": photo{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n          bio[]{ \n  _type != "infographic" => { ... },\n  _type == "infographic" => { _key, _type, eyebrow, title, description, wide, narrow },\n  _type == "image" => { "alt": coalesce(alt, asset->altText) },\n  _type == "videoFile" => { "url": asset->url, "mimeType": asset->mimeType }\n }\n        }\n      },\n      winners[]{\n        _key,\n        categoryGroup,\n        "category": category->{ title, "slug": slug.current },\n        people,\n        displayName,\n        "company": company->{ title, "logo": logo{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n } }\n      },\n      registrationSteps[]{ _key, text[]{ \n  _type != "infographic" => { ... },\n  _type == "infographic" => { _key, _type, eyebrow, title, description, wide, narrow },\n  _type == "image" => { "alt": coalesce(alt, asset->altText) },\n  _type == "videoFile" => { "url": asset->url, "mimeType": asset->mimeType }\n } },\n      sponsorTypes[]{\n        _key,\n        name,\n        "companies": companies[]->{ _id, title, "logo": logo{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n } }\n      },\n      faq[]{ _key, question, answer[]{ \n  _type != "infographic" => { ... },\n  _type == "infographic" => { _key, _type, eyebrow, title, description, wide, narrow },\n  _type == "image" => { "alt": coalesce(alt, asset->altText) },\n  _type == "videoFile" => { "url": asset->url, "mimeType": asset->mimeType }\n } },\n      "acclaimSlug": acclaim->slug.current,\n      "previous": *[\n        _type == "awardsProgramme"\n        && defined(^.programme._ref)\n        && programme._ref == ^.programme._ref\n        && startDate < ^.startDate\n      ] | order(startDate desc)[0]{ "slug": slug.current }\n    },\n    _type == "conferenceEvent" => {\n      _id,\n      title,\n      "slug": slug.current,\n      eventType,\n      body[]{ \n  _type != "infographic" => { ... },\n  _type == "infographic" => { _key, _type, eyebrow, title, description, wide, narrow },\n  _type == "image" => { "alt": coalesce(alt, asset->altText) },\n  _type == "videoFile" => { "url": asset->url, "mimeType": asset->mimeType }\n },\n      "logo": logo{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n      startDate,\n      endDate,\n      startTime,\n      endTime,\n      timezoneCode,\n      hideDateTime,\n      country,\n      "venue": venue->{ title, address },\n      eventFormat,\n      whyAttend{ intro[]{ \n  _type != "infographic" => { ... },\n  _type == "infographic" => { _key, _type, eyebrow, title, description, wide, narrow },\n  _type == "image" => { "alt": coalesce(alt, asset->altText) },\n  _type == "videoFile" => { "url": asset->url, "mimeType": asset->mimeType }\n }, points },\n      speakerTypes[]{\n        _key,\n        name,\n        "people": people[]->{\n          _id,\n          title,\n          jobTitle,\n          "company": companies[0]->title,\n          "photo": photo{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n }\n        }\n      },\n      "chairs": chairs[]->{ _id, title, jobTitle, "company": companies[0]->title, "photo": photo{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n } },\n      agenda[]{\n        _key,\n        title,\n        items[]{\n          _key,\n          time,\n          endTime,\n          sessionType,\n          title,\n          text[]{ \n  _type != "infographic" => { ... },\n  _type == "infographic" => { _key, _type, eyebrow, title, description, wide, narrow },\n  _type == "image" => { "alt": coalesce(alt, asset->altText) },\n  _type == "videoFile" => { "url": asset->url, "mimeType": asset->mimeType }\n },\n          speakers[]{ _key, chair, "person": person->{ _id, title, jobTitle, "company": companies[0]->title, "photo": photo{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n } } }\n        }\n      },\n      agendaText[]{ \n  _type != "infographic" => { ... },\n  _type == "infographic" => { _key, _type, eyebrow, title, description, wide, narrow },\n  _type == "image" => { "alt": coalesce(alt, asset->altText) },\n  _type == "videoFile" => { "url": asset->url, "mimeType": asset->mimeType }\n },\n      sponsorTypes[]{\n        _key,\n        name,\n        "companies": companies[]->{ _id, title, "logo": logo{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n }, websiteUrl, "about": pt::text(about) }\n      },\n      "relatedCoverage": relatedCoverage[]->{ _id, title, "slug": slug.current, brands }\n    }\n  }\n': AWARDS_PROGRAMME_QUERY_RESULT;
+    '\n  *[_id == $id && _type == "awardsProgrammePage"][0]{\n    breadcrumbHomeLabel,\n    breadcrumbAwardsLabel,\n    registerLabel,\n    previousYearLabel,\n    previousYearWinnersLabel,\n    marketingKitText,\n    acclaimLinkLabel,\n    videoConsentText,\n    videoConsentButton,\n    videoDialogTitle,\n    registrationOpenIntro,\n    registrationClosedLabel,\n    registrationClosedIntro,\n    registrationFaqLinkLabel,\n    openProgrammesEmptyText,\n    deadlineLabel,\n    navOverviewLabel,\n    navVideoLabel,\n    navCategoriesLabel,\n    navSponsorsLabel,\n    navJudgesLabel,\n    navWinnersLabel,\n    navMarketingKitLabel,\n    navFaqLabel,\n    sponsorLink{ \n  label,\n  \n  kind,\n  external,\n  hub,\n  internal->{\n    _type,\n    "slug": slug.current,\n    brand,\n    brands\n  }\n\n },\n    allAwardsLink{ \n  label,\n  \n  kind,\n  external,\n  hub,\n  internal->{\n    _type,\n    "slug": slug.current,\n    brand,\n    brands\n  }\n\n },\n    launchingSoonLabel,\n    submissionsOpenLabel,\n    ceremonyDueLabel,\n    winnersAnnouncedLabel,\n    overviewHeading[]{ _key, style, children[]{ _key, text } },\n    videoHeading[]{ _key, style, children[]{ _key, text } },\n    judgesHeading[]{ _key, style, children[]{ _key, text } },\n    winnersHeading[]{ _key, style, children[]{ _key, text } },\n    categoriesHeading[]{ _key, style, children[]{ _key, text } },\n    sponsorsHeading[]{ _key, style, children[]{ _key, text } },\n    marketingKitHeading[]{ _key, style, children[]{ _key, text } },\n    faqHeading[]{ _key, style, children[]{ _key, text } },\n    otherProgrammesHeading[]{ _key, style, children[]{ _key, text } },\n    "otherProgrammes": otherProgrammes[]{ _key, title, "edition": edition->{ \n  _id, title, "slug": slug.current, "programmeId": programme._ref,\n  startDate, endDate, hideDateTime, country, nominationsOpeningDate, nominationsClosingDate\n } }\n  }\n': AWARDS_PROGRAMME_PAGE_QUERY_RESULT;
     '\n  *[_id == $id && _type == "eventPage"][0]{\n    breadcrumbHomeLabel,\n    breadcrumbEventsLabel,\n    summitTypeLabel,\n    briefingTypeLabel,\n    webinarTypeLabel,\n    statusLabel,\n    upcomingLabel,\n    pastLabel,\n    eventFormatLabel,\n    chairLabel,\n    agendaChairLabel,\n    venueLabel,\n    addressLabel,\n    dateLabel,\n    timeLabel,\n    navOverviewLabel,\n    navSpeakersLabel,\n    navWhyAttendLabel,\n    navAgendaLabel,\n    navSponsorsLabel,\n    navVenueLabel,\n    navRelatedCoverageLabel,\n    overviewHeading[]{ _key, style, children[]{ _key, text } },\n    speakersHeading[]{ _key, style, children[]{ _key, text } },\n    whyAttendHeading[]{ _key, style, children[]{ _key, text } },\n    agendaHeading[]{ _key, style, children[]{ _key, text } },\n    sponsorsHeading[]{ _key, style, children[]{ _key, text } },\n    venueHeading[]{ _key, style, children[]{ _key, text } },\n    relatedCoverageHeading[]{ _key, style, children[]{ _key, text } },\n    relatedEventsHeading[]{ _key, style, children[]{ _key, text } },\n    "relatedEvents": relatedEvents[]{ _key, title, "event": event->{ \n  _id, title, "slug": slug.current, startDate, endDate, hideDateTime, "venue": venue->title\n } }\n  }\n': EVENT_PAGE_QUERY_RESULT;
     '\n  [\n    ...*[\n      _type == "conferenceEvent"\n      && defined(slug.current)\n      && _id != $eventId\n      && coalesce(endDate, startDate) >= $today\n    ] | order(startDate asc)[0...6]{ \n  _id, title, "slug": slug.current, startDate, endDate, hideDateTime, "venue": venue->title\n },\n    ...*[\n      _type == "conferenceEvent"\n      && defined(slug.current)\n      && _id != $eventId\n      && !(coalesce(endDate, startDate) >= $today)\n    ] | order(startDate desc)[0...6]{ \n  _id, title, "slug": slug.current, startDate, endDate, hideDateTime, "venue": venue->title\n }\n  ]\n': RELATED_EVENTS_QUERY_RESULT;
     '\n  {\n    "page": *[_type == "page" && _id == $id && brand == $brand][0]{\n      _id,\n      title,\n      blocks[]{ _key, _type, \n  _type == "topStories" => { \n  linkLabel,\n  label,\n  "slides": slides[$brand == "clearview" || $brand in @->brands]->{ \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  \n  "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title }\n,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n  "category": category->{ title, "slug": slug.current }\n },\n  "articles": articles[$brand == "clearview" || $brand in @->brands]->{ \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  \n  "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title }\n,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n  "category": category->{ title, "slug": slug.current }\n },\n  "latest": *[\n    _type == "post"\n    && defined(slug.current)\n    && ($brand == "clearview" || $brand in brands)\n    && !(_id in coalesce(^.slides[]._ref, []))\n    && !(_id in coalesce(^.articles[]._ref, []))\n  ] | order(publishedAt desc)[0...6]{ \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  \n  "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title }\n,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n  "category": category->{ title, "slug": slug.current }\n }\n },\n  _type == "publications" => { \n  heading[]{ _key, style, children[]{ _key, text } },\n  body,\n  cards[]{\n    _key,\n    brand,\n    "brandTitle": *[_type == "brand" && key.current == ^.brand][0].title,\n    description,\n    image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n    linkLabel\n  }\n },\n  _type == "cta" => { \n  heading,\n  text,\n  link{ label, href }\n },\n  _type == "highlights" => { \n  source,\n  layout,\n  count,\n  heading[]{ _key, style, children[]{ _key, text } },\n  deadlineLabel,\n  "items": items[]->{ \n  _id,\n  _type,\n  "slug": slug.current,\n  title,\n  category,\n  nominationsClosingDate,\n  startDate,\n  endDate,\n  hideDateTime,\n  country,\n  publishedAt\n },\n  "fill": select(\n  source == "awards" => [\n    ...*[\n      _type == "awardsProgramme"\n      && nominationsClosingDate >= $today\n      && !(_id in coalesce(^.items[]._ref, []))\n    ] | order(nominationsClosingDate asc)[0...5]{ \n  _id,\n  _type,\n  "slug": slug.current,\n  title,\n  category,\n  nominationsClosingDate,\n  startDate,\n  endDate,\n  hideDateTime,\n  country,\n  publishedAt\n },\n    ...*[\n      _type == "awardsProgramme"\n      && !(defined(nominationsClosingDate) && nominationsClosingDate >= $today)\n      && startDate >= $today\n      && !(_id in coalesce(^.items[]._ref, []))\n    ] | order(startDate asc)[0...5]{ \n  _id,\n  _type,\n  "slug": slug.current,\n  title,\n  category,\n  nominationsClosingDate,\n  startDate,\n  endDate,\n  hideDateTime,\n  country,\n  publishedAt\n },\n    ...*[\n      _type == "awardsProgramme"\n      && !(defined(nominationsClosingDate) && nominationsClosingDate >= $today)\n      && startDate < $today\n      && !(_id in coalesce(^.items[]._ref, []))\n    ] | order(startDate desc)[0...5]{ \n  _id,\n  _type,\n  "slug": slug.current,\n  title,\n  category,\n  nominationsClosingDate,\n  startDate,\n  endDate,\n  hideDateTime,\n  country,\n  publishedAt\n }\n  ],\n  source == "events" => [\n    ...*[\n      _type == "conferenceEvent"\n      && coalesce(endDate, startDate) >= $today\n      && !(_id in coalesce(^.items[]._ref, []))\n    ] | order(startDate asc)[0...4]{ \n  _id,\n  _type,\n  "slug": slug.current,\n  title,\n  category,\n  nominationsClosingDate,\n  startDate,\n  endDate,\n  hideDateTime,\n  country,\n  publishedAt\n },\n    ...*[\n      _type == "conferenceEvent"\n      && coalesce(endDate, startDate) < $today\n      && !(_id in coalesce(^.items[]._ref, []))\n    ] | order(startDate desc)[0...4]{ \n  _id,\n  _type,\n  "slug": slug.current,\n  title,\n  category,\n  nominationsClosingDate,\n  startDate,\n  endDate,\n  hideDateTime,\n  country,\n  publishedAt\n }\n  ],\n  source == "research" => *[\n    _type == "resource"\n    && category == "research"\n    && !(_id in coalesce(^.items[]._ref, []))\n    && _id != coalesce(^.promo.resource._ref, "")\n  ] | order(defined(publishedAt) desc, publishedAt desc, legacyWpId desc)[0...3]{ \n  _id,\n  _type,\n  "slug": slug.current,\n  title,\n  category,\n  nominationsClosingDate,\n  startDate,\n  endDate,\n  hideDateTime,\n  country,\n  publishedAt\n }\n),\n  button{ \n  label,\n  \n  kind,\n  external,\n  hub,\n  internal->{\n    _type,\n    "slug": slug.current,\n    brand,\n    brands\n  }\n\n },\n  promo{\n    resource->{\n      title,\n      "downloadThumbnail": downloadThumbnail{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n      "downloadFileUrl": downloadFile.asset->url,\n      downloadUrl\n    },\n    title,\n    description,\n    "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n    link{ \n  kind,\n  external,\n  hub,\n  internal->{\n    _type,\n    "slug": slug.current,\n    brand,\n    brands\n  }\n }\n  }\n },\n  _type == "featuredStories" => { \n  heading[]{ _key, style, children[]{ _key, text } },\n  link{ \n  label,\n  \n  kind,\n  external,\n  hub,\n  internal->{\n    _type,\n    "slug": slug.current,\n    brand,\n    brands\n  }\n\n },\n  "posts": posts[]->{ \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  \n  "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title }\n,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n  "category": category->{ title, "slug": slug.current }\n }\n },\n  _type == "statsBar" => { \n  heading[]{ _key, style, children[]{ _key, text } },\n  items[]{ _key, icon, value, label }\n },\n  _type == "newsletterSignup" => { \n  heading[]{ _key, style, children[]{ _key, text } },\n  body,\n  preferencesLabel,\n  options[]{\n    _key,\n    label,\n    defaultChecked,\n    "interestKey": *[_type == "subscribeModal" && _id == "subscribe-modal-" + $brand][0].interests[attribute.name == ^.attribute.name][0]._key\n  },\n  emailPlaceholder,\n  buttonLabel,\n  invalidEmailMessage,\n  noOptionMessage,\n  image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n }\n },\n  _type == "sponsoredContent" => { \n  label,\n  link{ \n  label,\n  \n  kind,\n  external,\n  hub,\n  internal->{\n    _type,\n    "slug": slug.current,\n    brand,\n    brands\n  }\n\n },\n  profileLabel,\n  "post": *[\n    _type == "post"\n    && _id == ^.post._ref\n    && defined(slug.current)\n    && defined(sponsor)\n    && ($brand == "clearview" || $brand in brands)\n  ][0]{\n    \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  \n  "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title }\n,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n  "category": category->{ title, "slug": slug.current }\n,\n    "sponsor": sponsor->{\n      title,\n      "slug": slug.current,\n      "logo": logo{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n }\n    }\n  }\n },\n  _type == "postCards" => { \n  \n  heading[]{ _key, style, children[]{ _key, text } },\n  link{ \n  label,\n  \n  kind,\n  external,\n  hub,\n  internal->{\n    _type,\n    "slug": slug.current,\n    brand,\n    brands\n  }\n\n }\n,\n  "category": category->{ title, "slug": slug.current },\n  "posts": posts[$brand in @->brands]->{ \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  \n  "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title }\n,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n  "category": category->{ title, "slug": slug.current }\n },\n  "latest": \n  *[\n    _type == "post"\n    && defined(slug.current)\n    && $brand in brands\n    && defined(^.category._ref) && category._ref == ^.category._ref\n    && !(_id in coalesce(^.posts[]._ref, []))\n  ] | order(publishedAt desc)[0...6]\n{ \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  \n  "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title }\n,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n  "category": category->{ title, "slug": slug.current }\n }\n },\n  _type == "postBriefs" => { \n  \n  heading[]{ _key, style, children[]{ _key, text } },\n  link{ \n  label,\n  \n  kind,\n  external,\n  hub,\n  internal->{\n    _type,\n    "slug": slug.current,\n    brand,\n    brands\n  }\n\n }\n,\n  count,\n  "posts": posts[$brand in @->brands]->{ \n  \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  \n  "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title }\n,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n  "category": category->{ title, "slug": slug.current }\n,\n  "topic": primaryTopic->{ title },\n  briefText\n },\n  "latest": \n  *[\n    _type == "post"\n    && defined(slug.current)\n    && $brand in brands\n    && true\n    && !(_id in coalesce(^.posts[]._ref, []))\n  ] | order(publishedAt desc)[0...6]\n{ \n  \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  \n  "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title }\n,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n  "category": category->{ title, "slug": slug.current }\n,\n  "topic": primaryTopic->{ title },\n  briefText\n }\n },\n  _type == "weeklyRoundup" => { \n  heading[]{ _key, style, children[]{ _key, text } },\n  label,\n  title,\n  summary,\n  button{ \n  label,\n  \n  kind,\n  external,\n  hub,\n  internal->{\n    _type,\n    "slug": slug.current,\n    brand,\n    brands\n  }\n\n },\n  listLabel,\n  "posts": posts[$brand in @->brands]->{ \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  \n  "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title }\n,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n  "category": category->{ title, "slug": slug.current }\n },\n  "latest": \n  *[\n    _type == "post"\n    && defined(slug.current)\n    && $brand in brands\n    && true\n    && !(_id in coalesce(^.posts[]._ref, []))\n  ] | order(publishedAt desc)[0...8]\n{ \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  \n  "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title }\n,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n  "category": category->{ title, "slug": slug.current }\n }\n },\n  _type == "topPicks" => { \n  heading[]{ _key, style, children[]{ _key, text } },\n  link{ \n  label,\n  \n  kind,\n  external,\n  hub,\n  internal->{\n    _type,\n    "slug": slug.current,\n    brand,\n    brands\n  }\n\n },\n  "posts": posts[$brand in @->brands]->{ \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  \n  "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title }\n,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n  "category": category->{ title, "slug": slug.current }\n, "sponsored": defined(sponsor) },\n  "fill": [\n    ...\n  *[\n    _type == "post"\n    && defined(slug.current)\n    && $brand in brands\n    && !defined(sponsor) && dateTime(publishedAt) >= dateTime($today + "T00:00:00Z") - 60*60*24*7\n    && !(_id in coalesce(^.posts[]._ref, []))\n  ] | order(publishedAt desc)[0...6]\n{ \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  \n  "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title }\n,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n  "category": category->{ title, "slug": slug.current }\n },\n    ...\n  *[\n    _type == "post"\n    && defined(slug.current)\n    && $brand in brands\n    && !defined(sponsor) && dateTime(publishedAt) < dateTime($today + "T00:00:00Z") - 60*60*24*7\n    && !(_id in coalesce(^.posts[]._ref, []))\n  ] | order(publishedAt desc)[0...6]\n{ \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  \n  "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title }\n,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n  "category": category->{ title, "slug": slug.current }\n }\n  ]\n },\n  _type == "exploreGrid" => { \n  cards[]{\n    _key,\n    heading[]{ _key, style, children[]{ _key, text } },\n    icon,\n    source,\n    count,\n    deadlineLabel,\n    button{ \n  label,\n  \n  kind,\n  external,\n  hub,\n  internal->{\n    _type,\n    "slug": slug.current,\n    brand,\n    brands\n  }\n\n },\n    "items": items[@->_type != "post" || $brand in @->brands]->{ \n  _type == "post" => { _type, \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  \n  "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title }\n,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n  "category": category->{ title, "slug": slug.current }\n },\n  _type != "post" => { \n  _id,\n  _type,\n  "slug": slug.current,\n  title,\n  category,\n  nominationsClosingDate,\n  startDate,\n  endDate,\n  hideDateTime,\n  country,\n  publishedAt\n }\n },\n    "fill": select(\n      source == "posts" => \n  *[\n    _type == "post"\n    && defined(slug.current)\n    && $brand in brands\n    && defined(^.category._ref) && category._ref == ^.category._ref\n    && !(_id in coalesce(^.items[]._ref, []))\n  ] | order(publishedAt desc)[0...6]\n{ _type, \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  \n  "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title }\n,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n  "category": category->{ title, "slug": slug.current }\n },\n      \n  source == "awards" => [\n    ...*[\n      _type == "awardsProgramme"\n      && nominationsClosingDate >= $today\n      && !(_id in coalesce(^.items[]._ref, []))\n    ] | order(nominationsClosingDate asc)[0...5]{ \n  _id,\n  _type,\n  "slug": slug.current,\n  title,\n  category,\n  nominationsClosingDate,\n  startDate,\n  endDate,\n  hideDateTime,\n  country,\n  publishedAt\n },\n    ...*[\n      _type == "awardsProgramme"\n      && !(defined(nominationsClosingDate) && nominationsClosingDate >= $today)\n      && startDate >= $today\n      && !(_id in coalesce(^.items[]._ref, []))\n    ] | order(startDate asc)[0...5]{ \n  _id,\n  _type,\n  "slug": slug.current,\n  title,\n  category,\n  nominationsClosingDate,\n  startDate,\n  endDate,\n  hideDateTime,\n  country,\n  publishedAt\n },\n    ...*[\n      _type == "awardsProgramme"\n      && !(defined(nominationsClosingDate) && nominationsClosingDate >= $today)\n      && startDate < $today\n      && !(_id in coalesce(^.items[]._ref, []))\n    ] | order(startDate desc)[0...5]{ \n  _id,\n  _type,\n  "slug": slug.current,\n  title,\n  category,\n  nominationsClosingDate,\n  startDate,\n  endDate,\n  hideDateTime,\n  country,\n  publishedAt\n }\n  ],\n  source == "events" => [\n    ...*[\n      _type == "conferenceEvent"\n      && coalesce(endDate, startDate) >= $today\n      && !(_id in coalesce(^.items[]._ref, []))\n    ] | order(startDate asc)[0...4]{ \n  _id,\n  _type,\n  "slug": slug.current,\n  title,\n  category,\n  nominationsClosingDate,\n  startDate,\n  endDate,\n  hideDateTime,\n  country,\n  publishedAt\n },\n    ...*[\n      _type == "conferenceEvent"\n      && coalesce(endDate, startDate) < $today\n      && !(_id in coalesce(^.items[]._ref, []))\n    ] | order(startDate desc)[0...4]{ \n  _id,\n  _type,\n  "slug": slug.current,\n  title,\n  category,\n  nominationsClosingDate,\n  startDate,\n  endDate,\n  hideDateTime,\n  country,\n  publishedAt\n }\n  ],\n  source == "research" => *[\n    _type == "resource"\n    && category == "research"\n    && !(_id in coalesce(^.items[]._ref, []))\n    && _id != coalesce(^.promo.resource._ref, "")\n  ] | order(defined(publishedAt) desc, publishedAt desc, legacyWpId desc)[0...3]{ \n  _id,\n  _type,\n  "slug": slug.current,\n  title,\n  category,\n  nominationsClosingDate,\n  startDate,\n  endDate,\n  hideDateTime,\n  country,\n  publishedAt\n }\n\n    )\n  }\n },\n  _type == "subscribeBanner" => { \n  heading[]{ _key, style, children[]{ _key, text } },\n  description,\n  buttonLabel,\n  cta{ \n  label,\n  \n  kind,\n  external,\n  hub,\n  internal->{\n    _type,\n    "slug": slug.current,\n    brand,\n    brands\n  }\n\n }\n },\n  _type == "imageHero" => { \n  breadcrumbHomeLabel,\n  breadcrumbLabel,\n  eyebrow,\n  heading[]{ _key, style, children[]{ _key, text } },\n  standfirst,\n  button{ \n  label,\n  \n  kind,\n  external,\n  hub,\n  internal->{\n    _type,\n    "slug": slug.current,\n    brand,\n    brands\n  }\n\n },\n  image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n }\n },\n  _type == "numberedList" => { \n  heading[]{ _key, style, children[]{ _key, text } },\n  items[]{ _key, title, description }\n },\n  _type == "benefitPanel" => { \n  heading[]{ _key, style, children[]{ _key, text } },\n  image{ asset, hotspot, crop },\n  items[]{ _key, title, description }\n },\n  _type == "opportunityCards" => { \n  heading[]{ _key, style, children[]{ _key, text } },\n  cards[]{ _key, icon, label, heading, copy, benefits, link{ \n  label,\n  \n  kind,\n  external,\n  hub,\n  internal->{\n    _type,\n    "slug": slug.current,\n    brand,\n    brands\n  }\n\n } }\n },\n  _type == "enquiryForm" => { \n  anchorId,\n  heading[]{ _key, style, children[]{ _key, text } },\n  firstNameLabel,\n  lastNameLabel,\n  emailLabel,\n  companyLabel,\n  jobTitleLabel,\n  messageLabel,\n  consentText,\n  privacyLinkLabel,\n  privacyLink{ \n  kind,\n  external,\n  hub,\n  internal->{\n    _type,\n    "slug": slug.current,\n    brand,\n    brands\n  }\n },\n  consentError,\n  submitLabel,\n  requiredMessage,\n  invalidEmailMessage,\n  sendErrorMessage,\n  successMessage,\n  returnLabel\n },\n  _type == "contactForm" => { \n  breadcrumbHomeLabel,\n  breadcrumbLabel,\n  heading[]{ _key, style, children[]{ _key, text } },\n  standfirst,\n  image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n  firstNameLabel,\n  lastNameLabel,\n  jobTitleLabel,\n  companyLabel,\n  emailLabel,\n  phoneLabel,\n  messageLabel,\n  optionalMarker,\n  consentText,\n  privacyLinkLabel,\n  privacyLink{ \n  kind,\n  external,\n  hub,\n  internal->{\n    _type,\n    "slug": slug.current,\n    brand,\n    brands\n  }\n },\n  submitLabel,\n  firstNameError,\n  lastNameError,\n  jobTitleError,\n  companyError,\n  emailMissingError,\n  emailInvalidError,\n  messageError,\n  consentError,\n  sendErrorMessage,\n  successMessage,\n  returnLabel\n },\n  _type == "splitLayout" => {\n    "main": main[]{ _key, _type, \n  _type == "topStories" => { \n  linkLabel,\n  label,\n  "slides": slides[$brand == "clearview" || $brand in @->brands]->{ \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  \n  "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title }\n,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n  "category": category->{ title, "slug": slug.current }\n },\n  "articles": articles[$brand == "clearview" || $brand in @->brands]->{ \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  \n  "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title }\n,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n  "category": category->{ title, "slug": slug.current }\n },\n  "latest": *[\n    _type == "post"\n    && defined(slug.current)\n    && ($brand == "clearview" || $brand in brands)\n    && !(_id in coalesce(^.slides[]._ref, []))\n    && !(_id in coalesce(^.articles[]._ref, []))\n  ] | order(publishedAt desc)[0...6]{ \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  \n  "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title }\n,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n  "category": category->{ title, "slug": slug.current }\n }\n },\n  _type == "sponsoredContent" => { \n  label,\n  link{ \n  label,\n  \n  kind,\n  external,\n  hub,\n  internal->{\n    _type,\n    "slug": slug.current,\n    brand,\n    brands\n  }\n\n },\n  profileLabel,\n  "post": *[\n    _type == "post"\n    && _id == ^.post._ref\n    && defined(slug.current)\n    && defined(sponsor)\n    && ($brand == "clearview" || $brand in brands)\n  ][0]{\n    \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  \n  "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title }\n,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n  "category": category->{ title, "slug": slug.current }\n,\n    "sponsor": sponsor->{\n      title,\n      "slug": slug.current,\n      "logo": logo{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n }\n    }\n  }\n },\n  _type == "postCards" => { \n  \n  heading[]{ _key, style, children[]{ _key, text } },\n  link{ \n  label,\n  \n  kind,\n  external,\n  hub,\n  internal->{\n    _type,\n    "slug": slug.current,\n    brand,\n    brands\n  }\n\n }\n,\n  "category": category->{ title, "slug": slug.current },\n  "posts": posts[$brand in @->brands]->{ \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  \n  "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title }\n,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n  "category": category->{ title, "slug": slug.current }\n },\n  "latest": \n  *[\n    _type == "post"\n    && defined(slug.current)\n    && $brand in brands\n    && defined(^.category._ref) && category._ref == ^.category._ref\n    && !(_id in coalesce(^.posts[]._ref, []))\n  ] | order(publishedAt desc)[0...6]\n{ \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  \n  "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title }\n,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n  "category": category->{ title, "slug": slug.current }\n }\n },\n  _type == "postBriefs" => { \n  \n  heading[]{ _key, style, children[]{ _key, text } },\n  link{ \n  label,\n  \n  kind,\n  external,\n  hub,\n  internal->{\n    _type,\n    "slug": slug.current,\n    brand,\n    brands\n  }\n\n }\n,\n  count,\n  "posts": posts[$brand in @->brands]->{ \n  \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  \n  "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title }\n,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n  "category": category->{ title, "slug": slug.current }\n,\n  "topic": primaryTopic->{ title },\n  briefText\n },\n  "latest": \n  *[\n    _type == "post"\n    && defined(slug.current)\n    && $brand in brands\n    && true\n    && !(_id in coalesce(^.posts[]._ref, []))\n  ] | order(publishedAt desc)[0...6]\n{ \n  \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  \n  "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title }\n,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n  "category": category->{ title, "slug": slug.current }\n,\n  "topic": primaryTopic->{ title },\n  briefText\n }\n },\n  _type == "weeklyRoundup" => { \n  heading[]{ _key, style, children[]{ _key, text } },\n  label,\n  title,\n  summary,\n  button{ \n  label,\n  \n  kind,\n  external,\n  hub,\n  internal->{\n    _type,\n    "slug": slug.current,\n    brand,\n    brands\n  }\n\n },\n  listLabel,\n  "posts": posts[$brand in @->brands]->{ \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  \n  "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title }\n,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n  "category": category->{ title, "slug": slug.current }\n },\n  "latest": \n  *[\n    _type == "post"\n    && defined(slug.current)\n    && $brand in brands\n    && true\n    && !(_id in coalesce(^.posts[]._ref, []))\n  ] | order(publishedAt desc)[0...8]\n{ \n  _id,\n  title,\n  "slug": slug.current,\n  brands,\n  \n  "brandTitles": *[_type == "brand" && key.current in ^.brands]{ "key": key.current, title }\n,\n  publishedAt,\n  excerpt,\n  "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n  "category": category->{ title, "slug": slug.current }\n }\n },\n  _type == "publications" => { \n  heading[]{ _key, style, children[]{ _key, text } },\n  body,\n  cards[]{\n    _key,\n    brand,\n    "brandTitle": *[_type == "brand" && key.current == ^.brand][0].title,\n    description,\n    image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n    linkLabel\n  }\n },\n  _type == "cta" => { \n  heading,\n  text,\n  link{ label, href }\n },\n  _type == "pageHero" => { \n  breadcrumbHomeLabel,\n  breadcrumbLabel,\n  title,\n  intro\n },\n  _type == "recordListing" => { \n  awardsTabLabel,\n  eventsTabLabel,\n  researchTabLabel,\n  regionFilterLabel,\n  regionEuropeLabel,\n  regionMenaLabel,\n  regionAsiaLabel,\n  regionNorthAmericaLabel,\n  regionGlobalLabel,\n  yearFilterLabel,\n  statusFilterLabel,\n  allOptionLabel,\n  clearFiltersLabel,\n  upcomingEventLabel,\n  pastEventLabel,\n  publishedLabel,\n  emptyHeading,\n  emptyText,\n  emptyAwardNoun,\n  emptyEventNoun,\n  emptyResearchNoun,\n  emptyButtonLabel,\n  previousLabel,\n  nextLabel\n },\n  _type == "articleListing" => { \n  topicsLabel,\n  allTopicsLabel,\n  regionsLabel,\n  allRegionsLabel,\n  sortLabel,\n  sortLatestLabel,\n  sortOldestLabel,\n  selectedLabel,\n  clearFiltersLabel,\n  emptyStateText,\n  readArticleLabel,\n  previousLabel,\n  nextLabel,\n  topicHintLabel\n },\n  _type == "relatedTopics" => { \n  heading[]{ _key, style, children[]{ _key, text } },\n  "items": items[defined(@->slug.current)]->{ _id, _type, title, "slug": slug.current }\n }\n },\n    "aside": aside[]{ _key, _type, \n  _type == "highlights" => { \n  source,\n  layout,\n  count,\n  heading[]{ _key, style, children[]{ _key, text } },\n  deadlineLabel,\n  "items": items[]->{ \n  _id,\n  _type,\n  "slug": slug.current,\n  title,\n  category,\n  nominationsClosingDate,\n  startDate,\n  endDate,\n  hideDateTime,\n  country,\n  publishedAt\n },\n  "fill": select(\n  source == "awards" => [\n    ...*[\n      _type == "awardsProgramme"\n      && nominationsClosingDate >= $today\n      && !(_id in coalesce(^.items[]._ref, []))\n    ] | order(nominationsClosingDate asc)[0...5]{ \n  _id,\n  _type,\n  "slug": slug.current,\n  title,\n  category,\n  nominationsClosingDate,\n  startDate,\n  endDate,\n  hideDateTime,\n  country,\n  publishedAt\n },\n    ...*[\n      _type == "awardsProgramme"\n      && !(defined(nominationsClosingDate) && nominationsClosingDate >= $today)\n      && startDate >= $today\n      && !(_id in coalesce(^.items[]._ref, []))\n    ] | order(startDate asc)[0...5]{ \n  _id,\n  _type,\n  "slug": slug.current,\n  title,\n  category,\n  nominationsClosingDate,\n  startDate,\n  endDate,\n  hideDateTime,\n  country,\n  publishedAt\n },\n    ...*[\n      _type == "awardsProgramme"\n      && !(defined(nominationsClosingDate) && nominationsClosingDate >= $today)\n      && startDate < $today\n      && !(_id in coalesce(^.items[]._ref, []))\n    ] | order(startDate desc)[0...5]{ \n  _id,\n  _type,\n  "slug": slug.current,\n  title,\n  category,\n  nominationsClosingDate,\n  startDate,\n  endDate,\n  hideDateTime,\n  country,\n  publishedAt\n }\n  ],\n  source == "events" => [\n    ...*[\n      _type == "conferenceEvent"\n      && coalesce(endDate, startDate) >= $today\n      && !(_id in coalesce(^.items[]._ref, []))\n    ] | order(startDate asc)[0...4]{ \n  _id,\n  _type,\n  "slug": slug.current,\n  title,\n  category,\n  nominationsClosingDate,\n  startDate,\n  endDate,\n  hideDateTime,\n  country,\n  publishedAt\n },\n    ...*[\n      _type == "conferenceEvent"\n      && coalesce(endDate, startDate) < $today\n      && !(_id in coalesce(^.items[]._ref, []))\n    ] | order(startDate desc)[0...4]{ \n  _id,\n  _type,\n  "slug": slug.current,\n  title,\n  category,\n  nominationsClosingDate,\n  startDate,\n  endDate,\n  hideDateTime,\n  country,\n  publishedAt\n }\n  ],\n  source == "research" => *[\n    _type == "resource"\n    && category == "research"\n    && !(_id in coalesce(^.items[]._ref, []))\n    && _id != coalesce(^.promo.resource._ref, "")\n  ] | order(defined(publishedAt) desc, publishedAt desc, legacyWpId desc)[0...3]{ \n  _id,\n  _type,\n  "slug": slug.current,\n  title,\n  category,\n  nominationsClosingDate,\n  startDate,\n  endDate,\n  hideDateTime,\n  country,\n  publishedAt\n }\n),\n  button{ \n  label,\n  \n  kind,\n  external,\n  hub,\n  internal->{\n    _type,\n    "slug": slug.current,\n    brand,\n    brands\n  }\n\n },\n  promo{\n    resource->{\n      title,\n      "downloadThumbnail": downloadThumbnail{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n      "downloadFileUrl": downloadFile.asset->url,\n      downloadUrl\n    },\n    title,\n    description,\n    "image": image{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n    link{ \n  kind,\n  external,\n  hub,\n  internal->{\n    _type,\n    "slug": slug.current,\n    brand,\n    brands\n  }\n }\n  }\n },\n  _type == "awardsWinners" => { heading[]{ _key, style, children[]{ _key, text } } }\n }\n  }\n }\n    },\n    "statuses": *[_id == $statusesId && _type == "awardsProgrammePage"][0]{\n      launchingSoonLabel,\n      submissionsOpenLabel,\n      ceremonyDueLabel,\n      winnersAnnouncedLabel\n    },\n    "awards": *[$tab == "awards" && _type == "awardsProgramme" && defined(slug.current)]{\n      _id,\n      title,\n      "slug": slug.current,\n      standfirst,\n      startDate,\n      endDate,\n      hideDateTime,\n      nominationsOpeningDate,\n      nominationsClosingDate,\n      country,\n      "programmeRegion": programme->region,\n      "hasWinners": count(winners[defined(category->title) && defined(company->title)]) > 0\n    },\n    "events": *[$tab == "events" && _type == "conferenceEvent" && defined(slug.current)]{\n      _id,\n      title,\n      "slug": slug.current,\n      startDate,\n      endDate,\n      hideDateTime,\n      country\n    },\n    "research": *[$tab == "research" && _type == "resource" && category == "research" && defined(slug.current)]{\n      _id,\n      title,\n      "slug": slug.current,\n      publishedAt\n    }\n  }\n': SHARED_LISTINGS_PAGE_QUERY_RESULT;

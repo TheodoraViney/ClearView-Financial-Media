@@ -5,6 +5,8 @@ import { cx } from './cx'
 const VARIANTS = {
   default: 'text-grey',
   inverse: 'text-white/50',
+  // Light blue-grey on the dark awards programme masthead, white/24 dividers, the tag white on white/14.
+  masthead: 'text-masthead-muted',
 }
 
 // Space between items, each side of the divider: `default` 8px, `relaxed` 16px (shared-listing-record). The row is
@@ -77,6 +79,7 @@ export function Meta({
               nowrap && index > 0 && 'shrink-0',
               index > 0 && !wrapItems && 'h-3.25',
               variant === 'inverse' && 'border-white/20',
+              variant === 'masthead' && 'border-white/24',
               index === 0 && accentFirst && 'text-accent',
               index === 0 && strongFirst && 'font-medium',
             )}
@@ -96,7 +99,8 @@ export function Meta({
   const tagBox = (
     <span
       className={cx(
-        'inline-flex h-6 items-center rounded-sm bg-surface-thumb px-2 leading-none whitespace-nowrap text-foreground',
+        'inline-flex h-6 items-center rounded-sm px-2 leading-none whitespace-nowrap',
+        variant === 'masthead' ? 'bg-white/14 text-white' : 'bg-surface-thumb text-foreground',
         !tagEnd && 'mr-2',
       )}
     >

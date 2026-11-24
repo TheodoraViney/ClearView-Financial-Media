@@ -60,6 +60,18 @@ export const paragraphsBlock = defineArrayMember({
   },
 })
 
+/**
+ * Paragraphs with bulleted and numbered lists: bold, italic and links, no headings, quotes or media. For short
+ * structured copy such as a registration step, where an editor writes the lead-in and any list under it.
+ */
+export const paragraphsWithListsBlock = defineArrayMember({
+  ...paragraphsBlock,
+  lists: [
+    { title: 'Bullet', value: 'bullet' },
+    { title: 'Numbered', value: 'number' },
+  ],
+})
+
 /** An image with alt text. */
 export const richTextImage = defineArrayMember({
   type: 'image',

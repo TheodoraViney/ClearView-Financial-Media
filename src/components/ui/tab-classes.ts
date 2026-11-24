@@ -11,8 +11,11 @@
  */
 export const TAB_ROW = 'relative flex overflow-x-auto overflow-y-hidden scrollbar-none'
 
-export const TAB_ITEM =
-  'flex h-12 items-center text-base leading-none whitespace-nowrap transition-colors duration-180 ease-out focus-visible:-outline-offset-2'
+/** The item without its height: 48 in a scrolling row (`TAB_ITEM`), 44 in a wrapping one (`SectionNav wrap`). */
+export const TAB_ITEM_LOOK =
+  'flex items-center text-base leading-none whitespace-nowrap transition-colors duration-180 ease-out focus-visible:-outline-offset-2'
+
+export const TAB_ITEM = `h-12 ${TAB_ITEM_LOOK}`
 
 export const TAB_CURRENT = 'text-accent inset-shadow-bar'
 
