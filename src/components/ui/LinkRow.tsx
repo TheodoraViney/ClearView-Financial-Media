@@ -21,10 +21,13 @@ export function LinkRow({
   href,
   label,
   chevronAlign = 'center',
+  newTab = false,
 }: {
   href: string
   label: string
   chevronAlign?: keyof typeof CHEVRON_ALIGN
+  /** Opens in a new tab, for links that leave the site (Acclaim on Issuu). */
+  newTab?: boolean
 }) {
   const align = CHEVRON_ALIGN[chevronAlign]
 
@@ -32,6 +35,7 @@ export function LinkRow({
     <Link
       href={href}
       prefetch={false}
+      {...(newTab ? { target: '_blank', rel: 'noopener noreferrer' } : {})}
       className={cx('group', ROW, align.row, 'transition-colors duration-180 ease-out hover:text-accent')}
     >
       <span className="min-w-0 text-pretty wrap-anywhere">{label}</span>

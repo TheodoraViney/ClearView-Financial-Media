@@ -292,18 +292,12 @@ export function awardCategoryHref(
 }
 
 /**
- * Href of an Acclaim magazine: `/acclaim/{slug}`, the clearviewpublishing.com path without its trailing slash. Shared
- * record rules as `sharedRecordHref`. The Acclaim page is not built yet: the link points at the final URL and 404s
- * until it exists. Null without a slug.
+ * Href of an Acclaim magazine: its Issuu reader, `https://issuu.com/docs/{issuuId}`. There is no Acclaim page on the
+ * site: the awards programme page links straight to the magazine, and the legacy `/acclaim/{slug}/` addresses redirect
+ * to the programme page (docs/migration-baseline.md). Null unless the id is the 32-character hex the schema validates.
  */
-export function acclaimHref(slug: string | null | undefined, currentBrand: BrandKey): string | null {
-  const clean = stegaClean(slug)?.trim()
+export function acclaimHref(issuuId: string | null | undefined): string | null {
+  const clean = stegaClean(issuuId)?.trim().toLowerCase()
 
-  if (!clean) {
-    return null
-  }
-
-  const path = pathFor(clean, '/acclaim')
-
-  return currentBrand === 'clearview' ? path : `${brandOrigin('clearview')}${path}`
+  return clean && /^[0-9a-f]{32}$/.test(clean) ? `https://issuu.com/docs/${clean}` : null
 }
