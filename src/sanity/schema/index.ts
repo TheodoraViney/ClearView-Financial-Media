@@ -28,6 +28,7 @@ import { researchSummary } from './documents/research-summary'
 import { resource } from './documents/resource'
 import { searchPage } from './documents/search-page'
 import { signupNotificationSettings } from './documents/signup-notification-settings'
+import { notFoundPage } from './documents/not-found-page'
 import { subscribeFormSettings } from './documents/subscribe-form-settings'
 import { subscribeModal } from './documents/subscribe-modal'
 import { objectTypes } from './objects'
@@ -57,6 +58,7 @@ export const documentTypes = [
   researchGenerationSettings,
   subscribeModal,
   subscribeFormSettings,
+  notFoundPage,
   signupNotificationSettings,
   newsletterIssue,
   awardsProgrammeGroup,

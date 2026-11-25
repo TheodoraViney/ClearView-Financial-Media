@@ -12,6 +12,7 @@ import { FolderIcon } from '@sanity/icons/Folder'
 import { InboxIcon } from '@sanity/icons/Inbox'
 import { InsertBelowIcon } from '@sanity/icons/InsertBelow'
 import { MenuIcon } from '@sanity/icons/Menu'
+import { ErrorOutlineIcon } from '@sanity/icons/ErrorOutline'
 import { SearchIcon } from '@sanity/icons/Search'
 import { SparklesIcon } from '@sanity/icons/Sparkles'
 import { StarIcon } from '@sanity/icons/Star'
@@ -27,6 +28,7 @@ import {
   BRAND_KEYS,
   BRANDS,
   EVENT_PAGE_ID,
+  NOT_FOUND_PAGE_ID,
   PARTNER_PROFILE_PAGE_ID,
   RESEARCH_REPORT_PAGE_ID,
   SIGNUP_NOTIFICATION_SETTINGS_ID,
@@ -207,6 +209,11 @@ export const structure: StructureResolver = (S) =>
                 ),
             ]),
         ),
+      // The not-found page's texts, one document for every brand.
+      S.listItem()
+        .title('404 page')
+        .icon(ErrorOutlineIcon)
+        .child(S.document().schemaType('notFoundPage').documentId(NOT_FOUND_PAGE_ID)),
       S.divider(),
       // Shared records. They belong to the group, not to one brand: filtering
       // them by the host brand would hide them from clearviewpublishing.com.

@@ -1010,3 +1010,9 @@ export const COMPANY_ENGAGEMENT_PAGE_QUERY = defineQuery(`
     blocks[]{ _key, _type, ${BLOCKS_PROJECTION} }
   }
 `)
+
+// The not-found page's texts, `$id` is NOT_FOUND_PAGE_ID: one document and one cached result for every brand, so no
+// `$brand`. Null until the document is published; the page then shows the design texts from src/lib/not-found-copy.ts.
+export const NOT_FOUND_PAGE_QUERY = defineQuery(`
+  *[_id == $id && _type == "notFoundPage"][0]{ title, description, buttonLabel }
+`)

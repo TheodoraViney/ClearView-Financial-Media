@@ -326,6 +326,11 @@ main [data-section-anchor] {
   /* Report cover or logo contained in a search result thumbnail: the shadow follows the painted image, not its box */
   --drop-shadow-cover: 0 4px 10px rgb(31 43 50 / 0.16);
 
+  /* Not-found page numeral (wb-g-404): 120px up to 240px, 16.7vw between, line-height 1 */
+  --text-error-code: clamp(7.5rem, 16.7vw, 15rem);
+  --text-error-code--line-height: 1;
+  --tracking-error-code: -0.02em;
+
   /* Research report key finding figure (key-finding-card), 40/48 on every breakpoint */
   --text-finding: 2.5rem;
   --text-finding--line-height: 3rem;
@@ -640,6 +645,13 @@ main [data-section-anchor] {
   & a strong {
     color: inherit;
   }
+}
+
+/* Not-found page numeral: transparent fill with a 1px brand outline (wb-g-404 error-number) */
+@utility text-outline {
+  color: transparent;
+  -webkit-text-stroke: 1px var(--accent);
+  paint-order: stroke;
 }
 
 /* FAQ question row on mobile: the question, then a 24px chevron column (faq-accordion-item) */
