@@ -157,6 +157,15 @@ export const post = defineType({
         'Set only for sponsored content: the company that paid for this post. A post with a sponsor can appear in the "Sponsored content" block, which shows the company name, logo and a link to its profile.',
       options: { disableNew: true },
     }),
+    defineField({
+      name: 'contributor',
+      title: 'Contributor (guest)',
+      type: 'reference',
+      to: [{ type: 'company' }],
+      description:
+        'Set only for contributed content: the company whose guest wrote this post. Leave empty for staff articles.',
+      options: { disableNew: true },
+    }),
     // The article banner sits between the two text fields, fixed by the template. `content` keeps its name from
     // before the split, so stored bodies need no move.
     defineField({

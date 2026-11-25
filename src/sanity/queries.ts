@@ -84,14 +84,14 @@ export const PAGE_QUERY = defineQuery(`
   }
 `)
 
-// The home page, the Categories page and the shared listings page have routes of their own
-// (src/app/sites/[brand]/categories, /events-category and /resource-categories).
+// The home page, the Categories page, the shared listings page and the Company Engagement page have routes of their own
+// (src/app/sites/[brand]/categories, /events-category, /resource-categories and /companies).
 export const PAGE_SLUGS_QUERY = defineQuery(`
   *[
     _type == "page"
     && brand == $brand
     && defined(slug.current)
-    && !(slug.current in ["home", "categories", "shared-listings"])
+    && !(slug.current in ["home", "categories", "shared-listings", "company-engagement"])
   ]{
     "slug": slug.current
   }
@@ -944,5 +944,69 @@ export const PARTNER_PROFILE_PAGE_QUERY = defineQuery(`
     sponsorInterviewsHeading[]{ _key, style, children[]{ _key, text } },
     archiveCoverageHeading[]{ _key, style, children[]{ _key, text } },
     officialLinksHeading[]{ _key, style, children[]{ _key, text } }
+  }
+`)
+
+// The Company Engagement page's records (/companies, ClearView only), fetched once for all its blocks, as flat records
+// the view (src/sanity/company-engagement-view.ts) builds every list from: the companies with a profile
+// (COMPANY_HAS_PROFILE), each with its About as plain text; the awards editions, events, research reports and posts
+// with the company references that count as activity, as ids (`_ref`, never dereferenced here: the view joins them to
+// the companies). Venues, speakers, judges and people do not count. Posts follow the brand rule of the Sponsored
+// content block (every editorial brand on ClearView).
+export const COMPANY_ENGAGEMENT_QUERY = defineQuery(`
+  {
+    "companies": *[_type == "company" && defined(slug.current) && ${COMPANY_HAS_PROFILE}]{
+      _id,
+      title,
+      "slug": slug.current,
+      "logo": logo{ ${IMAGE} },
+      "about": pt::text(about)
+    },
+    "awards": *[_type == "awardsProgramme" && defined(slug.current)]{
+      _id,
+      title,
+      "slug": slug.current,
+      startDate,
+      "winners": winners[defined(company._ref)]{ _key, "company": company._ref, "category": category->title },
+      "sponsors": sponsorTypes[].companies[]._ref,
+      "charityPartners": charityPartners[]._ref
+    },
+    "events": *[_type == "conferenceEvent" && defined(slug.current)]{
+      _id,
+      title,
+      "slug": slug.current,
+      startDate,
+      "sponsors": sponsorTypes[].companies[]._ref,
+      "techDemos": techDemos[defined(company._ref)].company._ref
+    },
+    "research": *[_type == "resource" && defined(researchPartner.company._ref)]{
+      _id,
+      publishedAt,
+      "company": researchPartner.company._ref
+    },
+    "posts": *[
+      _type == "post"
+      && defined(slug.current)
+      && (defined(sponsor) || defined(contributor))
+      && ($brand == "clearview" || $brand in brands)
+    ]{
+      _id,
+      title,
+      "slug": slug.current,
+      brands,
+      publishedAt,
+      "sponsor": sponsor._ref,
+      "contributor": contributor._ref
+    }
+  }
+`)
+
+// The Company Engagement page document (`$id` is COMPANY_ENGAGEMENT_PAGE_DOCUMENT_ID), built from blocks like any page.
+// Its records are COMPANY_ENGAGEMENT_QUERY's. `$today` is for the blocks that read it (BLOCKS_PROJECTION).
+export const COMPANY_ENGAGEMENT_PAGE_QUERY = defineQuery(`
+  *[_type == "page" && _id == $id && brand == $brand][0]{
+    _id,
+    title,
+    blocks[]{ _key, _type, ${BLOCKS_PROJECTION} }
   }
 `)

@@ -231,6 +231,9 @@ export const EVENT_LISTING_PATHS = {
  */
 export const RESEARCH_LISTING_PATH = '/resource-categories/research'
 
+/** The company directory, Industry Engagement (ClearView only); each company's profile sits under it at /companies/{slug}. */
+export const COMPANY_ENGAGEMENT_PATH = '/companies'
+
 /**
  * Bare `/resource`, the reports' own prefix: a legacy clearviewpublishing.com URL in the redirect baseline. It shows
  * the same Research tab, its canonical pointing at RESEARCH_LISTING_PATH, as /events-category/briefings does at summits.

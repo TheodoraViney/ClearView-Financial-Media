@@ -508,6 +508,11 @@ main [data-section-anchor] {
   grid-template-columns: 8.75rem minmax(0, 1fr);
 }
 
+/* Company Engagement filter row from the header breakpoint: the search, two 200px dropdowns, Clear filters. */
+@utility grid-cols-company-filters {
+  grid-template-columns: minmax(12.5rem, 1fr) repeat(2, 12.5rem) auto;
+}
+
 /* DefinitionList `detail` (award category details) from md: label and copy on a 4 / 8 split, as the design. */
 @utility grid-cols-detail {
   grid-template-columns: minmax(0, 4fr) minmax(0, 8fr);

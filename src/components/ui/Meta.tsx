@@ -1,5 +1,6 @@
 import { type ReactNode } from 'react'
 
+import { Badge } from './Badge'
 import { cx } from './cx'
 
 const VARIANTS = {
@@ -97,16 +98,10 @@ export function Meta({
 
   const tagEnd = tagPosition === 'end'
   const tagBox = (
-    <span
-      className={cx(
-        'inline-flex h-6 items-center rounded-sm px-2 leading-none whitespace-nowrap',
-        variant === 'masthead' ? 'bg-white/14 text-white' : 'bg-surface-thumb text-foreground',
-        !tagEnd && 'mr-2',
-      )}
-    >
+    <Badge tone={variant === 'masthead' ? 'masthead' : 'neutral'} className={cx('whitespace-nowrap', !tagEnd && 'mr-2')}>
       {tagLabel && <span className="sr-only">{tagLabel}</span>}
       {tag}
-    </span>
+    </Badge>
   )
 
   return (

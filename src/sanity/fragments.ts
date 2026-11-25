@@ -276,6 +276,7 @@ const WEEKLY_ROUNDUP = /* groq */ `
 ` as const
 
 const PAGE_HERO = /* groq */ `
+  showBreadcrumb,
   breadcrumbHomeLabel,
   breadcrumbLabel,
   title,
@@ -307,6 +308,73 @@ const RECORD_LISTING = /* groq */ `
   emptyEventNoun,
   emptyResearchNoun,
   emptyButtonLabel,
+  previousLabel,
+  nextLabel
+`
+
+// The Company Engagement page's blocks: their labels only. The companies and the records that name them are not here:
+// only the Company Engagement route fetches them (COMPANY_ENGAGEMENT_QUERY), once for every block.
+const COMPANY_FILTERS = /* groq */ `
+  searchLabel,
+  searchPlaceholder,
+  clearFiltersLabel,
+  selectedLabel,
+  activityFilterLabel,
+  activityAllLabel,
+  awardsActivityLabel,
+  forumsActivityLabel,
+  researchActivityLabel,
+  contributedActivityLabel,
+  yearFilterLabel,
+  yearAllLabel
+`
+
+const COMPANY_DIRECTORY = /* groq */ `
+  summaryDefaultText,
+  summaryText,
+  summaryFiltersText,
+  summarySearchText,
+  ctaLabel,
+  noResultsText,
+  clearFiltersLabel,
+  previousLabel,
+  nextLabel
+`
+
+const COMPANY_AWARDS = /* groq */ `
+  heading[]{ _key, style, children[]{ _key, text } },
+  intro,
+  winnerLabel,
+  awardsSponsorLabel,
+  charityPartnerLabel,
+  metaLabel,
+  ctaLabel,
+  previousLabel,
+  nextLabel
+`
+
+const COMPANY_EVENTS = /* groq */ `
+  heading[]{ _key, style, children[]{ _key, text } },
+  intro,
+  sponsorLabel,
+  techDemoLabel,
+  metaLabel,
+  ctaLabel,
+  emptyBadges,
+  emptyText,
+  previousLabel,
+  nextLabel
+`
+
+const COMPANY_SPONSORED_CONTENT = /* groq */ `
+  heading[]{ _key, style, children[]{ _key, text } },
+  intro,
+  sponsoredGroupLabel,
+  sponsoredMetaLabel,
+  sponsoredCtaLabel,
+  contributedGroupLabel,
+  contributedMetaLabel,
+  contributedCtaLabel,
   previousLabel,
   nextLabel
 `
@@ -691,6 +759,13 @@ export const BLOCKS_PROJECTION = /* groq */ `
   _type == "teamNetwork" => { ${TEAM_NETWORK} },
   _type == "enquiryForm" => { ${ENQUIRY_FORM} },
   _type == "contactForm" => { ${CONTACT_FORM} },
+  // The Company Engagement page: its heading and its lists.
+  _type == "pageHero" => { ${PAGE_HERO} },
+  _type == "companyFilters" => { ${COMPANY_FILTERS} },
+  _type == "companyDirectory" => { ${COMPANY_DIRECTORY} },
+  _type == "companyAwards" => { ${COMPANY_AWARDS} },
+  _type == "companyEvents" => { ${COMPANY_EVENTS} },
+  _type == "companySponsoredContent" => { ${COMPANY_SPONSORED_CONTENT} },
   _type == "splitLayout" => {
     "main": main[]{ _key, _type, ${MAIN_COLUMN_BLOCKS} },
     "aside": aside[]{ _key, _type, ${ASIDE_BLOCKS} }
@@ -791,9 +866,9 @@ export const RELATED_RESEARCH_FILL = /* groq */ `
 
 // For a filter or projection on a company document (the inner query's `^`): whether it has a public partner
 // profile at /companies/{slug}: some awards edition, conference event or post references it. Venue, sponsor, winner,
-// technology demonstrator and charity partner all count, as do sponsored posts on any brand; person and resource
-// references do not. There is no manual flag. Used by the profile route query, and by any card that links a company
-// (only link when this holds, or the link 404s).
+// technology demonstrator and charity partner all count, as do posts on any brand that name it as their sponsor or
+// contributor; person and resource references do not. There is no manual flag. Used by the profile route query, the
+// company directory (/companies), and by any card that links a company (only link when this holds, or the link 404s).
 export const COMPANY_HAS_PROFILE = /* groq */ `
   count(*[_type in ["awardsProgramme", "conferenceEvent", "post"] && references(^._id)]) > 0
 `
