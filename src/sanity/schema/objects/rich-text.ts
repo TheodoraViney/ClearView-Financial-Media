@@ -60,6 +60,59 @@ export const paragraphsBlock = defineArrayMember({
   },
 })
 
+/** Characters of plain text in a block array. */
+export function blocksTextLength(blocks: unknown): number {
+  return Array.isArray(blocks)
+    ? blocks.reduce(
+        (total: number, block: { children?: { text?: string }[] }) =>
+          total + (block?.children ?? []).reduce((sum, child) => sum + (child.text?.length ?? 0), 0),
+        0,
+      )
+    : 0
+}
+
+/** `text` as one `paragraphsBlock` paragraph, for initial values. Studio adds the block key. */
+export const paragraphValue = (text: string) => [
+  { _type: 'block', style: 'normal', markDefs: [], children: [{ _type: 'span', _key: 'span', text, marks: [] }] },
+]
+
+/**
+ * A required short copy field of `paragraphsBlock` paragraphs (bold, italic and links), starting as `initialText`.
+ * `maxLength` warns, never blocks, past that many characters of text.
+ */
+export const paragraphsField = ({
+  name,
+  title,
+  description,
+  initialText,
+  maxLength,
+  lengthWarning,
+}: {
+  name: string
+  title: string
+  description?: string
+  initialText?: string
+  maxLength?: number
+  lengthWarning?: string
+}) =>
+  defineField({
+    name,
+    title,
+    type: 'array',
+    description,
+    of: [paragraphsBlock],
+    initialValue: initialText ? paragraphValue(initialText) : undefined,
+    validation: (Rule) =>
+      maxLength
+        ? [
+            Rule.required(),
+            Rule.custom((blocks) =>
+              blocksTextLength(blocks) > maxLength ? (lengthWarning ?? `Longer than ${maxLength} characters`) : true,
+            ).warning(),
+          ]
+        : Rule.required(),
+  })
+
 /**
  * Paragraphs with bulleted and numbered lists: bold, italic and links, no headings, quotes or media. For short
  * structured copy such as a registration step, where an editor writes the lead-in and any list under it.

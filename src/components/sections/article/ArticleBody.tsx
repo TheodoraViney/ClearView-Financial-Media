@@ -270,12 +270,26 @@ const looseRichTextComponents: PortableTextComponents = {
   },
 }
 
+// `inherit`: paragraphs take the size, weight and wrapping of the container (a statement quote, PullQuote); the rest as
+// the article body.
+const inheritRichTextComponents: PortableTextComponents = {
+  ...richTextComponents,
+  block: {
+    ...blocks,
+    normal: ({ children }) => <p>{children}</p>,
+  },
+}
+
 const SIZE_COMPONENTS = {
   base: richTextComponents,
+  inherit: inheritRichTextComponents,
   sm: smallRichTextComponents,
   lg: largeRichTextComponents,
   loose: looseRichTextComponents,
 }
+
+/** A Portable Text value for `RichText`. */
+export type RichTextValue = PortableTextProps['value']
 
 /**
  * A `richText` field outside an article (a shared record's introduction, a judge's biography): the body members

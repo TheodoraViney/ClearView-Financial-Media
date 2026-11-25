@@ -8,6 +8,7 @@ import { ArticleListing } from './ArticleListing'
 import { AwardsWinners } from './AwardsWinners'
 import { BenefitPanel } from './BenefitPanel'
 import { ContactForm } from './ContactForm'
+import { CoverageList } from './CoverageList'
 import { Cta } from './Cta'
 import { EnquiryForm } from './EnquiryForm'
 import { ExploreGrid } from './ExploreGrid'
@@ -18,16 +19,19 @@ import { ImageHero } from './ImageHero'
 import { NewsletterSignup } from './NewsletterSignup'
 import { NumberedList } from './NumberedList'
 import { OpportunityCards } from './OpportunityCards'
+import { OverlayHero } from './OverlayHero'
 import { PageHero } from './PageHero'
 import { PostBriefs } from './PostBriefs'
 import { PostCards } from './PostCards'
 import { Publications } from './Publications'
+import { RecordFeature } from './RecordFeature'
 import { RecordListing } from './RecordListing'
 import { RelatedTopics } from './RelatedTopics'
 import { SplitLayout } from './SplitLayout'
 import { SponsoredContent } from './SponsoredContent'
 import { StatsBar } from './StatsBar'
 import { SubscribeBanner } from './SubscribeBanner'
+import { TeamNetwork } from './TeamNetwork'
 import { TopPicks } from './TopPicks'
 import { TopStories } from './TopStories'
 import { WeeklyRoundup } from './WeeklyRoundup'
@@ -180,6 +184,15 @@ function Block({
     // Contact page.
     case 'contactForm':
       return <ContactForm block={block} brand={brand} />
+    // About page blocks (the Contact panel is `cta`, above).
+    case 'overlayHero':
+      return <OverlayHero block={block} brand={brand} />
+    case 'coverageList':
+      return <CoverageList block={block} brand={brand} />
+    case 'recordFeature':
+      return <RecordFeature block={block} brand={brand} />
+    case 'teamNetwork':
+      return <TeamNetwork block={block} brand={brand} />
     default:
       return unknownBlock(block)
   }

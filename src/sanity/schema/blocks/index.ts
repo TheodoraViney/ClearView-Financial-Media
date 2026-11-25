@@ -6,6 +6,7 @@ import { articleListing } from './article-listing'
 import { awardsWinners } from './awards-winners'
 import { benefitPanel } from './benefit-panel'
 import { contactForm } from './contact-form'
+import { coverageList } from './coverage-list'
 import { cta } from './cta'
 import { enquiryForm } from './enquiry-form'
 import { exploreGrid } from './explore-grid'
@@ -16,15 +17,18 @@ import { imageHero } from './image-hero'
 import { newsletterSignup } from './newsletter-signup'
 import { numberedList } from './numbered-list'
 import { opportunityCards } from './opportunity-cards'
+import { overlayHero } from './overlay-hero'
 import { pageHero } from './page-hero'
 import { postBriefs, postCards } from './post-list'
 import { publications } from './publications'
+import { recordFeature } from './record-feature'
 import { recordListing } from './record-listing'
 import { relatedTopics } from './related-topics'
 import { splitLayout } from './split-layout'
 import { sponsoredContent } from './sponsored-content'
 import { statsBar } from './stats-bar'
 import { subscribeBanner } from './subscribe-banner'
+import { teamNetwork } from './team-network'
 import { topPicks } from './top-picks'
 import { topStories } from './top-stories'
 import { weeklyRoundup } from './weekly-roundup'
@@ -60,6 +64,10 @@ export const blockTypes = [
   opportunityCards,
   enquiryForm,
   contactForm,
+  overlayHero,
+  coverageList,
+  recordFeature,
+  teamNetwork,
 ]
 
 const COLUMN_ONLY_BLOCK_TYPES: readonly (typeof blockTypes)[number][] = [
@@ -94,9 +102,21 @@ const INSERT_MENU_GROUPS = [
   {
     name: 'landing',
     title: 'Landing page',
-    of: [imageHero.name, numberedList.name, benefitPanel.name, opportunityCards.name, enquiryForm.name, contactForm.name],
+    of: [
+      imageHero.name,
+      overlayHero.name,
+      coverageList.name,
+      numberedList.name,
+      recordFeature.name,
+      benefitPanel.name,
+      teamNetwork.name,
+      opportunityCards.name,
+      enquiryForm.name,
+      contactForm.name,
+      cta.name,
+    ],
   },
-  { name: 'other', title: 'Other', of: [publications.name, statsBar.name, cta.name] },
+  { name: 'other', title: 'Other', of: [publications.name, statsBar.name] },
 ]
 
 /** A list of page blocks. The page document has one, and the home page two more between its fixed banners. */

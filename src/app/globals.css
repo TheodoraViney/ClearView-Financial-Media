@@ -262,6 +262,8 @@ main [data-section-anchor] {
 
   /* Hero with image below the header breakpoint: the image box is 752 / 400 */
   --aspect-hero: 752 / 400;
+  /* Team and publications photo on tablet (About design v1.1): 704 / 400 */
+  --aspect-team: 704 / 400;
 
   /* AWARDS-LIST-VARIANTS (temporary): an awards edition wordmark logo, about 3.4:1 (Awards `?view=icon`) */
   --aspect-wordmark: 17 / 5;
@@ -468,6 +470,16 @@ main [data-section-anchor] {
 /* Hero with image, desktop: the row is at least 400px high (text column stretches, image is 400) */
 @utility grid-rows-hero {
   grid-template-rows: minmax(25rem, auto);
+}
+
+/* Hero over image below the header breakpoint: a dark scrim rising from the bottom behind the standfirst (About v1.1) */
+@utility bg-hero-scrim {
+  background-image: linear-gradient(to top, rgb(17 24 20 / 0.6) 0%, rgb(17 24 20 / 0) 45%);
+}
+
+/* Team and publications logos: two columns of at most 192px (About v1.1) */
+@utility grid-cols-logos {
+  grid-template-columns: repeat(2, minmax(0, 12rem));
 }
 
 /* Numbered list row (Weekly Roundup "In this edition"): 24px number column */
