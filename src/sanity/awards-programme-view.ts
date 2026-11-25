@@ -20,7 +20,7 @@ import { EDITION_STATUS_LABELS, editionStatus } from '@/lib/awards-status'
 import { countryName } from '@/lib/countries'
 import { formatLongDate, formatWeekdayDate } from '@/lib/dates'
 import type { AdUnits } from '@/lib/gam'
-import { acclaimHref, AWARDS_LISTING_PATH, awardCategoryHref, safeHref, sharedRecordHref } from '@/lib/links'
+import { acclaimHref, AWARDS_LISTING_PATH, awardCategoryHref, sharedRecordHref } from '@/lib/links'
 
 import { toStatuses } from './award-category-view'
 import { toHeading } from './heading'
@@ -246,7 +246,6 @@ export function toAwardsProgrammeView({
   const statusLabel = status ? statuses[EDITION_STATUS_LABELS[status]] || null : null
   const year = stegaClean(edition.startDate)?.slice(0, 4)
   const previousHref = edition.programme ? sharedRecordHref('awardsProgramme', edition.previous?.slug, 'clearview') : null
-  const registerHref = safeHref(edition.registerButtonLink)
   const videoId = stegaClean(edition.highlightsVideoId)?.trim()
   const acclaimLink = acclaimHref(edition.acclaimIssuuId)
   const body = richText(edition.body)
@@ -277,7 +276,7 @@ export function toAwardsProgrammeView({
     date: stegaClean(edition.hideDateTime) ? null : formatWeekdayDate(stegaClean(edition.startDate), stegaClean(edition.endDate)),
     venue: filled(edition.venue) ? edition.venue : null,
     country: countryName(stegaClean(edition.country)),
-    register: registerHref ? { label: copy.registerLabel, href: registerHref } : null,
+    register: toLinkProps({ ...edition.registerLink, label: edition.registerLink?.label || copy.registerLabel }, 'clearview'),
     sponsor: toLinkProps(rawCopy.sponsorLink, 'clearview'),
     previousYear: previousHref ? { label: copy.previousYearLabel, href: previousHref } : null,
     overview: body ? { heading: toHeading(rawCopy.overviewHeading), body } : null,

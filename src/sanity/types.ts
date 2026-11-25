@@ -2997,209 +2997,6 @@ export type Company = {
   legacyWpId?: number;
 };
 
-export type ResearchSummaryReference = {
-  _ref: string;
-  _type: "reference";
-  _weak?: boolean;
-  [internalGroqTypeReferenceTo]?: "researchSummary";
-};
-
-export type Resource = {
-  _id: string;
-  _type: "resource";
-  _createdAt: string;
-  _updatedAt: string;
-  _rev: string;
-  title?: string;
-  slug?: Slug;
-  publishedAt?: string;
-  category?: "research";
-  featuredImage?: {
-    asset?: SanityImageAssetReference;
-    media?: unknown;
-    hotspot?: SanityImageHotspot;
-    crop?: SanityImageCrop;
-    alt?: string;
-    _type: "image";
-  };
-  body?: RichText;
-  authors?: Array<
-    {
-      _key: string;
-    } & PersonReference
-  >;
-  edition?: string;
-  standfirst?: string;
-  summary?: Array<{
-    children?: Array<{
-      marks?: Array<string>;
-      text?: string;
-      _type: "span";
-      _key: string;
-    }>;
-    style?: "normal";
-    listItem?: never;
-    markDefs?: Array<{
-      href?: string;
-      openInNewTab?: boolean;
-      _type: "link";
-      _key: string;
-    }>;
-    level?: number;
-    _type: "block";
-    _key: string;
-  }>;
-  keyFindings?: Array<{
-    value?: string;
-    text?: string;
-    note?: string;
-    _type: "keyFinding";
-    _key: string;
-  }>;
-  methodologyIntro?: Array<{
-    children?: Array<{
-      marks?: Array<string>;
-      text?: string;
-      _type: "span";
-      _key: string;
-    }>;
-    style?: "normal";
-    listItem?: never;
-    markDefs?: Array<{
-      href?: string;
-      openInNewTab?: boolean;
-      _type: "link";
-      _key: string;
-    }>;
-    level?: number;
-    _type: "block";
-    _key: string;
-  }>;
-  methodology?: Array<{
-    label?: string;
-    value?: string;
-    _type: "methodologyRow";
-    _key: string;
-  }>;
-  charts?: Array<{
-    title?: string;
-    note?: string;
-    gauges?: Array<{
-      label?: string;
-      value?: string;
-      percent?: number;
-      current?: boolean;
-      _type: "researchGauge";
-      _key: string;
-    }>;
-    _type: "researchChart";
-    _key: string;
-  }>;
-  insights?: Array<string>;
-  researchPartner?: {
-    company?: CompanyReference;
-    description?: string;
-  };
-  partnerCategories?: Array<
-    {
-      _key: string;
-    } & CompanyGroup
-  >;
-  relatedResearch?: Array<
-    {
-      _key: string;
-    } & ResourceReference
-  >;
-  executiveSummaryPage?: ResearchSummaryReference;
-  downloadThumbnail?: {
-    asset?: SanityImageAssetReference;
-    media?: unknown;
-    hotspot?: SanityImageHotspot;
-    crop?: SanityImageCrop;
-    alt?: string;
-    _type: "image";
-  };
-  downloadFile?: {
-    asset?: SanityFileAssetReference;
-    media?: unknown;
-    _type: "file";
-  };
-  downloadUrl?: string;
-  legacyWpId?: number;
-};
-
-export type ResearchSummary = {
-  _id: string;
-  _type: "researchSummary";
-  _createdAt: string;
-  _updatedAt: string;
-  _rev: string;
-  title?: string;
-  slug?: Slug;
-  lead?: Array<{
-    children?: Array<{
-      marks?: Array<string>;
-      text?: string;
-      _type: "span";
-      _key: string;
-    }>;
-    style?: "normal";
-    listItem?: never;
-    markDefs?: Array<{
-      href?: string;
-      openInNewTab?: boolean;
-      _type: "link";
-      _key: string;
-    }>;
-    level?: number;
-    _type: "block";
-    _key: string;
-  }>;
-  intro?: Array<{
-    children?: Array<{
-      marks?: Array<string>;
-      text?: string;
-      _type: "span";
-      _key: string;
-    }>;
-    style?: "normal";
-    listItem?: never;
-    markDefs?: Array<{
-      href?: string;
-      openInNewTab?: boolean;
-      _type: "link";
-      _key: string;
-    }>;
-    level?: number;
-    _type: "block";
-    _key: string;
-  }>;
-  sections?: Array<{
-    heading?: string;
-    body?: Array<{
-      children?: Array<{
-        marks?: Array<string>;
-        text?: string;
-        _type: "span";
-        _key: string;
-      }>;
-      style?: "normal";
-      listItem?: never;
-      markDefs?: Array<{
-        href?: string;
-        openInNewTab?: boolean;
-        _type: "link";
-        _key: string;
-      }>;
-      level?: number;
-      _type: "block";
-      _key: string;
-    }>;
-    _type: "executiveSummarySection";
-    _key: string;
-  }>;
-};
-
 export type AwardsProgrammeGroupReference = {
   _ref: string;
   _type: "reference";
@@ -3543,6 +3340,18 @@ export type AwardsProgramme = {
     _type: "image";
     _key: string;
   }>;
+  registerLink?: {
+    kind?: "internal" | "external" | "hub";
+    internal?:
+      | PageReference
+      | PostReference
+      | ConferenceEventReference
+      | AwardsProgrammeReference
+      | ResourceReference;
+    external?: string;
+    hub?: "awards" | "events" | "research";
+    label?: string;
+  };
   registerButtonLink?: string;
   registrationSteps?: Array<{
     text?: Array<{
@@ -3599,6 +3408,209 @@ export type AwardsProgramme = {
     } & CustomTab
   >;
   legacyWpId?: number;
+};
+
+export type ResearchSummaryReference = {
+  _ref: string;
+  _type: "reference";
+  _weak?: boolean;
+  [internalGroqTypeReferenceTo]?: "researchSummary";
+};
+
+export type Resource = {
+  _id: string;
+  _type: "resource";
+  _createdAt: string;
+  _updatedAt: string;
+  _rev: string;
+  title?: string;
+  slug?: Slug;
+  publishedAt?: string;
+  category?: "research";
+  featuredImage?: {
+    asset?: SanityImageAssetReference;
+    media?: unknown;
+    hotspot?: SanityImageHotspot;
+    crop?: SanityImageCrop;
+    alt?: string;
+    _type: "image";
+  };
+  body?: RichText;
+  authors?: Array<
+    {
+      _key: string;
+    } & PersonReference
+  >;
+  edition?: string;
+  standfirst?: string;
+  summary?: Array<{
+    children?: Array<{
+      marks?: Array<string>;
+      text?: string;
+      _type: "span";
+      _key: string;
+    }>;
+    style?: "normal";
+    listItem?: never;
+    markDefs?: Array<{
+      href?: string;
+      openInNewTab?: boolean;
+      _type: "link";
+      _key: string;
+    }>;
+    level?: number;
+    _type: "block";
+    _key: string;
+  }>;
+  keyFindings?: Array<{
+    value?: string;
+    text?: string;
+    note?: string;
+    _type: "keyFinding";
+    _key: string;
+  }>;
+  methodologyIntro?: Array<{
+    children?: Array<{
+      marks?: Array<string>;
+      text?: string;
+      _type: "span";
+      _key: string;
+    }>;
+    style?: "normal";
+    listItem?: never;
+    markDefs?: Array<{
+      href?: string;
+      openInNewTab?: boolean;
+      _type: "link";
+      _key: string;
+    }>;
+    level?: number;
+    _type: "block";
+    _key: string;
+  }>;
+  methodology?: Array<{
+    label?: string;
+    value?: string;
+    _type: "methodologyRow";
+    _key: string;
+  }>;
+  charts?: Array<{
+    title?: string;
+    note?: string;
+    gauges?: Array<{
+      label?: string;
+      value?: string;
+      percent?: number;
+      current?: boolean;
+      _type: "researchGauge";
+      _key: string;
+    }>;
+    _type: "researchChart";
+    _key: string;
+  }>;
+  insights?: Array<string>;
+  researchPartner?: {
+    company?: CompanyReference;
+    description?: string;
+  };
+  partnerCategories?: Array<
+    {
+      _key: string;
+    } & CompanyGroup
+  >;
+  relatedResearch?: Array<
+    {
+      _key: string;
+    } & ResourceReference
+  >;
+  executiveSummaryPage?: ResearchSummaryReference;
+  downloadThumbnail?: {
+    asset?: SanityImageAssetReference;
+    media?: unknown;
+    hotspot?: SanityImageHotspot;
+    crop?: SanityImageCrop;
+    alt?: string;
+    _type: "image";
+  };
+  downloadFile?: {
+    asset?: SanityFileAssetReference;
+    media?: unknown;
+    _type: "file";
+  };
+  downloadUrl?: string;
+  legacyWpId?: number;
+};
+
+export type ResearchSummary = {
+  _id: string;
+  _type: "researchSummary";
+  _createdAt: string;
+  _updatedAt: string;
+  _rev: string;
+  title?: string;
+  slug?: Slug;
+  lead?: Array<{
+    children?: Array<{
+      marks?: Array<string>;
+      text?: string;
+      _type: "span";
+      _key: string;
+    }>;
+    style?: "normal";
+    listItem?: never;
+    markDefs?: Array<{
+      href?: string;
+      openInNewTab?: boolean;
+      _type: "link";
+      _key: string;
+    }>;
+    level?: number;
+    _type: "block";
+    _key: string;
+  }>;
+  intro?: Array<{
+    children?: Array<{
+      marks?: Array<string>;
+      text?: string;
+      _type: "span";
+      _key: string;
+    }>;
+    style?: "normal";
+    listItem?: never;
+    markDefs?: Array<{
+      href?: string;
+      openInNewTab?: boolean;
+      _type: "link";
+      _key: string;
+    }>;
+    level?: number;
+    _type: "block";
+    _key: string;
+  }>;
+  sections?: Array<{
+    heading?: string;
+    body?: Array<{
+      children?: Array<{
+        marks?: Array<string>;
+        text?: string;
+        _type: "span";
+        _key: string;
+      }>;
+      style?: "normal";
+      listItem?: never;
+      markDefs?: Array<{
+        href?: string;
+        openInNewTab?: boolean;
+        _type: "link";
+        _key: string;
+      }>;
+      level?: number;
+      _type: "block";
+      _key: string;
+    }>;
+    _type: "executiveSummarySection";
+    _key: string;
+  }>;
 };
 
 export type Acclaim = {
@@ -4405,12 +4417,12 @@ export type AllSanitySchemaTypes =
   | AuthorReference
   | Post
   | Company
-  | ResearchSummaryReference
-  | Resource
-  | ResearchSummary
   | AwardsProgrammeGroupReference
   | AcclaimReference
   | AwardsProgramme
+  | ResearchSummaryReference
+  | Resource
+  | ResearchSummary
   | Acclaim
   | AwardsProgrammeGroup
   | ConferenceEvent
@@ -35731,7 +35743,7 @@ export type AWARD_CATEGORY_PAGE_QUERY_RESULT = {
 
 // Source: src/sanity/queries.ts
 // Variable: AWARDS_PROGRAMME_QUERY
-// Query: *[_type in ["awardsProgramme", "conferenceEvent"] && slug.current == $slug][0]{    _type,    _type == "awardsProgramme" => {      _id,      title,      "slug": slug.current,      standfirst,      body[]{   _type != "infographic" => { ... },  _type == "infographic" => { _key, _type, eyebrow, title, description, wide, narrow },  _type == "image" => { "alt": coalesce(alt, asset->altText) },  _type == "videoFile" => { "url": asset->url, "mimeType": asset->mimeType } },      "logo": logo{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },      "programme": programme->{ _id, "slug": slug.current },      startDate,      endDate,      hideDateTime,      nominationsOpeningDate,      nominationsClosingDate,      country,      "venue": venue->title,      registerButtonLink,      highlightsVideoId,      "highlightVideoThumbnail": highlightVideoThumbnail{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },      highlightVideoDescription,      judgesIntro[]{   _type != "infographic" => { ... },  _type == "infographic" => { _key, _type, eyebrow, title, description, wide, narrow },  _type == "image" => { "alt": coalesce(alt, asset->altText) },  _type == "videoFile" => { "url": asset->url, "mimeType": asset->mimeType } },      judgesPanels[]{        _key,        name,        "people": people[]->{          _id,          title,          jobTitle,          "company": companies[0]->title,          "photo": photo{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },          bio[]{   _type != "infographic" => { ... },  _type == "infographic" => { _key, _type, eyebrow, title, description, wide, narrow },  _type == "image" => { "alt": coalesce(alt, asset->altText) },  _type == "videoFile" => { "url": asset->url, "mimeType": asset->mimeType } }        }      },      winners[]{        _key,        categoryGroup,        "category": category->{ title, "slug": slug.current },        people,        displayName,        "company": company->{ title, "logo": logo{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) } }      },      registrationSteps[]{ _key, text[]{   _type != "infographic" => { ... },  _type == "infographic" => { _key, _type, eyebrow, title, description, wide, narrow },  _type == "image" => { "alt": coalesce(alt, asset->altText) },  _type == "videoFile" => { "url": asset->url, "mimeType": asset->mimeType } } },      sponsorTypes[]{        _key,        name,        "companies": companies[]->{ _id, title, "logo": logo{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) } }      },      faq[]{ _key, question, answer[]{   _type != "infographic" => { ... },  _type == "infographic" => { _key, _type, eyebrow, title, description, wide, narrow },  _type == "image" => { "alt": coalesce(alt, asset->altText) },  _type == "videoFile" => { "url": asset->url, "mimeType": asset->mimeType } } },      "acclaimIssuuId": acclaim->issuuId,      "previous": *[        _type == "awardsProgramme"        && defined(^.programme._ref)        && programme._ref == ^.programme._ref        && startDate < ^.startDate      ] | order(startDate desc)[0]{ "slug": slug.current }    },    _type == "conferenceEvent" => {      _id,      title,      "slug": slug.current,      eventType,      body[]{   _type != "infographic" => { ... },  _type == "infographic" => { _key, _type, eyebrow, title, description, wide, narrow },  _type == "image" => { "alt": coalesce(alt, asset->altText) },  _type == "videoFile" => { "url": asset->url, "mimeType": asset->mimeType } },      "logo": logo{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },      startDate,      endDate,      startTime,      endTime,      timezoneCode,      hideDateTime,      country,      "venue": venue->{ title, address },      eventFormat,      whyAttend{ intro[]{   _type != "infographic" => { ... },  _type == "infographic" => { _key, _type, eyebrow, title, description, wide, narrow },  _type == "image" => { "alt": coalesce(alt, asset->altText) },  _type == "videoFile" => { "url": asset->url, "mimeType": asset->mimeType } }, points },      speakerTypes[]{        _key,        name,        "people": people[]->{          _id,          title,          jobTitle,          "company": companies[0]->title,          "photo": photo{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) }        }      },      "chairs": chairs[]->{ _id, title, jobTitle, "company": companies[0]->title, "photo": photo{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) } },      agenda[]{        _key,        title,        items[]{          _key,          time,          endTime,          sessionType,          title,          text[]{   _type != "infographic" => { ... },  _type == "infographic" => { _key, _type, eyebrow, title, description, wide, narrow },  _type == "image" => { "alt": coalesce(alt, asset->altText) },  _type == "videoFile" => { "url": asset->url, "mimeType": asset->mimeType } },          speakers[]{ _key, chair, "person": person->{ _id, title, jobTitle, "company": companies[0]->title, "photo": photo{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) } } }        }      },      agendaText[]{   _type != "infographic" => { ... },  _type == "infographic" => { _key, _type, eyebrow, title, description, wide, narrow },  _type == "image" => { "alt": coalesce(alt, asset->altText) },  _type == "videoFile" => { "url": asset->url, "mimeType": asset->mimeType } },      sponsorTypes[]{        _key,        name,        "companies": companies[]->{ _id, title, "logo": logo{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) }, websiteUrl, "about": pt::text(about) }      },      "relatedCoverage": relatedCoverage[]->{ _id, title, "slug": slug.current, brands }    }  }
+// Query: *[_type in ["awardsProgramme", "conferenceEvent"] && slug.current == $slug][0]{    _type,    _type == "awardsProgramme" => {      _id,      title,      "slug": slug.current,      standfirst,      body[]{   _type != "infographic" => { ... },  _type == "infographic" => { _key, _type, eyebrow, title, description, wide, narrow },  _type == "image" => { "alt": coalesce(alt, asset->altText) },  _type == "videoFile" => { "url": asset->url, "mimeType": asset->mimeType } },      "logo": logo{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },      "programme": programme->{ _id, "slug": slug.current },      startDate,      endDate,      hideDateTime,      nominationsOpeningDate,      nominationsClosingDate,      country,      "venue": venue->title,      registerLink{   label,    kind,  external,  hub,  internal->{    _type,    "slug": slug.current,    brand,    brands  } },      highlightsVideoId,      "highlightVideoThumbnail": highlightVideoThumbnail{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },      highlightVideoDescription,      judgesIntro[]{   _type != "infographic" => { ... },  _type == "infographic" => { _key, _type, eyebrow, title, description, wide, narrow },  _type == "image" => { "alt": coalesce(alt, asset->altText) },  _type == "videoFile" => { "url": asset->url, "mimeType": asset->mimeType } },      judgesPanels[]{        _key,        name,        "people": people[]->{          _id,          title,          jobTitle,          "company": companies[0]->title,          "photo": photo{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },          bio[]{   _type != "infographic" => { ... },  _type == "infographic" => { _key, _type, eyebrow, title, description, wide, narrow },  _type == "image" => { "alt": coalesce(alt, asset->altText) },  _type == "videoFile" => { "url": asset->url, "mimeType": asset->mimeType } }        }      },      winners[]{        _key,        categoryGroup,        "category": category->{ title, "slug": slug.current },        people,        displayName,        "company": company->{ title, "logo": logo{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) } }      },      registrationSteps[]{ _key, text[]{   _type != "infographic" => { ... },  _type == "infographic" => { _key, _type, eyebrow, title, description, wide, narrow },  _type == "image" => { "alt": coalesce(alt, asset->altText) },  _type == "videoFile" => { "url": asset->url, "mimeType": asset->mimeType } } },      sponsorTypes[]{        _key,        name,        "companies": companies[]->{ _id, title, "logo": logo{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) } }      },      faq[]{ _key, question, answer[]{   _type != "infographic" => { ... },  _type == "infographic" => { _key, _type, eyebrow, title, description, wide, narrow },  _type == "image" => { "alt": coalesce(alt, asset->altText) },  _type == "videoFile" => { "url": asset->url, "mimeType": asset->mimeType } } },      "acclaimIssuuId": acclaim->issuuId,      "previous": *[        _type == "awardsProgramme"        && defined(^.programme._ref)        && programme._ref == ^.programme._ref        && startDate < ^.startDate      ] | order(startDate desc)[0]{ "slug": slug.current }    },    _type == "conferenceEvent" => {      _id,      title,      "slug": slug.current,      eventType,      body[]{   _type != "infographic" => { ... },  _type == "infographic" => { _key, _type, eyebrow, title, description, wide, narrow },  _type == "image" => { "alt": coalesce(alt, asset->altText) },  _type == "videoFile" => { "url": asset->url, "mimeType": asset->mimeType } },      "logo": logo{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) },      startDate,      endDate,      startTime,      endTime,      timezoneCode,      hideDateTime,      country,      "venue": venue->{ title, address },      eventFormat,      whyAttend{ intro[]{   _type != "infographic" => { ... },  _type == "infographic" => { _key, _type, eyebrow, title, description, wide, narrow },  _type == "image" => { "alt": coalesce(alt, asset->altText) },  _type == "videoFile" => { "url": asset->url, "mimeType": asset->mimeType } }, points },      speakerTypes[]{        _key,        name,        "people": people[]->{          _id,          title,          jobTitle,          "company": companies[0]->title,          "photo": photo{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) }        }      },      "chairs": chairs[]->{ _id, title, jobTitle, "company": companies[0]->title, "photo": photo{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) } },      agenda[]{        _key,        title,        items[]{          _key,          time,          endTime,          sessionType,          title,          text[]{   _type != "infographic" => { ... },  _type == "infographic" => { _key, _type, eyebrow, title, description, wide, narrow },  _type == "image" => { "alt": coalesce(alt, asset->altText) },  _type == "videoFile" => { "url": asset->url, "mimeType": asset->mimeType } },          speakers[]{ _key, chair, "person": person->{ _id, title, jobTitle, "company": companies[0]->title, "photo": photo{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) } } }        }      },      agendaText[]{   _type != "infographic" => { ... },  _type == "infographic" => { _key, _type, eyebrow, title, description, wide, narrow },  _type == "image" => { "alt": coalesce(alt, asset->altText) },  _type == "videoFile" => { "url": asset->url, "mimeType": asset->mimeType } },      sponsorTypes[]{        _key,        name,        "companies": companies[]->{ _id, title, "logo": logo{   asset,  hotspot,  crop,  "alt": coalesce(alt, asset->altText) }, websiteUrl, "about": pt::text(about) }      },      "relatedCoverage": relatedCoverage[]->{ _id, title, "slug": slug.current, brands }    }  }
 export type AWARDS_PROGRAMME_QUERY_RESULT =
   | {
       _type: "awardsProgramme";
@@ -36053,7 +36065,49 @@ export type AWARDS_PROGRAMME_QUERY_RESULT =
         | "ZW"
         | null;
       venue: string | null;
-      registerButtonLink: string | null;
+      registerLink: {
+        label: string | null;
+        kind: "external" | "hub" | "internal" | null;
+        external: string | null;
+        hub: "awards" | "events" | "research" | null;
+        internal:
+          | {
+              _type: "awardsProgramme";
+              slug: string | null;
+              brand: null;
+              brands: null;
+            }
+          | {
+              _type: "conferenceEvent";
+              slug: string | null;
+              brand: null;
+              brands: null;
+            }
+          | {
+              _type: "page";
+              slug: string | null;
+              brand:
+                | "clearview"
+                | "familywealthreport"
+                | "wealthbriefing"
+                | "wealthbriefingasia"
+                | null;
+              brands: null;
+            }
+          | {
+              _type: "post";
+              slug: string | null;
+              brand: null;
+              brands: Array<string> | null;
+            }
+          | {
+              _type: "resource";
+              slug: string | null;
+              brand: null;
+              brands: null;
+            }
+          | null;
+      } | null;
       highlightsVideoId: string | null;
       highlightVideoThumbnail: {
         asset: SanityImageAssetReference | null;
@@ -44252,7 +44306,7 @@ declare global {
     '\n  [\n    ...*[\n      _type == "awardsProgramme"\n      && nominationsClosingDate >= $today\n      && coalesce(programme->slug.current, "") != $programme\n    ] | order(nominationsClosingDate asc)[0...12]{ \n  _id, title, "slug": slug.current, "programmeId": programme._ref,\n  startDate, endDate, hideDateTime, country, nominationsOpeningDate, nominationsClosingDate\n },\n    ...*[\n      _type == "awardsProgramme"\n      && !(defined(nominationsClosingDate) && nominationsClosingDate >= $today)\n      && startDate >= $today\n      && coalesce(programme->slug.current, "") != $programme\n    ] | order(startDate asc)[0...12]{ \n  _id, title, "slug": slug.current, "programmeId": programme._ref,\n  startDate, endDate, hideDateTime, country, nominationsOpeningDate, nominationsClosingDate\n }\n  ]\n': OTHER_AWARDS_QUERY_RESULT;
     '\n  *[\n    _type == "awardsProgramme"\n    && defined(slug.current)\n    && nominationsClosingDate >= $today\n    && _id != $editionId\n  ] | order(nominationsClosingDate asc){ \n  _id, title, "slug": slug.current, "programmeId": programme._ref,\n  startDate, endDate, hideDateTime, country, nominationsOpeningDate, nominationsClosingDate\n }\n': OPEN_AWARDS_QUERY_RESULT;
     '\n  *[_id == $id && _type == "awardCategoryPage"][0]{\n    breadcrumbHomeLabel,\n    breadcrumbAwardsLabel,\n    detailsHeading,\n    eligibilityLabel,\n    recognisesLabel,\n    judgingLabel,\n    winnersHeading,\n    winnerLabel,\n    otherProgrammesHeading[]{ _key, style, children[]{ _key, text } },\n    "otherProgrammes": otherProgrammes[]{ _key, title, "edition": edition->{ \n  _id, title, "slug": slug.current, "programmeId": programme._ref,\n  startDate, endDate, hideDateTime, country, nominationsOpeningDate, nominationsClosingDate\n } },\n    "statuses": *[_id == $statusesId && _type == "awardsProgrammePage"][0]{\n      launchingSoonLabel,\n      submissionsOpenLabel,\n      ceremonyDueLabel,\n      winnersAnnouncedLabel\n    }\n  }\n': AWARD_CATEGORY_PAGE_QUERY_RESULT;
-    '\n  *[_type in ["awardsProgramme", "conferenceEvent"] && slug.current == $slug][0]{\n    _type,\n    _type == "awardsProgramme" => {\n      _id,\n      title,\n      "slug": slug.current,\n      standfirst,\n      body[]{ \n  _type != "infographic" => { ... },\n  _type == "infographic" => { _key, _type, eyebrow, title, description, wide, narrow },\n  _type == "image" => { "alt": coalesce(alt, asset->altText) },\n  _type == "videoFile" => { "url": asset->url, "mimeType": asset->mimeType }\n },\n      "logo": logo{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n      "programme": programme->{ _id, "slug": slug.current },\n      startDate,\n      endDate,\n      hideDateTime,\n      nominationsOpeningDate,\n      nominationsClosingDate,\n      country,\n      "venue": venue->title,\n      registerButtonLink,\n      highlightsVideoId,\n      "highlightVideoThumbnail": highlightVideoThumbnail{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n      highlightVideoDescription,\n      judgesIntro[]{ \n  _type != "infographic" => { ... },\n  _type == "infographic" => { _key, _type, eyebrow, title, description, wide, narrow },\n  _type == "image" => { "alt": coalesce(alt, asset->altText) },\n  _type == "videoFile" => { "url": asset->url, "mimeType": asset->mimeType }\n },\n      judgesPanels[]{\n        _key,\n        name,\n        "people": people[]->{\n          _id,\n          title,\n          jobTitle,\n          "company": companies[0]->title,\n          "photo": photo{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n          bio[]{ \n  _type != "infographic" => { ... },\n  _type == "infographic" => { _key, _type, eyebrow, title, description, wide, narrow },\n  _type == "image" => { "alt": coalesce(alt, asset->altText) },\n  _type == "videoFile" => { "url": asset->url, "mimeType": asset->mimeType }\n }\n        }\n      },\n      winners[]{\n        _key,\n        categoryGroup,\n        "category": category->{ title, "slug": slug.current },\n        people,\n        displayName,\n        "company": company->{ title, "logo": logo{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n } }\n      },\n      registrationSteps[]{ _key, text[]{ \n  _type != "infographic" => { ... },\n  _type == "infographic" => { _key, _type, eyebrow, title, description, wide, narrow },\n  _type == "image" => { "alt": coalesce(alt, asset->altText) },\n  _type == "videoFile" => { "url": asset->url, "mimeType": asset->mimeType }\n } },\n      sponsorTypes[]{\n        _key,\n        name,\n        "companies": companies[]->{ _id, title, "logo": logo{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n } }\n      },\n      faq[]{ _key, question, answer[]{ \n  _type != "infographic" => { ... },\n  _type == "infographic" => { _key, _type, eyebrow, title, description, wide, narrow },\n  _type == "image" => { "alt": coalesce(alt, asset->altText) },\n  _type == "videoFile" => { "url": asset->url, "mimeType": asset->mimeType }\n } },\n      "acclaimIssuuId": acclaim->issuuId,\n      "previous": *[\n        _type == "awardsProgramme"\n        && defined(^.programme._ref)\n        && programme._ref == ^.programme._ref\n        && startDate < ^.startDate\n      ] | order(startDate desc)[0]{ "slug": slug.current }\n    },\n    _type == "conferenceEvent" => {\n      _id,\n      title,\n      "slug": slug.current,\n      eventType,\n      body[]{ \n  _type != "infographic" => { ... },\n  _type == "infographic" => { _key, _type, eyebrow, title, description, wide, narrow },\n  _type == "image" => { "alt": coalesce(alt, asset->altText) },\n  _type == "videoFile" => { "url": asset->url, "mimeType": asset->mimeType }\n },\n      "logo": logo{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n      startDate,\n      endDate,\n      startTime,\n      endTime,\n      timezoneCode,\n      hideDateTime,\n      country,\n      "venue": venue->{ title, address },\n      eventFormat,\n      whyAttend{ intro[]{ \n  _type != "infographic" => { ... },\n  _type == "infographic" => { _key, _type, eyebrow, title, description, wide, narrow },\n  _type == "image" => { "alt": coalesce(alt, asset->altText) },\n  _type == "videoFile" => { "url": asset->url, "mimeType": asset->mimeType }\n }, points },\n      speakerTypes[]{\n        _key,\n        name,\n        "people": people[]->{\n          _id,\n          title,\n          jobTitle,\n          "company": companies[0]->title,\n          "photo": photo{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n }\n        }\n      },\n      "chairs": chairs[]->{ _id, title, jobTitle, "company": companies[0]->title, "photo": photo{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n } },\n      agenda[]{\n        _key,\n        title,\n        items[]{\n          _key,\n          time,\n          endTime,\n          sessionType,\n          title,\n          text[]{ \n  _type != "infographic" => { ... },\n  _type == "infographic" => { _key, _type, eyebrow, title, description, wide, narrow },\n  _type == "image" => { "alt": coalesce(alt, asset->altText) },\n  _type == "videoFile" => { "url": asset->url, "mimeType": asset->mimeType }\n },\n          speakers[]{ _key, chair, "person": person->{ _id, title, jobTitle, "company": companies[0]->title, "photo": photo{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n } } }\n        }\n      },\n      agendaText[]{ \n  _type != "infographic" => { ... },\n  _type == "infographic" => { _key, _type, eyebrow, title, description, wide, narrow },\n  _type == "image" => { "alt": coalesce(alt, asset->altText) },\n  _type == "videoFile" => { "url": asset->url, "mimeType": asset->mimeType }\n },\n      sponsorTypes[]{\n        _key,\n        name,\n        "companies": companies[]->{ _id, title, "logo": logo{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n }, websiteUrl, "about": pt::text(about) }\n      },\n      "relatedCoverage": relatedCoverage[]->{ _id, title, "slug": slug.current, brands }\n    }\n  }\n': AWARDS_PROGRAMME_QUERY_RESULT;
+    '\n  *[_type in ["awardsProgramme", "conferenceEvent"] && slug.current == $slug][0]{\n    _type,\n    _type == "awardsProgramme" => {\n      _id,\n      title,\n      "slug": slug.current,\n      standfirst,\n      body[]{ \n  _type != "infographic" => { ... },\n  _type == "infographic" => { _key, _type, eyebrow, title, description, wide, narrow },\n  _type == "image" => { "alt": coalesce(alt, asset->altText) },\n  _type == "videoFile" => { "url": asset->url, "mimeType": asset->mimeType }\n },\n      "logo": logo{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n      "programme": programme->{ _id, "slug": slug.current },\n      startDate,\n      endDate,\n      hideDateTime,\n      nominationsOpeningDate,\n      nominationsClosingDate,\n      country,\n      "venue": venue->title,\n      registerLink{ \n  label,\n  \n  kind,\n  external,\n  hub,\n  internal->{\n    _type,\n    "slug": slug.current,\n    brand,\n    brands\n  }\n\n },\n      highlightsVideoId,\n      "highlightVideoThumbnail": highlightVideoThumbnail{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n      highlightVideoDescription,\n      judgesIntro[]{ \n  _type != "infographic" => { ... },\n  _type == "infographic" => { _key, _type, eyebrow, title, description, wide, narrow },\n  _type == "image" => { "alt": coalesce(alt, asset->altText) },\n  _type == "videoFile" => { "url": asset->url, "mimeType": asset->mimeType }\n },\n      judgesPanels[]{\n        _key,\n        name,\n        "people": people[]->{\n          _id,\n          title,\n          jobTitle,\n          "company": companies[0]->title,\n          "photo": photo{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n          bio[]{ \n  _type != "infographic" => { ... },\n  _type == "infographic" => { _key, _type, eyebrow, title, description, wide, narrow },\n  _type == "image" => { "alt": coalesce(alt, asset->altText) },\n  _type == "videoFile" => { "url": asset->url, "mimeType": asset->mimeType }\n }\n        }\n      },\n      winners[]{\n        _key,\n        categoryGroup,\n        "category": category->{ title, "slug": slug.current },\n        people,\n        displayName,\n        "company": company->{ title, "logo": logo{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n } }\n      },\n      registrationSteps[]{ _key, text[]{ \n  _type != "infographic" => { ... },\n  _type == "infographic" => { _key, _type, eyebrow, title, description, wide, narrow },\n  _type == "image" => { "alt": coalesce(alt, asset->altText) },\n  _type == "videoFile" => { "url": asset->url, "mimeType": asset->mimeType }\n } },\n      sponsorTypes[]{\n        _key,\n        name,\n        "companies": companies[]->{ _id, title, "logo": logo{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n } }\n      },\n      faq[]{ _key, question, answer[]{ \n  _type != "infographic" => { ... },\n  _type == "infographic" => { _key, _type, eyebrow, title, description, wide, narrow },\n  _type == "image" => { "alt": coalesce(alt, asset->altText) },\n  _type == "videoFile" => { "url": asset->url, "mimeType": asset->mimeType }\n } },\n      "acclaimIssuuId": acclaim->issuuId,\n      "previous": *[\n        _type == "awardsProgramme"\n        && defined(^.programme._ref)\n        && programme._ref == ^.programme._ref\n        && startDate < ^.startDate\n      ] | order(startDate desc)[0]{ "slug": slug.current }\n    },\n    _type == "conferenceEvent" => {\n      _id,\n      title,\n      "slug": slug.current,\n      eventType,\n      body[]{ \n  _type != "infographic" => { ... },\n  _type == "infographic" => { _key, _type, eyebrow, title, description, wide, narrow },\n  _type == "image" => { "alt": coalesce(alt, asset->altText) },\n  _type == "videoFile" => { "url": asset->url, "mimeType": asset->mimeType }\n },\n      "logo": logo{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n      startDate,\n      endDate,\n      startTime,\n      endTime,\n      timezoneCode,\n      hideDateTime,\n      country,\n      "venue": venue->{ title, address },\n      eventFormat,\n      whyAttend{ intro[]{ \n  _type != "infographic" => { ... },\n  _type == "infographic" => { _key, _type, eyebrow, title, description, wide, narrow },\n  _type == "image" => { "alt": coalesce(alt, asset->altText) },\n  _type == "videoFile" => { "url": asset->url, "mimeType": asset->mimeType }\n }, points },\n      speakerTypes[]{\n        _key,\n        name,\n        "people": people[]->{\n          _id,\n          title,\n          jobTitle,\n          "company": companies[0]->title,\n          "photo": photo{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n }\n        }\n      },\n      "chairs": chairs[]->{ _id, title, jobTitle, "company": companies[0]->title, "photo": photo{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n } },\n      agenda[]{\n        _key,\n        title,\n        items[]{\n          _key,\n          time,\n          endTime,\n          sessionType,\n          title,\n          text[]{ \n  _type != "infographic" => { ... },\n  _type == "infographic" => { _key, _type, eyebrow, title, description, wide, narrow },\n  _type == "image" => { "alt": coalesce(alt, asset->altText) },\n  _type == "videoFile" => { "url": asset->url, "mimeType": asset->mimeType }\n },\n          speakers[]{ _key, chair, "person": person->{ _id, title, jobTitle, "company": companies[0]->title, "photo": photo{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n } } }\n        }\n      },\n      agendaText[]{ \n  _type != "infographic" => { ... },\n  _type == "infographic" => { _key, _type, eyebrow, title, description, wide, narrow },\n  _type == "image" => { "alt": coalesce(alt, asset->altText) },\n  _type == "videoFile" => { "url": asset->url, "mimeType": asset->mimeType }\n },\n      sponsorTypes[]{\n        _key,\n        name,\n        "companies": companies[]->{ _id, title, "logo": logo{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n }, websiteUrl, "about": pt::text(about) }\n      },\n      "relatedCoverage": relatedCoverage[]->{ _id, title, "slug": slug.current, brands }\n    }\n  }\n': AWARDS_PROGRAMME_QUERY_RESULT;
     '\n  *[_id == $id && _type == "awardsProgrammePage"][0]{\n    breadcrumbHomeLabel,\n    breadcrumbAwardsLabel,\n    registerLabel,\n    previousYearLabel,\n    previousYearWinnersLabel,\n    marketingKitText,\n    acclaimLinkLabel,\n    videoConsentText,\n    videoConsentButton,\n    videoDialogTitle,\n    registrationOpenIntro,\n    registrationClosedLabel,\n    registrationClosedIntro,\n    registrationFaqLinkLabel,\n    openProgrammesEmptyText,\n    deadlineLabel,\n    navOverviewLabel,\n    navVideoLabel,\n    navCategoriesLabel,\n    navSponsorsLabel,\n    navJudgesLabel,\n    navWinnersLabel,\n    navMarketingKitLabel,\n    navFaqLabel,\n    sponsorLink{ \n  label,\n  \n  kind,\n  external,\n  hub,\n  internal->{\n    _type,\n    "slug": slug.current,\n    brand,\n    brands\n  }\n\n },\n    allAwardsLink{ \n  label,\n  \n  kind,\n  external,\n  hub,\n  internal->{\n    _type,\n    "slug": slug.current,\n    brand,\n    brands\n  }\n\n },\n    launchingSoonLabel,\n    submissionsOpenLabel,\n    ceremonyDueLabel,\n    winnersAnnouncedLabel,\n    overviewHeading[]{ _key, style, children[]{ _key, text } },\n    videoHeading[]{ _key, style, children[]{ _key, text } },\n    judgesHeading[]{ _key, style, children[]{ _key, text } },\n    winnersHeading[]{ _key, style, children[]{ _key, text } },\n    categoriesHeading[]{ _key, style, children[]{ _key, text } },\n    sponsorsHeading[]{ _key, style, children[]{ _key, text } },\n    marketingKitHeading[]{ _key, style, children[]{ _key, text } },\n    faqHeading[]{ _key, style, children[]{ _key, text } },\n    otherProgrammesHeading[]{ _key, style, children[]{ _key, text } },\n    "otherProgrammes": otherProgrammes[]{ _key, title, "edition": edition->{ \n  _id, title, "slug": slug.current, "programmeId": programme._ref,\n  startDate, endDate, hideDateTime, country, nominationsOpeningDate, nominationsClosingDate\n } }\n  }\n': AWARDS_PROGRAMME_PAGE_QUERY_RESULT;
     '\n  *[_id == $id && _type == "eventPage"][0]{\n    breadcrumbHomeLabel,\n    breadcrumbEventsLabel,\n    summitTypeLabel,\n    briefingTypeLabel,\n    webinarTypeLabel,\n    statusLabel,\n    upcomingLabel,\n    pastLabel,\n    eventFormatLabel,\n    chairLabel,\n    agendaChairLabel,\n    venueLabel,\n    addressLabel,\n    dateLabel,\n    timeLabel,\n    navOverviewLabel,\n    navSpeakersLabel,\n    navWhyAttendLabel,\n    navAgendaLabel,\n    navSponsorsLabel,\n    navVenueLabel,\n    navRelatedCoverageLabel,\n    overviewHeading[]{ _key, style, children[]{ _key, text } },\n    speakersHeading[]{ _key, style, children[]{ _key, text } },\n    whyAttendHeading[]{ _key, style, children[]{ _key, text } },\n    agendaHeading[]{ _key, style, children[]{ _key, text } },\n    sponsorsHeading[]{ _key, style, children[]{ _key, text } },\n    venueHeading[]{ _key, style, children[]{ _key, text } },\n    relatedCoverageHeading[]{ _key, style, children[]{ _key, text } },\n    relatedEventsHeading[]{ _key, style, children[]{ _key, text } },\n    "relatedEvents": relatedEvents[]{ _key, title, "event": event->{ \n  _id, title, "slug": slug.current, startDate, endDate, hideDateTime, "venue": venue->title\n } }\n  }\n': EVENT_PAGE_QUERY_RESULT;
     '\n  [\n    ...*[\n      _type == "conferenceEvent"\n      && defined(slug.current)\n      && _id != $eventId\n      && coalesce(endDate, startDate) >= $today\n    ] | order(startDate asc)[0...6]{ \n  _id, title, "slug": slug.current, startDate, endDate, hideDateTime, "venue": venue->title\n },\n    ...*[\n      _type == "conferenceEvent"\n      && defined(slug.current)\n      && _id != $eventId\n      && !(coalesce(endDate, startDate) >= $today)\n    ] | order(startDate desc)[0...6]{ \n  _id, title, "slug": slug.current, startDate, endDate, hideDateTime, "venue": venue->title\n }\n  ]\n': RELATED_EVENTS_QUERY_RESULT;

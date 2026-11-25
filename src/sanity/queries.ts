@@ -554,7 +554,7 @@ export const AWARDS_PROGRAMME_QUERY = defineQuery(`
       nominationsClosingDate,
       country,
       "venue": venue->title,
-      registerButtonLink,
+      registerLink{ ${LINK} },
       highlightsVideoId,
       "highlightVideoThumbnail": highlightVideoThumbnail{ ${IMAGE} },
       highlightVideoDescription,
