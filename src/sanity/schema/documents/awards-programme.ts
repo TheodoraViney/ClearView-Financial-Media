@@ -1,7 +1,7 @@
 import { StarIcon } from '@sanity/icons/Star'
 import { defineArrayMember, defineField, defineType } from 'sanity'
 
-import { EVENT_COUNTRIES, altField, isUniqueEventSlug, legacyWpIdField, timeField } from '../fields'
+import { EVENT_COUNTRIES, altField, isUniqueEventSlug, legacyWpIdField, linkField, timeField } from '../fields'
 import { paragraphsBlock, paragraphsWithListsBlock } from '../objects/rich-text'
 
 /**
@@ -363,11 +363,19 @@ export const awardsProgramme = defineType({
       options: { layout: 'grid' },
     }),
 
+    linkField({
+      name: 'registerLink',
+      title: 'Register button',
+      group: 'registration',
+      description:
+        'Usually a web address: the nominations form (Jotform). Leave the label empty to show the default "Register now" from the Awards programme page document.',
+    }),
     defineField({
       name: 'registerButtonLink',
-      title: 'Register now button link',
+      title: 'Register now button link (old)',
       type: 'url',
       group: 'registration',
+      description: 'From WordPress, copied into Register button above. Not used on the site.',
       validation: (Rule) => Rule.uri({ scheme: ['http', 'https'] }),
     }),
     defineField({
