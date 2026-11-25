@@ -247,7 +247,7 @@ export function toAwardsProgrammeView({
   const year = stegaClean(edition.startDate)?.slice(0, 4)
   const previousHref = edition.programme ? sharedRecordHref('awardsProgramme', edition.previous?.slug, 'clearview') : null
   const videoId = stegaClean(edition.highlightsVideoId)?.trim()
-  const acclaimLink = acclaimHref(edition.acclaimIssuuId)
+  const acclaimLink = acclaimHref(edition.acclaimLink)
   const body = richText(edition.body)
   const panels = toPanels(edition)
   const sponsorTiers = toSponsorTiers(edition)

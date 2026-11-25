@@ -292,12 +292,10 @@ export function awardCategoryHref(
 }
 
 /**
- * Href of an Acclaim magazine: its Issuu reader, `https://issuu.com/docs/{issuuId}`. There is no Acclaim page on the
- * site: the awards programme page links straight to the magazine, and the legacy `/acclaim/{slug}/` addresses redirect
- * to the programme page (docs/migration-baseline.md). Null unless the id is the 32-character hex the schema validates.
+ * Href of an Acclaim magazine: the record's `link` (the Issuu reader, a PDF or any page), opened in a new tab. There is
+ * no Acclaim page on the site; the legacy `/acclaim/{slug}/` addresses redirect to the programme page
+ * (docs/migration-baseline.md). Null unless `safeHref` allows it.
  */
-export function acclaimHref(issuuId: string | null | undefined): string | null {
-  const clean = stegaClean(issuuId)?.trim().toLowerCase()
-
-  return clean && /^[0-9a-f]{32}$/.test(clean) ? `https://issuu.com/docs/${clean}` : null
+export function acclaimHref(link: string | null | undefined): string | null {
+  return safeHref(link)
 }
