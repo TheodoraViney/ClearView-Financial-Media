@@ -1,6 +1,7 @@
 import { type ReactNode } from 'react'
 
 import { Avatar } from './Avatar'
+import { Badge } from './Badge'
 import { Disclosure } from './Disclosure.client'
 import type { MediaImage } from './Media'
 import { SpeakerBioDialog } from './SpeakerBioDialog.client'
@@ -83,9 +84,9 @@ export function SpeakerCard({
         {role && <p className="text-caption text-pretty text-grey">{role}</p>}
         {organisation && <p className="text-caption text-pretty text-foreground">{organisation}</p>}
         {tag && (
-          <p className="mt-1 inline-flex h-6 items-center self-start rounded-sm bg-surface-thumb px-2 text-caption leading-none text-foreground">
+          <Badge as="p" className="mt-1 self-start">
             {tag}
-          </p>
+          </Badge>
         )}
         {bio && !modal && showBioLabel && hideBioLabel && (
           <Disclosure showLabel={showBioLabel} hideLabel={hideBioLabel}>

@@ -1,5 +1,6 @@
 import { EDITORIAL_BRAND_KEYS } from '@/brands'
 import type { HeadingValue } from '@/sanity/heading'
+import type { HeroIntro } from '@/sanity/page-hero'
 
 import type { ArticleCardView, ArticleLink } from './article'
 import type { AdUnitView } from './gam'
@@ -208,7 +209,7 @@ export type FilterOptionView = { slug: string; title: string; selected: boolean;
 /** The Categories page heading: the page title and intro, or the category's or the single topic's when one heads it. */
 export type CategoriesHeadingView = {
   title: string
-  intro: string | null
+  intro: HeroIntro | null
   breadcrumb: { label: string; href?: string | null }[]
   /** The "Select a topic" hint beside the H1 (no topic selected): its text and the Topics filter's label. */
   topicHint: { label: string; filterLabel: string } | null

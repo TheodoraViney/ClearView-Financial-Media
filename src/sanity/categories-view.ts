@@ -27,6 +27,7 @@ import { resolveHref } from '@/lib/links'
 
 import { toHeading } from './heading'
 import { toImage } from './image'
+import { toHeroIntro } from './page-hero'
 import type { CATEGORIES_LATEST_QUERY_RESULT, CATEGORIES_PAGE_QUERY_RESULT } from './types'
 
 /*
@@ -105,17 +106,18 @@ export const findPageHero = (blocks: PageBlock[] | null | undefined) => findMain
 
 /**
  * What heads the list: the category when one is set, else the topic when exactly one is selected, else the page
- * heading block's title. A category or topic without a description takes the block's intro.
+ * heading block's title. A category or topic without a description takes the block's intro (the description becomes
+ * one paragraph).
  */
 export function categoriesHeading(
-  base: { title: string | null; intro: string | null },
+  base: { title: string | null; intro: unknown },
   filters: Pick<Filters, 'category' | 'topic'>,
 ) {
   const term = filters.category ?? filters.topic
-  const intro = base.intro
+  const intro = toHeroIntro(base.intro)
 
   return term?.title
-    ? { title: term.title, intro: term.description || intro, term: true }
+    ? { title: term.title, intro: toHeroIntro(term.description) ?? intro, term: true }
     : { title: base.title ?? '', intro, term: false }
 }
 

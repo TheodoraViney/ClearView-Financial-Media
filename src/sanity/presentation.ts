@@ -2,7 +2,8 @@ import type { PluginOptions } from 'sanity'
 import { defineDocuments, defineLocations, presentationTool } from 'sanity/presentation'
 
 import { BRAND_KEYS, BRANDS, brandOrigin } from '@/brands'
-import { HOME_PAGE_SLUG } from '@/lib/links'
+import { COMPANY_ENGAGEMENT_PAGE_DOCUMENT_ID, isCompanyEngagementPageId } from '@/lib/company-engagement'
+import { COMPANY_ENGAGEMENT_PATH, HOME_PAGE_SLUG } from '@/lib/links'
 import { SHARED_LISTINGS_PAGE_DOCUMENT_ID } from '@/lib/shared-listings'
 
 // An awards edition or a conference event: both are served at /events/{slug} on ClearView.
@@ -99,6 +100,13 @@ export const presentationTools: PluginOptions[] = BRAND_KEYS.map((key) =>
                 filter:
                   '_type == "researchSummary" && slug.current == $summary && _id in *[_type == "resource" && slug.current == $slug].executiveSummaryPage._ref',
               },
+              // The company directory: the cards are the records' own; the blocks are the Company Engagement page
+              // document's.
+              {
+                route: COMPANY_ENGAGEMENT_PATH,
+                filter: '_id == $id',
+                params: { id: COMPANY_ENGAGEMENT_PAGE_DOCUMENT_ID },
+              },
               // A company profile: the company's own fields. The labels are the Company profile page document's.
               {
                 route: '/companies/:slug',
@@ -144,6 +152,10 @@ export const presentationTools: PluginOptions[] = BRAND_KEYS.map((key) =>
 
             if (doc.id?.replace(/^drafts\./, '') === SHARED_LISTINGS_PAGE_DOCUMENT_ID) {
               return { locations: SHARED_LISTINGS_ROUTES }
+            }
+
+            if (isCompanyEngagementPageId(doc.id)) {
+              return { locations: [{ title: doc.title ?? 'Untitled', href: COMPANY_ENGAGEMENT_PATH }] }
             }
 
             return {

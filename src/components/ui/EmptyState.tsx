@@ -11,6 +11,7 @@ import { Icon } from './Icon'
  *   search that comes back empty is announced.
  * - `plain` (shared listings `results-empty`): left-aligned between two rules, 40px above and below, no icon, title,
  *   text and action 16px apart. No role: the caller announces the result count.
+ * - `rule` (Company Engagement no results): `plain` with the top rule only; the text is optional.
  * The caller sets the margin.
  */
 export function EmptyState({
@@ -22,18 +23,25 @@ export function EmptyState({
   className,
 }: {
   title: string
-  text: string
+  /** `rule` only: may be left out. */
+  text?: string
   action?: ReactNode
-  variant?: 'panel' | 'plain'
+  variant?: 'panel' | 'plain' | 'rule'
   /** The title's heading level. */
   titleAs?: 'h2' | 'h3'
   className?: string
 }) {
-  if (variant === 'plain') {
+  if (variant === 'plain' || variant === 'rule') {
     return (
-      <section className={cx('flex flex-col items-start gap-4 border-y border-border py-10', className)}>
+      <section
+        className={cx(
+          'flex flex-col items-start gap-4 border-border py-10',
+          variant === 'plain' ? 'border-y' : 'border-t',
+          className,
+        )}
+      >
         <Title className="text-title-lg font-medium">{title}</Title>
-        <p className="text-base leading-copy text-pretty wrap-anywhere text-grey">{text}</p>
+        {(variant === 'plain' || text) && <p className="text-base leading-copy text-pretty wrap-anywhere text-grey">{text}</p>}
         {action}
       </section>
     )

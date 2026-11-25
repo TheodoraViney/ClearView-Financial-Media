@@ -4,6 +4,7 @@ import { Suspense } from 'react'
 
 import { isBrandKey, type BrandKey } from '@/brands'
 import { PageBlocks } from '@/components/blocks/PageBlocks'
+import { COMPANY_ENGAGEMENT_PAGE_SLUG } from '@/lib/company-engagement'
 import { SHARED_LISTINGS_PAGE_SLUG } from '@/lib/shared-listings'
 import { fetchAdUnits } from '@/sanity/brand-title'
 import {
@@ -46,8 +47,14 @@ export default async function BrandPage({
 }) {
   const { brand, slug } = await params
 
-  // The shared listings page is served only at its listing paths (/events-category/…, /resource-categories/research).
-  if (!isBrandKey(brand) || slug === PLACEHOLDER_SLUG || slug === SHARED_LISTINGS_PAGE_SLUG) {
+  // The shared listings page is served only at its listing paths (/events-category/…, /resource-categories/research),
+  // the Company Engagement page only at /companies.
+  if (
+    !isBrandKey(brand) ||
+    slug === PLACEHOLDER_SLUG ||
+    slug === SHARED_LISTINGS_PAGE_SLUG ||
+    slug === COMPANY_ENGAGEMENT_PAGE_SLUG
+  ) {
     notFound()
   }
 

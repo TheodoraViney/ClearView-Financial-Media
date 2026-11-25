@@ -1,7 +1,9 @@
 import { type ReactNode } from 'react'
 
+import { RichText } from '@/components/sections/article/ArticleBody'
 import { Breadcrumb, type BreadcrumbItem } from '@/components/ui/Breadcrumb'
 import { cx } from '@/components/ui/cx'
+import type { HeroIntro } from '@/sanity/page-hero'
 
 /**
  * Breadcrumb, the page title (or the heading category's or topic's) and its intro, 728px wide at most. `titleAside`
@@ -15,7 +17,7 @@ export function CategoriesHeader({
   className,
 }: {
   title: string
-  intro: string | null
+  intro: HeroIntro | null
   breadcrumb: BreadcrumbItem[]
   titleAside?: ReactNode
   className?: string
@@ -34,7 +36,7 @@ export function CategoriesHeader({
         ) : (
           heading
         )}
-        {intro && <p className="text-base leading-copy text-pretty text-grey">{intro}</p>}
+        {intro && <RichText value={intro} spacing="tight" className="text-grey" />}
       </div>
     </header>
   )

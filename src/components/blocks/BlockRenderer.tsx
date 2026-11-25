@@ -1,12 +1,18 @@
 import type { BrandKey } from '@/brands'
 import type { AdUnits } from '@/lib/gam'
 import type { ArticleListingContext } from '@/sanity/categories-view'
+import type { CompanyEngagementContext } from '@/sanity/company-engagement-view'
 import type { DynamicFetchOptions } from '@/sanity/live'
 import type { RecordListingContext } from '@/sanity/shared-listings-view'
 
 import { ArticleListing } from './ArticleListing'
 import { AwardsWinners } from './AwardsWinners'
 import { BenefitPanel } from './BenefitPanel'
+import { CompanyAwards } from './CompanyAwards'
+import { CompanyDirectory } from './CompanyDirectory'
+import { CompanyEvents } from './CompanyEvents'
+import { CompanyFilters } from './CompanyFilters'
+import { CompanySponsoredContent } from './CompanySponsoredContent'
 import { ContactForm } from './ContactForm'
 import { CoverageList } from './CoverageList'
 import { Cta } from './Cta'
@@ -44,6 +50,8 @@ import type { PageBlock } from './types'
  * `listing` is the shared listings route's tab, URL and records; a record listing block renders nothing without it.
  * `articles` is the Categories route's state and list; the articles list block renders nothing without it, and the
  * page heading block takes the Categories form with it.
+ * `companies` is the Company Engagement route's records and URL state; its blocks render nothing without it, and the
+ * page heading block takes that page's form with it.
  * `options` are the route's fetch options (perspective, stega), for the blocks that load their own data (Most read).
  */
 export function BlockRenderer({
@@ -55,6 +63,7 @@ export function BlockRenderer({
   options,
   listing,
   articles,
+  companies,
 }: {
   blocks: PageBlock[] | null | undefined
   brand: BrandKey
@@ -64,6 +73,7 @@ export function BlockRenderer({
   options: DynamicFetchOptions
   listing?: RecordListingContext
   articles?: ArticleListingContext
+  companies?: CompanyEngagementContext
 }) {
   if (!blocks?.length) {
     return null
@@ -82,6 +92,7 @@ export function BlockRenderer({
           options={options}
           listing={listing}
           articles={articles}
+          companies={companies}
         />
       ))}
     </>
@@ -97,6 +108,7 @@ function Block({
   options,
   listing,
   articles,
+  companies,
 }: {
   block: PageBlock
   brand: BrandKey
@@ -106,6 +118,7 @@ function Block({
   options: DynamicFetchOptions
   listing?: RecordListingContext
   articles?: ArticleListingContext
+  companies?: CompanyEngagementContext
 }) {
   switch (block._type) {
     case 'cta':
@@ -133,6 +146,7 @@ function Block({
               options={options}
               listing={listing}
               articles={articles}
+              companies={companies}
             />
           )}
         />
@@ -158,7 +172,7 @@ function Block({
       return <SubscribeBanner block={block} brand={brand} />
     // Main column only.
     case 'pageHero':
-      return <PageHero block={block} brand={brand} articles={articles} />
+      return <PageHero block={block} brand={brand} articles={articles} companies={companies} />
     case 'recordListing':
       return listing ? <RecordListing block={block} brand={brand} listing={listing} /> : null
     case 'articleListing':
@@ -193,6 +207,17 @@ function Block({
       return <RecordFeature block={block} brand={brand} />
     case 'teamNetwork':
       return <TeamNetwork block={block} brand={brand} />
+    // Company Engagement page.
+    case 'companyFilters':
+      return companies ? <CompanyFilters block={block} brand={brand} companies={companies} /> : null
+    case 'companyDirectory':
+      return companies ? <CompanyDirectory block={block} brand={brand} companies={companies} /> : null
+    case 'companyAwards':
+      return companies ? <CompanyAwards block={block} brand={brand} companies={companies} /> : null
+    case 'companyEvents':
+      return companies ? <CompanyEvents block={block} brand={brand} companies={companies} /> : null
+    case 'companySponsoredContent':
+      return companies ? <CompanySponsoredContent block={block} brand={brand} companies={companies} /> : null
     default:
       return unknownBlock(block)
   }
