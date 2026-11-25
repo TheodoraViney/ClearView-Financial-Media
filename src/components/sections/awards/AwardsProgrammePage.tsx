@@ -241,7 +241,7 @@ export function AwardsProgrammePage({ view }: { view: AwardsProgrammeView }) {
                   </p>
                   <ul className="flex min-w-0 flex-col @split:col-span-6 @split:col-start-7 @split:row-start-2">
                     <li className="flex">
-                      <LinkRow href={acclaim.link.href} label={acclaim.link.label} />
+                      <LinkRow href={acclaim.link.href} label={acclaim.link.label} newTab />
                     </li>
                   </ul>
                 </>

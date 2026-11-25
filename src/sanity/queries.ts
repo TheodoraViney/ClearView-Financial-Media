@@ -586,7 +586,7 @@ export const AWARDS_PROGRAMME_QUERY = defineQuery(`
         "companies": companies[]->{ _id, title, "logo": logo{ ${IMAGE} } }
       },
       faq[]{ _key, question, answer[]{ ${ARTICLE_BODY} } },
-      "acclaimSlug": acclaim->slug.current,
+      "acclaimIssuuId": acclaim->issuuId,
       "previous": *[
         _type == "awardsProgramme"
         && defined(^.programme._ref)
