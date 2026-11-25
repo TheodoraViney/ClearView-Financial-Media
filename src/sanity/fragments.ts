@@ -123,10 +123,11 @@ export const LISTING_CARD = /* groq */ `
   "category": category->{ title, "slug": slug.current }
 `
 
+// Contact panel. Every visible string is projected.
 const CTA = /* groq */ `
-  heading,
-  text,
-  link{ label, href }
+  heading[]{ _key, style, children[]{ _key, text } },
+  text[]{ ${ARTICLE_BODY} },
+  link{ ${LINK} }
 `
 
 // Pick filters: a picked post shows only while it still runs on the page brand (its brands can change after picking);
@@ -529,6 +530,44 @@ const OPPORTUNITY_CARDS = /* groq */ `
   cards[]{ _key, icon, label, heading, copy, benefits, link{ ${LINK} } }
 `
 
+// About page blocks. Headings as the other blocks; every visible string is projected.
+const OVERLAY_HERO = /* groq */ `
+  breadcrumbHomeLabel,
+  breadcrumbLabel,
+  heading[]{ _key, style, children[]{ _key, text } },
+  standfirst,
+  image{ ${IMAGE} }
+`
+
+const COVERAGE_LIST = /* groq */ `
+  heading[]{ _key, style, children[]{ _key, text } },
+  text,
+  listHeading[]{ _key, style, children[]{ _key, text } },
+  items[]{ _key, icon, title, description[]{ ${ARTICLE_BODY} } }
+`
+
+const RECORD_FEATURE = /* groq */ `
+  image{ ${IMAGE} },
+  heading[]{ _key, style, children[]{ _key, text } },
+  text[]{ ${ARTICLE_BODY} },
+  figureValue,
+  figureLabel
+`
+
+// The logos are the editorial brands' Brand settings logos (every brand but the group), ordered in the adapter.
+const TEAM_NETWORK = /* groq */ `
+  image{ ${IMAGE} },
+  heading[]{ _key, style, children[]{ _key, text } },
+  body[]{ ${ARTICLE_BODY} },
+  quote[]{ ${ARTICLE_BODY} },
+  quoteCaption,
+  "publications": *[_type == "brand" && key.current != "clearview" && defined(logo.asset)]{
+    "key": key.current,
+    title,
+    "logo": logo{ ${IMAGE} }
+  }
+`
+
 const ENQUIRY_FORM = /* groq */ `
   anchorId,
   heading[]{ _key, style, children[]{ _key, text } },
@@ -646,6 +685,10 @@ export const BLOCKS_PROJECTION = /* groq */ `
   _type == "numberedList" => { ${NUMBERED_LIST} },
   _type == "benefitPanel" => { ${BENEFIT_PANEL} },
   _type == "opportunityCards" => { ${OPPORTUNITY_CARDS} },
+  _type == "overlayHero" => { ${OVERLAY_HERO} },
+  _type == "coverageList" => { ${COVERAGE_LIST} },
+  _type == "recordFeature" => { ${RECORD_FEATURE} },
+  _type == "teamNetwork" => { ${TEAM_NETWORK} },
   _type == "enquiryForm" => { ${ENQUIRY_FORM} },
   _type == "contactForm" => { ${CONTACT_FORM} },
   _type == "splitLayout" => {

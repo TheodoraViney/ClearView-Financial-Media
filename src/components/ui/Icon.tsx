@@ -1,6 +1,7 @@
 import type { SVGProps } from 'react'
 
 import { cx } from './cx'
+import { BarChartIcon } from './icons/bar-chart'
 import { CardChevronIcon } from './icons/card-chevron'
 import { CheckIcon } from './icons/check'
 import { CheckSmIcon } from './icons/check-sm'
@@ -10,6 +11,7 @@ import { ChevronRightIcon } from './icons/chevron-right'
 import { CloseIcon } from './icons/close'
 import { CloseSmIcon } from './icons/close-sm'
 import { CommentIcon } from './icons/comment'
+import { CpuChipIcon } from './icons/cpu-chip'
 import { DocumentIcon } from './icons/document'
 import { DownloadIcon } from './icons/download'
 import { DownloadTrayIcon } from './icons/download-tray'
@@ -19,6 +21,7 @@ import { LinkIcon } from './icons/link'
 import { MenuIcon } from './icons/menu'
 import { MenuCloseIcon } from './icons/menu-close'
 import { PeopleMovesIcon } from './icons/people-moves'
+import { PieChartIcon } from './icons/pie-chart'
 import { PlayIcon } from './icons/play'
 import { PublicIcon } from './icons/public'
 import { RowChevronIcon } from './icons/row-chevron'
@@ -33,6 +36,7 @@ import { StatSearchIcon } from './icons/stat-search'
 import { StatStarIcon } from './icons/stat-star'
 import { StatUserIcon } from './icons/stat-user'
 import { TickIcon } from './icons/tick'
+import { UserIcon } from './icons/user'
 
 export const iconMap = {
   'chevron-right': ChevronRightIcon,
@@ -67,6 +71,10 @@ export const iconMap = {
   'stat-user': StatUserIcon,
   share: ShareIcon,
   link: LinkIcon,
+  'pie-chart': PieChartIcon,
+  'cpu-chip': CpuChipIcon,
+  user: UserIcon,
+  'bar-chart': BarChartIcon,
 } as const
 
 export type IconName = keyof typeof iconMap

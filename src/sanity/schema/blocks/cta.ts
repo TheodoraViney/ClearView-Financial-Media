@@ -1,55 +1,40 @@
-import { defineField, defineType } from 'sanity'
+import { CommentIcon } from '@sanity/icons/Comment'
+import { defineType } from 'sanity'
 
-import { isAllowedLinkTarget } from '@/lib/links'
+import { adminLabelField, headingField, headingText, linkField } from '../fields'
+import { paragraphsField } from '../objects/rich-text'
 
+/** A dark panel with a heading, a line of text and one button, e.g. "Ask the team anything" → Contact. */
 export const cta = defineType({
   name: 'cta',
-  title: 'CTA',
+  title: 'Contact panel',
   type: 'object',
+  icon: CommentIcon,
   fields: [
-    defineField({
-      name: 'heading',
+    adminLabelField,
+    headingField('heading', {
       title: 'Heading',
-      type: 'string',
+      defaultLevel: 'h2',
+      initialText: 'Ask the ClearView team anything',
+      required: true,
     }),
-    defineField({
+    paragraphsField({
       name: 'text',
       title: 'Text',
-      type: 'text',
+      initialText: 'Our team can help with membership, research, awards and event enquiries.',
+      maxLength: 140,
+      lengthWarning: 'Longer than 140 characters; the text will wrap onto more lines',
     }),
-    defineField({
-      name: 'link',
-      title: 'Link',
-      type: 'object',
-      fields: [
-        defineField({
-          name: 'label',
-          title: 'Label',
-          type: 'string',
-        }),
-        defineField({
-          name: 'href',
-          title: 'Href',
-          type: 'string',
-          description: 'https://…, mailto:…, tel:… or a path on this site starting with /',
-          validation: (Rule) =>
-            Rule.custom((value) => {
-              if (!value) {
-                return true
-              }
-
-              // A bare startsWith('/') let "//evil.com" through, which browsers treat as another host.
-              return isAllowedLinkTarget(value.trim())
-                ? true
-                : 'Use https://, http://, mailto:, tel: or a path starting with a single /'
-            }),
-        }),
-      ],
-    }),
+    {
+      ...linkField({ name: 'link', title: 'Button', required: true, labelRequired: true }),
+      // The label starts as the design copy; the target is the editor's (on ClearView, the Contact page).
+      initialValue: { kind: 'internal', label: 'Get in touch' },
+    },
   ],
   preview: {
-    select: {
-      title: 'heading',
+    select: { adminLabel: 'adminLabel', heading: 'heading' },
+    prepare({ adminLabel, heading }) {
+      return { title: adminLabel || headingText(heading) || 'Contact panel', subtitle: 'Contact panel' }
     },
   },
 })
