@@ -2,6 +2,7 @@ import { defineField, defineType } from 'sanity'
 
 import { BRAND_KEYS, BRANDS, isBrandKey } from '@/brands'
 import { isCategoriesPageDocumentId } from '@/lib/categories'
+import { isCompanyEngagementPageId } from '@/lib/company-engagement'
 import { SHARED_LISTINGS_PAGE_DOCUMENT_ID } from '@/lib/shared-listings'
 
 import { pageBlocksField } from '../blocks'
@@ -22,6 +23,15 @@ const isCategoriesPage = (document: unknown) => isCategoriesPageDocumentId((docu
 const isSharedListingsPage = (document: unknown) =>
   String((document as { _id?: string } | undefined)?._id ?? '').replace(/^drafts\./, '') === SHARED_LISTINGS_PAGE_DOCUMENT_ID
 
+// The Company Engagement page (ClearView's company directory) is the page with the fixed id
+// COMPANY_ENGAGEMENT_PAGE_DOCUMENT_ID and the slug "company-engagement". It is built from blocks like any page, but
+// served only at /companies, so its brand and slug are fixed.
+const isCompanyEngagementPage = (document: unknown) => isCompanyEngagementPageId((document as { _id?: string } | undefined)?._id)
+
+// Pages served by a route of their own, whose brand and slug the route relies on.
+const isFixedPage = (document: unknown) =>
+  isCategoriesPage(document) || isSharedListingsPage(document) || isCompanyEngagementPage(document)
+
 export const page = defineType({
   name: 'page',
   title: 'Page',
@@ -39,7 +49,7 @@ export const page = defineType({
         layout: 'radio',
         direction: 'horizontal',
       },
-      readOnly: ({ document }) => isCategoriesPage(document) || isSharedListingsPage(document),
+      readOnly: ({ document }) => isFixedPage(document),
       validation: (Rule) => Rule.required(),
     }),
     defineField({
@@ -53,8 +63,8 @@ export const page = defineType({
       title: 'Slug',
       type: 'slug',
       description:
-        'Fixed on the Categories page (served at /categories) and on the shared listings page (served at /events-category/… and /resource-categories/research).',
-      readOnly: ({ document }) => isCategoriesPage(document) || isSharedListingsPage(document),
+        'Fixed on the Categories page (served at /categories), the shared listings page (served at /events-category/… and /resource-categories/research) and the Company Engagement page (served at /companies).',
+      readOnly: ({ document }) => isFixedPage(document),
       options: {
         source: 'title',
         isUnique: async (slug, context) => {

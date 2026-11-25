@@ -262,6 +262,8 @@ main [data-section-anchor] {
 
   /* Hero with image below the header breakpoint: the image box is 752 / 400 */
   --aspect-hero: 752 / 400;
+  /* Team and publications photo on tablet (About design v1.1): 704 / 400 */
+  --aspect-team: 704 / 400;
 
   /* AWARDS-LIST-VARIANTS (temporary): an awards edition wordmark logo, about 3.4:1 (Awards `?view=icon`) */
   --aspect-wordmark: 17 / 5;
@@ -475,6 +477,16 @@ main [data-section-anchor] {
   grid-template-rows: minmax(25rem, auto);
 }
 
+/* Hero over image below the header breakpoint: a dark scrim rising from the bottom behind the standfirst (About v1.1) */
+@utility bg-hero-scrim {
+  background-image: linear-gradient(to top, rgb(17 24 20 / 0.6) 0%, rgb(17 24 20 / 0) 45%);
+}
+
+/* Team and publications logos: two columns of at most 192px (About v1.1) */
+@utility grid-cols-logos {
+  grid-template-columns: repeat(2, minmax(0, 12rem));
+}
+
 /* Numbered list row (Weekly Roundup "In this edition"): 24px number column */
 @utility grid-cols-numbered {
   grid-template-columns: 1.5rem minmax(0, 1fr);
@@ -499,6 +511,11 @@ main [data-section-anchor] {
 /* Label / value rows of a definition list (article fact box): 140px label column */
 @utility grid-cols-definition {
   grid-template-columns: 8.75rem minmax(0, 1fr);
+}
+
+/* Company Engagement filter row from the header breakpoint: the search, two 200px dropdowns, Clear filters. */
+@utility grid-cols-company-filters {
+  grid-template-columns: minmax(12.5rem, 1fr) repeat(2, 12.5rem) auto;
 }
 
 /* DefinitionList `detail` (award category details) from md: label and copy on a 4 / 8 split, as the design. */

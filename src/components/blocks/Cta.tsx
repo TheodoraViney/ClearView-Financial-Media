@@ -1,17 +1,20 @@
 import { Cta as CtaSection } from '@/components/sections/Cta'
-import { safeHref } from '@/lib/links'
+import { resolveHref } from '@/lib/links'
+import { toHeading } from '@/sanity/heading'
 
 import type { BlockProps } from './types'
 
-export function Cta({ block }: BlockProps<'cta'>) {
-  const { heading, text, link } = block
+/** Contact panel. Text keeps stega for click-to-edit; the button goes through resolveHref (scheme allowlist). */
+export function Cta({ block, brand }: BlockProps<'cta'>) {
+  const href = resolveHref(block.link, brand)
+  const label = block.link?.label ?? ''
 
   return (
     <CtaSection
-      heading={heading ?? undefined}
-      text={text ?? undefined}
-      href={safeHref(link?.href) ?? undefined}
-      label={link?.label ?? undefined}
+      headingId={`${block._key}-heading`}
+      heading={toHeading(block.heading)}
+      text={block.text?.length ? block.text : null}
+      button={href && label ? { href, label } : null}
     />
   )
 }

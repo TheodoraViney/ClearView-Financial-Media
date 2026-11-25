@@ -139,6 +139,21 @@ export interface TagPatch {
   match: { type: string; param?: { key: string; value: string } }
   parameter: Param[]
   consentSettings: ConsentSettings
+  /** Names of triggers this config defines, added to the tag's blocking triggers. */
+  blocking?: string[]
+  /** A tag GTM creates itself, possibly not yet: no match is fine. */
+  optional?: true
+}
+
+/**
+ * A change to a container-level Google tag setting (gtag_config), matched by type. Only the listed parameters are
+ * set. GTM creates these itself, so no match is fine.
+ */
+export interface GtagConfigPatch {
+  kind: 'gtagConfigPatch'
+  label: string
+  match: { type: string }
+  parameter: Param[]
 }
 
 export interface ContainerPlan {
@@ -149,11 +164,14 @@ export interface ContainerPlan {
   triggers: DesiredTrigger[]
   tags: DesiredTag[]
   patches: TagPatch[]
+  gtagConfigs: GtagConfigPatch[]
 }
 
 // ─── Builders ───────────────────────────────────────────────────────────────────────────────────────────────────────
 
 const template = (key: string, value: string): Param => ({ type: 'template', key, value })
+
+const off = (...keys: string[]): Param[] => keys.map((key) => ({ type: 'boolean', key, value: 'false' }))
 
 /** A settings table (Google tag configSettingsTable / eventSettingsTable, GA4 event eventSettingsTable). */
 const settingsTable = (key: string, rows: Record<string, string>): Param => ({
@@ -294,7 +312,36 @@ export function containerPlan(brand: BrandKey): ContainerPlan {
       parameter: [],
       consentSettings: consentNeeded,
     },
+    // GTM auto-creates a "Google Analytics G-..." destination tag on Initialization, consent notSet and unblocked,
+    // the first time a GA4 event tag names a measurement id without one. Hold it to the same rules as our tags.
+    ...[measurementId, NETWORK.measurementId].map<TagPatch>((id) => ({
+      kind: 'tagPatch',
+      label: `GA4 destination ${id} (auto-created)`,
+      match: { type: 'dest_ga', param: { key: 'destinationId', value: id } },
+      parameter: [],
+      consentSettings: consentNeeded,
+      blocking: [BLOCK_NOT_PRODUCTION.name],
+      optional: true,
+    })),
   ]
 
-  return { brand, gtmPublicId, builtInVariables: ['event'], variables, triggers, tags, patches }
+  // Auto-created with the destination tags, all on: automatic events and user-provided data (email, phone, address)
+  // collection. Neither is agreed with the client.
+  const gtagConfigs: GtagConfigPatch[] = [
+    {
+      kind: 'gtagConfigPatch',
+      label: 'Automatic events (ogt_auto_events)',
+      match: { type: 'ogt_auto_events' },
+      parameter: off('enableOutboundClick', 'enableScroll', 'enableDownload', 'enableHistoryEvents', 'enableForm', 'enableVideo'),
+    },
+    {
+      kind: 'gtagConfigPatch',
+      label: 'User-provided data (ogt_1p_data_v2)',
+      match: { type: 'ogt_1p_data_v2' },
+      // Disabled, GTM drops the auto-detection fields (email, phone, address) from the setting.
+      parameter: off('isEnabled'),
+    },
+  ]
+
+  return { brand, gtmPublicId, builtInVariables: ['event'], variables, triggers, tags, patches, gtagConfigs }
 }

@@ -8,6 +8,8 @@ import { DocumentPdfIcon } from '@sanity/icons/DocumentPdf'
 import { StarIcon } from '@sanity/icons/Star'
 import type { ReferenceFilterResolver } from 'sanity'
 
+import { isCompanyEngagementPageId } from '@/lib/company-engagement'
+
 export const TOP_STORIES_SLIDE_COUNT = 3
 export const TOP_STORIES_ARTICLE_COUNT = 3
 
@@ -20,6 +22,23 @@ const CLEARVIEW_ONLY_BLOCK_TYPES: readonly string[] = ['newsletterSignup']
 /** Whether a page of this brand can carry the block. A page with no brand yet is offered no ClearView-only block. */
 export const blockAllowedOnBrand = (type: string, brand: unknown): boolean =>
   !CLEARVIEW_ONLY_BLOCK_TYPES.includes(type) || brand === 'clearview'
+
+/**
+ * Blocks only the Company Engagement page carries at the top level, by type name: its lists need its route, and Page
+ * heading elsewhere goes in a Two columns block's main column.
+ */
+const COMPANY_ENGAGEMENT_BLOCK_TYPES: readonly string[] = [
+  'pageHero',
+  'companyFilters',
+  'companyDirectory',
+  'companyAwards',
+  'companyEvents',
+  'companySponsoredContent',
+]
+
+/** Whether the page with this document id can carry the block at the top level. */
+export const blockAllowedOnPage = (type: string, documentId: unknown): boolean =>
+  !COMPANY_ENGAGEMENT_BLOCK_TYPES.includes(type) || isCompanyEngagementPageId(documentId)
 
 // ClearView posts never carry the clearview key: the group page draws on every editorial brand.
 export const postsOfPageBrand: ReferenceFilterResolver = ({ document }) => {

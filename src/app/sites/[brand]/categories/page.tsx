@@ -18,6 +18,7 @@ import {
 } from '@/lib/categories'
 import { fetchAdUnits } from '@/sanity/brand-title'
 import { categoriesHeading, findPageHero, resolveCategoriesFilters } from '@/sanity/categories-view'
+import { heroIntroText } from '@/sanity/page-hero'
 import {
   cachedNow,
   cachedSanity,
@@ -83,7 +84,7 @@ export async function generateMetadata({ params, searchParams }: Props): Promise
 
   return {
     title: stegaClean(heading.title),
-    description: stegaClean(heading.intro) || undefined,
+    description: heroIntroText(heading.intro) || undefined,
     alternates: { canonical: `${brandOrigin(brand)}${path}` },
     ...(filtered ? { robots: { index: false, follow: true } } : {}),
   }

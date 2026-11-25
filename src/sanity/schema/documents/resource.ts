@@ -13,18 +13,7 @@ import { AutoFillPicksInput } from '@/sanity/components/auto-fill-picks-input'
 import { ResearchGenerateInput } from '@/sanity/components/research-generate-input'
 
 import { altField, imageField, keyFindingMember, legacyWpIdField } from '../fields'
-import { paragraphsBlock } from '../objects/rich-text'
-
-/** Characters of plain text in a block array. */
-function blocksTextLength(blocks: unknown): number {
-  return Array.isArray(blocks)
-    ? blocks.reduce(
-        (total: number, block: { children?: { text?: string }[] }) =>
-          total + (block?.children ?? []).reduce((sum, child) => sum + (child.text?.length ?? 0), 0),
-        0,
-      )
-    : 0
-}
+import { blocksTextLength, paragraphsBlock } from '../objects/rich-text'
 
 /**
  * A downloadable research report or post-forum report. 12 records.

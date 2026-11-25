@@ -4,6 +4,7 @@ import { type ReactNode } from 'react'
 import { RichText } from '@/components/sections/article/ArticleBody'
 import { AD_SLOT_FITS, AD_SLOT_UNSET, AdSlot } from '@/components/ui/AdSlot'
 import { ArrowLink } from '@/components/ui/ArrowLink'
+import { Badge } from '@/components/ui/Badge'
 import { Breadcrumb } from '@/components/ui/Breadcrumb'
 import { cx } from '@/components/ui/cx'
 import { DefinitionList } from '@/components/ui/DefinitionList'
@@ -258,12 +259,9 @@ function Recognition({ items }: { items: RecognitionView[] }) {
           </span>
           <ul aria-label={`${item.winsLabel} categories`} className="flex flex-wrap gap-2">
             {item.wins.map((win) => (
-              <li
-                key={win.key}
-                className="inline-flex min-h-6 max-w-full min-w-0 items-center rounded-sm bg-surface-thumb px-2 py-1 text-caption leading-4 text-foreground wrap-anywhere"
-              >
+              <Badge key={win.key} as="li" layout="wrap">
                 {win.label}
-              </li>
+              </Badge>
             ))}
           </ul>
         </li>

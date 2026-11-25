@@ -231,6 +231,9 @@ export const EVENT_LISTING_PATHS = {
  */
 export const RESEARCH_LISTING_PATH = '/resource-categories/research'
 
+/** The company directory, Industry Engagement (ClearView only); each company's profile sits under it at /companies/{slug}. */
+export const COMPANY_ENGAGEMENT_PATH = '/companies'
+
 /**
  * Bare `/resource`, the reports' own prefix: a legacy clearviewpublishing.com URL in the redirect baseline. It shows
  * the same Research tab, its canonical pointing at RESEARCH_LISTING_PATH, as /events-category/briefings does at summits.
@@ -292,18 +295,10 @@ export function awardCategoryHref(
 }
 
 /**
- * Href of an Acclaim magazine: `/acclaim/{slug}`, the clearviewpublishing.com path without its trailing slash. Shared
- * record rules as `sharedRecordHref`. The Acclaim page is not built yet: the link points at the final URL and 404s
- * until it exists. Null without a slug.
+ * Href of an Acclaim magazine: the record's `link` (the Issuu reader, a PDF or any page), opened in a new tab. There is
+ * no Acclaim page on the site; the legacy `/acclaim/{slug}/` addresses redirect to the programme page
+ * (docs/migration-baseline.md). Null unless `safeHref` allows it.
  */
-export function acclaimHref(slug: string | null | undefined, currentBrand: BrandKey): string | null {
-  const clean = stegaClean(slug)?.trim()
-
-  if (!clean) {
-    return null
-  }
-
-  const path = pathFor(clean, '/acclaim')
-
-  return currentBrand === 'clearview' ? path : `${brandOrigin('clearview')}${path}`
+export function acclaimHref(link: string | null | undefined): string | null {
+  return safeHref(link)
 }

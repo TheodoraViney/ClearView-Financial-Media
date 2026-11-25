@@ -4,6 +4,7 @@ import { Suspense } from 'react'
 
 import { isBrandKey, type BrandKey } from '@/brands'
 import { PageBlocks } from '@/components/blocks/PageBlocks'
+import { COMPANY_ENGAGEMENT_PAGE_SLUG } from '@/lib/company-engagement'
 import { SHARED_LISTINGS_PAGE_SLUG } from '@/lib/shared-listings'
 import { fetchAdUnits } from '@/sanity/brand-title'
 import {
@@ -46,8 +47,14 @@ export default async function BrandPage({
 }) {
   const { brand, slug } = await params
 
-  // The shared listings page is served only at its listing paths (/events-category/…, /resource-categories/research).
-  if (!isBrandKey(brand) || slug === PLACEHOLDER_SLUG || slug === SHARED_LISTINGS_PAGE_SLUG) {
+  // The shared listings page is served only at its listing paths (/events-category/…, /resource-categories/research),
+  // the Company Engagement page only at /companies.
+  if (
+    !isBrandKey(brand) ||
+    slug === PLACEHOLDER_SLUG ||
+    slug === SHARED_LISTINGS_PAGE_SLUG ||
+    slug === COMPANY_ENGAGEMENT_PAGE_SLUG
+  ) {
     notFound()
   }
 
@@ -109,10 +116,10 @@ async function CachedPage({
     notFound()
   }
 
-  // A page that opens with a Hero with image or a Contact form has its H1 there, so the template's title would be a
-  // second H1.
+  // A page that opens with a Hero with image, a Hero over image or a Contact form has its H1 there, so the template's
+  // title would be a second H1.
   const first = data.blocks?.[0]?._type
-  const ownsHeading = first === 'imageHero' || first === 'contactForm'
+  const ownsHeading = first === 'imageHero' || first === 'overlayHero' || first === 'contactForm'
 
   return (
     <main>
