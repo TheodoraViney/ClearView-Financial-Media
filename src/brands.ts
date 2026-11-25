@@ -63,6 +63,9 @@ export const RESEARCH_REPORT_PAGE_ID = 'research-report-page'
 /** Id of the one "Company profile page" document: the company profile template's labels. ClearView only. */
 export const PARTNER_PROFILE_PAGE_ID = 'partner-profile-page'
 
+/** Id of the one "404 page" document, shared by every brand: the not-found page's texts. */
+export const NOT_FOUND_PAGE_ID = 'not-found-page'
+
 /** Id of the one subscribe form settings document, shared by every brand: the Brevo list and confirmation email. */
 export const SUBSCRIBE_FORM_SETTINGS_ID = 'subscribe-form-settings'
 

@@ -1432,6 +1432,17 @@ export type SignupNotificationSettings = {
   notifySender?: BrevoSender;
 };
 
+export type NotFoundPage = {
+  _id: string;
+  _type: "notFoundPage";
+  _createdAt: string;
+  _updatedAt: string;
+  _rev: string;
+  title?: string;
+  description?: string;
+  buttonLabel?: string;
+};
+
 export type SubscribeFormSettings = {
   _id: string;
   _type: "subscribeFormSettings";
@@ -4100,6 +4111,7 @@ export type AllSanitySchemaTypes =
   | SanityImageCrop
   | SanityImageHotspot
   | SignupNotificationSettings
+  | NotFoundPage
   | SubscribeFormSettings
   | SubscribeModal
   | ResearchGenerationSettings
@@ -42130,6 +42142,15 @@ export type PARTNER_PROFILE_PAGE_QUERY_RESULT = {
   }> | null;
 } | null;
 
+// Source: src/sanity/queries.ts
+// Variable: NOT_FOUND_PAGE_QUERY
+// Query: *[_id == $id && _type == "notFoundPage"][0]{ title, description, buttonLabel }
+export type NOT_FOUND_PAGE_QUERY_RESULT = {
+  title: string | null;
+  description: string | null;
+  buttonLabel: string | null;
+} | null;
+
 // Query TypeMap
 declare global {
   interface SanityQueries {
@@ -42172,6 +42193,7 @@ declare global {
     '\n  *[_id == $id && _type == "researchReportPage"][0]{\n    breadcrumbHomeLabel,\n    breadcrumbResearchLabel,\n    typeLabel,\n    downloadLabel,\n    readFullSummaryLabel,\n    companyProfileLabel,\n    navExecutiveSummaryLabel,\n    navKeyFindingsLabel,\n    navMethodologyLabel,\n    navInsightsLabel,\n    navResearchPartnerLabel,\n    navRelatedResearchLabel,\n    summaryBreadcrumbLabel,\n    summaryTitle,\n    summaryReportLabel,\n    summaryEditionLabel,\n    summaryDateLabel,\n    summaryPartnerLabel,\n    backToReportLabel,\n    executiveSummaryHeading[]{ _key, style, children[]{ _key, text } },\n    keyFindingsHeading[]{ _key, style, children[]{ _key, text } },\n    methodologyHeading[]{ _key, style, children[]{ _key, text } },\n    insightsHeading[]{ _key, style, children[]{ _key, text } },\n    selectedInsightsHeading[]{ _key, style, children[]{ _key, text } },\n    researchPartnerHeading[]{ _key, style, children[]{ _key, text } },\n    relatedResearchHeading[]{ _key, style, children[]{ _key, text } },\n    keyTakeawaysHeading[]{ _key, style, children[]{ _key, text } },\n    mostReadHeading[]{ _key, style, children[]{ _key, text } }\n  }\n': RESEARCH_REPORT_PAGE_QUERY_RESULT;
     '\n  *[_type == "company" && slug.current == $slug && \n  count(*[_type in ["awardsProgramme", "conferenceEvent", "post"] && references(^._id)]) > 0\n][0]{\n    _id,\n    title,\n    "slug": slug.current,\n    "logo": logo{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n    "profileImage": profileImage{ \n  asset,\n  hotspot,\n  crop,\n  "alt": coalesce(alt, asset->altText)\n },\n    about[]{ \n  _type != "infographic" => { ... },\n  _type == "infographic" => { _key, _type, eyebrow, title, description, wide, narrow },\n  _type == "image" => { "alt": coalesce(alt, asset->altText) },\n  _type == "videoFile" => { "url": asset->url, "mimeType": asset->mimeType }\n },\n    "aboutText": pt::text(about),\n    websiteUrl,\n    profileMetrics[]{ _key, value, text },\n    profileFields[]{ _key, label, values },\n    "sponsorships": *[\n      _type in ["awardsProgramme", "conferenceEvent"]\n      && ^._id in sponsorTypes[].companies[]._ref\n    ] | order(startDate desc){\n      _id,\n      _type,\n      title,\n      startDate,\n      "programme": programme->title\n    },\n    "recognition": *[\n      _type == "awardsProgramme"\n      && ^._id in winners[].company._ref\n    ] | order(startDate desc){\n      _id,\n      title,\n      startDate,\n      "programme": programme->title,\n      "wins": winners[company._ref == ^.^._id && defined(category->title)]{ _key, "category": category->title, people }\n    },\n    sponsorInterviews[]{ _key, label, link{ \n  kind,\n  external,\n  hub,\n  internal->{\n    _type,\n    "slug": slug.current,\n    brand,\n    brands\n  }\n } },\n    awardsArchiveTitles,\n    officialLinks[]{ _key, label, link{ \n  kind,\n  external,\n  hub,\n  internal->{\n    _type,\n    "slug": slug.current,\n    brand,\n    brands\n  }\n } }\n  }\n': PARTNER_PROFILE_QUERY_RESULT;
     '\n  *[_id == $id && _type == "partnerProfilePage"][0]{\n    breadcrumbHomeLabel,\n    breadcrumbProfileLabel,\n    breadcrumbProfileLink{ \n  kind,\n  external,\n  hub,\n  internal->{\n    _type,\n    "slug": slug.current,\n    brand,\n    brands\n  }\n },\n    typeLabel,\n    websiteLinkLabel,\n    atAGlanceLabel,\n    sponsorActivityText,\n    archiveLinkLabel,\n    archiveLink{ \n  kind,\n  external,\n  hub,\n  internal->{\n    _type,\n    "slug": slug.current,\n    brand,\n    brands\n  }\n },\n    fieldsHeading[]{ _key, style, children[]{ _key, text } },\n    activityHeading[]{ _key, style, children[]{ _key, text } },\n    sponsorActivityHeading[]{ _key, style, children[]{ _key, text } },\n    recognitionHeading[]{ _key, style, children[]{ _key, text } },\n    coverageHeading[]{ _key, style, children[]{ _key, text } },\n    sponsorInterviewsHeading[]{ _key, style, children[]{ _key, text } },\n    archiveCoverageHeading[]{ _key, style, children[]{ _key, text } },\n    officialLinksHeading[]{ _key, style, children[]{ _key, text } }\n  }\n': PARTNER_PROFILE_PAGE_QUERY_RESULT;
+    '\n  *[_id == $id && _type == "notFoundPage"][0]{ title, description, buttonLabel }\n': NOT_FOUND_PAGE_QUERY_RESULT;
   }
 }
 // Lets @sanity/client releases that predate the global registry read it too

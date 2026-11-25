@@ -103,6 +103,7 @@ const SINGLETON_TYPES = new Set([
   'subscribeModal',
   'subscribeFormSettings',
   'signupNotificationSettings',
+  'notFoundPage',
 ])
 
 const SINGLETON_REMOVED_ACTIONS = new Set(['duplicate', 'delete'])
