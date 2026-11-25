@@ -57,6 +57,10 @@ function embedSrc(provider: string | undefined, id: string | undefined, hash: st
   return null
 }
 
+// Text links in a body (accent, accent-subtle underline 3px below, fade on hover).
+const LINK_CLASS =
+  'text-accent underline decoration-accent-subtle underline-offset-3 transition-opacity duration-180 ease-out hover:opacity-60'
+
 const blocks = {
   normal: ({ children }) => <p className="text-base leading-copy text-pretty">{children}</p>,
   h2: ({ children }) => <h2 className="text-title-lg font-medium">{children}</h2>,
@@ -82,15 +86,12 @@ const components: PortableTextComponents = {
         return <>{children}</>
       }
 
-      const className =
-        'text-accent underline decoration-accent-subtle underline-offset-3 transition-opacity duration-180 ease-out hover:opacity-60'
-
       return value?.openInNewTab === true ? (
-        <a href={href} target="_blank" rel="noopener noreferrer" className={className}>
+        <a href={href} target="_blank" rel="noopener noreferrer" className={LINK_CLASS}>
           {children}
         </a>
       ) : (
-        <a href={href} className={className}>
+        <a href={href} className={LINK_CLASS}>
           {children}
         </a>
       )
@@ -288,6 +289,119 @@ const SIZE_COMPONENTS = {
   loose: looseRichTextComponents,
 }
 
+type Definition = { _key: string; term?: string; text?: string }
+
+type CookieRecord = {
+  _key: string
+  name?: string
+  purpose?: string
+  provider?: string
+  service?: string
+  serviceUrl?: string
+  country?: string
+  type?: string
+  expires?: string
+}
+
+type CookieRecords = {
+  nameLabel?: string
+  purposeLabel?: string
+  providerLabel?: string
+  serviceLabel?: string
+  serviceLinkLabel?: string
+  countryLabel?: string
+  typeLabel?: string
+  expiresLabel?: string
+  emptyValueLabel?: string
+  records?: CookieRecord[]
+}
+
+/** A cookie's service: its name, then the link to its privacy policy (both optional). */
+function cookieService(record: CookieRecord, linkLabel: string | undefined) {
+  const href = safeHref(record.serviceUrl)
+
+  return (
+    <>
+      {record.service}
+      {record.service && href && linkLabel ? ' ' : null}
+      {href && linkLabel ? (
+        <a href={href} className={LINK_CLASS}>
+          {linkLabel}
+        </a>
+      ) : null}
+    </>
+  )
+}
+
+/**
+ * `legal` (privacy, terms and cookie pages, design wb-g-info): H2 26/32, H3 20/24, H4 16/20.8, H5 14/19.6; lists
+ * 20px in with 8px between items; spacing from `.legal-flow`. H2 and H3 take their anchor id from `anchors` (by block
+ * key, `headingAnchors()`), the table of contents' targets. Adds the legal members: an editor-placed divider, terms
+ * definitions and cookie lists. No images, embeds or ads.
+ */
+function legalComponents(anchors: Record<string, string>): PortableTextComponents {
+  return {
+    block: {
+      normal: blocks.normal,
+      h2: ({ children, value }) => (
+        <h2 id={value._key ? anchors[value._key] : undefined} data-toc-target="" className="text-title-xl font-medium text-balance">
+          {children}
+        </h2>
+      ),
+      h3: ({ children, value }) => (
+        <h3 id={value._key ? anchors[value._key] : undefined} data-toc-target="" className="text-title-lg font-medium text-balance">
+          {children}
+        </h3>
+      ),
+      h4: ({ children }) => <h4 className="text-base leading-title font-medium">{children}</h4>,
+      h5: ({ children }) => <h5 className="text-sm leading-copy font-medium">{children}</h5>,
+    },
+    list: {
+      bullet: ({ children }) => <ul className="flex list-disc flex-col gap-2 pl-5 text-base leading-copy">{children}</ul>,
+      number: ({ children }) => <ol className="flex list-decimal flex-col gap-2 pl-5 text-base leading-copy">{children}</ol>,
+    },
+    listItem: ({ children }) => <li className="pl-1">{children}</li>,
+    marks: components.marks,
+    types: {
+      // The rule and the 40px under it; `.legal-flow` puts 48 above it and nothing between it and the next heading.
+      divider: () => <hr data-flow="divider" className="border-border pb-10" />,
+      definitions: ({ value }: { value: { rows?: Definition[] } }) => {
+        const items = (value.rows ?? [])
+          .filter((row) => row.term && row.text)
+          .map((row) => ({ key: row._key, label: row.term ?? '', value: row.text ?? '' }))
+
+        return items.length > 0 ? <DefinitionList variant="terms" items={items} /> : null
+      },
+      // Each cookie a record of seven labelled rows, 24px apart. An empty value keeps its row with the placeholder.
+      cookieRecords: ({ value }: { value: CookieRecords }) => {
+        const records = (value.records ?? []).filter((record) => record.name)
+        // A value the cookie does not have: the CMS placeholder in grey, as the design.
+        const orEmpty = (text: string | undefined) => text || <span className="text-grey">{value.emptyValueLabel}</span>
+
+        return records.length > 0 ? (
+          <div className="flex flex-col gap-6">
+            {records.map((record) => (
+              <DefinitionList
+                key={record._key}
+                variant="record"
+                items={[
+                  { key: 'name', label: value.nameLabel ?? '', value: <span className="font-medium">{record.name}</span> },
+                  { key: 'purpose', label: value.purposeLabel ?? '', value: orEmpty(record.purpose) },
+                  { key: 'provider', label: value.providerLabel ?? '', value: orEmpty(record.provider) },
+                  { key: 'service', label: value.serviceLabel ?? '', value: record.service || record.serviceUrl ? cookieService(record, value.serviceLinkLabel) : orEmpty(undefined) },
+                  { key: 'country', label: value.countryLabel ?? '', value: orEmpty(record.country) },
+                  { key: 'type', label: value.typeLabel ?? '', value: orEmpty(record.type) },
+                  { key: 'expires', label: value.expiresLabel ?? '', value: orEmpty(record.expires) },
+                ]}
+              />
+            ))}
+          </div>
+        ) : null
+      },
+    },
+  }
+}
+
 /** A Portable Text value for `RichText`. */
 export type RichTextValue = PortableTextProps['value']
 
@@ -300,14 +414,28 @@ export function RichText({
   value,
   size = 'base',
   spacing = 'default',
+  variant = 'default',
+  anchors,
   className,
 }: {
   value: PortableTextProps['value']
   size?: keyof typeof SIZE_COMPONENTS
   /** Opt-in `tight`: 16px between every member (research Executive Summary, split-editorial-section). */
   spacing?: 'default' | 'tight'
+  /** Opt-in `legal`: the legal page body (`legalComponents`, `.legal-flow`); `size` and `spacing` do not apply. */
+  variant?: 'default' | 'legal'
+  /** `legal` only: H2 and H3 anchor ids by block key. */
+  anchors?: Record<string, string>
   className?: string
 }) {
+  if (variant === 'legal') {
+    return (
+      <div className={cx('legal-flow min-w-0', className)}>
+        <PortableText value={value} components={legalComponents(anchors ?? {})} />
+      </div>
+    )
+  }
+
   return (
     <div className={cx('article-flow min-w-0', spacing === 'tight' && 'article-flow-tight', className)}>
       <PortableText value={value} components={SIZE_COMPONENTS[size]} />

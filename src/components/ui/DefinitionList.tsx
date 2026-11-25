@@ -1,6 +1,9 @@
+import type { ReactNode } from 'react'
+
 import { cx } from './cx'
 
-export type Definition = { key: string; label: string; value: string }
+/** A label and its value; the value may carry markup (a cookie list's name in 500, a service link). */
+export type Definition = { key: string; label: string; value: ReactNode }
 
 /** A label with a list of values, one per line (partner profile Clients and platform). */
 export type DefinitionValues = { key: string; label: string; values: string[] }
@@ -10,6 +13,7 @@ const DIVIDED = 'border-t border-border first:border-t-0 first:pt-0'
 const VARIANTS = {
   // Fact box: 13 grey label, 16 dark value, 140px label column from md, 12px rows.
   default: {
+    cols: 'grid-cols-1',
     list: undefined,
     row: cx(DIVIDED, 'gap-1 py-3 last:pb-0 md:grid-cols-definition md:gap-6'),
     label: 'text-caption text-grey',
@@ -18,6 +22,7 @@ const VARIANTS = {
   // Award category details: 16/20.8 500 dark label, 16/22.4 grey copy up to 640px, a 4 / 8 split with a 32px gap
   // from md, 24px rows (shared-shell award-category-detail).
   detail: {
+    cols: 'grid-cols-1',
     list: undefined,
     row: cx(DIVIDED, 'gap-2 py-6 md:grid-cols-detail md:gap-8'),
     label: 'text-base leading-title font-medium text-foreground',
@@ -26,6 +31,7 @@ const VARIANTS = {
   // Partner profile Clients and platform (partner-profile-fields): 16/20.8 500 label, the values a list 8px apart in
   // 16/22.4 dark, two equal columns 32px apart from md, stacked 12px apart below; 24px rows.
   fields: {
+    cols: 'grid-cols-1',
     list: undefined,
     row: cx(DIVIDED, 'gap-3 py-6 md:grid-cols-2 md:gap-x-8'),
     label: 'text-base leading-title font-medium text-foreground',
@@ -34,9 +40,29 @@ const VARIANTS = {
   // Event venue and practical information (shared-shell event-info-block `plain`): one column at every breakpoint, no
   // rules, 20px between items; 13/13 grey label 8px above the 16/22.4 dark value.
   plain: {
+    cols: 'grid-cols-1',
     list: 'gap-5',
     row: 'gap-2',
     label: 'text-caption leading-none text-grey',
+    value: 'text-base leading-copy text-foreground',
+  },
+  // Legal definitions (terms page): 16/22.4 500 term, 16/22.4 meaning; a rule above the list and under every row,
+  // 12px rows. Term and meaning stacked 4px apart on mobile, a 200px term column 24px from the meaning from md.
+  terms: {
+    cols: 'grid-cols-1 md:grid-cols-terms',
+    list: 'border-t border-border',
+    row: 'gap-1 border-b border-border py-3 md:gap-x-6',
+    label: 'text-base leading-copy font-medium text-foreground',
+    value: 'text-base leading-copy text-foreground',
+  },
+  // Cookie list record: 13 grey label and 16 dark value, both 22.4 high, a 104px label column 16px from the value on
+  // every breakpoint; a rule above the list and under every row, 4px rows. Long values break inside the word (dd
+  // break-words).
+  record: {
+    cols: 'grid-cols-record',
+    list: 'border-t border-border',
+    row: 'gap-x-4 border-b border-border py-1',
+    label: 'text-caption leading-5.6 text-grey',
     value: 'text-base leading-copy text-foreground',
   },
 }
@@ -58,7 +84,7 @@ export function DefinitionList({
       {items.map((item) => (
         <div
           key={item.key}
-          className={cx('grid min-w-0 grid-cols-1', look.row)}
+          className={cx('grid min-w-0', look.cols, look.row)}
         >
           <dt className={cx('min-w-0 break-words', look.label)}>{item.label}</dt>
           <dd className={cx('m-0 min-w-0 break-words whitespace-pre-line text-pretty', look.value)}>

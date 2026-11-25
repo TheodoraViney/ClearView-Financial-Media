@@ -636,6 +636,16 @@ const TEAM_NETWORK = /* groq */ `
   }
 `
 
+// Legal pages (privacy, terms, cookies): every visible string is projected; the body as stored.
+const LEGAL_TEXT = /* groq */ `
+  breadcrumbHomeLabel,
+  breadcrumbLabel,
+  title,
+  intro,
+  tocLabel,
+  body
+`
+
 const ENQUIRY_FORM = /* groq */ `
   anchorId,
   heading[]{ _key, style, children[]{ _key, text } },
@@ -759,6 +769,7 @@ export const BLOCKS_PROJECTION = /* groq */ `
   _type == "teamNetwork" => { ${TEAM_NETWORK} },
   _type == "enquiryForm" => { ${ENQUIRY_FORM} },
   _type == "contactForm" => { ${CONTACT_FORM} },
+  _type == "legalText" => { ${LEGAL_TEXT} },
   // The Company Engagement page: its heading and its lists.
   _type == "pageHero" => { ${PAGE_HERO} },
   _type == "companyFilters" => { ${COMPANY_FILTERS} },

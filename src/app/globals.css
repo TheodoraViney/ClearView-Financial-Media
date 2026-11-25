@@ -172,6 +172,11 @@ main :where(*) {
   scroll-margin-top: var(--header-h);
 }
 
+/* Legal page headings the table of contents links to land 24px below the sticky header (the design's offset) */
+main [data-toc-target] {
+  scroll-margin-top: calc(var(--header-h) + 1.5rem);
+}
+
 /* Awards programme section nav (ui/SectionNav): 48px items + the 1px rule under them */
 :root {
   --section-nav-h: 3.0625rem;
@@ -210,6 +215,8 @@ main [data-section-anchor] {
 @theme {
   /* Header desktop layout, as in the design's shared-shell masters (desktop from 1200px) */
   --breakpoint-header: 75rem;
+  /* Legal pages: from here the table of contents is a sticky rail left of the text column, below it a disclosure */
+  --breakpoint-toc: 82.5rem;
 
   --container-page: 90rem;
   /* Article text column (728) plus the share rail on both sides (2 × 68): from here the column centres at 728 and the rail shows */
@@ -523,6 +530,26 @@ main [data-section-anchor] {
   grid-template-columns: minmax(0, 4fr) minmax(0, 8fr);
 }
 
+/* Legal pages from the toc breakpoint: table of contents rail, the 728px text column centred, an empty balancing track */
+@utility grid-cols-legal {
+  grid-template-columns: minmax(0, 1fr) minmax(0, 45.5rem) minmax(0, 1fr);
+}
+
+/* DefinitionList `terms` (legal definitions) from md: 200px term column */
+@utility grid-cols-terms {
+  grid-template-columns: 12.5rem minmax(0, 1fr);
+}
+
+/* DefinitionList `record` (cookie list): 104px label column on every breakpoint */
+@utility grid-cols-record {
+  grid-template-columns: minmax(0, 6.5rem) minmax(0, 1fr);
+}
+
+/* Legal table of contents rail: the viewport under the sticky header, less 32px above (top-rail) and below */
+@utility max-h-toc-rail {
+  max-height: calc(100dvh - var(--header-h) - 4rem);
+}
+
 /* Event page overview from the header breakpoint: the introduction and the event format on a 7 / 5 split. */
 @utility grid-cols-overview {
   grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
@@ -549,6 +576,15 @@ main [data-section-anchor] {
 /* Categories "Select a topic" hint placed left of what it points at: 13px clear of it (8px tail + 5px) */
 @utility right-hint {
   right: calc(100% + 0.8125rem);
+}
+
+/* A <summary> without the browser's disclosure triangle (legal table of contents, stacked) */
+@utility details-marker-none {
+  list-style: none;
+
+  &::-webkit-details-marker {
+    display: none;
+  }
 }
 
 /* Horizontal scroll without a visible scrollbar (publication nav on narrow desktops) */
@@ -740,6 +776,49 @@ body {
 .article-flow > * + :is([data-flow='block'], h2, h3, h4),
 .article-flow > [data-flow='block'] + * {
   margin-block-start: 3rem;
+}
+
+/*
+ * RichText variant="legal" (privacy, terms and cookie pages): 16px between paragraphs, list items and records; 40
+ * before an H2 or H3, 24 before an H4, 16 before an H5; after a heading 20 (H2), 16 (H3), 12 (H4) and 8 (H5).
+ * An editor-placed divider sits 48 below the text before it and draws a rule with 40 above the heading that follows.
+ */
+.legal-flow > :where(* + *) {
+  margin-block-start: 1rem;
+}
+
+/* After a heading; the rules before a heading come later, so they win where two headings meet. */
+.legal-flow > :where(h2 + *) {
+  margin-block-start: 1.25rem;
+}
+
+.legal-flow > :where(h4 + *) {
+  margin-block-start: 0.75rem;
+}
+
+.legal-flow > :where(h5 + *) {
+  margin-block-start: 0.5rem;
+}
+
+.legal-flow > :where(* + h2, * + h3) {
+  margin-block-start: 2.5rem;
+}
+
+.legal-flow > :where(* + h4) {
+  margin-block-start: 1.5rem;
+}
+
+/* An H4 opening an H3 section, as the H3's own content */
+.legal-flow > :where(h3 + h4) {
+  margin-block-start: 1rem;
+}
+
+.legal-flow > :where(* + [data-flow='divider']) {
+  margin-block-start: 3rem;
+}
+
+.legal-flow > :where([data-flow='divider'] + *) {
+  margin-block-start: 0;
 }
 
 /* RichText spacing="tight": 16px between every member, headings included (research Executive Summary sections) */
