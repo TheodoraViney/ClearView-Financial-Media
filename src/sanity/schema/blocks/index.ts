@@ -19,6 +19,7 @@ import { featuredStories } from './featured-stories'
 import { highlights } from './highlights'
 import { mostReadSidebar } from './most-read-sidebar'
 import { imageHero } from './image-hero'
+import { legalText } from './legal-text'
 import { newsletterSignup } from './newsletter-signup'
 import { numberedList } from './numbered-list'
 import { opportunityCards } from './opportunity-cards'
@@ -78,6 +79,7 @@ export const blockTypes = [
   companyAwards,
   companyEvents,
   companySponsoredContent,
+  legalText,
 ]
 
 const COLUMN_ONLY_BLOCK_TYPES: readonly (typeof blockTypes)[number][] = [
@@ -139,6 +141,7 @@ const INSERT_MENU_GROUPS = [
       companySponsoredContent.name,
     ],
   },
+  { name: 'legal', title: 'Legal page', of: [legalText.name] },
   { name: 'other', title: 'Other', of: [publications.name, statsBar.name] },
 ]
 

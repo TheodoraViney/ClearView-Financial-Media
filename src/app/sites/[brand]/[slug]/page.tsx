@@ -116,10 +116,11 @@ async function CachedPage({
     notFound()
   }
 
-  // A page that opens with a Hero with image, a Hero over image or a Contact form has its H1 there, so the template's
-  // title would be a second H1.
+  // A page that opens with a Hero with image, a Hero over image, a Contact form or Legal text has its H1 there, so the
+  // template's title would be a second H1.
   const first = data.blocks?.[0]?._type
-  const ownsHeading = first === 'imageHero' || first === 'overlayHero' || first === 'contactForm'
+  const ownsHeading =
+    first === 'imageHero' || first === 'overlayHero' || first === 'contactForm' || first === 'legalText'
 
   return (
     <main>

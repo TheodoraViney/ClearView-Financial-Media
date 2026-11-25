@@ -22,6 +22,7 @@ import { FeaturedStories } from './FeaturedStories'
 import { Highlights } from './Highlights'
 import { MostReadSidebar } from './MostReadSidebar'
 import { ImageHero } from './ImageHero'
+import { LegalText } from './LegalText'
 import { NewsletterSignup } from './NewsletterSignup'
 import { NumberedList } from './NumberedList'
 import { OpportunityCards } from './OpportunityCards'
@@ -218,6 +219,9 @@ function Block({
       return companies ? <CompanyEvents block={block} brand={brand} companies={companies} /> : null
     case 'companySponsoredContent':
       return companies ? <CompanySponsoredContent block={block} brand={brand} companies={companies} /> : null
+    // Legal pages (privacy, terms, cookies).
+    case 'legalText':
+      return <LegalText block={block} brand={brand} />
     default:
       return unknownBlock(block)
   }

@@ -12,6 +12,7 @@ import { CloseIcon } from './icons/close'
 import { CloseSmIcon } from './icons/close-sm'
 import { CommentIcon } from './icons/comment'
 import { CpuChipIcon } from './icons/cpu-chip'
+import { DisclosureChevronIcon } from './icons/disclosure-chevron'
 import { DocumentIcon } from './icons/document'
 import { DownloadIcon } from './icons/download'
 import { DownloadTrayIcon } from './icons/download-tray'
@@ -56,6 +57,7 @@ export const iconMap = {
   'check-sm': CheckSmIcon,
   'select-chevron': SelectChevronIcon,
   'dropdown-chevron': DropdownChevronIcon,
+  'disclosure-chevron': DisclosureChevronIcon,
   tick: TickIcon,
   star: StarIcon,
   public: PublicIcon,
