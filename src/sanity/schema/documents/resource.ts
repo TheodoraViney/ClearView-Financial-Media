@@ -27,7 +27,7 @@ import { blocksTextLength, paragraphsBlock } from '../objects/rich-text'
  * `researchSummary` document (`executiveSummaryPage`, required, one per
  * report), shown while that document has content. The "Page content" fields
  * are optional: the page hides a section, and its tab, while the section is
- * empty. The pages' labels live on the "Research report page" document
+ * empty. The pages' labels live on the "Resource page texts" document
  * (RESEARCH_REPORT_PAGE_ID).
  *
  * Three source fields are empty on all 12 records and are not carried over:

@@ -28,7 +28,7 @@ function blocksText(blocks: unknown): string {
  * A research report's Executive Summary page, at /resource/{report slug}/{this slug} on ClearView Publishing. One per
  * report: the report points at it with its required `executiveSummaryPage` reference, and the reference is unique
  * across reports. The page exists only while this document has a lead, an introduction or a section. Its labels
- * (page title, details labels, Key takeaways heading, back link) live on the "Research report page" document, and the
+ * (page title, details labels, Key takeaways heading, back link) live on the "Resource page texts" document, and the
  * Key takeaways are the report's own key findings.
  *
  * Document ids: `research-summary-{suffix of the report id}` for migrated ones, for example `research-summary-wp-36571`;
@@ -48,7 +48,7 @@ export const researchSummary = defineType({
       title: 'Studio title',
       type: 'string',
       description:
-        'Optional. Names this summary in Studio lists, for example the report it belongs to. Not shown on the site: the page title comes from the "Research report page" labels.',
+        'Optional. Names this summary in Studio lists, for example the report it belongs to. Not shown on the site: the page title comes from the "Resource page texts" document.',
     }),
     defineField({
       name: 'slug',

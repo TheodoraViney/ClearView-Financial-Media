@@ -120,24 +120,6 @@ export const structure: StructureResolver = (S) =>
                         .child(S.document().schemaType('articlePage').documentId(articlePageDocumentId(key))),
                     ]
                   : []),
-                // The event, research report and company profile pages live on ClearView Publishing only, like the
-                // other shared records. The two awards page documents sit in the Awards folder.
-                ...(key === 'clearview'
-                  ? [
-                      S.listItem()
-                        .title('Event page')
-                        .icon(CalendarIcon)
-                        .child(S.document().schemaType('eventPage').documentId(EVENT_PAGE_ID)),
-                      S.listItem()
-                        .title('Research report page')
-                        .icon(DocumentPdfIcon)
-                        .child(S.document().schemaType('researchReportPage').documentId(RESEARCH_REPORT_PAGE_ID)),
-                      S.listItem()
-                        .title('Company profile page')
-                        .icon(CaseIcon)
-                        .child(S.document().schemaType('partnerProfilePage').documentId(PARTNER_PROFILE_PAGE_ID)),
-                    ]
-                  : []),
                 S.listItem()
                   .title('Search page')
                   .icon(SearchIcon)
@@ -237,11 +219,54 @@ export const structure: StructureResolver = (S) =>
                 .child(S.document().schemaType('awardCategoryPage').documentId(AWARD_CATEGORY_PAGE_ID)),
             ]),
         ),
-      S.documentTypeListItem('conferenceEvent').title('Events').icon(CalendarIcon),
-      S.documentTypeListItem('eventRegion').title('Event regions').icon(EarthGlobeIcon),
-      S.documentTypeListItem('resource').title('Resources').icon(DocumentPdfIcon),
-      S.documentTypeListItem('researchSummary').title('Executive summaries').icon(DocumentTextIcon),
+      // Each shared record folder: its records, then after a divider the texts its page template shares.
+      S.listItem()
+        .title('Events')
+        .icon(CalendarIcon)
+        .child(
+          S.list()
+            .title('Events')
+            .items([
+              S.documentTypeListItem('conferenceEvent').title('Events').icon(CalendarIcon),
+              S.documentTypeListItem('eventRegion').title('Event regions').icon(EarthGlobeIcon),
+              S.divider(),
+              S.listItem()
+                .title('Event page texts')
+                .icon(CalendarIcon)
+                .child(S.document().schemaType('eventPage').documentId(EVENT_PAGE_ID)),
+            ]),
+        ),
+      S.listItem()
+        .title('Resources')
+        .icon(DocumentPdfIcon)
+        .child(
+          S.list()
+            .title('Resources')
+            .items([
+              S.documentTypeListItem('resource').title('Resources').icon(DocumentPdfIcon),
+              S.documentTypeListItem('researchSummary').title('Executive summaries').icon(DocumentTextIcon),
+              S.divider(),
+              S.listItem()
+                .title('Resource page texts')
+                .icon(DocumentPdfIcon)
+                .child(S.document().schemaType('researchReportPage').documentId(RESEARCH_REPORT_PAGE_ID)),
+            ]),
+        ),
       S.divider(),
-      S.documentTypeListItem('company').title('Companies').icon(CaseIcon),
-      S.documentTypeListItem('person').title('People').icon(UserIcon),
+      S.listItem()
+        .title('Companies')
+        .icon(CaseIcon)
+        .child(
+          S.list()
+            .title('Companies')
+            .items([
+              S.documentTypeListItem('company').title('Companies').icon(CaseIcon),
+              S.documentTypeListItem('person').title('People').icon(UserIcon),
+              S.divider(),
+              S.listItem()
+                .title('Company page texts')
+                .icon(CaseIcon)
+                .child(S.document().schemaType('partnerProfilePage').documentId(PARTNER_PROFILE_PAGE_ID)),
+            ]),
+        ),
     ])

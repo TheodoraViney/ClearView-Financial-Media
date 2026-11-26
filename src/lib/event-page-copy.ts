@@ -1,7 +1,7 @@
 /*
- * Visible labels of the conference event page, edited in the "Event page" document (ClearView folder in the Studio).
- * The design texts live only as the fields' initial values in the schema; the page renders the stored values.
- * Section headings are heading fields (headingField) and are read separately. Pure: no Sanity or Next imports.
+ * Visible labels of the conference event page, edited in the "Event page texts" document (Events folder in the
+ * Studio). The design texts live only as the fields' initial values in the schema; the page renders the stored values.
+ * Section headings are plain strings, read separately and rendered as h2. Pure: no Sanity or Next imports.
  */
 
 export const EVENT_PAGE_COPY_KEYS = [

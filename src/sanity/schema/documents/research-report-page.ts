@@ -3,154 +3,108 @@ import { defineField, defineType } from 'sanity'
 
 import type { ResearchReportPageCopyKey } from '@/lib/research-report-copy'
 
-import { headingField } from '../fields'
-
 /*
- * The research report template's labels: one document with the fixed id RESEARCH_REPORT_PAGE_ID from `src/brands.ts`,
- * opened from the ClearView folder in the Studio, because the page lives on ClearView Publishing only. It covers the
- * report page (/resource/{slug}) and its Executive Summary page (/resource/{slug}/{summary slug}). The report's
- * own content (standfirst, summary, key findings, methodology, insights, partner) lives on the resource document.
+ * "Resource page texts": the research report template's labels, one document with the fixed id RESEARCH_REPORT_PAGE_ID
+ * from `src/brands.ts`, opened from the Resources folder in the Studio. The page lives on ClearView Publishing only.
+ * It covers the report page (/resource/{slug}) and its Executive Summary page (/resource/{slug}/{summary slug}). The
+ * report's own content (standfirst, summary, key findings, methodology, insights, partner) lives on the resource
+ * document.
+ * Tabs and fieldsets follow the page from top to bottom; a section's heading and its menu link sit side by side.
+ * Section headings are plain strings rendered as h2; the Selected insights subheading renders as h3.
  * The design texts are the fields' initial values only: the page renders what is stored. Screen-reader-only text
  * stays in code.
  */
 
-const label = (
-  name: ResearchReportPageCopyKey,
-  title: string,
-  description: string,
-  group: string,
-  initialValue: string,
-) =>
-  defineField({
-    name,
-    title,
-    type: 'string',
-    description,
-    group,
-    initialValue,
-    validation: (Rule) => Rule.required(),
-  })
+type FieldOptions = { description?: string; fieldset?: string; group?: string }
 
-const heading = (
-  name: string,
-  title: string,
-  description: string,
-  initialText: string,
-  group = 'page',
-  defaultLevel: 'h2' | 'h3' = 'h2',
-) =>
-  headingField(name, {
-    title,
-    defaultLevel,
-    initialText,
-    required: true,
-    group,
-    description: `${description} Choose the heading level in the style menu. The size on the page stays the same.`,
-  })
+const label = (name: ResearchReportPageCopyKey, title: string, initialValue: string, options: FieldOptions = {}) =>
+  defineField({ name, title, type: 'string', initialValue, validation: (Rule) => Rule.required(), group: 'sections', ...options })
 
-const NAV = 'In-page navigation link. Hidden when the section is empty.'
+const heading = (name: string, initialValue: string, options: FieldOptions & { title?: string } = {}) =>
+  defineField({ name, title: 'Heading', type: 'string', initialValue, validation: (Rule) => Rule.required(), group: 'sections', ...options })
+
+/** A section of the page: its heading and its link in the menu under the header, side by side. */
+const section = (name: string, headingName: string, headingText: string, navName: ResearchReportPageCopyKey, navText: string) => [
+  heading(headingName, headingText, { fieldset: name }),
+  label(navName, 'Menu link', navText, { fieldset: name }),
+]
 
 export const researchReportPage = defineType({
   name: 'researchReportPage',
-  title: 'Research report page',
+  title: 'Resource page texts',
   type: 'document',
   icon: DocumentPdfIcon,
   groups: [
-    { name: 'page', title: 'Report page', default: true },
-    { name: 'navigation', title: 'Navigation' },
-    { name: 'summary', title: 'Executive Summary page' },
+    { name: 'header', title: 'Header', default: true },
+    { name: 'sections', title: 'Sections' },
     { name: 'sidebar', title: 'Sidebar' },
+    { name: 'summary', title: 'Executive Summary page' },
+  ],
+  fieldsets: [
+    { name: 'breadcrumb', title: 'Breadcrumb', description: 'Also used on the Executive Summary page.', options: { columns: 2 } },
+    { name: 'executiveSummary', title: 'Executive summary', options: { columns: 2 } },
+    { name: 'keyFindings', title: 'Key findings', options: { columns: 2 } },
+    { name: 'methodology', title: 'Contributors and methodology', options: { columns: 2 } },
+    { name: 'insights', title: 'Charts and selected insights', options: { columns: 2 } },
+    { name: 'researchPartner', title: 'Research partner', options: { columns: 2 } },
+    { name: 'relatedResearch', title: 'Related research', options: { columns: 2 } },
+    { name: 'summaryHeader', title: 'Header', options: { columns: 2 } },
+    { name: 'summaryDetails', title: 'Details list', options: { columns: 2 } },
   ],
   fields: [
-    label('breadcrumbHomeLabel', 'Breadcrumb home label', 'First item of the breadcrumb, linking to the home page.', 'page', 'Home'),
-    label(
-      'breadcrumbResearchLabel',
-      'Breadcrumb research label',
-      'Second item of the breadcrumb, linking to the research list. Used on both pages.',
-      'page',
-      'Research',
-    ),
-    label('typeLabel', 'Type label', 'Shown above the report title on both pages.', 'page', 'Research report'),
-    label(
-      'downloadLabel',
-      'Download button label',
-      "Button that opens the report's download form, or its PDF when there is no form. Hidden when the report has neither.",
-      'page',
-      'Download report',
-    ),
-    heading('executiveSummaryHeading', 'Executive summary heading', 'Heading above the short executive summary.', 'Executive summary'),
-    label(
-      'readFullSummaryLabel',
-      'Full summary link label',
-      'Link to the Executive Summary page. Hidden when the report has no full summary.',
-      'page',
-      'Read full Executive Summary',
-    ),
-    heading('keyFindingsHeading', 'Key findings heading', 'Heading above the key findings.', 'Key findings'),
-    heading(
-      'methodologyHeading',
-      'Contributors and methodology heading',
-      'Heading above the methodology and the contributors.',
-      'Contributors / methodology',
-    ),
-    heading('insightsHeading', 'Insights section heading', 'Heading of the section with the selected insights.', 'Charts and selected insights'),
-    heading(
-      'selectedInsightsHeading',
-      'Selected insights heading',
-      'Smaller heading directly above the numbered insights.',
-      'Selected insights',
-      'page',
-      'h3',
-    ),
-    heading('researchPartnerHeading', 'Research partner heading', 'Heading of the research partner card.', 'Research partner'),
-    label(
-      'companyProfileLabel',
-      'Company profile link label',
-      "Link to the partner company's website. Hidden when the company has no website.",
-      'page',
-      'Company profile',
-    ),
-    heading('relatedResearchHeading', 'Related research heading', 'Heading above the related reports.', 'Related research'),
+    // Header
+    label('breadcrumbHomeLabel', 'Home', 'Home', { group: 'header', fieldset: 'breadcrumb' }),
+    label('breadcrumbResearchLabel', 'Research', 'Research', { group: 'header', fieldset: 'breadcrumb' }),
+    label('typeLabel', 'Type label', 'Research report', {
+      group: 'header',
+      description: 'Above the title on both pages.',
+    }),
+    label('downloadLabel', 'Download button', 'Download report', {
+      group: 'header',
+      description: 'Opens the download form, else the PDF. Hidden when the report has neither.',
+    }),
 
-    label('navExecutiveSummaryLabel', 'Executive summary link', NAV, 'navigation', 'Executive Summary'),
-    label('navKeyFindingsLabel', 'Key findings link', NAV, 'navigation', 'Key Findings'),
-    label('navMethodologyLabel', 'Contributors and methodology link', NAV, 'navigation', 'Contributors / Methodology'),
-    label('navInsightsLabel', 'Insights link', NAV, 'navigation', 'Charts and Selected Insights'),
-    label('navResearchPartnerLabel', 'Research partner link', NAV, 'navigation', 'Research Partner'),
-    label('navRelatedResearchLabel', 'Related research link', NAV, 'navigation', 'Related Research'),
+    // Sections, in page order. A menu link is hidden while its section is empty.
+    ...section('executiveSummary', 'executiveSummaryHeading', 'Executive summary', 'navExecutiveSummaryLabel', 'Executive Summary'),
+    label('readFullSummaryLabel', 'Full summary link', 'Read full Executive Summary', {
+      fieldset: 'executiveSummary',
+      description: 'Hidden when the report has no Executive Summary page.',
+    }),
 
-    label(
-      'summaryBreadcrumbLabel',
-      'Breadcrumb label',
-      'Last item of the breadcrumb on the Executive Summary page.',
-      'summary',
-      'Executive Summary',
-    ),
-    label('summaryTitle', 'Page title', 'Main heading of the Executive Summary page.', 'summary', 'Executive Summary'),
-    label('summaryReportLabel', 'Report label', 'Label of the report title in the details list.', 'summary', 'Report'),
-    label(
-      'summaryEditionLabel',
-      'Edition label',
-      'Label of the edition in the details list. Hidden when the report has no edition.',
-      'summary',
-      'Edition',
-    ),
-    label('summaryDateLabel', 'Date label', 'Label of the publish date in the details list.', 'summary', 'Date'),
-    label(
-      'summaryPartnerLabel',
-      'Research partner label',
-      'Label of the research partner in the details list. Hidden when the report has no partner.',
-      'summary',
-      'Research partner',
-    ),
-    heading('keyTakeawaysHeading', 'Key takeaways heading', "Heading above the report's key findings.", 'Key takeaways', 'summary'),
-    label('backToReportLabel', 'Back link label', 'Link back to the report page.', 'summary', 'Back to the full report'),
+    ...section('keyFindings', 'keyFindingsHeading', 'Key findings', 'navKeyFindingsLabel', 'Key Findings'),
+    ...section('methodology', 'methodologyHeading', 'Contributors / methodology', 'navMethodologyLabel', 'Contributors / Methodology'),
 
-    heading('mostReadHeading', 'Most read heading', 'Heading of the most read list beside the report.', 'Most Read', 'sidebar'),
+    ...section('insights', 'insightsHeading', 'Charts and selected insights', 'navInsightsLabel', 'Charts and Selected Insights'),
+    heading('selectedInsightsHeading', 'Selected insights', { fieldset: 'insights', title: 'Subheading' }),
+
+    ...section('researchPartner', 'researchPartnerHeading', 'Research partner', 'navResearchPartnerLabel', 'Research Partner'),
+    label('companyProfileLabel', 'Website link', 'Company profile', {
+      fieldset: 'researchPartner',
+      description: 'Hidden when the company has no website.',
+    }),
+
+    ...section('relatedResearch', 'relatedResearchHeading', 'Related research', 'navRelatedResearchLabel', 'Related Research'),
+
+    // Sidebar
+    heading('mostReadHeading', 'Most Read', { group: 'sidebar', title: 'Most read heading' }),
+
+    // Executive Summary page
+    label('summaryBreadcrumbLabel', 'Breadcrumb', 'Executive Summary', {
+      group: 'summary',
+      fieldset: 'summaryHeader',
+      description: 'Last item, after Home and Research.',
+    }),
+    label('summaryTitle', 'Page title', 'Executive Summary', { group: 'summary', fieldset: 'summaryHeader' }),
+    label('summaryReportLabel', 'Report', 'Report', { group: 'summary', fieldset: 'summaryDetails' }),
+    label('summaryEditionLabel', 'Edition', 'Edition', { group: 'summary', fieldset: 'summaryDetails' }),
+    label('summaryDateLabel', 'Date', 'Date', { group: 'summary', fieldset: 'summaryDetails' }),
+    label('summaryPartnerLabel', 'Research partner', 'Research partner', { group: 'summary', fieldset: 'summaryDetails' }),
+    heading('keyTakeawaysHeading', 'Key takeaways', { group: 'summary', title: 'Key takeaways heading' }),
+    label('backToReportLabel', 'Back link', 'Back to the full report', { group: 'summary' }),
   ],
   preview: {
     prepare() {
-      return { title: 'Research report page', media: DocumentPdfIcon }
+      return { title: 'Resource page texts', media: DocumentPdfIcon }
     },
   },
 })

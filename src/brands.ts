@@ -51,16 +51,16 @@ export const AWARD_CATEGORY_PAGE_ID = 'award-category-page'
  */
 export const AWARDS_PROGRAMME_PAGE_ID = 'awards-programme-page'
 
-/** Id of the one "Event page" document: the conference event template's labels. ClearView only. */
+/** Id of the one "Event page texts" document: the conference event template's labels. ClearView only. */
 export const EVENT_PAGE_ID = 'event-page'
 
 /**
- * Id of the one "Research report page" document: the labels of the research report page and its Executive Summary
+ * Id of the one "Resource page texts" document: the labels of the research report page and its Executive Summary
  * page. ClearView only.
  */
 export const RESEARCH_REPORT_PAGE_ID = 'research-report-page'
 
-/** Id of the one "Company profile page" document: the company profile template's labels. ClearView only. */
+/** Id of the one "Company page texts" document: the company profile template's labels. ClearView only. */
 export const PARTNER_PROFILE_PAGE_ID = 'partner-profile-page'
 
 /** Id of the one "404 page" document, shared by every brand: the not-found page's texts. */

@@ -1,5 +1,5 @@
 /*
- * Visible labels of the award category page, edited in the "Award category page" document (ClearView folder in the
+ * Visible labels of the award category page, edited in the "Category page texts" document (Awards folder in the
  * Studio). The design texts live only as the fields' initial values in the schema; the page renders the stored values.
  * The sidebar's edition status labels live in the "Awards page texts" document (src/lib/awards-programme-copy.ts).
  * Pure: no Sanity or Next imports, so the Studio validation and the page share the template rule.

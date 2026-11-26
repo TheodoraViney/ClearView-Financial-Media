@@ -19,8 +19,7 @@ import {
 } from '@/lib/research-report'
 import { RESEARCH_REPORT_PAGE_COPY_KEYS, type ResearchReportPageCopy, type ResearchReportPageCopyKey } from '@/lib/research-report-copy'
 
-import { clipDescription } from './awards-programme-view'
-import { toHeading } from './heading'
+import { clipDescription, sectionHeading } from './awards-programme-view'
 import { toImage } from './image'
 import type { MostReadGroupFill } from './most-read'
 import type { RESEARCH_REPORT_PAGE_QUERY_RESULT, RESEARCH_REPORT_QUERY_RESULT } from './types'
@@ -207,29 +206,29 @@ export function toResearchReportView({
     summary:
       summaryText || summaryPath
         ? {
-            heading: toHeading(rawCopy.executiveSummaryHeading),
+            heading: sectionHeading(rawCopy.executiveSummaryHeading),
             text: summaryText,
             fullSummary: summaryPath ? { label: copy.readFullSummaryLabel, href: summaryPath } : null,
           }
         : null,
-    keyFindings: findings.length > 0 ? { heading: toHeading(rawCopy.keyFindingsHeading), items: findings } : null,
+    keyFindings: findings.length > 0 ? { heading: sectionHeading(rawCopy.keyFindingsHeading), items: findings } : null,
     methodology:
       methodologyIntro || rows.length > 0 || contributors.length > 0
-        ? { heading: toHeading(rawCopy.methodologyHeading), intro: methodologyIntro, rows, contributors }
+        ? { heading: sectionHeading(rawCopy.methodologyHeading), intro: methodologyIntro, rows, contributors }
         : null,
     insights:
       chartCards.length > 0 || insights.length > 0
         ? {
-            heading: toHeading(rawCopy.insightsHeading),
+            heading: sectionHeading(rawCopy.insightsHeading),
             charts: chartCards,
-            subheading: toHeading(rawCopy.selectedInsightsHeading),
+            subheading: sectionHeading(rawCopy.selectedInsightsHeading, 'h3'),
             items: insights,
           }
         : null,
     researchPartner:
       company && filled(company.title)
         ? {
-            heading: toHeading(rawCopy.researchPartnerHeading),
+            heading: sectionHeading(rawCopy.researchPartnerHeading),
             name: company.title,
             logo: withAlt(toImage(company.logo), company.title),
             description: filled(report.researchPartner?.description) ? report.researchPartner.description : null,
@@ -237,8 +236,8 @@ export function toResearchReportView({
             profile: website && /^https?:\/\//i.test(website) ? { label: copy.companyProfileLabel, href: website } : null,
           }
         : null,
-    relatedResearch: related.length > 0 ? { heading: toHeading(rawCopy.relatedResearchHeading), items: related } : null,
-    mostRead: mostReadItems.length > 0 ? { heading: toHeading(rawCopy.mostReadHeading), items: mostReadItems } : null,
+    relatedResearch: related.length > 0 ? { heading: sectionHeading(rawCopy.relatedResearchHeading), items: related } : null,
+    mostRead: mostReadItems.length > 0 ? { heading: sectionHeading(rawCopy.mostReadHeading), items: mostReadItems } : null,
     ads: { top: ads.top, side: ads.side },
   }
 
@@ -285,7 +284,7 @@ export function toExecutiveSummaryView({ report, copy: rawCopy }: { report: Rese
 
       return heading || body ? [{ key: section._key, heading, body }] : []
     }),
-    keyTakeaways: findings.length > 0 ? { heading: toHeading(rawCopy.keyTakeawaysHeading), items: findings } : null,
+    keyTakeaways: findings.length > 0 ? { heading: sectionHeading(rawCopy.keyTakeawaysHeading), items: findings } : null,
     back: { label: copy.backToReportLabel, href: reportPath(report) ?? '/' },
   }
 }

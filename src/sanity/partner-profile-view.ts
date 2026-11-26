@@ -13,8 +13,7 @@ import {
   type PartnerProfilePageCopy,
 } from '@/lib/partner-profile-copy'
 
-import { clipDescription } from './awards-programme-view'
-import { toHeading } from './heading'
+import { clipDescription, sectionHeading } from './awards-programme-view'
 import { toImage } from './image'
 import type { PARTNER_PROFILE_PAGE_QUERY_RESULT, PARTNER_PROFILE_QUERY_RESULT } from './types'
 
@@ -147,32 +146,32 @@ export function toPartnerProfileView({
         ? { kind: 'logo', image: logo.alt ? logo : { ...logo, alt: logoAlt } }
         : { kind: 'lockup', name, label: logoAlt },
     metrics: metrics.length > 0 ? { label: plain(copy.atAGlanceLabel), items: metrics } : null,
-    fields: rows.length > 0 ? { heading: toHeading(rawCopy.fieldsHeading), rows } : null,
+    fields: rows.length > 0 ? { heading: sectionHeading(rawCopy.fieldsHeading), rows } : null,
     activity:
       sponsor.length > 0 || won.length > 0
         ? {
-            heading: toHeading(rawCopy.activityHeading),
-            sponsor: sponsor.length > 0 ? { heading: toHeading(rawCopy.sponsorActivityHeading), items: sponsor } : null,
-            recognition: won.length > 0 ? { heading: toHeading(rawCopy.recognitionHeading), items: won } : null,
+            heading: sectionHeading(rawCopy.activityHeading),
+            sponsor: sponsor.length > 0 ? { heading: sectionHeading(rawCopy.sponsorActivityHeading, 'h3'), items: sponsor } : null,
+            recognition: won.length > 0 ? { heading: sectionHeading(rawCopy.recognitionHeading, 'h3'), items: won } : null,
           }
         : null,
     coverage:
       interviews.length > 0 || archiveTitles.length > 0
         ? {
-            heading: toHeading(rawCopy.coverageHeading),
+            heading: sectionHeading(rawCopy.coverageHeading),
             interviews:
-              interviews.length > 0 ? { heading: toHeading(rawCopy.sponsorInterviewsHeading), items: interviews } : null,
+              interviews.length > 0 ? { heading: sectionHeading(rawCopy.sponsorInterviewsHeading, 'h3'), items: interviews } : null,
             archive:
               archiveTitles.length > 0
                 ? {
-                    heading: toHeading(rawCopy.archiveCoverageHeading),
+                    heading: sectionHeading(rawCopy.archiveCoverageHeading, 'h3'),
                     titles: archiveTitles,
                     link: archiveHref && filled(copy.archiveLinkLabel) ? { label: copy.archiveLinkLabel, href: archiveHref } : null,
                   }
                 : null,
           }
         : null,
-    officialLinks: officialLinks.length > 0 ? { heading: toHeading(rawCopy.officialLinksHeading), items: officialLinks } : null,
+    officialLinks: officialLinks.length > 0 ? { heading: sectionHeading(rawCopy.officialLinksHeading), items: officialLinks } : null,
     ads: { top: ads.top, side: ads.side },
   }
 }

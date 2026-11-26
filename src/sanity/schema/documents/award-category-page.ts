@@ -6,30 +6,24 @@ import { OTHER_PROGRAMMES_COUNT } from '@/lib/award-category'
 import { AWARD_YEAR_TOKEN, winnerLabelError, type AwardCategoryPageCopyKey } from '@/lib/award-category-copy'
 import { AutoFillPicksInput } from '@/sanity/components/auto-fill-picks-input'
 
-import { headingField } from '../fields'
-
 /*
- * The award category template's labels: one document with the fixed id AWARD_CATEGORY_PAGE_ID from `src/brands.ts`,
- * opened from the ClearView folder in the Studio, because the page lives on ClearView Publishing only. The category's
- * own copy (description, eligibility, recognition, judging) lives on the award category document.
+ * "Category page texts": the award category template's labels, one document with the fixed id AWARD_CATEGORY_PAGE_ID
+ * from `src/brands.ts`, opened from the Awards folder in the Studio. The category's own copy (description,
+ * eligibility, recognition, judging) lives on the award category document.
+ * Fieldsets follow the page from top to bottom, short fields two to a row. The sidebar heading is a plain string
+ * rendered as h2.
  * The design texts are the fields' initial values only: the page renders what is stored, and 404s until this
  * document is published. Screen-reader-only text stays in code. The sidebar's edition status labels are shared with the
- * awards programme page and live in the "Awards programme page" document (awards-programme-page.ts).
+ * awards programme page and live in the "Awards page texts" document (awards-programme-page.ts).
  */
 
-const label = (
-  name: AwardCategoryPageCopyKey,
-  title: string,
-  description: string,
-  group: string,
-  initialValue: string,
-) =>
+const label = (name: AwardCategoryPageCopyKey, title: string, initialValue: string, fieldset: string) =>
   defineField({
     name,
     title,
     type: 'string',
-    description,
-    group,
+    group: 'page',
+    fieldset,
     initialValue,
     validation: (Rule) => Rule.required(),
   })
@@ -43,38 +37,46 @@ export const awardCategoryPage = defineType({
     { name: 'page', title: 'Page', default: true },
     { name: 'sidebar', title: 'Sidebar' },
   ],
+  fieldsets: [
+    { name: 'breadcrumb', title: 'Breadcrumb', options: { columns: 2 } },
+    { name: 'details', title: 'Category details', options: { columns: 2 } },
+    { name: 'winners', title: 'Winners by year', options: { columns: 2 } },
+  ],
   fields: [
-    label('breadcrumbHomeLabel', 'Breadcrumb home label', 'First item of the breadcrumb, linking to the home page.', 'page', 'Home'),
-    label('breadcrumbAwardsLabel', 'Breadcrumb awards label', 'First item of the breadcrumb, linking to the awards list.', 'page', 'Awards'),
-    label('detailsHeading', 'Category details heading', 'Heading above eligibility, recognition and judging.', 'page', 'Category details'),
-    label('eligibilityLabel', 'Eligibility label', 'Label of the eligibility text in Category details.', 'page', 'Eligibility'),
-    label('recognisesLabel', 'Recognition label', 'Label of the "what the category recognises" text in Category details.', 'page', 'What the category recognises'),
-    label('judgingLabel', 'Judging label', 'Label of the judging context text in Category details.', 'page', 'Judging context'),
-    label('winnersHeading', 'Winners heading', 'Heading above the winners and the year selector.', 'page', 'Winners by year'),
+    label('breadcrumbHomeLabel', 'Home', 'Home', 'breadcrumb'),
+    label('breadcrumbAwardsLabel', 'Awards', 'Awards', 'breadcrumb'),
+
+    label('detailsHeading', 'Heading', 'Category details', 'details'),
+    label('eligibilityLabel', 'Eligibility', 'Eligibility', 'details'),
+    label('recognisesLabel', 'Recognition', 'What the category recognises', 'details'),
+    label('judgingLabel', 'Judging', 'Judging context', 'details'),
+
+    label('winnersHeading', 'Heading', 'Winners by year', 'winners'),
     defineField({
       name: 'winnerLabel',
       title: 'Winner card label',
       type: 'string',
-      description: `Above the winner's name, for example "2025 winner". Placeholder: ${AWARD_YEAR_TOKEN}, the award year.`,
+      description: `${AWARD_YEAR_TOKEN} becomes the year: "2025 winner".`,
       group: 'page',
+      fieldset: 'winners',
       initialValue: `${AWARD_YEAR_TOKEN} winner`,
       validation: (Rule) => Rule.required().custom((value: string | undefined) => winnerLabelError(value) ?? true),
     }),
-    headingField('otherProgrammesHeading', {
-      title: 'Other programmes heading',
-      defaultLevel: 'h2',
-      initialText: 'Other awards programmes',
-      required: true,
+
+    defineField({
+      name: 'otherProgrammesHeading',
+      title: 'Heading',
+      type: 'string',
       group: 'sidebar',
-      description:
-        'Heading of the awards programmes list. Choose the heading level in the style menu. The size on the page stays the same.',
+      initialValue: 'Other awards programmes',
+      validation: (Rule) => Rule.required(),
     }),
     defineField({
       name: 'otherProgrammes',
-      title: 'Awards programmes',
+      title: 'Pinned editions',
       type: 'array',
       group: 'sidebar',
-      description: `Optional. Up to ${OTHER_PROGRAMMES_COUNT} awards editions, shown first in this order on every category page. A pick from the page's own programme is skipped on that page. Empty places fill automatically with the next edition of other programmes (nominations open first, then ceremonies ahead), one per programme. A past edition you pick still shows, without a status.`,
+      description: `Optional. Up to ${OTHER_PROGRAMMES_COUNT}, shown first. Empty places fill with upcoming editions of other programmes.`,
       components: { input: AutoFillPicksInput },
       of: [
         defineArrayMember({
@@ -88,7 +90,6 @@ export const awardCategoryPage = defineType({
               title: 'Edition',
               type: 'reference',
               to: [{ type: 'awardsProgramme' }],
-              description: 'Its title, link, dates, country and status are used on the page.',
               options: { disableNew: true },
               validation: (Rule) => Rule.required(),
             }),

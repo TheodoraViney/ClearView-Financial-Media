@@ -21,6 +21,7 @@ import { EDITION_STATUS_LABELS, editionStatus } from '@/lib/awards-status'
 import { countryName } from '@/lib/countries'
 import { formatLongDate, formatWeekdayDate } from '@/lib/dates'
 import type { AdUnits } from '@/lib/gam'
+import type { HeadingLevel } from '@/lib/headings'
 import { acclaimHref, AWARDS_LISTING_PATH, awardCategoryHref, sharedRecordHref } from '@/lib/links'
 
 import { toStatuses } from './award-category-view'
@@ -47,10 +48,14 @@ function toCopy(copy: NonNullable<CopyData>): AwardsProgrammePageCopy {
   return Object.fromEntries(AWARDS_PROGRAMME_PAGE_COPY_KEYS.map((key) => [key, copy[key] ?? ''])) as AwardsProgrammePageCopy
 }
 
-/** A Portable Text field with at least one member, else null. */
-/** A section heading of the "Awards page texts" document: a plain string, always an h2. Null when empty. */
-const sectionHeading = (value: string | null | undefined): HeadingView => (filled(value) ? { as: 'h2', text: value } : null)
+/**
+ * A section heading of a page texts document: a plain string, an h2 unless the page needs a subheading level. Null
+ * when empty. Also used by the event, research report and company pages.
+ */
+export const sectionHeading = (value: string | null | undefined, as: HeadingLevel = 'h2'): HeadingView =>
+  filled(value) ? { as, text: value } : null
 
+/** A Portable Text field with at least one member, else null. */
 const richText = <T extends Body | readonly unknown[]>(value: T | null | undefined): T | null =>
   value && value.length > 0 ? value : null
 
