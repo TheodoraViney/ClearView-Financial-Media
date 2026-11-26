@@ -22,7 +22,6 @@ import { formatDateRange } from '@/lib/dates'
 import type { AdUnits } from '@/lib/gam'
 import { AWARDS_LISTING_PATH, sharedRecordHref } from '@/lib/links'
 
-import { toHeading } from './heading'
 import { toImage } from './image'
 import type {
   AWARD_CATEGORY_PAGE_QUERY_RESULT,
@@ -201,7 +200,7 @@ export function toAwardCategoryView({
     details: toDetails(category, copy),
     years: toYears(category.editions, copy.winnerLabel),
     otherProgrammes: {
-      heading: toHeading(rawCopy.otherProgrammesHeading),
+      heading: filled(rawCopy.otherProgrammesHeading) ? { as: 'h2', text: rawCopy.otherProgrammesHeading } : null,
       items: toOtherProgrammes(rawCopy.otherProgrammes, others, category.programme._id, toStatuses(statuses), today),
     },
     copy,

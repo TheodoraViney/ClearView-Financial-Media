@@ -519,7 +519,7 @@ export const AWARD_CATEGORY_PAGE_QUERY = defineQuery(`
     judgingLabel,
     winnersHeading,
     winnerLabel,
-    otherProgrammesHeading[]{ _key, style, children[]{ _key, text } },
+    otherProgrammesHeading,
     "otherProgrammes": otherProgrammes[]{ _key, title, "edition": edition->{ ${OTHER_AWARDS_EDITION} } },
     "statuses": *[_id == $statusesId && _type == "awardsProgrammePage"][0]{
       launchingSoonLabel,
@@ -726,14 +726,14 @@ export const EVENT_PAGE_QUERY = defineQuery(`
     navSponsorsLabel,
     navVenueLabel,
     navRelatedCoverageLabel,
-    overviewHeading[]{ _key, style, children[]{ _key, text } },
-    speakersHeading[]{ _key, style, children[]{ _key, text } },
-    whyAttendHeading[]{ _key, style, children[]{ _key, text } },
-    agendaHeading[]{ _key, style, children[]{ _key, text } },
-    sponsorsHeading[]{ _key, style, children[]{ _key, text } },
-    venueHeading[]{ _key, style, children[]{ _key, text } },
-    relatedCoverageHeading[]{ _key, style, children[]{ _key, text } },
-    relatedEventsHeading[]{ _key, style, children[]{ _key, text } },
+    overviewHeading,
+    speakersHeading,
+    whyAttendHeading,
+    agendaHeading,
+    sponsorsHeading,
+    venueHeading,
+    relatedCoverageHeading,
+    relatedEventsHeading,
     "relatedEvents": relatedEvents[]{ _key, title, "event": event->{ ${RELATED_EVENT} } }
   }
 `)
@@ -872,15 +872,15 @@ export const RESEARCH_REPORT_PAGE_QUERY = defineQuery(`
     summaryDateLabel,
     summaryPartnerLabel,
     backToReportLabel,
-    executiveSummaryHeading[]{ _key, style, children[]{ _key, text } },
-    keyFindingsHeading[]{ _key, style, children[]{ _key, text } },
-    methodologyHeading[]{ _key, style, children[]{ _key, text } },
-    insightsHeading[]{ _key, style, children[]{ _key, text } },
-    selectedInsightsHeading[]{ _key, style, children[]{ _key, text } },
-    researchPartnerHeading[]{ _key, style, children[]{ _key, text } },
-    relatedResearchHeading[]{ _key, style, children[]{ _key, text } },
-    keyTakeawaysHeading[]{ _key, style, children[]{ _key, text } },
-    mostReadHeading[]{ _key, style, children[]{ _key, text } }
+    executiveSummaryHeading,
+    keyFindingsHeading,
+    methodologyHeading,
+    insightsHeading,
+    selectedInsightsHeading,
+    researchPartnerHeading,
+    relatedResearchHeading,
+    keyTakeawaysHeading,
+    mostReadHeading
   }
 `)
 
@@ -945,14 +945,14 @@ export const PARTNER_PROFILE_PAGE_QUERY = defineQuery(`
     sponsorActivityText,
     archiveLinkLabel,
     archiveLink{ ${LINK_TARGET} },
-    fieldsHeading[]{ _key, style, children[]{ _key, text } },
-    activityHeading[]{ _key, style, children[]{ _key, text } },
-    sponsorActivityHeading[]{ _key, style, children[]{ _key, text } },
-    recognitionHeading[]{ _key, style, children[]{ _key, text } },
-    coverageHeading[]{ _key, style, children[]{ _key, text } },
-    sponsorInterviewsHeading[]{ _key, style, children[]{ _key, text } },
-    archiveCoverageHeading[]{ _key, style, children[]{ _key, text } },
-    officialLinksHeading[]{ _key, style, children[]{ _key, text } }
+    fieldsHeading,
+    activityHeading,
+    sponsorActivityHeading,
+    recognitionHeading,
+    coverageHeading,
+    sponsorInterviewsHeading,
+    archiveCoverageHeading,
+    officialLinksHeading
   }
 `)
 

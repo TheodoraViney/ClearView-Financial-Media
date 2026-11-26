@@ -17,8 +17,7 @@ import { EVENT_PAGE_COPY_KEYS, type EventPageCopy, type EventPageCopyKey } from 
 import type { AdUnits } from '@/lib/gam'
 import { EVENT_LISTING_PATHS, isEventType, resolveHref, safeHref, sharedRecordHref } from '@/lib/links'
 
-import { clipDescription, plainText } from './awards-programme-view'
-import { toHeading } from './heading'
+import { clipDescription, plainText, sectionHeading } from './awards-programme-view'
 import { toImage } from './image'
 import type { AWARDS_PROGRAMME_QUERY_RESULT, EVENT_PAGE_QUERY_RESULT, RELATED_EVENTS_QUERY_RESULT } from './types'
 
@@ -276,7 +275,7 @@ export function toEventPageView({
     overview:
       body || format.length > 0
         ? {
-            heading: toHeading(rawCopy.overviewHeading),
+            heading: sectionHeading(rawCopy.overviewHeading),
             body,
             format: format.length > 0 ? { label: copy.eventFormatLabel, items: format } : null,
           }
@@ -284,7 +283,7 @@ export function toEventPageView({
     speakers:
       speakerGroups.length > 0
         ? {
-            heading: toHeading(rawCopy.speakersHeading),
+            heading: sectionHeading(rawCopy.speakersHeading),
             groups: speakerGroups,
             chairLabel: copy.chairLabel,
           }
@@ -292,20 +291,20 @@ export function toEventPageView({
     whyAttend:
       whyAttendPoints.length > 0
         ? {
-            heading: toHeading(rawCopy.whyAttendHeading),
+            heading: sectionHeading(rawCopy.whyAttendHeading),
             intro: richText(event.whyAttend?.intro),
             points: whyAttendPoints,
           }
         : null,
     agenda:
       tracks.length > 0 || agendaText
-        ? { heading: toHeading(rawCopy.agendaHeading), tracks, text: tracks.length > 0 ? null : agendaText }
+        ? { heading: sectionHeading(rawCopy.agendaHeading), tracks, text: tracks.length > 0 ? null : agendaText }
         : null,
-    partners: partnerGroups.length > 0 ? { heading: toHeading(rawCopy.sponsorsHeading), groups: partnerGroups } : null,
-    venueInfo: venueItems.length > 0 ? { heading: toHeading(rawCopy.venueHeading), items: venueItems } : null,
-    relatedCoverage: coverage.length > 0 ? { heading: toHeading(rawCopy.relatedCoverageHeading), links: coverage } : null,
+    partners: partnerGroups.length > 0 ? { heading: sectionHeading(rawCopy.sponsorsHeading), groups: partnerGroups } : null,
+    venueInfo: venueItems.length > 0 ? { heading: sectionHeading(rawCopy.venueHeading), items: venueItems } : null,
+    relatedCoverage: coverage.length > 0 ? { heading: sectionHeading(rawCopy.relatedCoverageHeading), links: coverage } : null,
     relatedEvents: {
-      heading: toHeading(rawCopy.relatedEventsHeading),
+      heading: sectionHeading(rawCopy.relatedEventsHeading),
       items: relatedEventItems(rawCopy.relatedEvents, others, { excludeId: event._id, clean: stegaClean }).map(
         ({ event: related, title }) => toRelatedEvent(related, title),
       ),

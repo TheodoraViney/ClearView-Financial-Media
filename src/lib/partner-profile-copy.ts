@@ -1,8 +1,9 @@
 /*
- * Visible labels of the company profile page (/companies/{slug} on ClearView Publishing), edited in the "Company profile
- * page" document (ClearView folder in the Studio). The design texts live only as the fields' initial values in the
- * schema; the page renders the stored values. Section headings are heading fields (headingField) and are read
- * separately. Screen-reader-only text stays in code. Pure: no Sanity or Next imports.
+ * Visible labels of the company profile page (/companies/{slug} on ClearView Publishing), edited in the "Company page
+ * texts" document (Companies folder in the Studio). The design texts live only as the fields' initial values in the
+ * schema; the page renders the stored values. Section headings are plain strings, read separately and rendered as h2
+ * (the subheadings inside Activity and Coverage as h3). Screen-reader-only text stays in code. Pure: no Sanity or
+ * Next imports.
  */
 
 export const PARTNER_PROFILE_PAGE_COPY_KEYS = [

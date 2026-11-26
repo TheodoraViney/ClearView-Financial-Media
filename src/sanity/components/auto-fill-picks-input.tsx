@@ -126,8 +126,8 @@ export function AutoFillPicksInput(props: ArrayOfObjectsInputProps) {
           <Stack gap={4}>
             <Flex align="center" gap={2}>
               <Box flex={1}>
-                <Stack gap={2}>
-                  <Text size={1} weight="medium">
+                <Stack gap={3}>
+                  <Text size={2} weight="medium">
                     Shown automatically now
                   </Text>
                   <Text size={1} muted>

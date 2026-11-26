@@ -107,7 +107,7 @@ export const presentationTools: PluginOptions[] = BRAND_KEYS.map((key) =>
                 filter: '_id == $id',
                 params: { id: COMPANY_ENGAGEMENT_PAGE_DOCUMENT_ID },
               },
-              // A company profile: the company's own fields. The labels are the Company profile page document's.
+              // A company profile: the company's own fields. The labels are the Company page texts document's.
               {
                 route: '/companies/:slug',
                 filter: '_type == "company" && slug.current == $slug',

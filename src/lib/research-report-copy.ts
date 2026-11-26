@@ -1,7 +1,8 @@
 /*
- * Visible labels of the research report page and its Executive Summary page, edited in the "Research report page"
- * document (ClearView folder in the Studio). The design texts live only as the fields' initial values in the schema;
- * the pages render the stored values. Section headings are heading fields (headingField) and are read separately.
+ * Visible labels of the research report page and its Executive Summary page, edited in the "Resource page texts"
+ * document (Resources folder in the Studio). The design texts live only as the fields' initial values in the schema;
+ * the pages render the stored values. Section headings are plain strings, read separately and rendered as h2 (the
+ * Selected insights subheading as h3).
  * Screen-reader-only text stays in code. Pure: no Sanity or Next imports.
  */
 
