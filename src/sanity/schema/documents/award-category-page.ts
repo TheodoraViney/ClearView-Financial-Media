@@ -36,7 +36,7 @@ const label = (
 
 export const awardCategoryPage = defineType({
   name: 'awardCategoryPage',
-  title: 'Award category page',
+  title: 'Category page texts',
   type: 'document',
   icon: TagIcon,
   groups: [
@@ -121,7 +121,7 @@ export const awardCategoryPage = defineType({
   ],
   preview: {
     prepare() {
-      return { title: 'Award category page', media: TagIcon }
+      return { title: 'Category page texts', media: TagIcon }
     },
   },
 })

@@ -120,14 +120,10 @@ export const structure: StructureResolver = (S) =>
                         .child(S.document().schemaType('articlePage').documentId(articlePageDocumentId(key))),
                     ]
                   : []),
-                // The awards programme, event, research report, award category and company profile pages live on
-                // ClearView Publishing only, like the other shared records.
+                // The event, research report and company profile pages live on ClearView Publishing only, like the
+                // other shared records. The two awards page documents sit in the Awards folder.
                 ...(key === 'clearview'
                   ? [
-                      S.listItem()
-                        .title('Awards programme page')
-                        .icon(StarIcon)
-                        .child(S.document().schemaType('awardsProgrammePage').documentId(AWARDS_PROGRAMME_PAGE_ID)),
                       S.listItem()
                         .title('Event page')
                         .icon(CalendarIcon)
@@ -136,10 +132,6 @@ export const structure: StructureResolver = (S) =>
                         .title('Research report page')
                         .icon(DocumentPdfIcon)
                         .child(S.document().schemaType('researchReportPage').documentId(RESEARCH_REPORT_PAGE_ID)),
-                      S.listItem()
-                        .title('Award category page')
-                        .icon(TagIcon)
-                        .child(S.document().schemaType('awardCategoryPage').documentId(AWARD_CATEGORY_PAGE_ID)),
                       S.listItem()
                         .title('Company profile page')
                         .icon(CaseIcon)
@@ -234,6 +226,15 @@ export const structure: StructureResolver = (S) =>
                 .title('Categories')
                 .icon(TagIcon),
               S.documentTypeListItem('acclaim').title('Acclaim').icon(BookIcon),
+              S.divider(),
+              S.listItem()
+                .title('Awards page texts')
+                .icon(StarIcon)
+                .child(S.document().schemaType('awardsProgrammePage').documentId(AWARDS_PROGRAMME_PAGE_ID)),
+              S.listItem()
+                .title('Category page texts')
+                .icon(TagIcon)
+                .child(S.document().schemaType('awardCategoryPage').documentId(AWARD_CATEGORY_PAGE_ID)),
             ]),
         ),
       S.documentTypeListItem('conferenceEvent').title('Events').icon(CalendarIcon),

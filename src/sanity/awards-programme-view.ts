@@ -6,6 +6,7 @@ import { categoryGroupLabel, openProgrammeEditions, winnerName, type OtherProgra
 import type {
   AwardsProgrammeSectionId,
   AwardsProgrammeView,
+  HeadingView,
   JudgesPanelView,
   SponsorTierView,
   WinnersGroupView,
@@ -23,7 +24,6 @@ import type { AdUnits } from '@/lib/gam'
 import { acclaimHref, AWARDS_LISTING_PATH, awardCategoryHref, sharedRecordHref } from '@/lib/links'
 
 import { toStatuses } from './award-category-view'
-import { toHeading } from './heading'
 import { toImage } from './image'
 import type { AWARDS_PROGRAMME_PAGE_QUERY_RESULT, AWARDS_PROGRAMME_QUERY_RESULT, OPEN_AWARDS_QUERY_RESULT } from './types'
 
@@ -48,6 +48,9 @@ function toCopy(copy: NonNullable<CopyData>): AwardsProgrammePageCopy {
 }
 
 /** A Portable Text field with at least one member, else null. */
+/** A section heading of the "Awards page texts" document: a plain string, always an h2. Null when empty. */
+const sectionHeading = (value: string | null | undefined): HeadingView => (filled(value) ? { as: 'h2', text: value } : null)
+
 const richText = <T extends Body | readonly unknown[]>(value: T | null | undefined): T | null =>
   value && value.length > 0 ? value : null
 
@@ -281,12 +284,12 @@ export function toAwardsProgrammeView({
     register: toLinkProps({ ...edition.registerLink, label: edition.registerLink?.label || copy.registerLabel }, 'clearview'),
     sponsor: toLinkProps(rawCopy.sponsorLink, 'clearview'),
     previousYear: previousHref ? { label: copy.previousYearLabel, href: previousHref } : null,
-    overview: body ? { heading: toHeading(rawCopy.overviewHeading), body } : null,
+    overview: body ? { heading: sectionHeading(rawCopy.overviewHeading), body } : null,
     // The schema allows digits only; checked again because the Content API accepts writes that never ran validation.
     video:
       videoId && /^\d+$/.test(videoId)
         ? {
-            heading: toHeading(rawCopy.videoHeading),
+            heading: sectionHeading(rawCopy.videoHeading),
             dialogTitle: copy.videoDialogTitle,
             description: filled(edition.highlightVideoDescription) ? edition.highlightVideoDescription : null,
             playerSrc: `https://player.vimeo.com/video/${videoId}`,
@@ -297,7 +300,7 @@ export function toAwardsProgrammeView({
     registration:
       steps.length > 0
         ? {
-            heading: toHeading(rawCopy.categoriesHeading),
+            heading: sectionHeading(rawCopy.categoriesHeading),
             // The year is the ceremony's (start date); the label after it comes from the CMS.
             badge: nominationsOpen
               ? statusLabel
@@ -306,14 +309,14 @@ export function toAwardsProgrammeView({
             steps,
           }
         : null,
-    sponsors: sponsorTiers.length > 0 ? { heading: toHeading(rawCopy.sponsorsHeading), tiers: sponsorTiers } : null,
+    sponsors: sponsorTiers.length > 0 ? { heading: sectionHeading(rawCopy.sponsorsHeading), tiers: sponsorTiers } : null,
     judges:
-      panels.length > 0 ? { heading: toHeading(rawCopy.judgesHeading), intro: richText(edition.judgesIntro), panels } : null,
-    finalists: finalists ? { heading: toHeading(rawCopy.finalistsHeading), body: finalists } : null,
+      panels.length > 0 ? { heading: sectionHeading(rawCopy.judgesHeading), intro: richText(edition.judgesIntro), panels } : null,
+    finalists: finalists ? { heading: sectionHeading(rawCopy.finalistsHeading), body: finalists } : null,
     winners:
       winnerGroups.length > 0
         ? {
-            heading: toHeading(rawCopy.winnersHeading),
+            heading: sectionHeading(rawCopy.winnersHeading),
             previousYear: previousHref ? { label: copy.previousYearWinnersLabel, href: `${previousHref}#winners` } : null,
             allLabel: copy.winnersAllLabel,
             groups: winnerGroups,
@@ -321,15 +324,15 @@ export function toAwardsProgrammeView({
         : null,
     acclaim: acclaimLink
       ? {
-          heading: toHeading(rawCopy.marketingKitHeading),
+          heading: sectionHeading(rawCopy.marketingKitHeading),
           text: copy.marketingKitText,
           link: { label: copy.acclaimLinkLabel, href: acclaimLink },
         }
       : null,
-    faq: faq.length > 0 ? { heading: toHeading(rawCopy.faqHeading), items: faq } : null,
+    faq: faq.length > 0 ? { heading: sectionHeading(rawCopy.faqHeading), items: faq } : null,
     openProgrammes: {
       allAwards: toLinkProps(rawCopy.allAwardsLink, 'clearview'),
-      heading: toHeading(rawCopy.otherProgrammesHeading),
+      heading: sectionHeading(rawCopy.otherProgrammesHeading),
       items: openItems,
       emptyText: copy.openProgrammesEmptyText,
     },

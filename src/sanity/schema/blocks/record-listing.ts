@@ -70,7 +70,7 @@ export const recordListing = defineType({
     label(
       'statusFilterLabel',
       'Status filter label',
-      'Label of the status filter. Its options on the Awards tab are the status labels of the Awards programme page document.',
+      'Label of the status filter. Its options on the Awards tab are the statuses in Awards › Awards page texts.',
       'filters',
       'Status',
     ),

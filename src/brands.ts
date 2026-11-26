@@ -46,7 +46,7 @@ export const subscribeModalDocumentId = (key: BrandKey): string => `subscribe-mo
 export const AWARD_CATEGORY_PAGE_ID = 'award-category-page'
 
 /**
- * Id of the one "Awards programme page" document: the awards programme template's labels, and the edition status
+ * Id of the one "Awards page texts" document: the awards programme template's labels, and the edition status
  * labels the award category page sidebar shares. ClearView only.
  */
 export const AWARDS_PROGRAMME_PAGE_ID = 'awards-programme-page'

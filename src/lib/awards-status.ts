@@ -35,7 +35,7 @@ export function editionStatus(
   return startDate && startDate < today && hasWinners ? 'winnersAnnounced' : null
 }
 
-/** The status label of each status, in the "Awards programme page" document. */
+/** The status label of each status, in the "Awards page texts" document. */
 export const EDITION_STATUS_LABELS: Record<EditionStatus, EditionStatusCopyKey> = {
   launchingSoon: 'launchingSoonLabel',
   submissionsOpen: 'submissionsOpenLabel',
