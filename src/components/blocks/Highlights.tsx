@@ -11,7 +11,6 @@ import { countryName } from '@/lib/countries'
 import { formatDateRange, formatDay, formatLongDate, formatMediumDate } from '@/lib/dates'
 import { researchDownloadHref, resolveHref, sharedRecordHref } from '@/lib/links'
 import { picksThenFill } from '@/lib/picks'
-import { toHeading } from '@/sanity/heading'
 import { toImage } from '@/sanity/image'
 
 import type { BlockProps } from './types'
@@ -163,6 +162,8 @@ function toPromo(promo: Block['promo'], source: Source, brand: BrandKey): Highli
 
 export function Highlights({ block, brand, today }: BlockProps<'highlights'> & { today: string }) {
   const source = stegaClean(block.source)
+  // Always h2. The text keeps stega for click-to-edit; it is cleaned only to test for emptiness.
+  const heading = block.heading && stegaClean(block.heading).trim() ? { as: 'h2' as const, text: block.heading } : null
 
   if (!isSource(source)) {
     return null
@@ -190,7 +191,7 @@ export function Highlights({ block, brand, today }: BlockProps<'highlights'> & {
     return entries.length === 0 ? null : (
       <div className="px-gutter pt-10 pb-16 header:flex-1 header:px-8 header:pt-8 header:pb-8 after-side-banner:pt-0">
         <OtherProgrammes
-          heading={toHeading(block.heading)}
+          heading={heading}
           items={entries.map((record) => ({
             ...toItem(record, source, brand, block.deadlineLabel, today, style),
             status: null,
@@ -211,7 +212,7 @@ export function Highlights({ block, brand, today }: BlockProps<'highlights'> & {
       // Surface and icon come from code by source, not from the CMS.
       variant={source}
       look={publication ? 'publication' : 'group'}
-      heading={toHeading(block.heading)}
+      heading={heading}
       items={entries.map((record) =>
         toItem(record, source, brand, block.deadlineLabel, today, style),
       )}

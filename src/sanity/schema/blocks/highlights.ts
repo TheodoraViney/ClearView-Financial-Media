@@ -10,8 +10,9 @@ import {
 } from 'sanity'
 
 import { AutoFillPicksInput } from '@/sanity/components/auto-fill-picks-input'
+import { HighlightsCountInput } from '@/sanity/components/highlights-count-input'
 
-import { adminLabelField, headingField, headingText, imageField, linkField } from '../fields'
+import { adminLabelField, imageField, linkField } from '../fields'
 import {
   HIGHLIGHTS_DEFAULT_COUNT,
   HIGHLIGHTS_ITEM_MAX,
@@ -143,8 +144,7 @@ export const highlights = defineType({
       name: 'layout',
       title: 'Look',
       type: 'string',
-      description:
-        'Optional. "Plain list" shows the heading and the items only, without icon, background, button or promo, as in the shared listings sidebar.',
+      description: '"Plain list" shows only the heading and the items, as in the shared listings sidebar.',
       options: {
         list: [
           { title: 'Block', value: 'block' },
@@ -154,12 +154,20 @@ export const highlights = defineType({
         direction: 'horizontal',
       },
     }),
-    headingField('heading', { title: 'Heading', defaultLevel: 'h2', required: true }),
+    // A plain string: the block always renders it as h2.
+    defineField({
+      name: 'heading',
+      title: 'Heading',
+      type: 'string',
+      validation: (Rule) => Rule.required(),
+    }),
     defineField({
       name: 'count',
       title: 'Number of items',
       type: 'number',
-      description: `How many items the block shows. Leave empty for ${HIGHLIGHTS_DEFAULT_COUNT.awards} awards, ${HIGHLIGHTS_DEFAULT_COUNT.events} events or ${HIGHLIGHTS_DEFAULT_COUNT.research} research reports. At most ${HIGHLIGHTS_ITEM_MAX.awards} awards, ${HIGHLIGHTS_ITEM_MAX.events} events or ${HIGHLIGHTS_ITEM_MAX.research} research reports.`,
+      description: 'How many items the block shows.',
+      // A select of Default and 1 to the source's maximum; the stored value stays a number.
+      components: { input: HighlightsCountInput },
       validation: (Rule) =>
         Rule.integer()
           .min(1)
@@ -172,7 +180,7 @@ export const highlights = defineType({
 
             const max = HIGHLIGHTS_ITEM_MAX[source.value]
 
-            return value <= max ? true : `${source.title} shows up to ${max} items`
+            return value <= max ? true : `${source.title} shows at most ${max} items. Choose 1–${max}.`
           }),
     }),
     defineField({
@@ -331,7 +339,11 @@ export const highlights = defineType({
       const count = Array.isArray(items) ? items.length : 0
 
       return {
-        title: adminLabel || headingText(heading) || match?.title || 'Highlights',
+        title:
+          adminLabel ||
+          (typeof heading === 'string' ? heading.trim() || undefined : undefined) ||
+          match?.title ||
+          'Highlights',
         subtitle: `Highlights · ${match?.title ?? 'No source'} · ${count} ${count === 1 ? 'pick' : 'picks'}`,
         media: match?.icon ?? SparklesIcon,
       }
