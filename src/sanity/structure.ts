@@ -244,7 +244,6 @@ export const structure: StructureResolver = (S) =>
             .title('Resources')
             .items([
               S.documentTypeListItem('resource').title('Resources').icon(DocumentPdfIcon),
-              S.documentTypeListItem('researchSummary').title('Executive summaries').icon(DocumentTextIcon),
               S.divider(),
               S.listItem()
                 .title('Resource page texts')

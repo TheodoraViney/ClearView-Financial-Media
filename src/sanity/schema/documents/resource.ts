@@ -28,10 +28,7 @@ import { blocksTextLength, paragraphsBlock } from '../objects/rich-text'
  * Executive Summary page at /resource/{slug}/{summarySlug, default
  * executive-summary} from its "Executive summary page" fields (`summaryLead`,
  * `summaryIntro`, `summarySections`), shown while one of them has content. Each
- * page has optional SEO overrides (`seo`, `summarySeo`). Until
- * scripts/merge-executive-summaries.ts has run, a report may still point at an
- * old `researchSummary` document (`executiveSummaryPage`, read-only now); the
- * site reads that document while the three fields are all unset. The "Page content" fields
+ * page has optional SEO overrides (`seo`, `summarySeo`). The "Page content" fields
  * are optional: the page hides a section, and its tab, while the section is
  * empty. The pages' labels live on the "Resource page texts" document
  * (RESEARCH_REPORT_PAGE_ID).
@@ -49,8 +46,8 @@ import { blocksTextLength, paragraphsBlock } from '../objects/rich-text'
  * 2 Issuu links, 1 Jotform. The download button uses it first and falls back to
  * `downloadFile` only when it is empty.
  */
-/** A section of the Executive Summary page: a heading beside its text. Also used by the old `researchSummary`. */
-export const executiveSummarySectionMember = defineArrayMember({
+/** A section of the Executive Summary page: a heading beside its text. */
+const executiveSummarySectionMember = defineArrayMember({
   type: 'object',
   name: 'executiveSummarySection',
   title: 'Section',
@@ -65,7 +62,6 @@ export const executiveSummarySectionMember = defineArrayMember({
       name: 'body',
       title: 'Text',
       type: 'array',
-      description: 'Bold, italic and links only.',
       of: [paragraphsBlock],
       validation: (Rule) => Rule.required(),
     }),
@@ -104,7 +100,7 @@ export const resource = defineType({
       type: 'slug',
       group: 'details',
       options: { source: 'title', maxLength: 96 },
-      description: 'Published at /resource/{slug}/. Migrated from WordPress, changing it breaks a live URL.',
+      description: 'Changing it breaks a live URL.',
       validation: (Rule) => Rule.required(),
     }),
     defineField({
@@ -112,8 +108,6 @@ export const resource = defineType({
       title: 'Published at',
       type: 'datetime',
       group: 'details',
-      description:
-        'Orders the Research list on the site and is the date shown on the report page. Migrated from the WordPress publish date.',
       initialValue: () => new Date().toISOString(),
       validation: (Rule) => Rule.required(),
     }),
@@ -134,23 +128,20 @@ export const resource = defineType({
     imageField('featuredImage', {
       title: 'Banner image',
       group: 'details',
-      description:
-        'Wide banner (1200×627) used when the report is shared. Migrated from the WordPress featured image.',
+      description: 'Used only when the report is shared, not on the page.',
     }),
     defineField({
       name: 'body',
       title: 'Report text',
       type: 'richText',
       group: 'details',
-      description:
-        'Not shown on the report page. Used by site search, as the page description for search engines while Standfirst and Short summary are empty, and by the Generate from report text button in Page content. For a new report, paste the report’s text here, for example from the PDF.',
+      description: 'Not shown on the page: feeds site search and the Generate from report text button.',
     }),
     defineField({
       name: 'authors',
       title: 'Participants and authors',
       type: 'array',
       group: 'details',
-      description: 'Shown by name as the contributors on the report page. Hidden when empty.',
       of: [defineArrayMember({ type: 'reference', to: [{ type: 'person' }] })],
       validation: (Rule) => Rule.unique(),
     }),
@@ -160,7 +151,6 @@ export const resource = defineType({
       title: 'Edition',
       type: 'string',
       group: 'page',
-      description: 'Optional. Shown beside the date under the title, for example "Twelfth Edition".',
     }),
     defineField({
       name: 'standfirst',
@@ -168,15 +158,12 @@ export const resource = defineType({
       type: 'text',
       rows: 3,
       group: 'page',
-      description: 'Optional. A short introduction under the title, above the download button.',
     }),
     defineField({
       name: 'summary',
       title: 'Short summary (report page)',
       type: 'array',
       group: 'page',
-      description:
-        'Optional. One short paragraph in the Executive summary section of the report page. Bold, italic and links only. Without it, and without a full Executive Summary page, the section and its tab are hidden.',
       of: [paragraphsBlock],
       validation: (Rule) =>
         Rule.custom((blocks) =>
@@ -190,7 +177,7 @@ export const resource = defineType({
       title: 'Key findings',
       type: 'array',
       group: 'page',
-      description: `Optional. Up to ${KEY_FINDINGS_MAX} figures. Shown as Key findings on the report page and as Key takeaways on the Executive Summary page. Hidden when empty.`,
+      description: 'Also shown as Key takeaways on the Executive Summary page.',
       of: [keyFindingMember({ withNote: true })],
       validation: (Rule) => Rule.max(KEY_FINDINGS_MAX),
     }),
@@ -199,8 +186,6 @@ export const resource = defineType({
       title: 'Methodology introduction',
       type: 'array',
       group: 'page',
-      description:
-        'Optional. A paragraph about the study in the Contributors / methodology section. Bold, italic and links only.',
       of: [paragraphsBlock],
     }),
     defineField({
@@ -208,24 +193,25 @@ export const resource = defineType({
       title: 'Methodology details',
       type: 'array',
       group: 'page',
-      description:
-        'Optional. Label and value rows under the introduction, for example "Study format" and "Annual industry research report". The section and its tab are hidden when this, the introduction and the contributors are all empty.',
       of: [
         defineArrayMember({
           type: 'object',
           name: 'methodologyRow',
           title: 'Row',
+          fieldsets: [{ name: 'row', title: 'Row', options: { columns: 2 } }],
           fields: [
             defineField({
               name: 'label',
               title: 'Label',
               type: 'string',
+              fieldset: 'row',
               validation: (Rule) => Rule.required(),
             }),
             defineField({
               name: 'value',
               title: 'Value',
               type: 'string',
+              fieldset: 'row',
               validation: (Rule) => Rule.required(),
             }),
           ],
@@ -240,7 +226,6 @@ export const resource = defineType({
       title: 'Charts',
       type: 'array',
       group: 'page',
-      description: `Optional. Up to ${RESEARCH_CHARTS_MAX} chart cards, shown in this order in the Charts and selected insights section. Each card shows one or two half-circle gauges.`,
       of: [
         defineArrayMember({
           type: 'object',
@@ -251,7 +236,6 @@ export const resource = defineType({
               name: 'title',
               title: 'Title',
               type: 'string',
-              description: 'What the chart shows, for example "Average digitisation progress score".',
               validation: (Rule) => Rule.required(),
             }),
             defineField({
@@ -259,48 +243,48 @@ export const resource = defineType({
               title: 'Note',
               type: 'text',
               rows: 2,
-              description: 'Optional. A short line explaining the figures, shown at the foot of the card.',
             }),
             defineField({
               name: 'gauges',
               title: 'Gauges',
               type: 'array',
-              description:
-                'One or two. Two gauges sit beside the title, for example last year and this year; one sits under it.',
               of: [
                 defineArrayMember({
                   type: 'object',
                   name: 'researchGauge',
                   title: 'Gauge',
+                  fieldsets: [
+                    { name: 'figure', title: 'Figure', options: { columns: 2 } },
+                    { name: 'arc', title: 'Arc', options: { columns: 2 } },
+                  ],
                   fields: [
                     defineField({
                       name: 'label',
                       title: 'Label',
                       type: 'string',
-                      description: 'Under the gauge, for example "2024" or "Scores above 4".',
+                      fieldset: 'figure',
                       validation: (Rule) => Rule.required(),
                     }),
                     defineField({
                       name: 'value',
                       title: 'Figure',
                       type: 'string',
-                      description:
-                        'The figure as shown in the gauge, for example "5.3 / 7" or "70%". A number at its start counts up when the card scrolls into view.',
+                      fieldset: 'figure',
                       validation: (Rule) => Rule.required(),
                     }),
                     defineField({
                       name: 'percent',
                       title: 'Arc fill (%)',
                       type: 'number',
-                      description:
-                        'How much of the half circle is filled, 0 to 100. For a score, its share of the scale: 5.3 out of 7 is 75.7.',
+                      fieldset: 'arc',
+                      description: 'For a score, its share of the scale: 5.3 out of 7 is 75.7.',
                       validation: (Rule) => Rule.required().min(0).max(100),
                     }),
                     defineField({
                       name: 'current',
                       title: 'Highlight',
                       type: 'boolean',
-                      description: 'Shows the figure in the brand colour, for example the latest year.',
+                      fieldset: 'arc',
                       initialValue: false,
                     }),
                   ],
@@ -334,8 +318,6 @@ export const resource = defineType({
       title: 'Selected insights',
       type: 'array',
       group: 'page',
-      description:
-        'Optional. Short statements, numbered on the page in this order. The Charts and selected insights section and its tab are hidden when this and Charts are both empty.',
       of: [defineArrayMember({ type: 'string', validation: (Rule) => Rule.required() })],
     }),
     defineField({
@@ -343,7 +325,6 @@ export const resource = defineType({
       title: 'Research partner',
       type: 'object',
       group: 'page',
-      description: 'Optional. The company the report was produced with. Hidden when no company is chosen.',
       options: { collapsible: false },
       fields: [
         defineField({
@@ -351,8 +332,6 @@ export const resource = defineType({
           title: 'Company',
           type: 'reference',
           to: [{ type: 'company' }],
-          description:
-            'Its logo is shown, and the Company profile link opens its website. The link is hidden when the company has no website.',
           options: { disableNew: true },
           validation: (Rule) =>
             Rule.custom((value, context) => {
@@ -366,7 +345,6 @@ export const resource = defineType({
           title: 'Description',
           type: 'text',
           rows: 2,
-          description: 'A sentence about the partnership, for example "Produced in conjunction with Alpha FMC."',
         }),
       ],
     }),
@@ -377,7 +355,6 @@ export const resource = defineType({
       group: 'page',
       // Legacy WordPress field, not in the new design: hidden in the Studio, data kept. Remove before launch if unused.
       hidden: true,
-      description: 'Migrated from WordPress. Not shown on the site: the report page shows the Research partner above.',
       of: [defineArrayMember({ type: 'companyGroup' })],
     }),
     defineField({
@@ -385,7 +362,7 @@ export const resource = defineType({
       title: 'Related research',
       type: 'array',
       group: 'page',
-      description: `Optional. Up to ${RELATED_RESEARCH_COUNT} reports, shown first in this order. Empty places fill automatically with the latest other research reports.`,
+      description: 'Empty places fill automatically with the latest reports.',
       components: { input: AutoFillPicksInput },
       of: [
         defineArrayMember({
@@ -416,7 +393,7 @@ export const resource = defineType({
       title: 'Slug',
       type: 'slug',
       group: 'summary',
-      description: `The last part of the page URL: /resource/{report slug}/{this slug}, for example /resource/tech-ops-report-2024/${RESEARCH_SUMMARY_DEFAULT_SLUG}. Empty: ${RESEARCH_SUMMARY_DEFAULT_SLUG}. Changing it changes the live URL.`,
+      description: 'Changing it breaks a live URL.',
       initialValue: { current: RESEARCH_SUMMARY_DEFAULT_SLUG },
       // The URL sits under the report's own slug, so every report may use the same summary slug.
       options: { isUnique: () => true },
@@ -435,8 +412,7 @@ export const resource = defineType({
       title: 'Lead paragraph',
       type: 'array',
       group: 'summary',
-      description:
-        'The large opening paragraph of the Executive Summary page. Bold, italic and links only. The page exists while this, the introduction or a section has content.',
+      description: 'The page exists only while this tab has a lead, introduction or section.',
       of: [paragraphsBlock],
     }),
     defineField({
@@ -444,7 +420,6 @@ export const resource = defineType({
       title: 'Introduction',
       type: 'array',
       group: 'summary',
-      description: 'Paragraphs under the lead. Bold, italic and links only.',
       of: [paragraphsBlock],
     }),
     defineField({
@@ -452,37 +427,21 @@ export const resource = defineType({
       title: 'Sections',
       type: 'array',
       group: 'summary',
-      description: 'Each section shows a heading beside its text, for example "Automation".',
       of: [executiveSummarySectionMember],
     }),
-    // The old separate summary document. Read-only and hidden once empty: scripts/merge-executive-summaries.ts moves
-    // its content into the three fields above and unsets it. Removed in Deploy B.
-    defineField({
-      name: 'executiveSummaryPage',
-      title: 'Executive Summary page (old)',
-      type: 'reference',
-      group: 'summary',
-      to: [{ type: 'researchSummary' }],
-      description: 'Being moved into this tab.',
-      readOnly: true,
-      hidden: ({ value }) => !value,
-    }),
-
     defineField({
       name: 'seo',
       title: 'Report page SEO',
       type: 'seo',
       group: 'seo',
-      description:
-        'Search and share overrides for /resource/{slug}. Empty fields use: title, the report title followed by " | ClearView Financial Media"; description, the Standfirst, else the Short summary, else the start of the Report text; share image, the Banner image, else the Download thumbnail.',
+      description: 'Empty fields use the report title, Standfirst and Banner image.',
     }),
     defineField({
       name: 'summarySeo',
       title: 'Executive Summary page SEO',
       type: 'seo',
       group: 'summarySeo',
-      description:
-        'Search and share overrides for the Executive Summary page. Empty fields use: title, the "Resource page texts" summary title, a dash and the report title, followed by " | ClearView Financial Media"; description, the summary Lead paragraph, else the start of its Introduction, else the report’s Standfirst, Short summary or start of the Report text; share image, the report page share image (SEO tab), else the Banner image, else the Download thumbnail.',
+      description: 'Empty fields use the summary title, Lead and the report’s share image.',
     }),
 
     defineField({
@@ -490,7 +449,7 @@ export const resource = defineType({
       title: 'Download thumbnail',
       type: 'image',
       group: 'download',
-      description: 'The report cover, shown on the report page and in research lists.',
+      description: 'The report cover on the page and in research lists.',
       options: { hotspot: true },
       fields: [altField],
     }),
@@ -499,16 +458,13 @@ export const resource = defineType({
       title: 'Download file',
       type: 'file',
       group: 'download',
-      description:
-        'The report PDF. The download button uses it only when the Download URL or form is empty. Half the migrated records arrive with one.',
+      description: 'Used only when Download URL or form is empty.',
     }),
     defineField({
       name: 'downloadUrl',
       title: 'Download URL or form',
       type: 'url',
       group: 'download',
-      description:
-        'The download form or Issuu link the download button opens. Used before the download file. Native registration forms are out of scope.',
       validation: (Rule) => Rule.uri({ scheme: ['http', 'https'] }),
     }),
     legacyWpIdField,

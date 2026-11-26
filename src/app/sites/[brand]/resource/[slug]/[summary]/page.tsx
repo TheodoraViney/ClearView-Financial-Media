@@ -19,11 +19,10 @@ import {
 } from '@/sanity/research-report-view'
 import { PLACEHOLDER_SLUG } from '@/sanity/static-params'
 
-// A research report's Executive Summary page at /resource/{report slug}/executive-summary, from the report's own
+// A research report's Executive Summary page at /resource/{report slug}/{summary slug}, from the report's own
 // summary fields. Same host and slug rules as the report page (../page.tsx). It exists only while the report is found,
 // the segment equals its summary's slug and the summary has a lead, an introduction or a section, and answers 404
-// otherwise. The slug is RESEARCH_SUMMARY_DEFAULT_SLUG, set by RESEARCH_REPORT_QUERY; until the merge script has run, a
-// report still pointing at an old `researchSummary` document is served at that document's own slug instead.
+// otherwise. The slug is the report's `summarySlug`, else RESEARCH_SUMMARY_DEFAULT_SLUG (RESEARCH_REPORT_QUERY).
 export const instant = false
 
 type Params = { brand: string; slug: string; summary: string }
@@ -50,7 +49,7 @@ function fetchReport(slug: string, options: DynamicFetchOptions) {
 
 /** The page's path when the report's summary is served at this segment, else null. */
 function pagePath(report: ResearchReportData, summary: string): string | null {
-  return stegaClean(report.executiveSummaryPage?.slug)?.trim() === summary ? executiveSummaryPagePath(report) : null
+  return stegaClean(report.executiveSummary.slug)?.trim() === summary ? executiveSummaryPagePath(report) : null
 }
 
 async function routeParams(params: Promise<Params>) {

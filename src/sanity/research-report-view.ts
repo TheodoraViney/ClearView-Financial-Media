@@ -41,12 +41,11 @@ export const reportPath = (report: Pick<ResearchReportData, 'slug'>): string | n
 
 /**
  * The report's Executive Summary page path, /resource/{slug}/{summary slug}: null unless the report has a slug and its
- * `executiveSummaryPage` (RESEARCH_REPORT_QUERY: the report's own summary fields, or the old summary document) has a
- * slug and content (stega-clean checks, so it holds in draft mode too).
+ * Executive Summary fields have a slug and content (stega-clean checks, so it holds in draft mode too).
  */
 export function executiveSummaryPagePath(report: ResearchReportData): string | null {
   const path = reportPath(report)
-  const summary = report.executiveSummaryPage
+  const summary = report.executiveSummary
   const slug = stegaClean(summary?.slug)?.trim()
 
   return path && slug && hasExecutiveSummary(summary, stegaClean) ? executiveSummaryPath(path, slug) : null
@@ -70,7 +69,7 @@ export function researchReportDescription(report: ResearchReportData): string | 
  * boundary, else the report's own description (researchReportDescription).
  */
 export function executiveSummaryDescription(report: ResearchReportData): string | null {
-  const summary = report.executiveSummaryPage
+  const summary = report.executiveSummary
 
   return plain(summary?.leadText) || clipDescription(plain(summary?.introText)) || researchReportDescription(report)
 }
@@ -278,7 +277,7 @@ export function toResearchReportView({
 /** The Executive Summary page as plain props. Call it only when executiveSummaryPagePath(report) is set. */
 export function toExecutiveSummaryView({ report, copy: rawCopy }: { report: ResearchReportData; copy: CopyData }): ExecutiveSummaryView {
   const copy = toCopy(rawCopy)
-  const summary = report.executiveSummaryPage
+  const summary = report.executiveSummary
   const findings = keyFindings(report)
   const date = formatLongDate(stegaClean(report.publishedAt))
   const partner = report.researchPartner?.company?.title

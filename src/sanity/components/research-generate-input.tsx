@@ -53,8 +53,6 @@ type Resource = {
   summaryLead?: unknown[] | null
   summaryIntro?: unknown[] | null
   summarySections?: { heading?: string | null; body?: unknown[] | null }[] | null
-  /** The old separate summary document, until scripts/merge-executive-summaries.ts moves it here. Deploy B drops it. */
-  executiveSummaryPage?: { _ref?: string } | null
 }
 
 type PartKey = 'summary' | 'executiveSummary' | 'keyFindings' | 'charts' | 'insights' | 'methodology'
@@ -94,17 +92,13 @@ function currentContent(part: PartKey, resource: Resource): string | null {
     case 'summary':
       return hasBlockText(resource.summary) ? 'has text' : null
     case 'executiveSummary':
-      // A report still linked to the old summary document counts as filled: the fields written here would replace it
-      // on the site.
       return hasExecutiveSummary({
         lead: resource.summaryLead,
         intro: resource.summaryIntro,
         sections: resource.summarySections,
       })
         ? 'has content'
-        : resource.executiveSummaryPage?._ref
-          ? 'has a linked page'
-          : null
+        : null
     case 'keyFindings':
     case 'charts':
     case 'insights':
