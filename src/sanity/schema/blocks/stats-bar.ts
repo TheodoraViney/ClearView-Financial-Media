@@ -22,12 +22,12 @@ export const statsBar = defineType({
       name: 'items',
       title: 'Stats',
       type: 'array',
-      description: 'Up to six figures, in display order.',
       of: [
         defineArrayMember({
           name: 'statsItem',
           title: 'Stat',
           type: 'object',
+          fieldsets: [{ name: 'figure', title: 'Figure', options: { columns: 2 } }],
           fields: [
             defineField({
               name: 'icon',
@@ -43,7 +43,7 @@ export const statsBar = defineType({
               name: 'value',
               title: 'Value',
               type: 'string',
-              description: 'The figure, e.g. "250k+".',
+              fieldset: 'figure',
               validation: (Rule) => [
                 Rule.required(),
                 Rule.max(8).warning('Short figures read best, e.g. 250k+'),
@@ -53,7 +53,7 @@ export const statsBar = defineType({
               name: 'label',
               title: 'Label',
               type: 'string',
-              description: 'What the figure counts, e.g. "Monthly readers".',
+              fieldset: 'figure',
               validation: (Rule) => [
                 Rule.required(),
                 Rule.max(40).warning('Longer than 40 characters; the label will wrap onto more lines'),

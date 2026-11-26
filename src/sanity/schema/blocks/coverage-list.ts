@@ -37,7 +37,6 @@ export const coverageList = defineType({
       title: 'Text',
       type: 'text',
       rows: 3,
-      description: 'Under the heading.',
       initialValue:
         'Through WealthBriefing, WealthBriefingAsia and Family Wealth Report, ClearView covers the key decisions and developments in private banking and wealth management.',
       validation: (Rule) => Rule.required(),
@@ -52,17 +51,18 @@ export const coverageList = defineType({
       name: 'items',
       title: 'Topics',
       type: 'array',
-      description: `Up to ${COVERAGE_LIST_ITEM_MAX}, in display order.`,
       of: [
         defineArrayMember({
           name: 'coverageListItem',
           title: 'Topic',
           type: 'object',
+          fieldsets: [{ name: 'iconTitle', title: 'Icon and title', options: { columns: 2 } }],
           fields: [
             defineField({
               name: 'icon',
               title: 'Icon',
               type: 'string',
+              fieldset: 'iconTitle',
               options: { list: COVERAGE_LIST_ICONS.map(({ value, title }) => ({ value, title })), layout: 'dropdown' },
               validation: (Rule) => Rule.required(),
             }),
@@ -70,6 +70,7 @@ export const coverageList = defineType({
               name: 'title',
               title: 'Title',
               type: 'string',
+              fieldset: 'iconTitle',
               validation: (Rule) => Rule.required(),
             }),
             paragraphsField({

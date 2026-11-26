@@ -17,20 +17,20 @@ export const pageHero = defineType({
   title: 'Page heading',
   type: 'object',
   icon: HomeIcon,
+  fieldsets: [{ name: 'breadcrumb', title: 'Breadcrumb', options: { columns: 2 } }],
   fields: [
     adminLabelField,
     defineField({
       name: 'showBreadcrumb',
       title: 'Show breadcrumb',
       type: 'boolean',
-      description: 'Off: the title takes the breadcrumb\'s place.',
       initialValue: true,
     }),
     defineField({
       name: 'breadcrumbHomeLabel',
-      title: 'Breadcrumb home label',
+      title: 'Home label',
       type: 'string',
-      description: 'First item of the breadcrumb, linking to the home page.',
+      fieldset: 'breadcrumb',
       initialValue: 'Home',
       hidden: ({ parent }) => withoutBreadcrumb(parent),
       validation: (Rule) =>
@@ -40,9 +40,9 @@ export const pageHero = defineType({
     }),
     defineField({
       name: 'breadcrumbLabel',
-      title: 'Breadcrumb current label',
+      title: 'This page label',
       type: 'string',
-      description: 'Last item of the breadcrumb: this page.',
+      fieldset: 'breadcrumb',
       hidden: ({ parent }) => withoutBreadcrumb(parent),
       validation: (Rule) =>
         Rule.custom((value, context) =>
@@ -53,7 +53,7 @@ export const pageHero = defineType({
       name: 'title',
       title: 'Title',
       type: 'string',
-      description: "The page's main heading (H1).",
+      description: "The page's H1.",
       validation: (Rule) => Rule.required(),
     }),
     defineField({
@@ -61,7 +61,6 @@ export const pageHero = defineType({
       title: 'Intro',
       type: 'array',
       of: [paragraphsBlock],
-      description: 'Text under the title. Bold, italic and links.',
       validation: (Rule) =>
         Rule.custom((value: unknown) =>
           Array.isArray(value) &&

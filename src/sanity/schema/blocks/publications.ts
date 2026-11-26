@@ -33,7 +33,6 @@ export const publications = defineType({
       name: 'cards',
       title: 'Publication cards',
       type: 'array',
-      description: `Up to ${PUBLICATIONS_CARD_MAX}, one per publication.`,
       of: [
         defineArrayMember({
           name: 'publicationCard',
@@ -65,7 +64,7 @@ export const publications = defineType({
               name: 'linkLabel',
               title: 'Link label',
               type: 'string',
-              description: 'The link text under the card, e.g. "Visit WealthBriefing".',
+              description: "Links to the publication's website.",
               validation: (Rule) => Rule.required(),
             }),
           ],

@@ -24,34 +24,23 @@ export const companySponsoredContent = defineType({
   validation: (Rule) =>
     Rule.custom((_value, context) => (onCompanyEngagementPage(context.document) ? true : PAGE_ONLY_MESSAGE)),
   fieldsets: [
-    { name: 'sponsored', title: 'Sponsored group', options: { collapsible: true, collapsed: true } },
-    { name: 'contributed', title: 'Contributed group', options: { collapsible: true, collapsed: true } },
-    { name: 'pagination', title: 'Pagination', options: { collapsible: true, collapsed: true } },
+    // A group is hidden while no post has a sponsor (or a contributor).
+    { name: 'sponsored', title: 'Sponsored group', options: { collapsible: true, collapsed: true, columns: 3 } },
+    { name: 'contributed', title: 'Contributed group', options: { collapsible: true, collapsed: true, columns: 3 } },
+    { name: 'pagination', title: 'Pagination', options: { collapsible: true, collapsed: true, columns: 2 } },
   ],
   fields: [
     adminLabelField,
-    sectionHeading('Sponsored content', 'Hidden with the block when no post names a sponsor or a contributor.'),
+    sectionHeading('Sponsored content', 'The block is hidden while no post names a sponsor or a contributor.'),
     sectionIntro(
       'Sponsored content is paid for by the named company. Contributed content is written by the named organisation and published by WealthBriefing.',
     ),
-    label('sponsoredGroupLabel', 'Group label', 'Above the posts with a sponsor. Hidden with the group.', 'Sponsored content', 'sponsored'),
-    label('sponsoredMetaLabel', 'Card type label', 'Top right of each sponsored post card, before the year.', 'Sponsored', 'sponsored'),
-    label('sponsoredCtaLabel', 'Card link', 'Bottom of each sponsored post card, opening the post.', 'Read sponsored content', 'sponsored'),
-    label(
-      'contributedGroupLabel',
-      'Group label',
-      'Above the posts with a contributor. Hidden with the group.',
-      'Contributed content',
-      'contributed',
-    ),
-    label('contributedMetaLabel', 'Card type label', 'Top right of each contributed post card, before the year.', 'Contributed', 'contributed'),
-    label(
-      'contributedCtaLabel',
-      'Card link',
-      'Bottom of each contributed post card, opening the post.',
-      'Read contributed content',
-      'contributed',
-    ),
+    label('sponsoredGroupLabel', 'Group label', undefined, 'Sponsored content', 'sponsored'),
+    label('sponsoredMetaLabel', 'Card type label', 'The year is added after it.', 'Sponsored', 'sponsored'),
+    label('sponsoredCtaLabel', 'Card link', undefined, 'Read sponsored content', 'sponsored'),
+    label('contributedGroupLabel', 'Group label', undefined, 'Contributed content', 'contributed'),
+    label('contributedMetaLabel', 'Card type label', 'The year is added after it.', 'Contributed', 'contributed'),
+    label('contributedCtaLabel', 'Card link', undefined, 'Read contributed content', 'contributed'),
     ...paginationLabels('pagination'),
   ],
   preview: {

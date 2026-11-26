@@ -18,7 +18,6 @@ export const personGroup = defineType({
       name: 'name',
       title: 'Group name',
       type: 'string',
-      description: 'For example "Trusted Advisors" or "Keynote speakers".',
       validation: (Rule) => Rule.required(),
     }),
     defineField({

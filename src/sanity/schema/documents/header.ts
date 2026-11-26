@@ -19,27 +19,26 @@ const searchPlaceholderField = defineField({
   name: 'searchPlaceholder',
   title: 'Search placeholder',
   type: 'string',
-  description: 'Hint text inside the search field.',
   validation: (Rule) => Rule.required(),
 })
 
-const searchLabel = (name: string, title: string, initialValue: string, description: string) =>
-  defineField({ name, title, type: 'string', initialValue, description, validation: (Rule) => Rule.required() })
+const searchLabel = (name: string, title: string, initialValue: string) =>
+  defineField({ name, title, type: 'string', initialValue, validation: (Rule) => Rule.required() })
 
 /** Visible copy of the suggestions popup under the search field. */
 const searchLabelsField = defineField({
     name: 'searchLabels',
     title: 'Search suggestions',
     type: 'object',
-    description: 'Headings and empty state of the suggestions shown while typing in the search field.',
-    options: { collapsible: true, collapsed: true },
+    description: 'Shown while typing in the search field.',
+    options: { collapsible: true, collapsed: true, columns: 2 },
     validation: (Rule) => Rule.required(),
     fields: [
-      searchLabel('articles', 'Articles heading', SEARCH_LABEL_DEFAULTS.articles, 'Heading above matching articles.'),
-      searchLabel('events', 'Events heading', SEARCH_LABEL_DEFAULTS.events, 'Heading above matching events.'),
-      searchLabel('awards', 'Awards heading', SEARCH_LABEL_DEFAULTS.awards, 'Heading above matching awards.'),
-      searchLabel('resources', 'Resources heading', SEARCH_LABEL_DEFAULTS.resources, 'Heading above matching resources.'),
-      searchLabel('nothingFound', 'Nothing found', SEARCH_LABEL_DEFAULTS.nothingFound, 'Shown when nothing matches the search.'),
+      searchLabel('articles', 'Articles heading', SEARCH_LABEL_DEFAULTS.articles),
+      searchLabel('events', 'Events heading', SEARCH_LABEL_DEFAULTS.events),
+      searchLabel('awards', 'Awards heading', SEARCH_LABEL_DEFAULTS.awards),
+      searchLabel('resources', 'Resources heading', SEARCH_LABEL_DEFAULTS.resources),
+      searchLabel('nothingFound', 'Nothing found', SEARCH_LABEL_DEFAULTS.nothingFound),
     ],
   })
 
@@ -67,7 +66,6 @@ export const clearviewHeader = defineType({
       name: 'navigation',
       title: 'Navigation',
       type: 'array',
-      description: 'Menu items in order. A dropdown groups several links under one label.',
       of: [defineArrayMember({ type: 'navLink' }), defineArrayMember({ type: 'navGroup' })],
       validation: (Rule) => Rule.required().min(1),
     }),
@@ -87,7 +85,6 @@ export const publicationHeader = defineType({
       name: 'navigation',
       title: 'Navigation',
       type: 'array',
-      description: 'Menu items in order.',
       of: [defineArrayMember({ type: 'navLink' })],
       validation: (Rule) => Rule.required().min(1),
     }),
@@ -97,7 +94,6 @@ export const publicationHeader = defineType({
       name: 'subscribeLabel',
       title: 'Subscribe button',
       type: 'string',
-      description: 'Label of the button that opens the subscribe pop-up.',
       initialValue: 'Subscribe',
       validation: (Rule) => Rule.required(),
     }),

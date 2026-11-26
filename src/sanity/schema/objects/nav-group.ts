@@ -12,7 +12,6 @@ export const navGroup = defineType({
       name: 'label',
       title: 'Label',
       type: 'string',
-      description: 'Menu text that opens the dropdown.',
       validation: (Rule) => Rule.required(),
     }),
     defineField({

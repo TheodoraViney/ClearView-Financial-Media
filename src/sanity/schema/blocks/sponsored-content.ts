@@ -27,12 +27,11 @@ export const sponsoredContent = defineType({
       name: 'label',
       title: 'Label',
       type: 'string',
-      description: 'Shown above the card.',
       initialValue: 'Sponsored Content',
       validation: (Rule) => Rule.required(),
     }),
     defineField({
-      ...linkField({ required: true, labelRequired: true, description: 'The "All sponsored articles" link beside the label.' }),
+      ...linkField({ required: true, labelRequired: true }),
       initialValue: { kind: 'internal', label: 'All Sponsored Articles' },
     }),
     defineField({
@@ -40,7 +39,7 @@ export const sponsoredContent = defineType({
       title: 'Post',
       type: 'reference',
       to: [{ type: 'post' }],
-      description: 'Only posts with a sponsor can be picked. Set the sponsor on the post first.',
+      description: 'Only posts with a sponsor can be picked.',
       options: { filter: sponsoredPostsOfPageBrand, disableNew: true },
       validation: (Rule) => [
         Rule.required(),
@@ -62,7 +61,6 @@ export const sponsoredContent = defineType({
       name: 'profileLabel',
       title: 'Company profile link label',
       type: 'string',
-      description: "The link to the sponsor's company profile.",
       initialValue: 'Company Profile',
       validation: (Rule) => Rule.required(),
     }),

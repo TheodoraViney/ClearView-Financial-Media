@@ -18,7 +18,7 @@ export const numberedList = defineType({
       name: 'items',
       title: 'Points',
       type: 'array',
-      description: `Up to ${NUMBERED_LIST_ITEM_MAX}, in display order. Numbered automatically.`,
+      description: 'Numbered automatically.',
       of: [
         defineArrayMember({
           name: 'numberedListItem',

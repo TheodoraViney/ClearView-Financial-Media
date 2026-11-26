@@ -24,17 +24,18 @@ export const opportunityCards = defineType({
       name: 'cards',
       title: 'Cards',
       type: 'array',
-      description: `Up to ${OPPORTUNITY_CARDS_MAX}, in display order.`,
       of: [
         defineArrayMember({
           name: 'opportunityCard',
           title: 'Card',
           type: 'object',
+          fieldsets: [{ name: 'iconLabel', title: 'Icon and label', options: { columns: 2 } }],
           fields: [
             defineField({
               name: 'icon',
               title: 'Icon',
               type: 'string',
+              fieldset: 'iconLabel',
               options: {
                 list: OPPORTUNITY_CARD_ICONS.map(({ value, title }) => ({ value, title })),
                 layout: 'dropdown',
@@ -45,7 +46,8 @@ export const opportunityCards = defineType({
               name: 'label',
               title: 'Label',
               type: 'string',
-              description: 'Short coloured line above the card heading, e.g. "Awards".',
+              fieldset: 'iconLabel',
+              description: 'Above the card heading.',
               validation: (Rule) => Rule.required(),
             }),
             defineField({
@@ -68,13 +70,12 @@ export const opportunityCards = defineType({
               name: 'benefits',
               title: 'Benefits',
               type: 'array',
-              description: `Up to ${OPPORTUNITY_BENEFITS_MAX} short lines, in display order.`,
               of: [defineArrayMember({ type: 'string' })],
               validation: (Rule) => Rule.required().min(1).max(OPPORTUNITY_BENEFITS_MAX),
             }),
             linkField({
               title: 'Link',
-              description: `To scroll to the enquiry form on this page, choose Web address and enter #${ENQUIRY_FORM_DEFAULT_ANCHOR} (the form's anchor id). An email link is mailto:name@example.com.`,
+              description: `To scroll to the enquiry form, choose Web address and enter #${ENQUIRY_FORM_DEFAULT_ANCHOR}. For email: mailto:name@example.com.`,
               required: true,
               labelRequired: true,
               allowAnchor: true,

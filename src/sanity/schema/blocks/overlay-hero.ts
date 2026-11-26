@@ -12,21 +12,22 @@ export const overlayHero = defineType({
   title: 'Hero over image',
   type: 'object',
   icon: ImageIcon,
+  fieldsets: [{ name: 'breadcrumb', title: 'Breadcrumb', options: { columns: 2 } }],
   fields: [
     adminLabelField,
     defineField({
       name: 'breadcrumbHomeLabel',
-      title: 'Breadcrumb home label',
+      title: 'Home',
       type: 'string',
-      description: 'First item of the breadcrumb, linking to the home page.',
+      fieldset: 'breadcrumb',
       initialValue: 'Home',
       validation: (Rule) => Rule.required(),
     }),
     defineField({
       name: 'breadcrumbLabel',
-      title: 'Breadcrumb current label',
+      title: 'This page',
       type: 'string',
-      description: 'Last item of the breadcrumb: this page.',
+      fieldset: 'breadcrumb',
       initialValue: 'About',
       validation: (Rule) => Rule.required(),
     }),
@@ -41,7 +42,6 @@ export const overlayHero = defineType({
       title: 'Standfirst',
       type: 'text',
       rows: 3,
-      description: 'Short text in the lower corner of the image.',
       initialValue:
         'ClearView Financial Media brings news and analysis, research, awards and industry events to professionals across global wealth management.',
       validation: (Rule) => [
@@ -51,7 +51,7 @@ export const overlayHero = defineType({
     }),
     imageField('image', {
       required: true,
-      description: 'Behind the white text; choose a photo dark enough for the text to stay readable.',
+      description: 'Behind white text: choose a dark photo.',
     }),
   ],
   preview: {

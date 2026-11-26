@@ -24,20 +24,20 @@ export const companyAwards = defineType({
   validation: (Rule) =>
     Rule.custom((_value, context) => (onCompanyEngagementPage(context.document) ? true : PAGE_ONLY_MESSAGE)),
   fieldsets: [
-    { name: 'cards', title: 'Cards', options: { collapsible: true, collapsed: true } },
-    { name: 'pagination', title: 'Pagination', options: { collapsible: true, collapsed: true } },
+    { name: 'cards', title: 'Cards', options: { collapsible: true, collapsed: true, columns: 2 } },
+    { name: 'pagination', title: 'Pagination', options: { collapsible: true, collapsed: true, columns: 2 } },
   ],
   fields: [
     adminLabelField,
-    sectionHeading('Winners and awards sponsors', 'Hidden with the block when no awards edition names a company.'),
+    sectionHeading('Winners and awards sponsors', 'The block is hidden while no awards edition names a company.'),
     sectionIntro(
       'Historical sponsor records from 2016 awards material. These are not current sponsorships. Winner records will be added as verified company records are published.',
     ),
-    label('winnerLabel', 'Winner tag', 'Tag on a card when the company won there, before the categories it won.', 'Winner', 'cards'),
-    label('awardsSponsorLabel', 'Awards sponsor tag', 'Tag on a card when the company sponsored the edition.', 'Awards sponsor', 'cards'),
-    label('charityPartnerLabel', 'Charity partner tag', 'Tag on a card when the company was a charity partner.', 'Charity partner', 'cards'),
-    label('metaLabel', 'Card type label', 'Top right of each card, before the year.', 'Award', 'cards'),
-    label('ctaLabel', 'Card link', 'Bottom of each card, opening the awards edition.', 'View award', 'cards'),
+    label('winnerLabel', 'Winner tag', 'The categories won are added after it.', 'Winner', 'cards'),
+    label('awardsSponsorLabel', 'Awards sponsor tag', undefined, 'Awards sponsor', 'cards'),
+    label('charityPartnerLabel', 'Charity partner tag', undefined, 'Charity partner', 'cards'),
+    label('metaLabel', 'Card type label', 'The year is added after it.', 'Award', 'cards'),
+    label('ctaLabel', 'Card link', undefined, 'View award', 'cards'),
     ...paginationLabels('pagination'),
   ],
   preview: {

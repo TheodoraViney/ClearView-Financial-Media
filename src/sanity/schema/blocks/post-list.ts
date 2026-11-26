@@ -91,7 +91,7 @@ const postListFields = (options: {
     adminLabelField,
     headingField('heading', { title: 'Heading', defaultLevel: 'h2', initialText: options.heading, required: true }),
     defineField({
-      ...linkField({ required: true, labelRequired: true, description: 'The "View all" link beside the heading.' }),
+      ...linkField({ required: true, labelRequired: true, description: 'The "View all" link.' }),
       initialValue: { kind: 'external', ...options.link },
     }),
     ...(category
@@ -101,8 +101,7 @@ const postListFields = (options: {
             title: 'Category',
             type: 'reference',
             to: [{ type: 'category' }],
-            description:
-              'The posts this block shows: picks are limited to it, and the latest posts of it fill the empty places.',
+            description: 'Picks are limited to it; its latest posts fill the empty places.',
             options: { disableNew: true },
             initialValue: { _ref: categoryDocumentId(category) },
             validation: (Rule) => Rule.required(),
@@ -116,10 +115,7 @@ const postListFields = (options: {
       type: 'array',
       // Lists what the site fills automatically right now, with Pin buttons.
       components: { input: AutoFillPicksInput },
-      description:
-        typeof max === 'number'
-          ? `Up to ${max}, in display order. Empty places fill with ${source}.`
-          : `Up to the number of rows above, in display order. Empty places fill with ${source}.`,
+      description: `Empty places fill with ${source}.`,
       of: [
         defineArrayMember({
           type: 'reference',
@@ -207,7 +203,6 @@ export const postBriefs = defineType({
         name: 'count',
         title: 'Number of rows',
         type: 'number',
-        description: `How many posts the block shows, 1 to ${POST_BRIEFS_MAX}.`,
         initialValue: POST_BRIEFS_MAX,
         validation: (Rule) => Rule.required().integer().min(1).max(POST_BRIEFS_MAX),
       }),

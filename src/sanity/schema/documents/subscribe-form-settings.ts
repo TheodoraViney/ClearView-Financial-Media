@@ -17,13 +17,12 @@ export const subscribeFormSettings = defineType({
   fields: [
     brevoListField('list', {
       title: 'Brevo list',
-      description: 'Every reader who signs up through a subscribe form is added to this list.',
+      description: 'Every reader who signs up through a subscribe form joins this list.',
       required: true,
     }),
     brevoTemplateField('confirmationTemplate', {
       title: 'Confirmation email',
-      description:
-        'The Brevo email that asks new readers to confirm their address before they are signed up. Only templates tagged optin in Brevo appear.',
+      description: 'Asks new readers to confirm their address. Only Brevo templates tagged optin appear.',
       required: true,
     }),
   ],

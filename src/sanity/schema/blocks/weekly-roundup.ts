@@ -19,6 +19,7 @@ export const weeklyRoundup = defineType({
   title: 'Weekly roundup',
   type: 'object',
   icon: CalendarIcon,
+  fieldsets: [{ name: 'edition', title: 'Edition', options: { columns: 2 } }],
   fields: [
     adminLabelField,
     headingField('heading', { title: 'Heading', defaultLevel: 'h2', initialText: 'Weekly Roundup', required: true }),
@@ -26,7 +27,8 @@ export const weeklyRoundup = defineType({
       name: 'label',
       title: 'Label',
       type: 'string',
-      description: 'Shown above the title, before the edition date.',
+      fieldset: 'edition',
+      description: 'The edition date is added after it.',
       initialValue: 'Weekly edition',
       validation: (Rule) => Rule.required(),
     }),
@@ -34,6 +36,7 @@ export const weeklyRoundup = defineType({
       name: 'title',
       title: 'Title',
       type: 'string',
+      fieldset: 'edition',
       initialValue: 'The week’s key stories for wealth managers',
       validation: (Rule) => Rule.required(),
     }),
@@ -57,7 +60,6 @@ export const weeklyRoundup = defineType({
       name: 'listLabel',
       title: 'List label',
       type: 'string',
-      description: 'Shown above the numbered list of posts.',
       initialValue: 'In this edition',
       validation: (Rule) => Rule.required(),
     }),
@@ -67,7 +69,7 @@ export const weeklyRoundup = defineType({
       type: 'array',
       // Lists what the site fills automatically right now, with Pin buttons.
       components: { input: AutoFillPicksInput },
-      description: `Up to ${WEEKLY_ROUNDUP_POST_COUNT}, in display order. Empty places fill with the latest posts.`,
+      description: 'Empty places fill with the latest posts.',
       of: [
         defineArrayMember({
           type: 'reference',

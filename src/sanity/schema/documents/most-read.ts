@@ -35,8 +35,7 @@ export const mostRead = defineType({
       name: 'posts',
       title: 'Posts',
       type: 'array',
-      description:
-        'Optional. Up to five posts of this brand, shown first in this order. Empty places fill automatically with the latest articles.',
+      description: 'Empty places fill with the latest articles.',
       of: [
         defineArrayMember({
           type: 'reference',

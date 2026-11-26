@@ -37,6 +37,10 @@ export const newsletterSignup = defineType({
         ? true
         : 'Newsletter signup is for ClearView pages only; remove it from this page'
     }),
+  fieldsets: [
+    { name: 'form', title: 'Email field and button', options: { columns: 2 } },
+    { name: 'messages', title: 'Error messages', options: { columns: 2 } },
+  ],
   fields: [
     adminLabelField,
     headingField('heading', { title: 'Heading', defaultLevel: 'h2', required: true }),
@@ -45,7 +49,6 @@ export const newsletterSignup = defineType({
       title: 'Description',
       type: 'text',
       rows: 3,
-      description: 'Short text under the heading.',
       validation: (Rule) => [
         Rule.required(),
         Rule.max(240).warning('Longer than 240 characters; the text will push the form down'),
@@ -55,7 +58,6 @@ export const newsletterSignup = defineType({
       name: 'preferencesLabel',
       title: 'Options label',
       type: 'string',
-      description: 'Shown above the options.',
       initialValue: 'Select the updates you would like to receive:',
       validation: (Rule) => Rule.required(),
     }),
@@ -63,7 +65,6 @@ export const newsletterSignup = defineType({
       name: 'options',
       title: 'Options',
       type: 'array',
-      description: 'What readers can choose to receive, in display order.',
       of: [
         defineArrayMember({
           name: 'newsletterOption',
@@ -87,7 +88,6 @@ export const newsletterSignup = defineType({
               name: 'defaultChecked',
               title: 'Ticked by default',
               type: 'boolean',
-              description: 'The box starts ticked; readers can untick it.',
               initialValue: false,
             }),
           ],
@@ -162,9 +162,9 @@ export const newsletterSignup = defineType({
     },
     defineField({
       name: 'emailPlaceholder',
-      title: 'Email placeholder',
+      title: 'Placeholder',
       type: 'string',
-      description: 'Hint text inside the empty email field.',
+      fieldset: 'form',
       initialValue: 'Enter your email address',
       validation: (Rule) => Rule.required(),
     }),
@@ -172,22 +172,23 @@ export const newsletterSignup = defineType({
       name: 'buttonLabel',
       title: 'Button label',
       type: 'string',
+      fieldset: 'form',
       initialValue: 'Sign Up',
       validation: (Rule) => Rule.required(),
     }),
     defineField({
       name: 'invalidEmailMessage',
-      title: 'Invalid email message',
+      title: 'Email missing or not valid',
       type: 'string',
-      description: 'Shown under the field when the email address is empty or not valid.',
+      fieldset: 'messages',
       initialValue: 'Please enter a valid email address.',
       validation: (Rule) => Rule.required(),
     }),
     defineField({
       name: 'noOptionMessage',
-      title: 'No option chosen message',
+      title: 'No option chosen',
       type: 'string',
-      description: 'Shown under the options when the reader has not chosen any. Keep it to one short line.',
+      fieldset: 'messages',
       initialValue: 'Choose at least one update.',
       validation: (Rule) =>
         Rule.required().max(40).warning('Longer than 40 characters; on phones the message may run into the text below'),

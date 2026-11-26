@@ -21,7 +21,7 @@ export const onCompanyEngagementPage = (document: unknown) =>
 export const label = (
   name: string,
   title: string,
-  description: string,
+  description: string | undefined,
   initialValue: string,
   fieldset?: string,
   validation?: (value: string | undefined) => true | string,
@@ -45,13 +45,13 @@ export const tokensOnce =
     return !value || missing.length === 0 ? true : `Use ${missing.join(', ')} exactly once`
   }
 
-/** A list section's heading: H2 by default, the size on the page fixed. */
-export const sectionHeading = (initialText: string, description: string) =>
+/** A list section's heading: H2 by default, the size on the page fixed. Without a description, headingField's own. */
+export const sectionHeading = (initialText: string, description?: string) =>
   headingField('heading', {
     defaultLevel: 'h2',
     initialText,
     required: true,
-    description: `${description} Choose the heading level in the style menu. The size on the page stays the same.`,
+    description: description ? `${description} The style menu sets the heading level, not its size.` : undefined,
   })
 
 /** A list section's optional intro under its heading. */
@@ -61,12 +61,11 @@ export const sectionIntro = (initialValue?: string) =>
     title: 'Intro',
     type: 'text',
     rows: 3,
-    description: 'Optional. Under the heading.',
     initialValue,
   })
 
 /** Previous and Next under a list, shown when it runs over more than one page (12 cards a page). */
 export const paginationLabels = (fieldset?: string) => [
-  label('previousLabel', 'Previous page button', 'Pagination, shown when the list runs over more than one page.', 'Previous', fieldset),
-  label('nextLabel', 'Next page button', 'Pagination, shown when the list runs over more than one page.', 'Next', fieldset),
+  label('previousLabel', 'Previous page button', undefined, 'Previous', fieldset),
+  label('nextLabel', 'Next page button', undefined, 'Next', fieldset),
 ]

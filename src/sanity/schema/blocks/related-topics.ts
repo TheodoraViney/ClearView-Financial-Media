@@ -28,7 +28,7 @@ export const relatedTopics = defineType({
       name: 'items',
       title: 'Categories and topics',
       type: 'array',
-      description: 'In this order. Drag to reorder. Each links to the Categories page filtered by it.',
+      description: 'Each links to the Categories page filtered by it.',
       of: [
         defineArrayMember({
           type: 'reference',

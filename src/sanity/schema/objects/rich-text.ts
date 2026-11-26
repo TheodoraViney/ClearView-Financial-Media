@@ -146,7 +146,7 @@ export const richTextVideoFile = defineArrayMember({
       name: 'title',
       title: 'Title',
       type: 'string',
-      description: 'Names the video for screen readers. Required once a file is attached.',
+      description: 'Names the video for screen readers.',
       validation: (Rule) =>
         Rule.custom((title, context) => {
           const parent = context.parent as { asset?: { _ref?: string } } | undefined
@@ -189,8 +189,9 @@ export const richTextEmbed = defineArrayMember({
       name: 'id',
       title: 'ID',
       type: 'string',
-      description:
-        'Vimeo: the numeric video id, for example 762229585, or showcase/6614946 for a showcase. Issuu: the 32-character pubId, for example 68c1ef3232d11826d464e0575ef51f0b, or {user}/{document} for older embeds, for example clearviewpublishing/fwrfintechreport2024.',
+      // Vimeo e.g. 762229585 or showcase/6614946; Issuu e.g. 68c1ef3232d11826d464e0575ef51f0b or
+      // clearviewpublishing/fwrfintechreport2024 (older embeds).
+      description: 'Vimeo: the numeric id or showcase/{id}; Issuu: the 32-character pubId or {user}/{document}.',
       validation: (Rule) =>
         Rule.required().custom((id, context) => {
           const { provider } = (context.parent ?? {}) as { provider?: string }
@@ -212,8 +213,7 @@ export const richTextEmbed = defineArrayMember({
       name: 'hash',
       title: 'Vimeo privacy hash',
       type: 'string',
-      description:
-        'The h= value from an unlisted video link, for example 54e5b4c1c2. Unlisted videos do not play without it.',
+      description: 'The h= value of an unlisted video link; unlisted videos do not play without it.',
       hidden: ({ parent }) => parent?.provider !== 'vimeo',
       validation: (Rule) => Rule.regex(/^[0-9a-f]+$/, { name: 'Vimeo privacy hash', invert: false }),
     }),

@@ -114,7 +114,6 @@ export const exploreCard = defineType({
       name: 'icon',
       title: 'Icon',
       type: 'string',
-      description: 'Shown beside the heading.',
       options: { list: EXPLORE_CARD_ICONS.map(({ value, title }) => ({ value, title })) },
       validation: (Rule) => Rule.required(),
     }),
@@ -122,7 +121,6 @@ export const exploreCard = defineType({
       name: 'source',
       title: 'Source',
       type: 'string',
-      description: 'Which records the card lists.',
       options: { list: EXPLORE_CARD_SOURCES.map(({ value, title }) => ({ value, title })), layout: 'radio' },
       validation: (Rule) => Rule.required(),
     }),
@@ -131,7 +129,7 @@ export const exploreCard = defineType({
       title: 'Category',
       type: 'reference',
       to: [{ type: 'category' }],
-      description: 'The posts this card lists: picks are limited to it, and its latest posts fill the empty places.',
+      description: 'Picks are limited to it, and its latest posts fill the empty places.',
       options: { disableNew: true },
       hidden: ({ parent }) => !isPosts(parent),
       validation: (Rule) =>
@@ -143,7 +141,7 @@ export const exploreCard = defineType({
       name: 'count',
       title: 'Number of items',
       type: 'number',
-      description: `How many items the card lists, 1 to ${EXPLORE_CARD_ITEM_MAX}. Leave empty for ${EXPLORE_CARD_ITEM_MAX}.`,
+      description: `Empty: ${EXPLORE_CARD_ITEM_MAX}.`,
       validation: (Rule) => Rule.integer().min(1).max(EXPLORE_CARD_ITEM_MAX),
     }),
     defineField({
@@ -152,7 +150,7 @@ export const exploreCard = defineType({
       type: 'array',
       // Lists what the site fills automatically right now, with Pin buttons.
       components: { input: AutoFillPicksInput },
-      description: 'Up to the number of items above, in display order. Empty places fill automatically.',
+      description: 'Empty places fill automatically.',
       of: [
         defineArrayMember({
           type: 'reference',
@@ -173,14 +171,13 @@ export const exploreCard = defineType({
       name: 'deadlineLabel',
       title: 'Deadline label',
       type: 'string',
-      description: 'Shown before the nominations deadline, e.g. "Entry deadline:". Leave empty to show the date only.',
+      description: 'Empty: the deadline date only.',
       initialValue: 'Entry deadline:',
       hidden: ({ parent }) => (parent as CardValue | undefined)?.source !== 'awards',
     }),
     linkField({
       name: 'button',
       title: 'Button',
-      description: 'The "View all …" button at the bottom of the card.',
       required: true,
       labelRequired: true,
     }),

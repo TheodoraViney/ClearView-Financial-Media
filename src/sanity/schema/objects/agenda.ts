@@ -32,7 +32,7 @@ export const agenda = defineType({
       name: 'title',
       title: 'Track title',
       type: 'string',
-      description: 'For example a day or a room ("Room One"). Leave empty when the event has one programme.',
+      description: 'A day or a room. Empty when the event has one programme.',
     }),
     defineField({
       name: 'items',
@@ -43,12 +43,13 @@ export const agenda = defineType({
           name: 'agendaItem',
           title: 'Agenda item',
           type: 'object',
+          fieldsets: [{ name: 'when', title: 'Time', description: '24-hour clock, for example 08:15.', options: { columns: 2 } }],
           fields: [
             defineField({
               name: 'time',
-              title: 'Start time',
+              title: 'Start',
               type: 'string',
-              description: '24-hour clock, for example 08:15. Leave empty for an item without a time.',
+              fieldset: 'when',
               validation: (Rule) => [
                 Rule.regex(TIME_OF_DAY, { name: 'time of day' }),
                 Rule.custom((time, context) =>
@@ -60,9 +61,9 @@ export const agenda = defineType({
             }),
             defineField({
               name: 'endTime',
-              title: 'End time',
+              title: 'End',
               type: 'string',
-              description: 'Optional. 24-hour clock, for example 08:45.',
+              fieldset: 'when',
               validation: (Rule) => [
                 Rule.regex(TIME_OF_DAY, { name: 'time of day' }),
                 Rule.custom((endTime, context) => {
@@ -80,7 +81,7 @@ export const agenda = defineType({
               name: 'sessionType',
               title: 'Session type',
               type: 'string',
-              description: 'Optional. Leave empty for breaks, registration and networking.',
+              description: 'Empty for breaks, registration and networking.',
               options: { list: [...AGENDA_SESSION_TYPES], layout: 'dropdown' },
             }),
             defineField({
@@ -120,7 +121,6 @@ export const agenda = defineType({
                       name: 'chair',
                       title: 'Chair',
                       type: 'boolean',
-                      description: 'Shown as "Chair: {name}".',
                       initialValue: false,
                     }),
                   ],

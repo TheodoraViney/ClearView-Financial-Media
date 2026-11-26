@@ -19,7 +19,6 @@ export const companyGroup = defineType({
       name: 'name',
       title: 'Group name',
       type: 'string',
-      description: 'For example "Category Sponsors" or "Sponsors and Partners".',
       validation: (Rule) => Rule.required(),
     }),
     defineField({

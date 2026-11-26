@@ -17,56 +17,37 @@ export const companyFilters = defineType({
   validation: (Rule) =>
     Rule.custom((_value, context) => (onCompanyEngagementPage(context.document) ? true : PAGE_ONLY_MESSAGE)),
   fieldsets: [
-    { name: 'search', title: 'Search' },
-    { name: 'activity', title: 'Activity filter', options: { collapsible: true, collapsed: true } },
-    { name: 'year', title: 'Year filter', options: { collapsible: true, collapsed: true } },
+    { name: 'search', title: 'Search', options: { columns: 2 } },
+    {
+      name: 'activity',
+      title: 'Activity filter',
+      description: 'Each option is also the tag on the matching company cards.',
+      options: { collapsible: true, collapsed: true, columns: 2 },
+    },
+    { name: 'year', title: 'Year filter', options: { collapsible: true, collapsed: true, columns: 2 } },
   ],
   fields: [
     adminLabelField,
-    label('searchLabel', 'Search field name', 'Read by screen readers for the company search field.', 'Search companies', 'search'),
-    label('searchPlaceholder', 'Search field placeholder', 'Shown in the empty search field.', 'Search companies', 'search'),
-    label(
-      'clearFiltersLabel',
-      'Clear filters link',
-      'Clears the search and the filters: beside the filters while one is set, and in each filter.',
-      'Clear filters',
-      'search',
-    ),
-    label('selectedLabel', 'Selected label', 'After the count when a filter has several options chosen, "2 selected".', 'selected', 'search'),
+    label('searchLabel', 'Field name', 'Read by screen readers only.', 'Search companies', 'search'),
+    label('searchPlaceholder', 'Placeholder', undefined, 'Search companies', 'search'),
+    // Beside the filters while one is set, and in each filter; clears the search and the filters.
+    label('clearFiltersLabel', 'Clear filters link', undefined, 'Clear filters', 'search'),
+    label('selectedLabel', 'Selected label', 'Follows the count: "2 selected".', 'selected', 'search'),
 
-    label('activityFilterLabel', 'Activity filter name', 'Read by screen readers for the Activity filter.', 'Activity', 'activity'),
-    label(
-      'activityAllLabel',
-      'Activity filter "All" label',
-      'The Activity filter while no activity is chosen, and its first option.',
-      'All Activities',
-      'activity',
-    ),
-    label(
-      'awardsActivityLabel',
-      'Awards option',
-      'Activity filter option and company card tag: winners, awards sponsors and charity partners.',
-      'Awards',
-      'activity',
-    ),
-    label(
-      'forumsActivityLabel',
-      'Forums and summits option',
-      'Activity filter option and company card tag: event sponsors and technology demonstrators.',
-      'Forums and Summits',
-      'activity',
-    ),
-    label('researchActivityLabel', 'Research option', 'Activity filter option and company card tag: research report partners.', 'Research', 'activity'),
-    label(
-      'contributedActivityLabel',
-      'Contributed content option',
-      'Activity filter option and company card tag: companies that contributed a post.',
-      'Contributed Content',
-      'activity',
-    ),
+    // The "All" options are also the filter's text while nothing is chosen.
+    label('activityFilterLabel', 'Filter name', 'Read by screen readers only.', 'Activity', 'activity'),
+    label('activityAllLabel', '"All" option', undefined, 'All Activities', 'activity'),
+    // Winners, awards sponsors and charity partners.
+    label('awardsActivityLabel', 'Awards', undefined, 'Awards', 'activity'),
+    // Event sponsors and technology demonstrators.
+    label('forumsActivityLabel', 'Forums and summits', undefined, 'Forums and Summits', 'activity'),
+    // Research report partners.
+    label('researchActivityLabel', 'Research', undefined, 'Research', 'activity'),
+    // Companies that contributed a post.
+    label('contributedActivityLabel', 'Contributed content', undefined, 'Contributed Content', 'activity'),
 
-    label('yearFilterLabel', 'Year filter name', 'Read by screen readers for the Year filter.', 'Year', 'year'),
-    label('yearAllLabel', 'Year filter "All" label', 'The Year filter while no year is chosen, and its first option.', 'All years', 'year'),
+    label('yearFilterLabel', 'Filter name', 'Read by screen readers only.', 'Year', 'year'),
+    label('yearAllLabel', '"All" option', undefined, 'All years', 'year'),
   ],
   preview: {
     select: { adminLabel: 'adminLabel' },

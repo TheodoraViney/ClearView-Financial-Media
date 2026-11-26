@@ -30,7 +30,7 @@ export const subscribeBanner = defineType({
       name: 'buttonLabel',
       title: 'Button label',
       type: 'string',
-      description: 'Label of the button that opens the subscribe pop-up.',
+      description: 'The button opens the subscribe pop-up.',
       initialValue: 'Subscribe to the daily newsletter',
       validation: (Rule) => Rule.required(),
     }),

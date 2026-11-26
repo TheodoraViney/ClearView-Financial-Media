@@ -16,7 +16,6 @@ export const navLink = defineType({
       name: 'label',
       title: 'Label',
       type: 'string',
-      description: 'Menu text.',
       validation: (Rule) => Rule.required(),
     }),
     // `label` above is the visible text, so the link carries no label of its own. Header and footer menus link to

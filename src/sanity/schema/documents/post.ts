@@ -21,6 +21,10 @@ export const post = defineType({
   name: 'post',
   title: 'Post',
   type: 'document',
+  fieldsets: [
+    { name: 'filing', title: 'Category and region', options: { columns: 2 } },
+    { name: 'partner', title: 'Sponsored or contributed', options: { columns: 2 } },
+  ],
   fields: [
     defineField({
       name: 'brands',
@@ -61,7 +65,16 @@ export const post = defineType({
       title: 'Category',
       type: 'reference',
       to: [{ type: 'category' }],
-      description: 'The section of the site the article belongs to.',
+      fieldset: 'filing',
+      options: { disableNew: true },
+      validation: (Rule) => Rule.required(),
+    }),
+    defineField({
+      name: 'region',
+      title: 'Region',
+      type: 'reference',
+      to: [{ type: 'region' }],
+      fieldset: 'filing',
       options: { disableNew: true },
       validation: (Rule) => Rule.required(),
     }),
@@ -70,7 +83,6 @@ export const post = defineType({
       title: 'Main topic',
       type: 'reference',
       to: [{ type: 'topic' }],
-      description: 'The main subject of the article. Shown above the headline and in the breadcrumb.',
       options: { disableNew: true },
       validation: (Rule) => Rule.required(),
     }),
@@ -78,7 +90,6 @@ export const post = defineType({
       name: 'secondaryTopics',
       title: 'Other topics',
       type: 'array',
-      description: 'Up to three other subjects the article covers. Used by the topic filter on the articles list.',
       of: [
         defineArrayMember({
           type: 'reference',
@@ -104,20 +115,11 @@ export const post = defineType({
           }),
     }),
     defineField({
-      name: 'region',
-      title: 'Region',
-      type: 'reference',
-      to: [{ type: 'region' }],
-      description: 'The geographical focus of the article. Used by the region filter on the articles list.',
-      options: { disableNew: true },
-      validation: (Rule) => Rule.required(),
-    }),
-    defineField({
       name: 'author',
       title: 'Author',
       type: 'reference',
       to: [{ type: 'author' }],
-      description: 'Who wrote the article. Use Editorial Staff for unsigned pieces.',
+      description: 'Use Editorial Staff for unsigned pieces.',
       options: { disableNew: true },
       validation: (Rule) => Rule.required(),
     }),
@@ -125,8 +127,6 @@ export const post = defineType({
       name: 'excerpt',
       title: 'Standfirst',
       type: 'text',
-      description:
-        'Shown under the headline on the article page and in the Home hero. About 120-200 characters reads best.',
       validation: (Rule) => [
         Rule.required(),
         Rule.max(200).warning('Longer than 200 characters; the hero will wrap onto more lines'),
@@ -139,7 +139,7 @@ export const post = defineType({
             name: 'credit',
             title: 'Credit',
             type: 'string',
-            description: 'Shown under the image as "Image: {credit}". Starts as the brand name.',
+            description: 'Shown as "Image: {credit}". Starts as the brand name.',
             validation: (Rule) => Rule.required(),
           }),
         ],
@@ -153,8 +153,8 @@ export const post = defineType({
       title: 'Sponsor',
       type: 'reference',
       to: [{ type: 'company' }],
-      description:
-        'Set only for sponsored content: the company that paid for this post. A post with a sponsor can appear in the "Sponsored content" block, which shows the company name, logo and a link to its profile.',
+      fieldset: 'partner',
+      description: 'Only for sponsored content. Lets the post appear in the Sponsored content block.',
       options: { disableNew: true },
     }),
     defineField({
@@ -162,8 +162,8 @@ export const post = defineType({
       title: 'Contributor (guest)',
       type: 'reference',
       to: [{ type: 'company' }],
-      description:
-        'Set only for contributed content: the company whose guest wrote this post. Leave empty for staff articles.',
+      fieldset: 'partner',
+      description: 'The company of the guest author.',
       options: { disableNew: true },
     }),
     // The article banner sits between the two text fields, fixed by the template. `content` keeps its name from
@@ -172,21 +172,19 @@ export const post = defineType({
       name: 'content',
       title: 'Text before the banner',
       type: 'articleBody',
-      description: 'The article text above the advertising banner.',
     }),
     defineField({
       name: 'contentAfter',
       title: 'Text after the banner',
       type: 'articleBody',
-      description: 'The article text below the advertising banner. Leave empty to show the banner after the text.',
+      description: 'Empty: the banner shows after the text.',
     }),
     defineField({
       name: 'briefText',
       title: 'Brief',
       type: 'text',
       rows: 5,
-      description:
-        `Five sentences, about ${BRIEF_TARGET_MIN_CHARS}–${BRIEF_MAX_CHARS} characters (three lines), shown in News in Brief. Write it or use Generate brief. Empty: the standfirst is shown.`,
+      description: `Shown in News in Brief, about ${BRIEF_TARGET_MIN_CHARS}–${BRIEF_MAX_CHARS} characters. Write it or use Generate brief; empty shows the standfirst.`,
       components: { input: BriefTextInput },
       validation: (Rule) =>
         Rule.max(BRIEF_MAX_CHARS).warning(
@@ -197,8 +195,7 @@ export const post = defineType({
       name: 'recommended',
       title: 'Recommended articles',
       type: 'array',
-      description:
-        'Up to three articles shown under this one. Leave empty to show the latest articles of the same category.',
+      description: 'Empty: the latest articles of the same category.',
       of: [
         defineArrayMember({
           type: 'reference',
