@@ -760,11 +760,7 @@ export const SHARED_LISTINGS_PAGE_QUERY = defineQuery(`
     },
     // The regions of the Awards and Events tabs (src/lib/regions.ts), in filter order.
     "regions": *[$tab in ["awards", "events"] && _type == "eventRegion" && defined(slug.current) && defined(title)]
-      | order(lower(title) asc){
-        "slug": slug.current,
-        title,
-        "countries": coalesce(countries, [])
-      },
+      | order(lower(title) asc){ "slug": slug.current, title },
     "awards": *[$tab == "awards" && _type == "awardsProgramme" && defined(slug.current)]{
       _id,
       title,

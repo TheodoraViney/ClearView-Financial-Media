@@ -112,11 +112,11 @@ type RowLabels = { statuses: Record<ListingStatus, string>; region: (region: str
 /** A record's row, built once the labels are known. The ranking, filters and page count need no labels. */
 type RowOf = (labels: RowLabels) => ListingRowView
 
-/** The event regions, stega-free: slugs and countries are compared, so only the titles keep stega (regionTitles). */
+/** The event regions, stega-free: slugs are compared, so only the titles keep stega (regionTitles). */
 const cleanRegions = (data: SharedListingsData) =>
   data.regions.flatMap((region) => {
     const slug = stegaClean(region.slug)
-    return slug ? [{ slug, title: stegaClean(region.title) ?? '', countries: stegaClean(region.countries) }] : []
+    return slug ? [{ slug, title: stegaClean(region.title) ?? '' }] : []
   })
 
 /** The title of each region by slug, stega kept for click-to-edit. */
