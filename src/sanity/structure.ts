@@ -201,6 +201,7 @@ export const structure: StructureResolver = (S) =>
               S.documentTypeListItem('awardsProgrammeGroup')
                 .title('Programmes')
                 .icon(BookmarkIcon),
+              S.documentTypeListItem('eventRegion').title('Event regions').icon(EarthGlobeIcon),
               S.documentTypeListItem('awardsProgramme')
                 .title('Editions')
                 .icon(StarIcon),
@@ -228,7 +229,6 @@ export const structure: StructureResolver = (S) =>
             .title('Events')
             .items([
               S.documentTypeListItem('conferenceEvent').title('Events').icon(CalendarIcon),
-              S.documentTypeListItem('eventRegion').title('Event regions').icon(EarthGlobeIcon),
               S.divider(),
               S.listItem()
                 .title('Event page texts')
