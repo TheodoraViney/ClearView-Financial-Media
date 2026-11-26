@@ -40,8 +40,9 @@ import { topStories } from './top-stories'
 import { weeklyRoundup } from './weekly-roundup'
 
 // Every block type in the schema. Awards Winners and Most read go in a Two columns sidebar only, and Page heading, the
-// awards, events and research list, the articles list and Related topics in its main column only (they bring the
-// column's inset), so pages do not list them. The Company Engagement page's blocks go on that page only.
+// articles list and Related topics in its main column only (they bring the column's inset), so pages do not list them.
+// The awards, events and research list goes in either: the shared listings page carries it full width under its Two
+// columns block. The Company Engagement page's blocks go on that page only, the list on the shared listings page only.
 export const blockTypes = [
   cta,
   splitLayout,
@@ -85,7 +86,6 @@ export const blockTypes = [
 const COLUMN_ONLY_BLOCK_TYPES: readonly (typeof blockTypes)[number][] = [
   awardsWinners,
   pageHero,
-  recordListing,
   articleListing,
   relatedTopics,
   mostReadSidebar,
@@ -141,6 +141,7 @@ const INSERT_MENU_GROUPS = [
       companySponsoredContent.name,
     ],
   },
+  { name: 'listings', title: 'Shared listings page', of: [recordListing.name] },
   { name: 'legal', title: 'Legal page', of: [legalText.name] },
   { name: 'other', title: 'Other', of: [publications.name, statsBar.name] },
 ]

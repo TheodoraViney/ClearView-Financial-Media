@@ -36,10 +36,11 @@ const mainBlockTypes = [
 const asideBlockTypes = [highlights, awardsWinners, mostReadSidebar]
 
 /**
- * A main column with a sidebar beside it from 1280px. Below that the sidebar
+ * A main column with a sidebar beside it from 1200px. Below that the sidebar
  * stacks after the main column. As a page's first block it also carries the
  * page's Top banner (head of the main column) and Side banner (head of the
- * sidebar), placed by the page template.
+ * sidebar), placed by the page template; there the sidebar may hold no block
+ * and shows the Side banner alone (the shared listings page).
  */
 export const splitLayout = defineType({
   name: 'splitLayout',
@@ -59,8 +60,9 @@ export const splitLayout = defineType({
       name: 'aside',
       title: 'Sidebar',
       type: 'array',
+      description:
+        'Optional. When this is the first block of the page, the sidebar always starts with the Side banner, so an empty sidebar still shows the banner beside the main column. Further down the page an empty sidebar is left out and the main column takes the full width.',
       of: asideBlockTypes.map((blockType) => defineArrayMember({ type: blockType.name })),
-      validation: (Rule) => Rule.required().min(1).error('Add at least one block to the sidebar'),
     }),
   ],
   preview: {

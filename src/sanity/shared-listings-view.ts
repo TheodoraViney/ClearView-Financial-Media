@@ -1,7 +1,6 @@
 import { stegaClean, type StegaBranded } from 'next-sanity'
 
 import type { BlockOf } from '@/components/blocks/types'
-import { parseAwardsListView, withAwardsListView } from '@/lib/awards-list-view' // AWARDS-LIST-VARIANTS (temporary)
 import type { EditionStatusCopy } from '@/lib/awards-programme-copy'
 import { EDITION_STATUS_LABELS, editionStatus } from '@/lib/awards-status'
 import { pageWindow } from '@/lib/categories'
@@ -31,6 +30,7 @@ import {
   STATUS_PARAMS,
   type ListingFilters,
   type ListingFilterView,
+  type ListingImageKind,
   type ListingRecord,
   type ListingRowView,
   type ListingState,
@@ -42,7 +42,7 @@ import {
 } from '@/lib/shared-listings'
 
 import { toStatuses } from './award-category-view'
-import { toImage } from './image' // AWARDS-LIST-VARIANTS (temporary)
+import { toImage } from './image'
 import type { SHARED_LISTINGS_PAGE_QUERY_RESULT } from './types'
 
 type QueryData = StegaBranded<SHARED_LISTINGS_PAGE_QUERY_RESULT>
@@ -70,8 +70,6 @@ export type RecordListingContext = {
 }
 
 type RecordListingBlock = BlockOf<'recordListing'>
-
-const filled = <T extends string>(value: T | null | undefined): value is T => Boolean(stegaClean(value)?.trim())
 
 /** The labels as the CMS holds them, stega kept for click-to-edit. Every label is required in the Studio. */
 function toCopy(block: RecordListingBlock): RecordListingCopy {
@@ -102,6 +100,8 @@ function statusLabels(copy: RecordListingCopy, statuses: EditionStatusCopy): Rec
     published: copy.publishedLabel,
   }
 }
+
+const IMAGE_KINDS: Record<SharedListingsTab, ListingImageKind> = { awards: 'wordmark', events: 'wordmark', research: 'cover' }
 
 // The status each URL value selects, for the option labels: STATUS_PARAMS of every tab in one table.
 const STATUS_OF_PARAM = Object.assign({}, ...Object.values(STATUS_PARAMS)) as Record<StatusParam, ListingStatus>
@@ -137,16 +137,20 @@ function toRecords(tab: SharedListingsTab, data: SharedListingsData, today: stri
           region,
           status,
           group: editionGroup(status),
-          rankDate: status === 'submissionsOpen' ? closingDate : startDate,
+          rankDate:
+            status === 'submissionsOpen'
+              ? closingDate
+              : status === 'launchingSoon'
+                ? stegaClean(edition.nominationsOpeningDate)
+                : startDate,
           item: (labels) => ({
             key: edition._id,
             title: edition.title ?? '',
             href: sharedRecordHref('awardsProgramme', edition.slug, 'clearview'),
-            standfirst: filled(edition.standfirst) ? edition.standfirst : null,
             date: stegaClean(edition.hideDateTime) ? null : formatDateRange(startDate, stegaClean(edition.endDate)),
             region: labels.region(region),
             status: status ? { label: labels.statuses[status], highlight: status === 'submissionsOpen' } : null,
-            logo: toImage(edition.logo), // AWARDS-LIST-VARIANTS (temporary)
+            image: toImage(edition.logo),
           }),
         }
       })
@@ -171,10 +175,10 @@ function toRecords(tab: SharedListingsTab, data: SharedListingsData, today: stri
             key: event._id,
             title: event.title ?? '',
             href: sharedRecordHref('conferenceEvent', event.slug, 'clearview'),
-            standfirst: null,
             date: stegaClean(event.hideDateTime) ? null : formatDateRange(startDate, endDate),
             region: labels.region(region),
             status: { label: labels.statuses[status], highlight: upcoming },
+            image: toImage(event.logo),
           }),
         }
       })
@@ -194,10 +198,10 @@ function toRecords(tab: SharedListingsTab, data: SharedListingsData, today: stri
             key: report._id,
             title: report.title ?? '',
             href: sharedRecordHref('resource', report.slug, 'clearview'),
-            standfirst: null,
             date: formatLongDate(publishedAt),
             region: null,
             status: { label: labels.statuses.published, highlight: false },
+            image: toImage(report.cover),
           }),
         }
       })
@@ -256,7 +260,7 @@ export function sharedListingsState(context: Omit<RecordListingContext, 'path'>)
 }
 
 /**
- * The record listing block as plain props, or null for a page past the end (a 404). Ten records a page; the
+ * The record listing block as plain props, or null for a page past the end (a 404). Twelve records a page; the
  * pagination links keep the filters, and a filter change (the GET form) drops the page number.
  */
 export function toRecordListingView(block: RecordListingBlock, context: RecordListingContext): RecordListingView | null {
@@ -273,9 +277,7 @@ export function toRecordListingView(block: RecordListingBlock, context: RecordLi
   const labels: RowLabels = { statuses, region: (region) => (region ? copy[REGION_LABELS[region]] : null) }
   const start = (state.page - 1) * LISTING_PAGE_SIZE
   const rows = records.slice(start, start + LISTING_PAGE_SIZE).map((record) => record.item(labels))
-  const awardsView = parseAwardsListView(tab, context.params) // AWARDS-LIST-VARIANTS (temporary)
-  const keepView = (url: string) => withAwardsListView(url, awardsView) // AWARDS-LIST-VARIANTS (temporary)
-  const href = (page: number) => keepView(listingHref(path, { ...state, page })) // AWARDS-LIST-VARIANTS (temporary): keepView
+  const href = (page: number) => listingHref(path, { ...state, page })
 
   return {
     tabs: SHARED_LISTINGS_TABS.map((key) => ({
@@ -288,17 +290,17 @@ export function toRecordListingView(block: RecordListingBlock, context: RecordLi
       action: path,
       allLabel: copy.allOptionLabel,
       fields: toFilterFields(copy, statuses, options, state),
-      clear: hasListingFilters(state) ? { label: copy.clearFiltersLabel, href: keepView(path) } : null, // AWARDS-LIST-VARIANTS (temporary): keepView
+      clear: hasListingFilters(state) ? { label: copy.clearFiltersLabel, href: path } : null,
     },
     rows,
-    awardsView, // AWARDS-LIST-VARIANTS (temporary)
+    imageKind: IMAGE_KINDS[tab],
     total: records.length,
     empty:
       rows.length === 0
         ? {
             heading: copy.emptyHeading,
             text: copy.emptyText.replace(RECORD_LISTING_TYPE_TOKEN, copy[EMPTY_NOUNS[tab]]),
-            button: { label: copy.emptyButtonLabel, href: keepView(path) }, // AWARDS-LIST-VARIANTS (temporary): keepView
+            button: { label: copy.emptyButtonLabel, href: path },
           }
         : null,
     pagination: {

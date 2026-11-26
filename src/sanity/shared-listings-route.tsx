@@ -22,7 +22,7 @@ import { isCompletePage, sharedListingsState } from './shared-listings-view'
 /*
  * The shared listings page, rendered by its two routes: /events-category/{awards,summits,briefings,webinar} and
  * /resource-categories/research. It is the `page` document SHARED_LISTINGS_PAGE_DOCUMENT_ID, built from blocks like any
- * page (a Two columns block with the page heading and the record listing in its main column); each route resolves
+ * page (a Two columns block with the page heading beside the Side banner, then the record listing full width); each route resolves
  * its tab and passes its own path, which the record listing block reads through `listing`. Served on ClearView only:
  * the routes answer 404 on every other host before calling in.
  */

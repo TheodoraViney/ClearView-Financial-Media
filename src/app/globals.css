@@ -272,9 +272,6 @@ main [data-section-anchor] {
   /* Team and publications photo on tablet (About design v1.1): 704 / 400 */
   --aspect-team: 704 / 400;
 
-  /* AWARDS-LIST-VARIANTS (temporary): an awards edition wordmark logo, about 3.4:1 (Awards `?view=icon`) */
-  --aspect-wordmark: 17 / 5;
-
   /* Active publication nav item: 2px bar drawn inside the bottom edge, in the text colour */
   --inset-shadow-bar: inset 0 -2px 0 currentColor;
 
