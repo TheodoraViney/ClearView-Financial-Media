@@ -1,10 +1,10 @@
+import Link from 'next/link'
 import { stegaClean } from 'next-sanity'
 import { type ReactNode } from 'react'
 
 import { RichText } from '@/components/sections/article/ArticleBody'
 import { AD_SLOT_FITS, AD_SLOT_UNSET, AdSlot } from '@/components/ui/AdSlot'
 import { ArrowLink } from '@/components/ui/ArrowLink'
-import { AwardWinnerGalleryCard } from '@/components/ui/AwardWinnerGalleryCard'
 import { Breadcrumb } from '@/components/ui/Breadcrumb'
 import { Button } from '@/components/ui/Button'
 import { cx } from '@/components/ui/cx'
@@ -25,11 +25,13 @@ import type {
 } from '@/lib/awards-programme'
 import { adPositionLabel } from '@/lib/gam'
 
+import { GroupFilter } from './GroupFilter.client'
 import { HighlightVideo } from './HighlightVideo.client'
 import { OtherProgrammes } from './OtherProgrammes'
 
 // Screen-reader-only texts. Visible copy comes from the CMS.
 const NAV_LABEL = 'Programme sections'
+const GROUP_FILTER_LABEL = 'Category groups'
 const STATUS_PREFIX = 'Status: '
 const CLOSE_VIDEO_LABEL = 'Close video'
 const CLOSE_BIO_LABEL = 'Close biography'
@@ -66,12 +68,12 @@ const GROUP_HEADING = 'text-base leading-title font-medium'
  * The awards programme page (one awards edition at /events/{slug}), ClearView only, as Claude Design v1.11. From the
  * header breakpoint the main column beside a 364px right rail, below it the rail under the column. Main column: Top banner, breadcrumb, the dark masthead (edition logo, title, standfirst, status | date |
  * venue | country, Register interest, Become a Sponsoring Partner, View previous year), the sticky wrapping section
- * navigation, then Overview, Highlight video, Categories and Registration, Sponsors, Judging panel, Winners, Acclaim,
- * FAQ. A section without content is left out with its navigation link. Rail (v1.11): Side banner, "View all awards",
+ * navigation, then Overview, Highlight video, Categories and Registration, Sponsors, Judging panel, Finalists, Winners,
+ * Acclaim, FAQ. A section without content is left out with its navigation link. Rail (v1.11): Side banner, "View all awards",
  * then Other awards programmes (every open edition, pins first), with its empty text when nothing is open.
  */
 export function AwardsProgrammePage({ view }: { view: AwardsProgrammeView }) {
-  const { overview, video, registration, sponsors, judges, winners, acclaim, faq, openProgrammes } = view
+  const { overview, video, registration, sponsors, judges, finalists, winners, acclaim, faq, openProgrammes } = view
 
   return (
     <main className="mx-auto w-full max-w-page header:grid header:grid-cols-article">
@@ -146,30 +148,20 @@ export function AwardsProgrammePage({ view }: { view: AwardsProgrammeView }) {
           {registration && (
             <Section id="categories-and-registration" heading={registration.heading} className={PLAIN}>
               {(heading) => (
-                // A grey card: from 872 a 12-column grid, the intro in 1–6 and the steps in 7–12; stacked below.
-                <div className="grid items-start gap-6 rounded-sm border border-border bg-surface-subtle p-6 md:p-8 @split:grid-cols-12 @split:gap-8">
-                  <div className="flex min-w-0 flex-col gap-6 @split:col-span-6">
-                    <div className="flex flex-col gap-3">
-                      <div className="flex flex-wrap items-center gap-x-3 gap-y-2">
-                        {heading}
-                        {registration.badge && (
-                          <span className="inline-flex h-6 items-center rounded-sm bg-white px-2 text-caption leading-none whitespace-nowrap text-foreground inset-ring inset-ring-border">
-                            {registration.badge}
-                          </span>
-                        )}
-                      </div>
-                      {registration.intro && <p className={COPY}>{registration.intro}</p>}
+                // A grey card, one column: the heading with its status tag, the intro, then the numbered steps.
+                <div className="flex flex-col gap-6 rounded-sm border border-border bg-surface-subtle p-6 md:p-8">
+                  <div className="flex flex-col gap-3">
+                    <div className="flex flex-wrap items-center gap-x-3 gap-y-2">
+                      {heading}
+                      {registration.badge && (
+                        <span className="inline-flex h-6 items-center rounded-sm bg-white px-2 text-caption leading-none whitespace-nowrap text-foreground inset-ring inset-ring-border">
+                          {registration.badge}
+                        </span>
+                      )}
                     </div>
-                    {registration.faqLink && (
-                      // The 44px target overhangs the row by 10px above and below, as the design.
-                      <div className="-my-2.5 flex">
-                        <ArrowLink href="#faq" variant="accent" hover="fade-tall">
-                          {registration.faqLink}
-                        </ArrowLink>
-                      </div>
-                    )}
+                    {registration.intro && <p className={cx(COPY, 'max-w-182')}>{registration.intro}</p>}
                   </div>
-                  <ol className="flex max-w-182 min-w-0 flex-col gap-4 @split:col-span-6 @split:col-start-7">
+                  <ol className="flex max-w-182 min-w-0 flex-col gap-4">
                     {registration.steps.map((step, index) => (
                       <li key={step.key} className="grid grid-cols-numbered items-start gap-x-2">
                         <span aria-hidden="true" className="text-base leading-copy font-medium text-foreground tabular-nums">
@@ -205,6 +197,17 @@ export function AwardsProgrammePage({ view }: { view: AwardsProgrammeView }) {
 
           {judges && <Judges judges={judges} />}
 
+          {finalists && (
+            <Section id="finalists" heading={finalists.heading} className={cx(SECTION, 'flex flex-col gap-6')}>
+              {(heading) => (
+                <>
+                  {heading}
+                  <RichText value={finalists.body} spacing="tight" className={cx(COPY, 'wrap-break-word')} />
+                </>
+              )}
+            </Section>
+          )}
+
           {winners && (
             <Section id="winners" heading={winners.heading} className={cx(SECTION, 'flex flex-col gap-6')}>
               {(heading) => (
@@ -217,11 +220,15 @@ export function AwardsProgrammePage({ view }: { view: AwardsProgrammeView }) {
                       </ArrowLink>
                     )}
                   </div>
-                  <div className="flex flex-col gap-10">
-                    {winners.groups.map((group) => (
-                      <WinnersGroup key={group.key} group={group} />
-                    ))}
-                  </div>
+                  <GroupFilter
+                    label={GROUP_FILTER_LABEL}
+                    allLabel={winners.allLabel}
+                    groups={winners.groups.map((group) => ({
+                      key: group.key,
+                      label: group.label,
+                      content: <WinnersGroup group={group} />,
+                    }))}
+                  />
                 </>
               )}
             </Section>
@@ -520,9 +527,15 @@ function JudgesPanel({ panel }: { panel: JudgesPanelView }) {
   )
 }
 
-/** One category group: its name (16/20.8 500), then a gallery card per winner, 1 / 2 / 3 a row by the column's width. */
+/**
+ * One category group: its name (16/20.8 500), then its winners. A winner with a banner shows the banner (the designed
+ * image, decorative: the caption names the win; not a link) with "Category — Winner" under it, 1 / 2 / 3 a row by the column's width; the rest follow as text
+ * rows "Category — Winner". The category links to its award category page when it has one.
+ */
 function WinnersGroup({ group }: { group: WinnersGroupView }) {
   const headingId = `${group.id}-heading`
+  const banners = group.winners.filter((winner) => winner.banner)
+  const rows = group.winners.filter((winner) => !winner.banner)
 
   return (
     <section id={group.id} aria-labelledby={group.label ? headingId : undefined} className="flex min-w-0 flex-col gap-4">
@@ -531,19 +544,53 @@ function WinnersGroup({ group }: { group: WinnersGroupView }) {
           {group.label}
         </h3>
       )}
-      <ul className={cx(CARDS, CARD_GAP)}>
-        {group.winners.map((winner) => (
-          <li key={winner.key} className="flex min-w-0">
-            <AwardWinnerGalleryCard
-              category={winner.category}
-              categoryHref={winner.categoryHref}
-              name={winner.name}
-              wordmark={winner.organisation}
-              logo={winner.logo}
-            />
-          </li>
-        ))}
-      </ul>
+      {banners.length > 0 && (
+        <ul className={cx(CARDS, CARD_GAP)}>
+          {banners.map((winner) => (
+            <li key={winner.key} className="min-w-0">
+              <figure className="flex flex-col gap-2">
+                {winner.banner && (
+                  <Media
+                    image={{ ...winner.banner, alt: '' }}
+                    sizes="(min-width: 768px) 320px, 100vw"
+                    natural
+                    className="overflow-hidden rounded-sm"
+                  />
+                )}
+                <figcaption className="text-caption text-grey">
+                  <WinnerLine winner={winner} />
+                </figcaption>
+              </figure>
+            </li>
+          ))}
+        </ul>
+      )}
+      {rows.length > 0 && (
+        <ul className="grid gap-x-8 gap-y-2 @split:grid-cols-2">
+          {rows.map((winner) => (
+            <li key={winner.key} className={cx(COPY, 'wrap-break-word')}>
+              <WinnerLine winner={winner} />
+            </li>
+          ))}
+        </ul>
+      )}
     </section>
+  )
+}
+
+/** "Category — Winner": the category (a link to its award category page when it has one), then the winner's name. */
+function WinnerLine({ winner }: { winner: WinnersGroupView['winners'][number] }) {
+  return (
+    <>
+      {winner.categoryHref ? (
+        <Link href={winner.categoryHref} prefetch={false} className="transition-colors duration-180 ease-out hover:text-accent">
+          {winner.category}
+        </Link>
+      ) : (
+        winner.category
+      )}
+      {' — '}
+      <span className="font-medium text-foreground">{winner.name}</span>
+    </>
   )
 }

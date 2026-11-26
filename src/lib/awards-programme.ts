@@ -9,13 +9,14 @@ import type { OtherProgrammeView } from './award-category'
 import type { AdUnits } from './gam'
 import type { HeadingLevel } from './headings'
 
-/** The in-page sections the sticky navigation links to, by their anchor ids, in page order (design v1.10). */
+/** The in-page sections the sticky navigation links to, by their anchor ids, in page order (design v1.11, plus Finalists). */
 export const AWARDS_PROGRAMME_SECTIONS = [
   'overview',
   'highlight-video',
   'categories-and-registration',
   'sponsors',
   'judging-panel',
+  'finalists',
   'winners',
   'acclaim',
   'faq',
@@ -64,6 +65,8 @@ export type ProgrammeWinnerView = {
   /** The company as shown (display name or company title), the wordmark when there is no logo. */
   organisation: string
   logo: MediaImage | null
+  /** The designed winner banner; the row shows as text without one. */
+  banner: MediaImage | null
 }
 
 export type WinnersGroupView = {
@@ -110,13 +113,18 @@ export type AwardsProgrammeView = {
     /** "2026 nominations closed" once nominations have closed, else the open status ("Submissions open"). */
     badge: string | null
     intro: string
-    /** "Read the FAQ", to the FAQ section; null when the edition has no FAQ. */
-    faqLink: string | null
     steps: { key: string; text: RichTextValue }[]
   } | null
   sponsors: { heading: HeadingView; tiers: SponsorTierView[] } | null
   judges: { heading: HeadingView; intro: RichTextValue | null; panels: JudgesPanelView[] } | null
-  winners: { heading: HeadingView; previousYear: LinkView | null; groups: WinnersGroupView[] } | null
+  finalists: { heading: HeadingView; body: RichTextValue } | null
+  winners: {
+    heading: HeadingView
+    previousYear: LinkView | null
+    /** "All", the first category group button. */
+    allLabel: string
+    groups: WinnersGroupView[]
+  } | null
   acclaim: { heading: HeadingView; text: string; link: LinkView } | null
   faq: { heading: HeadingView; items: FaqItemView[] } | null
   /**
