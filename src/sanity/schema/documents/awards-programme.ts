@@ -152,7 +152,7 @@ export const awardsProgramme = defineType({
       title: 'Register button',
       group: 'header',
       description:
-        'Usually a web address: the nominations form (Jotform). Leave the label empty to show the default "Register now" from the Awards programme page document.',
+        'Usually a web address: the nominations form (Jotform). Leave the label empty to show the button text from Awards › Awards page texts.',
     }),
     defineField({
       name: 'registerButtonLink',

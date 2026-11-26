@@ -1,5 +1,5 @@
 /*
- * Visible labels of the awards programme page, edited in the "Awards programme page" document (ClearView folder in the
+ * Visible labels of the awards programme page, edited in the "Awards page texts" document (Awards folder in the
  * Studio). The design texts live only as the fields' initial values in the schema; the page renders the stored values.
  * The edition status labels are here too: the award category page sidebar reads them from the same document.
  * Pure: no Sanity or Next imports.

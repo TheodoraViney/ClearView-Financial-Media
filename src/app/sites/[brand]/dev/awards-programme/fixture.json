@@ -10,38 +10,8 @@
   "navVideoLabel": "Highlight Video",
   "navSponsorsLabel": "Sponsors",
   "navFaqLabel": "FAQ",
-  "sponsorsHeading": [
-   {
-    "_type": "block",
-    "_key": "sponsorsHeading-0",
-    "style": "h2",
-    "markDefs": [],
-    "children": [
-     {
-      "_type": "span",
-      "_key": "span",
-      "text": "Sponsors",
-      "marks": []
-     }
-    ]
-   }
-  ],
-  "faqHeading": [
-   {
-    "_type": "block",
-    "_key": "faqHeading-0",
-    "style": "h2",
-    "markDefs": [],
-    "children": [
-     {
-      "_type": "span",
-      "_key": "span",
-      "text": "FAQ",
-      "marks": []
-     }
-    ]
-   }
-  ],
+  "sponsorsHeading": "Sponsors",
+  "faqHeading": "FAQ",
   "sponsorLink": {
    "label": "Become a Sponsoring Partner",
    "kind": "internal",
@@ -65,86 +35,11 @@
   "navCategoriesLabel": "Categories and Registration",
   "navJudgesLabel": "Judging Panel",
   "navMarketingKitLabel": "Acclaim",
-  "overviewHeading": [
-   {
-    "_key": "overviewHeading-0",
-    "_type": "block",
-    "children": [
-     {
-      "_key": "span",
-      "_type": "span",
-      "marks": [],
-      "text": "Programme Overview"
-     }
-    ],
-    "markDefs": [],
-    "style": "h2"
-   }
-  ],
-  "videoHeading": [
-   {
-    "_key": "videoHeading-0",
-    "_type": "block",
-    "children": [
-     {
-      "_key": "span",
-      "_type": "span",
-      "marks": [],
-      "text": "Highlight video"
-     }
-    ],
-    "markDefs": [],
-    "style": "h2"
-   }
-  ],
-  "categoriesHeading": [
-   {
-    "_key": "categoriesHeading-0",
-    "_type": "block",
-    "children": [
-     {
-      "_key": "span",
-      "_type": "span",
-      "marks": [],
-      "text": "Categories and Registration"
-     }
-    ],
-    "markDefs": [],
-    "style": "h2"
-   }
-  ],
-  "marketingKitHeading": [
-   {
-    "_key": "marketingKitHeading-0",
-    "_type": "block",
-    "children": [
-     {
-      "_key": "span",
-      "_type": "span",
-      "marks": [],
-      "text": "Acclaim"
-     }
-    ],
-    "markDefs": [],
-    "style": "h2"
-   }
-  ],
-  "otherProgrammesHeading": [
-   {
-    "_key": "otherProgrammesHeading-0",
-    "_type": "block",
-    "style": "h2",
-    "markDefs": [],
-    "children": [
-     {
-      "_key": "span",
-      "_type": "span",
-      "marks": [],
-      "text": "Other awards programmes"
-     }
-    ]
-   }
-  ]
+  "overviewHeading": "Programme Overview",
+  "videoHeading": "Highlight video",
+  "categoriesHeading": "Categories and Registration",
+  "marketingKitHeading": "Acclaim",
+  "otherProgrammesHeading": "Other awards programmes"
  },
  "editions": {
   "event-wp-45458": {
