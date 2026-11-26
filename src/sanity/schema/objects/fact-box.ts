@@ -24,7 +24,6 @@ export const factBox = defineType({
       name: 'facts',
       title: 'Facts',
       type: 'array',
-      description: 'Each fact is a short label and its value, for example "Market" and "Nordic wealth management".',
       of: [
         defineArrayMember({
           name: 'fact',
@@ -54,7 +53,6 @@ export const factBox = defineType({
       name: 'source',
       title: 'Source',
       type: 'string',
-      description: 'Shown under the facts, for example "Summarised from this article."',
     }),
     defineField({
       name: 'variant',

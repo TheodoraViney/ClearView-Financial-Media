@@ -10,6 +10,9 @@ import { altField, legacyWpIdField } from '../fields'
  *
  * 1,558 records from the Pods `people` CPT.
  *
+ * Studio: the full name, job title, companies, photo and biography are what the site shows. First and last name,
+ * slug, categories and the legacy id sit in a collapsed "Not shown on the site" fieldset; the data is kept.
+ *
  * The source also carries `pods_meta_email` on 10 of 1,558 records. It is
  * deliberately not modelled: the site reads published documents anonymously so
  * they stay CDN-cacheable, which would publish those addresses. Raise it with
@@ -20,31 +23,15 @@ export const person = defineType({
   title: 'Person',
   type: 'document',
   icon: UserIcon,
+  fieldsets: [
+    { name: 'legacy', title: 'Not shown on the site', options: { collapsible: true, collapsed: true, columns: 2 } },
+  ],
   fields: [
     defineField({
       name: 'title',
       title: 'Full name',
       type: 'string',
-      description: 'As it appears on event pages. Kept alongside the name parts, which are the source of truth for sorting.',
       validation: (Rule) => Rule.required(),
-    }),
-    defineField({
-      name: 'firstName',
-      title: 'First name',
-      type: 'string',
-    }),
-    defineField({
-      name: 'lastName',
-      title: 'Last name',
-      type: 'string',
-    }),
-    defineField({
-      name: 'slug',
-      title: 'Slug',
-      type: 'slug',
-      options: { source: 'title', maxLength: 96 },
-      description:
-        'No public URL today, people exist only as links from events. Kept so the Phase 2 entity layer is not blocked.',
     }),
     defineField({
       name: 'jobTitle',
@@ -56,7 +43,6 @@ export const person = defineType({
       title: 'Companies',
       type: 'array',
       of: [defineArrayMember({ type: 'reference', to: [{ type: 'company' }] })],
-      description: '33 people are attached to more than one company in the source.',
       validation: (Rule) => Rule.unique(),
     }),
     defineField({
@@ -72,16 +58,34 @@ export const person = defineType({
       type: 'richText',
     }),
     defineField({
+      name: 'firstName',
+      title: 'First name',
+      type: 'string',
+      fieldset: 'legacy',
+    }),
+    defineField({
+      name: 'lastName',
+      title: 'Last name',
+      type: 'string',
+      fieldset: 'legacy',
+    }),
+    defineField({
+      name: 'slug',
+      title: 'Slug',
+      type: 'slug',
+      options: { source: 'title', maxLength: 96 },
+      fieldset: 'legacy',
+    }),
+    defineField({
       name: 'categories',
       title: 'Categories',
       type: 'array',
       of: [defineArrayMember({ type: 'string' })],
       options: { layout: 'tags' },
-      description:
-        'From the `people_category` taxonomy. A field, not a document: these terms have no public URL.',
+      fieldset: 'legacy',
       validation: (Rule) => Rule.unique(),
     }),
-    legacyWpIdField,
+    { ...legacyWpIdField, fieldset: 'legacy' },
   ],
   preview: {
     select: {

@@ -17,7 +17,7 @@ const postPicks = (
   title: string,
   max: number | ((brand: unknown) => number),
   other: string,
-  description = `Up to ${typeof max === 'number' ? max : TOP_STORIES_SLIDE_COUNT}. Empty places fill with the latest posts.`,
+  description = 'Empty places fill with the latest posts.',
 ) =>
   defineField({
     name,
@@ -69,14 +69,13 @@ export const topStories = defineType({
       'Slides',
       topStoriesSlideCount,
       'articles',
-      `The lead story. ClearView: up to ${TOP_STORIES_SLIDE_COUNT}, shown as a slider. Publication homes: one. Empty places fill with the latest posts.`,
+      `ClearView: up to ${TOP_STORIES_SLIDE_COUNT}, as a slider. Publication homes: one. Empty places fill with the latest posts.`,
     ),
     // Publication homes only: the ClearView home has no label above its articles.
     defineField({
       name: 'label',
       title: 'Articles label',
       type: 'string',
-      description: 'Shown above the articles below the lead story.',
       initialValue: 'Top Stories',
       hidden: ({ document }) => pageBrandOf(document) === 'clearview',
       validation: (Rule) =>
@@ -89,7 +88,7 @@ export const topStories = defineType({
       name: 'linkLabel',
       title: 'Link label',
       type: 'string',
-      description: 'The link text on each slide.',
+      description: 'On each slide.',
       initialValue: 'Read article',
       validation: (Rule) => Rule.required(),
     }),

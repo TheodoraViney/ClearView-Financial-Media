@@ -34,12 +34,14 @@ export const videoGallery = defineType({
           name: 'video',
           title: 'Video',
           type: 'object',
+          fieldsets: [{ name: 'clip', title: 'Clip', options: { columns: 2 } }],
           fields: [
             defineField({
               name: 'vimeoId',
               title: 'Vimeo ID',
               type: 'string',
-              description: 'Numeric id only, for example 1065172175.',
+              fieldset: 'clip',
+              description: 'Digits only, not the URL.',
               validation: (Rule) =>
                 Rule.required().regex(/^\d+$/, { name: 'Vimeo ID', invert: false }),
             }),
@@ -47,14 +49,14 @@ export const videoGallery = defineType({
               name: 'name',
               title: 'Winner or sponsor',
               type: 'string',
-              description: 'Name the clip is filed under in the source.',
+              fieldset: 'clip',
               validation: (Rule) => Rule.required(),
             }),
             defineField({
               name: 'categoryGroups',
               title: 'Winning categories',
               type: 'array',
-              description: 'Winners galleries only. Left empty on sponsor videos.',
+              description: 'Winners galleries only.',
               of: [
                 defineArrayMember({
                   name: 'winningCategories',

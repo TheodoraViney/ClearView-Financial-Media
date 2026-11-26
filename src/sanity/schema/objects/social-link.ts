@@ -7,29 +7,31 @@ export const socialLink = defineType({
   title: 'Social link',
   type: 'object',
   icon: ShareIcon,
+  fieldsets: [{ name: 'link', title: 'Link', options: { columns: 2 } }],
   fields: [
     defineField({
       name: 'name',
-      title: 'Name',
+      title: 'Network name',
       type: 'string',
-      description: 'Network name, e.g. "LinkedIn". Screen readers announce it as the link text.',
-      validation: (Rule) => Rule.required(),
-    }),
-    defineField({
-      name: 'icon',
-      title: 'Icon',
-      type: 'image',
-      description:
-        'One-colour icon on a transparent background, SVG preferred. Only its shape is used: the colour comes from the brand.',
-      options: { accept: 'image/svg+xml,image/png' },
+      fieldset: 'link',
+      description: 'Screen readers announce it as the link text.',
       validation: (Rule) => Rule.required(),
     }),
     defineField({
       name: 'url',
       title: 'URL',
       type: 'url',
-      description: 'Profile address, starting with https://.',
+      fieldset: 'link',
       validation: (Rule) => Rule.required().uri({ scheme: ['https'] }),
+    }),
+    defineField({
+      name: 'icon',
+      title: 'Icon',
+      type: 'image',
+      // Only its shape is used, on a transparent background.
+      description: 'One colour, SVG preferred: the brand colour is applied.',
+      options: { accept: 'image/svg+xml,image/png' },
+      validation: (Rule) => Rule.required(),
     }),
   ],
   preview: {

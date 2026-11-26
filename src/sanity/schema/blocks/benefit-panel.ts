@@ -19,7 +19,7 @@ export const benefitPanel = defineType({
       name: 'image',
       title: 'Background image',
       type: 'image',
-      description: 'Decorative, behind the white text; choose a photo dark enough for the text to stay readable.',
+      description: 'Behind white text: choose a dark photo.',
       options: { hotspot: true },
       validation: (Rule) => Rule.required(),
     }),
@@ -27,7 +27,6 @@ export const benefitPanel = defineType({
       name: 'items',
       title: 'Benefits',
       type: 'array',
-      description: `Up to ${BENEFIT_PANEL_ITEM_MAX}, in display order.`,
       of: [
         defineArrayMember({
           name: 'benefitPanelItem',

@@ -21,7 +21,6 @@ export const exploreGrid = defineType({
       name: 'cards',
       title: 'Cards',
       type: 'array',
-      description: `1 to ${EXPLORE_GRID_CARD_MAX} cards, in display order.`,
       of: [defineArrayMember({ type: 'exploreCard' })],
       validation: (Rule) => Rule.required().min(1).max(EXPLORE_GRID_CARD_MAX),
     }),

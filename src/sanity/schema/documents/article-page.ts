@@ -15,12 +15,13 @@ import { SHARE_LINK_DEFAULTS, SHARE_LINKS_MAX, shareTemplateError } from '@/lib/
 const brandKeyOf = (id: string | undefined): string =>
   String(id ?? '').replace(/^drafts\./, '').replace(/^article-page-/, '')
 
-const label = (name: keyof ArticlePageCopy, title: string, description: string) =>
+const label = (name: keyof ArticlePageCopy, title: string, options: { description?: string; fieldset?: string } = {}) =>
   defineField({
     name,
     title,
     type: 'string',
-    description,
+    description: options.description,
+    fieldset: options.fieldset,
     initialValue: ARTICLE_PAGE_COPY_DEFAULTS[name],
     validation: (Rule) => Rule.required(),
   })
@@ -30,26 +31,26 @@ export const articlePage = defineType({
   title: 'Article page',
   type: 'document',
   icon: DocumentTextIcon,
+  // Fields follow the article page from top to bottom.
+  fieldsets: [
+    { name: 'byline', title: 'Byline and image', options: { columns: 2 } },
+    { name: 'share', title: 'Share buttons', options: { columns: 2 } },
+    { name: 'embed', title: 'Embedded players', options: { columns: 2 } },
+  ],
   fields: [
-    label('recommendedHeading', 'Recommended heading', 'Heading of the recommended articles under the article.'),
-    label('breadcrumbHomeLabel', 'Breadcrumb home label', 'First item of the breadcrumb, linking to the home page.'),
-    label('shareLabel', 'Share button', 'Button that opens the device share menu.'),
-    label('copyLinkLabel', 'Copy link button', 'Button that copies the article link.'),
-    label('linkCopiedLabel', 'Link copied message', 'Shown on the button for two seconds after copying.'),
-    label('readTimeSuffix', 'Reading time suffix', 'Follows the minutes in the byline, for example "3 min read".'),
-    label('imageCreditPrefix', 'Image credit prefix', 'Precedes the credit under the main image, for example "Image: WealthBriefing".'),
-    label('shareRailLabel', 'Share rail label', 'Above the share icons beside the text.'),
-    label(
-      'embedConsentText',
-      'Embed consent text',
-      'Shown instead of a video, podcast or Issuu player until the reader allows functional cookies.',
-    ),
-    label('embedConsentButton', 'Embed consent button', 'Button under that text, which opens the cookie settings.'),
+    label('breadcrumbHomeLabel', 'Breadcrumb home label'),
+    label('readTimeSuffix', 'Reading time suffix', { fieldset: 'byline', description: 'After the minutes: "3 min read".' }),
+    label('imageCreditPrefix', 'Image credit prefix', { fieldset: 'byline', description: 'Before the credit: "Image: WealthBriefing".' }),
+    // Share opens the device share menu; Link copied shows on the button for two seconds.
+    label('shareLabel', 'Share button', { fieldset: 'share' }),
+    label('copyLinkLabel', 'Copy link button', { fieldset: 'share' }),
+    label('linkCopiedLabel', 'Link copied message', { fieldset: 'share' }),
+    label('shareRailLabel', 'Share rail label', { fieldset: 'share' }),
     defineField({
       name: 'shareLinks',
       title: 'Share rail networks',
       type: 'array',
-      description: `The networks in the share rail beside the text, in this order, 1 to ${SHARE_LINKS_MAX}. The copy link button always follows them.`,
+      description: 'The copy link button always follows them.',
       initialValue: SHARE_LINK_DEFAULTS.map(({ key, label, url }) => ({ _key: key, _type: 'shareLink', label, url })),
       validation: (Rule) => Rule.required().min(1).max(SHARE_LINKS_MAX),
       of: [
@@ -63,15 +64,14 @@ export const articlePage = defineType({
               name: 'label',
               title: 'Label',
               type: 'string',
-              description: 'What screen readers announce for the icon, e.g. "Share on LinkedIn".',
+              description: 'Read by screen readers, e.g. "Share on LinkedIn".',
               validation: (Rule) => Rule.required(),
             }),
             defineField({
               name: 'icon',
               title: 'Icon',
               type: 'image',
-              description:
-                'One-colour icon on a transparent background, SVG preferred. Only its shape is used: the colour comes from the page.',
+              description: 'One colour on a transparent background, SVG preferred: only its shape is used.',
               options: { accept: 'image/svg+xml,image/png' },
               validation: (Rule) => Rule.required(),
             }),
@@ -79,8 +79,7 @@ export const articlePage = defineType({
               name: 'url',
               title: 'Share address',
               type: 'string',
-              description:
-                'The network\'s share address, starting with https://. {url} is replaced with the article address and {title} with its title, e.g. https://www.linkedin.com/sharing/share-offsite/?url={url}',
+              description: '{url} is replaced with the article address and {title} with its title.',
               validation: (Rule) => Rule.required().custom((value: string | undefined) => shareTemplateError(value) ?? true),
             }),
           ],
@@ -93,6 +92,13 @@ export const articlePage = defineType({
         }),
       ],
     }),
+    // The cookie button opens the cookie settings.
+    label('embedConsentText', 'Cookie notice', {
+      fieldset: 'embed',
+      description: 'Shown instead of a video, podcast or Issuu player until the reader allows cookies.',
+    }),
+    label('embedConsentButton', 'Cookie button', { fieldset: 'embed' }),
+    label('recommendedHeading', 'Recommended heading'),
   ],
   preview: {
     select: { id: '_id' },

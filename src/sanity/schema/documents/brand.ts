@@ -38,12 +38,12 @@ const isAdministrator = (user: Omit<CurrentUser, 'role'> | null | undefined) =>
 
 // Where each position sits, as the page templates place it.
 const POSITION_DESCRIPTIONS: Record<AdPosition, string> = {
-  top: 'At the head of the main column, on pages with a right column. Pages without one carry no Top banner.',
-  side: 'At the top of the right column, on pages that have one.',
-  publications: 'Under the cards of the Publications block, wherever that block is placed.',
-  article: 'In the article text, between "Text before the banner" and "Text after the banner".',
-  banner3: 'Home page, under the blocks above Banner 3. Other pages: in the Categories list, after the first row of cards.',
-  banner4: 'Home page, under the blocks between Banner 3 and Banner 4. Not shown while that list is empty.',
+  top: 'Head of the main column, only on pages with a right column.',
+  side: 'Top of the right column.',
+  publications: 'Under the cards of the Publications block.',
+  article: 'Between "Text before the banner" and "Text after the banner".',
+  banner3: 'Home page: under the blocks above Banner 3. Other pages: in the Categories list, after the first row.',
+  banner4: 'Home page, under the blocks between Banner 3 and Banner 4, when there are any.',
   awardsWinners: 'Inside the Awards Winners block in a sidebar.',
 }
 
@@ -74,8 +74,6 @@ const adUnitCodeField = (position: AdPosition, page: AdPageType) =>
     name: page,
     title: AD_PAGE_TYPE_TITLES[page],
     type: 'string',
-    description:
-      'The Code column in Google Ad Manager → Inventory → Ad units, e.g. WB_Leaderboard_Homepage_Only. Not the Name column. Empty: not shown on the live site.',
     components: { input: AdUnitCodeInput },
     validation: (Rule) => [
       Rule.custom(async (value: string | undefined, context) => {
@@ -130,7 +128,7 @@ const adUnitCodeField = (position: AdPosition, page: AdPageType) =>
     ]
   })
 
-const emailCopy = (name: keyof typeof NEWSLETTER_COPY_DEFAULTS, title: string, description: string) =>
+const emailCopy = (name: keyof typeof NEWSLETTER_COPY_DEFAULTS, title: string, description?: string) =>
   defineField({
     name,
     title,
@@ -148,12 +146,18 @@ export const brand = defineType({
     { name: 'newsletter', title: 'Newsletter', hidden: ({ document }) => !isPublication(document?._id) },
     { name: 'advertising', title: 'Advertising', hidden: ({ currentUser }) => !isAdministrator(currentUser) },
   ],
+  fieldsets: [
+    { name: 'identity', title: 'Name and key', options: { columns: 2 } },
+    { name: 'site', title: 'Site', options: { columns: 2 } },
+    { name: 'logos', title: 'Logos', options: { columns: 2 } },
+  ],
   fields: [
     defineField({
       name: 'title',
       title: 'Title',
       type: 'string',
       group: 'brand',
+      fieldset: 'identity',
       validation: (Rule) => Rule.required(),
     }),
     defineField({
@@ -161,6 +165,7 @@ export const brand = defineType({
       title: 'Key',
       type: 'slug',
       group: 'brand',
+      fieldset: 'identity',
       readOnly: ({ document }) => Boolean(document?._createdAt),
       validation: (Rule) => Rule.required(),
     }),
@@ -169,6 +174,7 @@ export const brand = defineType({
       title: 'Domain',
       type: 'string',
       group: 'brand',
+      fieldset: 'site',
       validation: (Rule) => Rule.required(),
     }),
     defineField({
@@ -176,6 +182,7 @@ export const brand = defineType({
       title: 'Region',
       type: 'string',
       group: 'brand',
+      fieldset: 'site',
       options: {
         list: [
           { title: 'UK', value: 'uk' },
@@ -190,7 +197,9 @@ export const brand = defineType({
       title: 'Logo',
       type: 'image',
       group: 'brand',
-      description: 'SVG. Screen readers read the image\'s alt text from Media, or the brand title when it is empty.',
+      fieldset: 'logos',
+      // Screen readers read the image's alt text from Media, or the brand title when it is empty.
+      description: 'SVG.',
       validation: (Rule) => Rule.required(),
     }),
     defineField({
@@ -198,7 +207,8 @@ export const brand = defineType({
       title: 'Footer logo',
       type: 'image',
       group: 'brand',
-      description: 'SVG. Only when the footer shows a different lockup from the header; empty uses the Logo above.',
+      fieldset: 'logos',
+      description: 'SVG. Empty: uses the Logo.',
     }),
     // Display only: the input shows BRANDS[key].colors from src/brands.ts and never writes, so this stays empty.
     defineField({
@@ -219,16 +229,14 @@ export const brand = defineType({
       fields: [
         brevoSenderField('sender', {
           title: 'Sender',
-          description:
-            'Who the newsletter comes from: the name and address readers see. Only active senders in Brevo → Senders appear.',
+          description: 'Only active senders in Brevo → Senders appear.',
           requiredWhen: ({ document }) => isPublication(document?._id),
         }),
         defineField({
           name: 'articlesPerIssue',
           title: 'Articles per issue',
           type: 'number',
-          description:
-            'How many of the latest articles a new issue starts with.',
+          description: 'How many of the latest articles a new issue starts with.',
           initialValue: 4,
           validation: (Rule) =>
             Rule.integer().min(1).max(20).custom(requiredForNewsletter('Required to start a newsletter issue')),
@@ -240,7 +248,7 @@ export const brand = defineType({
             name: slot,
             title: `${title} (${width} × ${height})`,
             type: 'object',
-            description: `Sponsor banner ${where} in every issue, until it is changed here. An issue can show its own banner or none instead. Leave the image and link empty for no banner.`,
+            description: `Sponsor banner ${where} in every issue that does not set its own. Empty: no banner.`,
             options: { collapsible: true, collapsed: false },
             // Both or neither: a banner needs its image and its link.
             fields: bannerFields(slot, {
@@ -256,26 +264,18 @@ export const brand = defineType({
           name: 'copy',
           title: 'Email copy',
           type: 'object',
-          description: 'Labels and footer text of every newsletter email. An empty field hides its element.',
-          options: { collapsible: true, collapsed: true },
+          description: 'An empty field hides its element in the email.',
+          options: { collapsible: true, collapsed: true, columns: 2 },
           fields: [
-            emailCopy('featuredLabel', 'Featured label', 'Small label above the first article. Leave empty to hide it.'),
-            emailCopy('readFullStory', 'Read full story button', 'Button under the first article. Leave empty to hide it.'),
-            emailCopy(
-              'readMore',
-              'Read more link',
-              'Link under every other article. Leave empty to hide it; the headline still links to the article.',
-            ),
-            emailCopy('advertisementLabel', 'Advertisement label', 'Small label above each banner. Leave empty to hide it.'),
-            emailCopy(
-              'footerText',
-              'Footer text',
-              `Why the reader gets this email. ${NEWSLETTER_TITLE_PLACEHOLDER} is replaced with the publication title. Leave empty to hide it.`,
-            ),
+            emailCopy('featuredLabel', 'Featured label'),
+            emailCopy('readFullStory', 'Read full story button'),
+            emailCopy('readMore', 'Read more link'),
+            emailCopy('advertisementLabel', 'Advertisement label'),
+            emailCopy('footerText', 'Footer text', `${NEWSLETTER_TITLE_PLACEHOLDER} is replaced with the publication title.`),
             emailCopy(
               'unsubscribe',
               'Unsubscribe link',
-              `Text of the unsubscribe link in the footer. Every email carries this link; left empty, it reads "${NEWSLETTER_COPY_DEFAULTS.unsubscribe}".`,
+              `Every email carries this link; empty, it reads "${NEWSLETTER_COPY_DEFAULTS.unsubscribe}".`,
             ),
           ],
         }),
@@ -287,8 +287,9 @@ export const brand = defineType({
       title: 'Advertising',
       type: 'object',
       group: 'advertising',
+      // Home page units show on the home page, other pages units everywhere else.
       description:
-        'Google Ad Manager units for the fixed banner positions. Home page units show on the home page, other pages units everywhere else.',
+        'Codes from the Code column in Google Ad Manager → Inventory → Ad units, not the Name column. Empty: no banner.',
       hidden: ({ currentUser }) => !isAdministrator(currentUser),
       fields: AD_POSITION_KEYS.map((position) => {
         const { title, pages } = AD_POSITIONS[position]

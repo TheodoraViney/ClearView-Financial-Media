@@ -27,7 +27,6 @@ export const altField = defineField({
   name: 'alt',
   title: 'Alternative text',
   type: 'string',
-  description: 'Describes the image for screen readers and search engines.',
   validation: (Rule) =>
     Rule.custom((alt, context) => {
       const parent = context.parent as { asset?: { _ref?: string } } | undefined
@@ -87,7 +86,6 @@ export const legacyWpIdField = defineField({
   title: 'Legacy WordPress ID',
   type: 'number',
   readOnly: true,
-  description: 'Source post id on clearviewpublishing.com. Set by the migration, do not edit.',
 })
 
 /**
@@ -122,7 +120,7 @@ export const imageField = (
  * One cell of a key-findings-group: a large figure and what it measures, read by `ui/KeyFindings`. The research report's
  * Key findings add an optional note under the text (`withNote`); a company's At a glance figures have none.
  */
-export const keyFindingMember = (options: { withNote?: boolean; textExample?: string } = {}) =>
+export const keyFindingMember = (options: { withNote?: boolean } = {}) =>
   defineArrayMember({
     type: 'object',
     name: 'keyFinding',
@@ -132,14 +130,13 @@ export const keyFindingMember = (options: { withNote?: boolean; textExample?: st
         name: 'value',
         title: 'Figure',
         type: 'string',
-        description: 'The large figure, for example "72%" or "5.3 / 7".',
+        description: 'For example 72% or 5.3 / 7.',
         validation: (Rule) => Rule.required(),
       }),
       defineField({
         name: 'text',
         title: 'Text',
         type: 'string',
-        description: `What the figure measures, for example "${options.textExample ?? 'Automation momentum (65% previous year)'}".`,
         validation: (Rule) => Rule.required(),
       }),
       ...(options.withNote
@@ -148,7 +145,6 @@ export const keyFindingMember = (options: { withNote?: boolean; textExample?: st
               name: 'note',
               title: 'Note',
               type: 'string',
-              description: 'Optional. A short line under the text, for example "Momentum rose year on year."',
             }),
           ]
         : []),
@@ -162,7 +158,7 @@ export const keyFindingMember = (options: { withNote?: boolean; textExample?: st
  * A labelled link row (ui/LinkRow): the visible text plus where it goes, any routable document or an allowlisted
  * address (linkField). Used by lists of links typed on a record, such as a company's sponsor interviews.
  */
-export const linkRowMember = (options: { title: string; labelDescription: string }) =>
+export const linkRowMember = (options: { title: string; labelDescription?: string }) =>
   defineArrayMember({
     type: 'object',
     name: 'linkRow',
@@ -207,7 +203,6 @@ export const adminLabelField = defineField({
   name: 'adminLabel',
   title: 'Label (CMS only)',
   type: 'string',
-  description: 'Shown in the Studio only, to tell blocks apart. Not displayed on the site.',
 })
 
 const ANCHOR_HREF = new RegExp(`^#${ANCHOR_ID.source.slice(1)}`)
@@ -367,8 +362,6 @@ export const linkField = (
         name: 'hub',
         title: 'Page',
         type: 'string',
-        description:
-          'Opens the page listing all awards, events or research on ClearView Publishing. Works from every publication.',
         options: {
           list: LINK_HUBS.map(({ value, title }) => ({ value, title })),
           layout: 'radio',
@@ -391,9 +384,7 @@ export const linkField = (
               name: 'label',
               title: 'Label',
               type: 'string',
-              description: labelRequired
-                ? 'Link text.'
-                : 'Link text. Leave empty to use the default for this block.',
+              description: labelRequired ? undefined : "Empty: the block's default text.",
               validation: labelRequired
                 ? requiredWhen && !required
                   ? (Rule) =>
@@ -454,7 +445,7 @@ export const headingField = (
 ) => {
   const { title = 'Heading', defaultLevel, initialText = '', required = false, requiredWhen, group } = options
   const description =
-    options.description ?? 'Choose the heading level in the style menu. The size on the page stays the same.'
+    options.description ?? 'The style menu sets the heading level, not its size.'
 
   return defineField({
     name,

@@ -126,14 +126,14 @@ export const highlights = defineType({
   title: 'Highlights',
   type: 'object',
   icon: SparklesIcon,
+  fieldsets: [{ name: 'headingCount', title: 'Heading and number of items', options: { columns: 2 } }],
   fields: [
     adminLabelField,
     defineField({
       name: 'source',
       title: 'Source',
       type: 'string',
-      description:
-        'Which records the block shows (awards editions, summits and events, or research) and how it looks.',
+      description: 'Also sets how the block looks.',
       options: {
         list: HIGHLIGHTS_SOURCES.map(({ value, title }) => ({ value, title })),
         layout: 'radio',
@@ -144,7 +144,7 @@ export const highlights = defineType({
       name: 'layout',
       title: 'Look',
       type: 'string',
-      description: '"Plain list" shows only the heading and the items, as in the shared listings sidebar.',
+      description: 'Plain list shows only the heading and the items: no button or promo.',
       options: {
         list: [
           { title: 'Block', value: 'block' },
@@ -159,13 +159,14 @@ export const highlights = defineType({
       name: 'heading',
       title: 'Heading',
       type: 'string',
+      fieldset: 'headingCount',
       validation: (Rule) => Rule.required(),
     }),
     defineField({
       name: 'count',
       title: 'Number of items',
       type: 'number',
-      description: 'How many items the block shows.',
+      fieldset: 'headingCount',
       // A select of Default and 1 to the source's maximum; the stored value stays a number.
       components: { input: HighlightsCountInput },
       validation: (Rule) =>
@@ -189,7 +190,8 @@ export const highlights = defineType({
       type: 'array',
       // Lists what the site fills automatically right now, with Pin buttons.
       components: { input: AutoFillPicksInput },
-      description: `Pick up to the number of items above. Empty places fill automatically: awards open for entries (nearest deadline first), upcoming events, newest research; past ones follow if there are not enough.`,
+      description:
+        'Empty places fill automatically: open awards by nearest deadline, upcoming events, newest research; then past ones.',
       of: [
         defineArrayMember({
           type: 'reference',
@@ -237,14 +239,13 @@ export const highlights = defineType({
       name: 'deadlineLabel',
       title: 'Deadline label',
       type: 'string',
-      description: 'Shown before the nominations deadline, e.g. "Entry deadline:". Leave empty to show the date only.',
+      description: 'Empty: the date only.',
       initialValue: 'Entry deadline:',
       hidden: ({ parent }) => (parent as { source?: unknown } | undefined)?.source !== 'awards',
     }),
     linkField({
       name: 'button',
       title: 'Button',
-      description: 'The "View all …" button under the list.',
       // The path is the button's own: one level below the block.
       requiredWhen: ({ document, path }) => !isListLayout(getValueAtPath(document, path.slice(0, -1))),
       labelRequired: true,
@@ -254,8 +255,7 @@ export const highlights = defineType({
       name: 'promo',
       title: 'Promo',
       type: 'object',
-      description:
-        'The row at the bottom of the block. Required for Summits & events on the ClearView home; optional otherwise.',
+      description: 'The row at the bottom of the block. Required for Summits & events on ClearView pages.',
       options: { collapsible: true, collapsed: true },
       hidden: ({ parent }) => isListLayout(parent),
       validation: (Rule) =>
@@ -272,7 +272,7 @@ export const highlights = defineType({
           title: 'Resource',
           type: 'reference',
           to: [{ type: 'resource' }],
-          description: 'The report this promo points at. Its title, cover and download button are used unless the fields below override them.',
+          description: 'Its title, cover and download button are used unless the fields below override them.',
           options: { filter: RESEARCH_FILTER, disableNew: true },
           hidden: ({ document, path }) => promoSourceAt(document, path) !== 'research',
           validation: (Rule) =>
@@ -286,7 +286,7 @@ export const highlights = defineType({
           name: 'title',
           title: 'Title',
           type: 'string',
-          description: 'For Research with a report picked: leave empty to use the report title.',
+          description: 'With a report picked, empty uses the report title.',
           validation: (Rule) =>
             Rule.custom((value, context) =>
               value?.trim() || promoUsesReport(context) || !promoFieldRequired(context)
@@ -308,7 +308,7 @@ export const highlights = defineType({
         }),
         defineField({
           ...imageField('image', {
-            description: 'For Research with a report picked: leave empty to use the report cover.',
+            description: 'With a report picked, empty uses the report cover.',
           }),
           validation: (Rule) =>
             Rule.custom((value, context) =>

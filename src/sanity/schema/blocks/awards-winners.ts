@@ -12,8 +12,7 @@ export const awardsWinners = defineType({
   title: 'Awards Winners (ad block)',
   type: 'object',
   icon: StarIcon,
-  description:
-    'Advertising block: a heading over the Awards Winners banner (MPU, 300 × 250). The ad unit is set in Brand settings → Advertising; while it is empty, the block is hidden on the live site.',
+  description: 'Ad block, hidden on the live site while Brand settings → Advertising has no ad unit.',
   fields: [
     adminLabelField,
     headingField('heading', { title: 'Heading', defaultLevel: 'h2', initialText: 'Awards Winners', required: true }),

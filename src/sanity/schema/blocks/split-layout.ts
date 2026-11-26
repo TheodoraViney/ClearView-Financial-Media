@@ -60,8 +60,8 @@ export const splitLayout = defineType({
       name: 'aside',
       title: 'Sidebar',
       type: 'array',
-      description:
-        'Optional. When this is the first block of the page, the sidebar always starts with the Side banner, so an empty sidebar still shows the banner beside the main column. Further down the page an empty sidebar is left out and the main column takes the full width.',
+      // Further down the page an empty sidebar is left out and the main column takes the full width.
+      description: "As the page's first block, the sidebar starts with the Side banner, even when empty.",
       of: asideBlockTypes.map((blockType) => defineArrayMember({ type: blockType.name })),
     }),
   ],

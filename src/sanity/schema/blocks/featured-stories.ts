@@ -20,7 +20,6 @@ export const featuredStories = defineType({
       name: 'posts',
       title: 'Posts',
       type: 'array',
-      description: 'Exactly four posts, in display order.',
       of: [
         defineArrayMember({
           type: 'reference',

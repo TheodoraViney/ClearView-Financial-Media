@@ -12,7 +12,6 @@ export const footerColumn = defineType({
       name: 'title',
       title: 'Title',
       type: 'string',
-      description: 'Text above the links.',
       validation: (Rule) => Rule.required(),
     }),
     defineField({

@@ -16,19 +16,21 @@ export const winner = defineType({
   title: 'Winner',
   type: 'object',
   icon: StarIcon,
+  fieldsets: [{ name: 'award', title: 'Award', options: { columns: 2 } }],
   fields: [
+    // The heading the category sat under in the source, e.g. "MULTI-FAMILY OFFICES CATEGORIES"; 177 distinct values.
     defineField({
       name: 'categoryGroup',
       title: 'Category group',
       type: 'string',
-      description:
-        'Heading the category sat under in the source, for example "MULTI-FAMILY OFFICES CATEGORIES". Groups the winners gallery; 177 distinct values.',
+      description: 'Groups the winners gallery.',
     }),
     defineField({
       name: 'category',
       title: 'Category',
       type: 'reference',
       to: [{ type: 'awardCategory' }],
+      fieldset: 'award',
       validation: (Rule) => Rule.required(),
     }),
     defineField({
@@ -36,6 +38,7 @@ export const winner = defineType({
       title: 'Winner',
       type: 'reference',
       to: [{ type: 'company' }],
+      fieldset: 'award',
       validation: (Rule) => Rule.required(),
     }),
     defineField({
@@ -43,21 +46,20 @@ export const winner = defineType({
       title: 'People',
       type: 'array',
       of: [{ type: 'string' }],
-      description: 'Optional. The people who won, for awards given to individuals. Add one item per person.',
+      description: 'For awards given to individuals, one item per person.',
     }),
     defineField({
       name: 'banner',
       title: 'Banner',
       type: 'image',
-      description:
-        'Optional. The designed winner banner (award, company logo and category). Shown on the page instead of the text row, with the category and winner as a caption under it.',
+      description: 'Shown instead of the text row, with the category and winner as its caption.',
     }),
     defineField({
       name: 'displayName',
       title: 'Name shown on site',
       type: 'string',
-      description:
-        'Optional. Shown instead of the company name for this award only, for example the name the firm traded under when it won. Leave empty to show the company name. The logo and the profile link still come from the company.',
+      // For example the name the firm traded under when it won.
+      description: 'Replaces the company name for this award only; the logo and profile link still come from the company.',
     }),
   ],
   preview: {

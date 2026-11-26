@@ -20,7 +20,7 @@ const legalLink = defineArrayMember({
       name: 'href',
       title: 'URL',
       type: 'url',
-      description: 'A full address (https://…, mailto:…) or a path on this site, for example /cookie-policy.',
+      description: 'Or a path on this site, e.g. /cookie-policy.',
       validation: (Rule) =>
         Rule.required()
           .uri({ scheme: ['http', 'https', 'mailto', 'tel'], allowRelative: true })
@@ -88,7 +88,6 @@ const legalDivider = defineArrayMember({
       name: 'note',
       title: 'Note (CMS only)',
       type: 'string',
-      description: 'Optional. Not displayed on the site.',
     }),
   ],
   preview: {
@@ -155,13 +154,13 @@ const recordLabel = (name: string, title: string, initialValue: string) =>
     fieldset: 'labels',
   })
 
-const recordValue = (name: string, title: string, type: 'string' | 'text' = 'string') =>
+const recordValue = (name: string, title: string, type: 'string' | 'text' = 'string', fieldset?: string) =>
   defineField({
     name,
     title,
     type,
     ...(type === 'text' ? { rows: 2 } : {}),
-    description: 'Optional: leave empty where the cookie has no value.',
+    fieldset,
   })
 
 /** A list of cookies, each shown as labelled rows (name, purpose, provider, service, country, type, expiry). */
@@ -170,21 +169,21 @@ const cookieRecords = defineArrayMember({
   title: 'Cookie list',
   type: 'object',
   icon: ThListIcon,
-  fieldsets: [{ name: 'labels', title: 'Row labels', options: { collapsible: true, collapsed: true } }],
+  fieldsets: [{ name: 'labels', title: 'Row labels', options: { collapsible: true, collapsed: true, columns: 2 } }],
   fields: [
-    recordLabel('nameLabel', 'Name label', 'Name:'),
-    recordLabel('purposeLabel', 'Purpose label', 'Purpose:'),
-    recordLabel('providerLabel', 'Provider label', 'Provider:'),
-    recordLabel('serviceLabel', 'Service label', 'Service:'),
-    recordLabel('serviceLinkLabel', 'Service link label', 'View Service Privacy Policy'),
-    recordLabel('countryLabel', 'Country label', 'Country:'),
-    recordLabel('typeLabel', 'Type label', 'Type:'),
-    recordLabel('expiresLabel', 'Expires label', 'Expires in:'),
+    recordLabel('nameLabel', 'Name', 'Name:'),
+    recordLabel('purposeLabel', 'Purpose', 'Purpose:'),
+    recordLabel('providerLabel', 'Provider', 'Provider:'),
+    recordLabel('serviceLabel', 'Service', 'Service:'),
+    recordLabel('serviceLinkLabel', 'Service link', 'View Service Privacy Policy'),
+    recordLabel('countryLabel', 'Country', 'Country:'),
+    recordLabel('typeLabel', 'Type', 'Type:'),
+    recordLabel('expiresLabel', 'Expires', 'Expires in:'),
     defineField({
       name: 'emptyValueLabel',
-      title: 'Empty value text',
+      title: 'Empty value',
       type: 'string',
-      description: 'Shown in grey in a row whose cookie has no value.',
+      description: 'Shown where a cookie has no value.',
       initialValue: '__________',
       validation: (Rule) => Rule.required(),
       fieldset: 'labels',
@@ -198,6 +197,10 @@ const cookieRecords = defineArrayMember({
           name: 'cookieRecord',
           title: 'Cookie',
           type: 'object',
+          fieldsets: [
+            { name: 'source', title: 'Provider and service', options: { columns: 2 } },
+            { name: 'details', title: 'Details', options: { columns: 3 } },
+          ],
           fields: [
             defineField({
               name: 'name',
@@ -206,18 +209,18 @@ const cookieRecords = defineArrayMember({
               validation: (Rule) => Rule.required(),
             }),
             recordValue('purpose', 'Purpose', 'text'),
-            recordValue('provider', 'Provider'),
-            recordValue('service', 'Service'),
+            recordValue('provider', 'Provider', 'string', 'source'),
+            recordValue('service', 'Service', 'string', 'source'),
             defineField({
               name: 'serviceUrl',
               title: 'Service privacy policy URL',
               type: 'url',
-              description: 'Optional. Shown after the service as the service link label.',
+              description: 'Shown after the service as the service link label.',
               validation: (Rule) => Rule.uri({ scheme: ['http', 'https'] }),
             }),
-            recordValue('country', 'Country'),
-            recordValue('type', 'Type'),
-            recordValue('expires', 'Expires in'),
+            recordValue('country', 'Country', 'string', 'details'),
+            recordValue('type', 'Type', 'string', 'details'),
+            recordValue('expires', 'Expires in', 'string', 'details'),
           ],
           preview: { select: { title: 'name', subtitle: 'provider' } },
         }),
@@ -243,42 +246,42 @@ export const legalText = defineType({
   title: 'Legal text',
   type: 'object',
   icon: DocumentTextIcon,
+  fieldsets: [{ name: 'breadcrumb', title: 'Breadcrumb', options: { columns: 2 } }],
   fields: [
     adminLabelField,
     defineField({
       name: 'breadcrumbHomeLabel',
-      title: 'Breadcrumb home label',
+      title: 'Home label',
       type: 'string',
-      description: 'First item of the breadcrumb, linking to the home page.',
+      fieldset: 'breadcrumb',
       initialValue: 'Home',
       validation: (Rule) => Rule.required(),
     }),
     defineField({
       name: 'breadcrumbLabel',
-      title: 'Breadcrumb current label',
+      title: 'This page label',
       type: 'string',
-      description: 'Last item of the breadcrumb: this page.',
+      fieldset: 'breadcrumb',
       validation: (Rule) => Rule.required(),
     }),
     defineField({
       name: 'title',
       title: 'Title',
       type: 'string',
-      description: 'The page heading (H1).',
+      description: "The page's H1.",
       validation: (Rule) => Rule.required(),
     }),
     defineField({
       name: 'intro',
       title: 'Introduction',
       type: 'array',
-      description: 'Optional. Paragraphs under the title, above the table of contents.',
       of: [legalIntroBlock],
     }),
     defineField({
       name: 'tocLabel',
       title: 'Table of contents label',
       type: 'string',
-      description: 'Above the list of headings, and on the button that opens it on smaller screens.',
+      description: 'Also the button text that opens it on phones.',
       initialValue: 'On this page',
       validation: (Rule) => Rule.required(),
     }),

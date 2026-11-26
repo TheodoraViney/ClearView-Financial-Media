@@ -17,9 +17,9 @@ import { adminLabelField } from '../fields'
 const label = (
   name: RecordListingCopyKey,
   title: string,
-  description: string,
   fieldset: string,
   initialValue: string,
+  description?: string,
 ) =>
   defineField({
     name,
@@ -30,8 +30,6 @@ const label = (
     initialValue,
     validation: (Rule) => Rule.required(),
   })
-
-const NOUN = `Replaces ${RECORD_LISTING_TYPE_TOKEN} in the empty state text`
 
 const onSharedListingsPage = (document: unknown) =>
   String((document as { _id?: string } | undefined)?._id ?? '').replace(/^drafts\./, '') === SHARED_LISTINGS_PAGE_DOCUMENT_ID
@@ -47,75 +45,58 @@ export const recordListing = defineType({
       onSharedListingsPage(context.document) ? true : 'This block works on the shared listings page only',
     ),
   fieldsets: [
-    { name: 'tabs', title: 'Tabs' },
-    { name: 'filters', title: 'Filters', options: { collapsible: true, collapsed: true } },
-    { name: 'statuses', title: 'Event and research statuses', options: { collapsible: true, collapsed: true } },
-    { name: 'empty', title: 'Empty state', options: { collapsible: true, collapsed: true } },
-    { name: 'pagination', title: 'Pagination', options: { collapsible: true, collapsed: true } },
+    // Tab paths: Awards /events-category/awards; Events /events-category/summits, /briefings and /webinar together;
+    // Research /resource-categories/research.
+    { name: 'tabs', title: 'Tabs', options: { columns: 3 } },
+    { name: 'filters', title: 'Filters', options: { collapsible: true, collapsed: true, columns: 2 } },
+    {
+      name: 'statuses',
+      title: 'Event and research statuses',
+      options: { collapsible: true, collapsed: true, columns: 3 },
+    },
+    { name: 'empty', title: 'Empty state', options: { collapsible: true, collapsed: true, columns: 2 } },
+    {
+      name: 'emptyNouns',
+      title: 'Empty state nouns',
+      description: `Replaces ${RECORD_LISTING_TYPE_TOKEN} in the empty state text.`,
+      options: { collapsible: true, collapsed: true, columns: 3 },
+    },
+    { name: 'pagination', title: 'Pagination', options: { collapsible: true, collapsed: true, columns: 2 } },
   ],
   fields: [
     adminLabelField,
-    label('awardsTabLabel', 'Awards tab', 'Tab of the awards list, opened at /events-category/awards.', 'tabs', 'Awards'),
-    label(
-      'eventsTabLabel',
-      'Events tab',
-      'Tab of the events list (summits, briefings and webinars together), opened at /events-category/summits, /events-category/briefings and /events-category/webinar.',
-      'tabs',
-      'Events',
-    ),
-    label('researchTabLabel', 'Research tab', 'Tab of the research list, opened at /resource-categories/research.', 'tabs', 'Research'),
+    label('awardsTabLabel', 'Awards', 'tabs', 'Awards'),
+    label('eventsTabLabel', 'Events', 'tabs', 'Events'),
+    label('researchTabLabel', 'Research', 'tabs', 'Research'),
 
-    label('regionFilterLabel', 'Region filter label', 'Label of the region filter (Awards and Events tabs). Its options are the Event regions with at least one record.', 'filters', 'Region'),
-    label('yearFilterLabel', 'Year filter label', 'Label of the year filter.', 'filters', 'Year'),
-    label(
-      'statusFilterLabel',
-      'Status filter label',
-      'Label of the status filter. Its options on the Awards tab are the statuses in Awards › Awards page texts.',
-      'filters',
-      'Status',
-    ),
-    label('allOptionLabel', 'All option', 'First option of every filter: no filtering.', 'filters', 'All'),
-    label('clearFiltersLabel', 'Clear filters link', 'Under the filters while any is set; resets them all to All.', 'filters', 'Clear filters'),
+    label('regionFilterLabel', 'Region', 'filters', 'Region', 'Options: the Event regions that have records.'),
+    label('yearFilterLabel', 'Year', 'filters', 'Year'),
+    label('statusFilterLabel', 'Status', 'filters', 'Status', 'Awards options come from Awards page texts.'),
+    label('allOptionLabel', 'All option', 'filters', 'All'),
+    label('clearFiltersLabel', 'Clear filters link', 'filters', 'Clear filters'),
 
-    label(
-      'upcomingEventLabel',
-      'Upcoming event status',
-      'Status of an event whose last day is today or later, on its row and as a status filter option on the Events tab.',
-      'statuses',
-      'Upcoming',
-    ),
-    label(
-      'pastEventLabel',
-      'Past event status',
-      'Status of an event whose last day has passed, on its row and as a status filter option on the Events tab.',
-      'statuses',
-      'Past',
-    ),
-    label(
-      'publishedLabel',
-      'Published research status',
-      'Status of a research report, on its row and as the status filter option on the Research tab.',
-      'statuses',
-      'Published',
-    ),
+    // Upcoming: the event's last day is today or later. Each label also names its status filter option.
+    label('upcomingEventLabel', 'Upcoming event', 'statuses', 'Upcoming'),
+    label('pastEventLabel', 'Past event', 'statuses', 'Past'),
+    label('publishedLabel', 'Published research', 'statuses', 'Published'),
 
-    label('emptyHeading', 'Empty state heading', 'Shown when no record matches the filters.', 'empty', 'No records match these filters'),
+    label('emptyHeading', 'Heading', 'empty', 'No records match these filters'),
     defineField({
       name: 'emptyText',
-      title: 'Empty state text',
+      title: 'Text',
       type: 'string',
       fieldset: 'empty',
-      description: `Text under that heading. ${RECORD_LISTING_TYPE_TOKEN} is the open tab's noun, set in the fields below; use it exactly once. Placeholders: ${RECORD_LISTING_TYPE_TOKEN}.`,
+      description: `${RECORD_LISTING_TYPE_TOKEN} becomes the open tab's noun, set below; use it once.`,
       initialValue: `Try a different combination, or clear the filters to see every ${RECORD_LISTING_TYPE_TOKEN}.`,
       validation: (Rule) => Rule.required().custom((value: string | undefined) => emptyTextError(value) ?? true),
     }),
-    label('emptyAwardNoun', 'Awards noun', `${NOUN} on the Awards tab.`, 'empty', 'award'),
-    label('emptyEventNoun', 'Events noun', `${NOUN} on the Events tab.`, 'empty', 'event'),
-    label('emptyResearchNoun', 'Research noun', `${NOUN} on the Research tab.`, 'empty', 'report'),
-    label('emptyButtonLabel', 'Empty state button', 'Under the empty state text, resets every filter to All.', 'empty', 'Clear filters'),
+    label('emptyButtonLabel', 'Button', 'empty', 'Clear filters'),
+    label('emptyAwardNoun', 'Awards', 'emptyNouns', 'award'),
+    label('emptyEventNoun', 'Events', 'emptyNouns', 'event'),
+    label('emptyResearchNoun', 'Research', 'emptyNouns', 'report'),
 
-    label('previousLabel', 'Previous page button', 'Pagination, shown when the list runs over more than one page.', 'pagination', 'Previous'),
-    label('nextLabel', 'Next page button', 'Pagination, shown when the list runs over more than one page.', 'pagination', 'Next'),
+    label('previousLabel', 'Previous page', 'pagination', 'Previous'),
+    label('nextLabel', 'Next page', 'pagination', 'Next'),
   ],
   preview: {
     select: { adminLabel: 'adminLabel' },

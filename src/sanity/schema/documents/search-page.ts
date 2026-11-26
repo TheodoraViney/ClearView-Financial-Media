@@ -3,7 +3,6 @@ import { defineField, defineType } from 'sanity'
 
 import { BRANDS, isBrandKey } from '@/brands'
 import {
-  SEARCH_TEMPLATE_TOKENS,
   searchTemplateError,
   type SearchPageCopyKey,
   type SearchTemplateKey,
@@ -18,25 +17,35 @@ import {
 const brandKeyOf = (id: string | undefined): string =>
   String(id ?? '').replace(/^drafts\./, '').replace(/^search-page-/, '')
 
-const text = (name: SearchPageCopyKey, title: string, description: string, group: string, initialValue: string) =>
+type FieldOptions = { description?: string; fieldset?: string }
+
+const text = (name: SearchPageCopyKey, title: string, group: string, initialValue: string, options: FieldOptions = {}) =>
   defineField({
     name,
     title,
     type: 'string',
-    description,
+    description: options.description,
     group,
+    fieldset: options.fieldset,
     initialValue,
     validation: (Rule) => Rule.required(),
   })
 
-/** A text with placeholders, each required exactly once. */
-const template = (name: SearchTemplateKey, title: string, description: string, group: string, initialValue: string) =>
+/** A text with placeholders, each required exactly once (SEARCH_TEMPLATE_TOKENS); the description names them all. */
+const template = (
+  name: SearchTemplateKey,
+  title: string,
+  group: string,
+  initialValue: string,
+  options: FieldOptions & { description: string },
+) =>
   defineField({
     name,
     title,
     type: 'string',
-    description: `${description} Placeholders: ${SEARCH_TEMPLATE_TOKENS[name].join(', ')}.`,
+    description: options.description,
     group,
+    fieldset: options.fieldset,
     initialValue,
     validation: (Rule) => Rule.required().custom((value: string | undefined) => searchTemplateError(name, value) ?? true),
   })
@@ -52,76 +61,66 @@ export const searchPage = defineType({
     { name: 'results', title: 'Results' },
     { name: 'empty', title: 'Empty states' },
   ],
+  fieldsets: [
+    { name: 'breadcrumb', title: 'Breadcrumb', options: { columns: 2 } },
+    { name: 'searchField', title: 'Search field', options: { columns: 2 } },
+    { name: 'typeChips', title: 'Content type chips', options: { columns: 2 } },
+    { name: 'yearFilter', title: 'Year filter', options: { columns: 2 } },
+    { name: 'resultWord', title: 'Result word in the summary', options: { columns: 2 } },
+    { name: 'cardTypes', title: 'Card type labels', options: { columns: 2 } },
+    { name: 'pagination', title: 'Pagination', options: { columns: 2 } },
+    { name: 'noQuery', title: 'Before a search', options: { columns: 2 } },
+    { name: 'noResults', title: 'No results', options: { columns: 2 } },
+  ],
   fields: [
-    text('title', 'Title', 'Heading of the page, and its title in search engines and the browser tab.', 'page', 'Search Results'),
-    text('breadcrumbHome', 'Breadcrumb home label', 'First item of the breadcrumb, linking to the home page.', 'page', 'Home'),
-    text('breadcrumbCurrent', 'Breadcrumb current label', 'Last item of the breadcrumb, this page.', 'page', 'Search'),
-    text(
-      'placeholder',
-      'Search field placeholder',
-      'Hint text inside the empty search field.',
-      'page',
-      'Search wealth management news, awards, events and research',
-    ),
-    text('submitLabel', 'Search button', 'Button that runs the search.', 'page', 'Search'),
+    text('title', 'Title', 'page', 'Search Results', { description: 'Also the title in search engines and the browser tab.' }),
+    text('breadcrumbHome', 'Home', 'page', 'Home', { fieldset: 'breadcrumb' }),
+    text('breadcrumbCurrent', 'Current page', 'page', 'Search', { fieldset: 'breadcrumb' }),
+    text('placeholder', 'Placeholder', 'page', 'Search wealth management news, awards, events and research', {
+      fieldset: 'searchField',
+    }),
+    text('submitLabel', 'Button', 'page', 'Search', { fieldset: 'searchField' }),
 
-    text('allLabel', 'All types chip', 'First content type chip: results of every type.', 'filters', 'All'),
-    text('articlesLabel', 'Articles chip', 'Content type chip. Also follows the summary when chosen.', 'filters', 'Articles'),
-    text('awardsLabel', 'Awards chip', 'Content type chip. Also follows the summary when chosen.', 'filters', 'Awards'),
-    text('eventsLabel', 'Events chip', 'Content type chip. Also follows the summary when chosen.', 'filters', 'Events'),
-    text('researchLabel', 'Research chip', 'Content type chip. Also follows the summary when chosen.', 'filters', 'Research'),
-    text('yearLabel', 'Year filter label', 'Label of the year filter.', 'filters', 'Year'),
-    text('allYearsLabel', 'All years option', 'Year filter text when nothing is selected, and its first option.', 'filters', 'All years'),
-    text(
-      'selectedLabel',
-      'Selected count suffix',
-      'Follows the number when two or more years are chosen, for example "3 selected".',
-      'filters',
-      'selected',
-    ),
-    text('clearFiltersLabel', 'Clear filters link', 'At the bottom of the open year filter.', 'filters', 'Clear filters'),
-    text('clearAllLabel', 'Clear all button', 'After the chosen filters, removes them all.', 'filters', 'Clear all'),
+    // The chosen type chip's label also follows the results summary ({type} in the type suffix).
+    text('allLabel', 'All types', 'filters', 'All', { fieldset: 'typeChips' }),
+    text('articlesLabel', 'Articles', 'filters', 'Articles', { fieldset: 'typeChips' }),
+    text('awardsLabel', 'Awards', 'filters', 'Awards', { fieldset: 'typeChips' }),
+    text('eventsLabel', 'Events', 'filters', 'Events', { fieldset: 'typeChips' }),
+    text('researchLabel', 'Research', 'filters', 'Research', { fieldset: 'typeChips' }),
+    text('yearLabel', 'Label', 'filters', 'Year', { fieldset: 'yearFilter' }),
+    text('allYearsLabel', 'All years option', 'filters', 'All years', { fieldset: 'yearFilter' }),
+    text('selectedLabel', 'Selected count suffix', 'filters', 'selected', { fieldset: 'yearFilter' }),
+    text('clearFiltersLabel', 'Clear filters link', 'filters', 'Clear filters', { fieldset: 'yearFilter' }),
+    text('clearAllLabel', 'Clear all button', 'filters', 'Clear all'),
 
-    template(
-      'summaryTemplate',
-      'Results summary',
-      'Above the results, for example "Showing 1–16 of 29 results for “wealth management”". {range} is the shown range, {total} the number of results, {results} the singular or plural word below and {query} the search.',
-      'results',
-      'Showing {range} of {total} {results} for “{query}”',
-    ),
-    template(
-      'typeSuffix',
-      'Results summary type suffix',
-      'Follows the summary when a content type is chosen, for example "in Articles". {type} is the chip label.',
-      'results',
-      'in {type}',
-    ),
-    text('resultSingular', 'Result (one)', 'Replaces {results} in the summary when there is one result.', 'results', 'result'),
-    text('resultPlural', 'Results (many)', 'Replaces {results} in the summary otherwise.', 'results', 'results'),
-    text('articleType', 'Article card label', 'Type label on an article result.', 'results', 'Article'),
-    text('awardType', 'Award card label', 'Type label on an awards result.', 'results', 'Award'),
-    text('eventType', 'Event card label', 'Type label on an event result.', 'results', 'Event'),
-    text('researchType', 'Research card label', 'Type label on a research result.', 'results', 'Research'),
-    text('previousLabel', 'Previous page button', 'Pagination.', 'results', 'Previous'),
-    text('nextLabel', 'Next page button', 'Pagination.', 'results', 'Next'),
+    template('summaryTemplate', 'Results summary', 'results', 'Showing {range} of {total} {results} for “{query}”', {
+      description: '{range} is the shown range, {total} the number of results, {results} the word below, {query} the search.',
+    }),
+    template('typeSuffix', 'Results summary type suffix', 'results', 'in {type}', {
+      description: 'Follows the summary when a type is chosen. {type} is the chip label.',
+    }),
+    text('resultSingular', 'One result', 'results', 'result', { fieldset: 'resultWord' }),
+    text('resultPlural', 'Several results', 'results', 'results', { fieldset: 'resultWord' }),
+    text('articleType', 'Article', 'results', 'Article', { fieldset: 'cardTypes' }),
+    text('awardType', 'Award', 'results', 'Award', { fieldset: 'cardTypes' }),
+    text('eventType', 'Event', 'results', 'Event', { fieldset: 'cardTypes' }),
+    text('researchType', 'Research', 'results', 'Research', { fieldset: 'cardTypes' }),
+    text('previousLabel', 'Previous button', 'results', 'Previous', { fieldset: 'pagination' }),
+    text('nextLabel', 'Next button', 'results', 'Next', { fieldset: 'pagination' }),
 
-    text('emptyQueryTitle', 'No search title', 'Heading shown before anything is searched.', 'empty', 'What are you looking for?'),
-    text(
-      'emptyQueryText',
-      'No search text',
-      'Text under that heading.',
-      'empty',
-      'Search WealthBriefing articles, awards, events and research.',
-    ),
-    text('noResultsTitle', 'No results title', 'Heading shown when nothing matches the search.', 'empty', 'No results found'),
+    text('emptyQueryTitle', 'Heading', 'empty', 'What are you looking for?', { fieldset: 'noQuery' }),
+    text('emptyQueryText', 'Text', 'empty', 'Search WealthBriefing articles, awards, events and research.', {
+      fieldset: 'noQuery',
+    }),
+    text('noResultsTitle', 'Heading', 'empty', 'No results found', { fieldset: 'noResults' }),
     template(
       'noResultsText',
-      'No results text',
-      'Text under that heading. {query} is the search.',
+      'Text',
       'empty',
       'Sorry, we couldn’t find any results for ‘{query}’. Try a different search term or check your spelling.',
+      { fieldset: 'noResults', description: '{query} is the search.' },
     ),
-    text('newSearchLabel', 'New search button', 'Under both empty states; clears the search field.', 'empty', 'Start New Search'),
+    text('newSearchLabel', 'New search button', 'empty', 'Start New Search'),
   ],
   preview: {
     select: { id: '_id' },

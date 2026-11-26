@@ -62,8 +62,8 @@ export const page = defineType({
       name: 'slug',
       title: 'Slug',
       type: 'slug',
-      description:
-        'Fixed on the Categories page (served at /categories), the shared listings page (served at /events-category/… and /resource-categories/research) and the Company Engagement page (served at /companies).',
+      // Read-only on the Categories, shared listings and Company Engagement pages, which their own routes serve.
+      description: 'Changing it breaks the page’s live address.',
       readOnly: ({ document }) => isFixedPage(document),
       options: {
         source: 'title',
@@ -95,16 +95,16 @@ export const page = defineType({
     // `blocks` keeps its name on the home page too, so its blocks above Banner 3 needed no move.
     pageBlocksField('blocks', {
       title: 'Blocks',
-      description: 'On the home page: the blocks above Banner 3. Banners are placed by the page template.',
+      // Banners are placed by the page template.
+      description: 'On the home page: the blocks above Banner 3.',
     }),
     pageBlocksField('blocksMiddle', {
       title: 'Blocks between Banner 3 and Banner 4',
-      description: 'Home page only. Leave empty to show no Banner 4.',
+      description: 'Empty: no Banner 4.',
       hidden: notHome,
     }),
     pageBlocksField('blocksBottom', {
       title: 'Blocks below Banner 4',
-      description: 'Home page only.',
       hidden: notHome,
     }),
   ],

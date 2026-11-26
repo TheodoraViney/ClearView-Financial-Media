@@ -17,7 +17,7 @@ export const teamNetwork = defineType({
     adminLabelField,
     imageField('image', {
       required: true,
-      description: 'Shown wide; set the hotspot on the faces so they stay in view when the photo is cropped.',
+      description: 'Set the hotspot on the faces so they stay in view when cropped.',
     }),
     headingField('heading', {
       title: 'Heading',
@@ -28,7 +28,7 @@ export const teamNetwork = defineType({
     paragraphsField({
       name: 'body',
       title: 'Text',
-      description: "Beside the heading. The publications' logos under the heading come from their Brand settings.",
+      description: "The publications' logos under the heading come from Brand settings.",
       initialText:
         "WealthBriefing, WealthBriefingAsia and Family Wealth Report connect wealth professionals through ClearView’s news, research, awards and events. Group Editor Tom Burroughes leads coverage; Publisher Stephen Harris brings 30+ years’ City experience.",
     }),
@@ -42,7 +42,6 @@ export const teamNetwork = defineType({
       name: 'quoteCaption',
       title: 'Quote caption',
       type: 'string',
-      description: 'Who the quote is from.',
       initialValue: 'ClearView Financial Media',
       validation: (Rule) => Rule.required(),
     }),

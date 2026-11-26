@@ -30,7 +30,7 @@ export const topPicks = defineType({
     adminLabelField,
     headingField('heading', { title: 'Heading', defaultLevel: 'h2', initialText: 'Top Picks', required: true }),
     defineField({
-      ...linkField({ required: true, labelRequired: true, description: 'The "View all" link beside the heading.' }),
+      ...linkField({ required: true, labelRequired: true }),
       initialValue: { kind: 'external', external: '/categories', label: 'View all top picks' },
     }),
     defineField({
@@ -39,7 +39,7 @@ export const topPicks = defineType({
       type: 'array',
       // Lists what the site fills automatically right now, with Pin buttons.
       components: { input: AutoFillPicksInput },
-      description: `Up to ${TOP_PICKS_POST_COUNT}, in display order. Sponsored posts cannot be picked. Empty places fill with the newest posts of the last seven days, then older ones.`,
+      description: 'Sponsored posts cannot be picked. Empty places fill with the newest posts.',
       of: [
         defineArrayMember({
           type: 'reference',

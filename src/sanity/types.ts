@@ -990,10 +990,10 @@ export type RecordListing = {
   publishedLabel?: string;
   emptyHeading?: string;
   emptyText?: string;
+  emptyButtonLabel?: string;
   emptyAwardNoun?: string;
   emptyEventNoun?: string;
   emptyResearchNoun?: string;
-  emptyButtonLabel?: string;
   previousLabel?: string;
   nextLabel?: string;
 };
@@ -1518,6 +1518,7 @@ export type ExploreCard = {
 export type SocialLink = {
   _type: "socialLink";
   name?: string;
+  url?: string;
   icon?: {
     asset?: SanityImageAssetReference;
     media?: unknown;
@@ -1525,7 +1526,6 @@ export type SocialLink = {
     crop?: SanityImageCrop;
     _type: "image";
   };
-  url?: string;
 };
 
 export type FooterColumn = {
@@ -2271,16 +2271,13 @@ export type ArticlePage = {
   _createdAt: string;
   _updatedAt: string;
   _rev: string;
-  recommendedHeading?: string;
   breadcrumbHomeLabel?: string;
+  readTimeSuffix?: string;
+  imageCreditPrefix?: string;
   shareLabel?: string;
   copyLinkLabel?: string;
   linkCopiedLabel?: string;
-  readTimeSuffix?: string;
-  imageCreditPrefix?: string;
   shareRailLabel?: string;
-  embedConsentText?: string;
-  embedConsentButton?: string;
   shareLinks?: Array<{
     label?: string;
     icon?: {
@@ -2294,6 +2291,9 @@ export type ArticlePage = {
     _type: "shareLink";
     _key: string;
   }>;
+  embedConsentText?: string;
+  embedConsentButton?: string;
+  recommendedHeading?: string;
 };
 
 export type MostRead = {
@@ -2744,13 +2744,13 @@ export type Post = {
   slug?: Slug;
   publishedAt?: string;
   category?: CategoryReference;
+  region?: RegionReference;
   primaryTopic?: TopicReference;
   secondaryTopics?: Array<
     {
       _key: string;
     } & TopicReference
   >;
-  region?: RegionReference;
   author?: AuthorReference;
   excerpt?: string;
   image?: {
@@ -3874,9 +3874,6 @@ export type Person = {
   _updatedAt: string;
   _rev: string;
   title?: string;
-  firstName?: string;
-  lastName?: string;
-  slug?: Slug;
   jobTitle?: string;
   companies?: Array<
     {
@@ -3892,6 +3889,9 @@ export type Person = {
     _type: "image";
   };
   bio?: RichText;
+  firstName?: string;
+  lastName?: string;
+  slug?: Slug;
   categories?: Array<string>;
   legacyWpId?: number;
 };
@@ -3917,16 +3917,6 @@ export type Author = {
   bio?: string;
 };
 
-export type Region = {
-  _id: string;
-  _type: "region";
-  _createdAt: string;
-  _updatedAt: string;
-  _rev: string;
-  title?: string;
-  slug?: Slug;
-};
-
 export type Topic = {
   _id: string;
   _type: "topic";
@@ -3936,6 +3926,16 @@ export type Topic = {
   title?: string;
   slug?: Slug;
   description?: string;
+};
+
+export type Region = {
+  _id: string;
+  _type: "region";
+  _createdAt: string;
+  _updatedAt: string;
+  _rev: string;
+  title?: string;
+  slug?: Slug;
 };
 
 export type Category = {
@@ -4294,8 +4294,8 @@ export type AllSanitySchemaTypes =
   | ConferenceEvent
   | Person
   | Author
-  | Region
   | Topic
+  | Region
   | Category
   | Brand
   | MediaFolderReference
