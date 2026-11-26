@@ -83,6 +83,16 @@ export const RESEARCH_REPORT_SECTIONS = [
 
 export type ResearchReportSectionId = (typeof RESEARCH_REPORT_SECTIONS)[number]
 
+/**
+ * The last segment of a report's Executive Summary page URL, /resource/{report slug}/{summary slug}: the report's
+ * `summarySlug`, this by default (its initial value, and the value while the field is unset). Reports not yet moved off
+ * the old `researchSummary` document use that document's own slug until the merge script copies it.
+ */
+export const RESEARCH_SUMMARY_DEFAULT_SLUG = 'executive-summary'
+
+/** A summary slug: lowercase letters, digits and hyphens, no hyphen at either end. */
+export const RESEARCH_SUMMARY_SLUG = /^[a-z0-9](?:[a-z0-9-]*[a-z0-9])?$/
+
 /** The Executive Summary page's path under a report's own path: /resource/{slug}/{summary slug}. */
 export const executiveSummaryPath = (reportPath: string, summarySlug: string): string =>
   `${reportPath}/${encodeURIComponent(summarySlug)}`
@@ -92,7 +102,7 @@ export const blocksOrNull = <T>(value: T[] | null | undefined): T[] | null =>
   Array.isArray(value) && value.length > 0 ? value : null
 
 /**
- * Whether an Executive Summary document has content for its page: a lead, an introduction or at least one section
+ * Whether an Executive Summary page has content: a lead, an introduction or at least one section
  * with a heading or text. Without one the page is a 404 and the report page shows no link to it.
  */
 export function hasExecutiveSummary(

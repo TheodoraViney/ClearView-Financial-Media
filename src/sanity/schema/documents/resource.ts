@@ -6,7 +6,9 @@ import {
   RELATED_RESEARCH_COUNT,
   RESEARCH_CHART_GAUGES_MAX,
   RESEARCH_CHARTS_MAX,
+  RESEARCH_SUMMARY_DEFAULT_SLUG,
   RESEARCH_SUMMARY_MAX_CHARS,
+  RESEARCH_SUMMARY_SLUG,
   publishedId,
 } from '@/lib/research-report'
 import { AutoFillPicksInput } from '@/sanity/components/auto-fill-picks-input'
@@ -23,9 +25,13 @@ import { blocksTextLength, paragraphsBlock } from '../objects/rich-text'
  * canonical, so `category` has to survive the migration.
  *
  * Each report has a page at /resource/{slug} on ClearView Publishing, and an
- * Executive Summary page at /resource/{slug}/{summary slug} from its own
- * `researchSummary` document (`executiveSummaryPage`, required, one per
- * report), shown while that document has content. The "Page content" fields
+ * Executive Summary page at /resource/{slug}/{summarySlug, default
+ * executive-summary} from its "Executive summary page" fields (`summaryLead`,
+ * `summaryIntro`, `summarySections`), shown while one of them has content. Each
+ * page has optional SEO overrides (`seo`, `summarySeo`). Until
+ * scripts/merge-executive-summaries.ts has run, a report may still point at an
+ * old `researchSummary` document (`executiveSummaryPage`, read-only now); the
+ * site reads that document while the three fields are all unset. The "Page content" fields
  * are optional: the page hides a section, and its tab, while the section is
  * empty. The pages' labels live on the "Resource page texts" document
  * (RESEARCH_REPORT_PAGE_ID).
@@ -43,6 +49,32 @@ import { blocksTextLength, paragraphsBlock } from '../objects/rich-text'
  * 2 Issuu links, 1 Jotform. The download button uses it first and falls back to
  * `downloadFile` only when it is empty.
  */
+/** A section of the Executive Summary page: a heading beside its text. Also used by the old `researchSummary`. */
+export const executiveSummarySectionMember = defineArrayMember({
+  type: 'object',
+  name: 'executiveSummarySection',
+  title: 'Section',
+  fields: [
+    defineField({
+      name: 'heading',
+      title: 'Heading',
+      type: 'string',
+      validation: (Rule) => Rule.required(),
+    }),
+    defineField({
+      name: 'body',
+      title: 'Text',
+      type: 'array',
+      description: 'Bold, italic and links only.',
+      of: [paragraphsBlock],
+      validation: (Rule) => Rule.required(),
+    }),
+  ],
+  preview: {
+    select: { title: 'heading' },
+  },
+})
+
 export const resource = defineType({
   name: 'resource',
   title: 'Resource',
@@ -53,8 +85,10 @@ export const resource = defineType({
   groups: [
     { name: 'details', title: 'Details', default: true },
     { name: 'page', title: 'Page content' },
-    { name: 'summary', title: 'Executive Summary' },
+    { name: 'summary', title: 'Executive summary page' },
     { name: 'download', title: 'Download' },
+    { name: 'seo', title: 'SEO' },
+    { name: 'summarySeo', title: 'Summary SEO' },
   ],
   fields: [
     defineField({
@@ -109,7 +143,7 @@ export const resource = defineType({
       type: 'richText',
       group: 'details',
       description:
-        'Not shown on the report page. Used by site search, as the page description for search engines while Standfirst and Executive summary are empty, and by the Generate from report text button in Page content. For a new report, paste the report’s text here, for example from the PDF.',
+        'Not shown on the report page. Used by site search, as the page description for search engines while Standfirst and Short summary are empty, and by the Generate from report text button in Page content. For a new report, paste the report’s text here, for example from the PDF.',
     }),
     defineField({
       name: 'authors',
@@ -138,7 +172,7 @@ export const resource = defineType({
     }),
     defineField({
       name: 'summary',
-      title: 'Executive summary',
+      title: 'Short summary (report page)',
       type: 'array',
       group: 'page',
       description:
@@ -378,55 +412,77 @@ export const resource = defineType({
     }),
 
     defineField({
+      name: 'summarySlug',
+      title: 'Slug',
+      type: 'slug',
+      group: 'summary',
+      description: `The last part of the page URL: /resource/{report slug}/{this slug}, for example /resource/tech-ops-report-2024/${RESEARCH_SUMMARY_DEFAULT_SLUG}. Empty: ${RESEARCH_SUMMARY_DEFAULT_SLUG}. Changing it changes the live URL.`,
+      initialValue: { current: RESEARCH_SUMMARY_DEFAULT_SLUG },
+      // The URL sits under the report's own slug, so every report may use the same summary slug.
+      options: { isUnique: () => true },
+      validation: (Rule) =>
+        Rule.custom((value) => {
+          const slug = value?.current ?? ''
+
+          // A URL segment as typed: no ".", "..", "%" or uppercase, which would not round-trip or would resolve away.
+          return slug && !RESEARCH_SUMMARY_SLUG.test(slug)
+            ? 'Use lowercase letters, numbers and hyphens only, not starting or ending with a hyphen'
+            : true
+        }),
+    }),
+    defineField({
+      name: 'summaryLead',
+      title: 'Lead paragraph',
+      type: 'array',
+      group: 'summary',
+      description:
+        'The large opening paragraph of the Executive Summary page. Bold, italic and links only. The page exists while this, the introduction or a section has content.',
+      of: [paragraphsBlock],
+    }),
+    defineField({
+      name: 'summaryIntro',
+      title: 'Introduction',
+      type: 'array',
+      group: 'summary',
+      description: 'Paragraphs under the lead. Bold, italic and links only.',
+      of: [paragraphsBlock],
+    }),
+    defineField({
+      name: 'summarySections',
+      title: 'Sections',
+      type: 'array',
+      group: 'summary',
+      description: 'Each section shows a heading beside its text, for example "Automation".',
+      of: [executiveSummarySectionMember],
+    }),
+    // The old separate summary document. Read-only and hidden once empty: scripts/merge-executive-summaries.ts moves
+    // its content into the three fields above and unsets it. Removed in Deploy B.
+    defineField({
       name: 'executiveSummaryPage',
-      title: 'Executive Summary page',
+      title: 'Executive Summary page (old)',
       type: 'reference',
       group: 'summary',
       to: [{ type: 'researchSummary' }],
+      description: 'Being moved into this tab.',
+      readOnly: true,
+      hidden: ({ value }) => !value,
+    }),
+
+    defineField({
+      name: 'seo',
+      title: 'Report page SEO',
+      type: 'seo',
+      group: 'seo',
       description:
-        'Required. The full summary page at /resource/{slug}/{its slug}. Choose an existing summary, create a new one here, or use Create Executive Summary page in Page content. A new summary is published on its own, before the report. While it has no lead, introduction or section, that page does not exist and the report page shows no link to it. Each summary belongs to one report.',
-      options: {
-        // Only summaries no other report uses.
-        filter: ({ document }) => {
-          const id = publishedId(document._id)
-
-          return {
-            filter: '!(_id in *[_type == "resource" && !(_id in [$id, $draft])].executiveSummaryPage._ref)',
-            params: { id, draft: `drafts.${id}` },
-          }
-        },
-      },
-      validation: (Rule) =>
-        Rule.required().custom(
-          async (value: { _ref?: string; _strengthenOnPublish?: unknown } | undefined, context) => {
-            const id = context.document?._id ? publishedId(context.document._id) : null
-
-            if (!value?._ref || !id) {
-              return true
-            }
-
-            const client = context.getClient({ apiVersion: '2026-09-01' })
-            const taken = await client.fetch<string | null>(
-              '*[_type == "resource" && executiveSummaryPage._ref == $ref && !(_id in [$id, $draft])][0].title',
-              { ref: value._ref, id, draft: `drafts.${id}` },
-            )
-
-            if (taken !== null) {
-              return `This summary already belongs to "${taken || 'another report'}". Create a new one.`
-            }
-
-            // A summary created here or with "Create Executive Summary page" is a weak reference until the report is
-            // published, when it turns strong; a strong reference to an unpublished document cannot be saved, so the
-            // report's publish would fail. The Studio checks again when the summary is published.
-            if (value._strengthenOnPublish) {
-              const published = await client.fetch<boolean>('count(*[_id == $ref]) > 0', { ref: value._ref })
-
-              return published ? true : 'Publish the Executive Summary page first (open it above), then publish the report.'
-            }
-
-            return true
-          },
-        ),
+        'Search and share overrides for /resource/{slug}. Empty fields use: title, the report title followed by " | ClearView Financial Media"; description, the Standfirst, else the Short summary, else the start of the Report text; share image, the Banner image, else the Download thumbnail.',
+    }),
+    defineField({
+      name: 'summarySeo',
+      title: 'Executive Summary page SEO',
+      type: 'seo',
+      group: 'summarySeo',
+      description:
+        'Search and share overrides for the Executive Summary page. Empty fields use: title, the "Resource page texts" summary title, a dash and the report title, followed by " | ClearView Financial Media"; description, the summary Lead paragraph, else the start of its Introduction, else the report’s Standfirst, Short summary or start of the Report text; share image, the report page share image (SEO tab), else the Banner image, else the Download thumbnail.',
     }),
 
     defineField({

@@ -781,14 +781,17 @@ export function draftToResourceFields(draft: ResearchDraft) {
   }
 }
 
-/** The Executive Summary document's fields, as Sanity values. All three are set together; empty ones are absent. */
+/**
+ * The report's Executive Summary page fields (its "Executive summary page" tab), as Sanity values. All three are set
+ * together; empty ones are absent.
+ */
 export function draftToSummaryFields(draft: ResearchDraft) {
   const { lead, intro, sections } = draft.executiveSummary
 
   return {
-    lead: lead ? paragraphsToBlocks([lead]) : undefined,
-    intro: intro.length ? paragraphsToBlocks(intro) : undefined,
-    sections: sections.length
+    summaryLead: lead ? paragraphsToBlocks([lead]) : undefined,
+    summaryIntro: intro.length ? paragraphsToBlocks(intro) : undefined,
+    summarySections: sections.length
       ? sections.map((section) => ({
           _type: 'executiveSummarySection' as const,
           _key: randomKey(),
