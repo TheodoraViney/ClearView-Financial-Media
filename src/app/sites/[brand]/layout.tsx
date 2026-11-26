@@ -12,6 +12,7 @@ import { toSubscribeModal } from '@/components/blocks/subscribe-modal'
 import { SubscribeModalProvider } from '@/components/sections/subscribe/SubscribeModalProvider.client'
 import { AnalyticsEvents } from '@/components/ui/AnalyticsEvents.client'
 import { CookieConsent } from '@/components/ui/CookieConsent'
+import { ExitPreview } from '@/components/ui/ExitPreview.client'
 import { InPageDialogs } from '@/components/ui/Dialog.client'
 import { GptLoader } from '@/components/ui/Gpt.client'
 import type { SubscribeModalData } from '@/components/sections/subscribe/types'
@@ -69,6 +70,7 @@ export default async function BrandLayout({
         </div>
         <SanityLive includeDrafts />
         <VisualEditing />
+        <ExitPreview />
       </>
     )
   }
