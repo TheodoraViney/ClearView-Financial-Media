@@ -119,18 +119,18 @@ export function AutoFillPicksInput(props: ArrayOfObjectsInputProps) {
   }
 
   return (
-    <Stack gap={3}>
+    <Stack gap={4}>
       {props.renderDefault(props)}
       {spec && brand && (
-        <Card padding={3} radius={2} border tone="transparent">
-          <Stack gap={3}>
+        <Card padding={4} radius={2} border tone="transparent">
+          <Stack gap={4}>
             <Flex align="center" gap={2}>
               <Box flex={1}>
                 <Stack gap={2}>
                   <Text size={1} weight="medium">
                     Shown automatically now
                   </Text>
-                  <Text size={0} muted>
+                  <Text size={1} muted>
                     {spec.hint ?? 'Fills the empty places on the site. Published posts only.'}
                   </Text>
                 </Stack>
@@ -160,11 +160,14 @@ export function AutoFillPicksInput(props: ArrayOfObjectsInputProps) {
                 Nothing fills automatically: the picks take every place, or nothing matches.
               </Text>
             ) : (
-              <Stack gap={2}>
-                {state.items.map((item) => (
+              // Rows divided by a thin rule, 12 above and below each; none on the outer edges.
+              <Stack>
+                {state.items.map((item, index) => (
                   <AutoFillRow
                     key={item._id}
                     item={item}
+                    first={index === 0}
+                    last={index === state.items.length - 1}
                     onPin={!readOnly && room > 0 ? () => pin([item]) : undefined}
                   />
                 ))}
@@ -177,32 +180,48 @@ export function AutoFillPicksInput(props: ArrayOfObjectsInputProps) {
   )
 }
 
-function AutoFillRow({ item, onPin }: { item: AutoFillItem; onPin?: () => void }) {
+function AutoFillRow({
+  item,
+  first,
+  last,
+  onPin,
+}: {
+  item: AutoFillItem
+  first: boolean
+  last: boolean
+  onPin?: () => void
+}) {
   const thumbnail = thumbnailUrl(item.image)
   const date = item.subtitle || dateOf(item)
 
   return (
-    <Flex align="center" gap={3}>
-      {thumbnail ? (
-        <Box style={{ width: 33, height: 33, flexShrink: 0, borderRadius: 3, overflow: 'hidden' }}>
-          {/* Studio, not a site page: a plain CDN thumbnail, as Studio previews do. */}
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src={thumbnail} alt="" width={33} height={33} style={{ display: 'block', objectFit: 'cover' }} />
-        </Box>
-      ) : null}
-      <Box flex={1}>
-        <Stack gap={2}>
-          <Text size={1} textOverflow="ellipsis">
-            {item.title || 'Untitled'}
-          </Text>
-          {date && (
-            <Text size={0} muted>
-              {date}
+    <Card tone="inherit" borderTop={!first} paddingTop={first ? 0 : 3} paddingBottom={last ? 0 : 3}>
+      <Flex align="center" gap={3}>
+        {thumbnail ? (
+          <Box style={{ width: 33, height: 33, flexShrink: 0, borderRadius: 3, overflow: 'hidden' }}>
+            {/* Studio, not a site page: a plain CDN thumbnail, as Studio previews do. */}
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src={thumbnail} alt="" width={33} height={33} style={{ display: 'block', objectFit: 'cover' }} />
+          </Box>
+        ) : null}
+        <Box flex={1}>
+          <Stack gap={2}>
+            <Text size={1} textOverflow="ellipsis">
+              {item.title || 'Untitled'}
             </Text>
-          )}
-        </Stack>
-      </Box>
-      {onPin && <Button mode="bleed" fontSize={1} padding={2} text="Pin" onClick={onPin} />}
-    </Flex>
+            {date && (
+              <Text size={1} muted>
+                {date}
+              </Text>
+            )}
+          </Stack>
+        </Box>
+        {onPin && (
+          <Box style={{ flexShrink: 0 }}>
+            <Button mode="bleed" fontSize={1} padding={2} text="Pin" onClick={onPin} />
+          </Box>
+        )}
+      </Flex>
+    </Card>
   )
 }

@@ -493,7 +493,7 @@ const HIGHLIGHTS = /* groq */ `
   source,
   layout,
   count,
-  heading[]{ _key, style, children[]{ _key, text } },
+  heading,
   deadlineLabel,
   "items": items[]->{ ${HIGHLIGHT_ITEM} },
   "fill": select(${RECORD_FILL_BRANCHES}),
