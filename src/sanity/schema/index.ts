@@ -8,6 +8,7 @@ import { awardCategoryPage } from './documents/award-category-page'
 import { awardsProgramme } from './documents/awards-programme'
 import { awardsProgrammePage } from './documents/awards-programme-page'
 import { awardsProgrammeGroup } from './documents/awards-programme-group'
+import { eventRegion } from './documents/event-region'
 import { brand } from './documents/brand'
 import { briefSettings } from './documents/brief-settings'
 import { company } from './documents/company'
@@ -62,6 +63,7 @@ export const documentTypes = [
   signupNotificationSettings,
   newsletterIssue,
   awardsProgrammeGroup,
+  eventRegion,
   awardsProgramme,
   conferenceEvent,
   awardCategory,

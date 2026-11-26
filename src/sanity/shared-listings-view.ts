@@ -13,7 +13,7 @@ import {
   type RecordListingCopy,
   type RecordListingCopyKey,
 } from '@/lib/record-listing-copy'
-import { REGION_LABELS, regionOf, type Region } from '@/lib/regions'
+import { regionResolver } from '@/lib/regions'
 import {
   editionGroup,
   filterListing,
@@ -106,14 +106,27 @@ const IMAGE_KINDS: Record<SharedListingsTab, ListingImageKind> = { awards: 'word
 // The status each URL value selects, for the option labels: STATUS_PARAMS of every tab in one table.
 const STATUS_OF_PARAM = Object.assign({}, ...Object.values(STATUS_PARAMS)) as Record<StatusParam, ListingStatus>
 
-/** How a record's row reads its labels: the status labels and the region names of the block. */
-type RowLabels = { statuses: Record<ListingStatus, string>; region: (region: Region | null) => string | null }
+/** How a record's row reads its labels: the status labels and the region names (the event region titles). */
+type RowLabels = { statuses: Record<ListingStatus, string>; region: (region: string | null) => string | null }
 
 /** A record's row, built once the labels are known. The ranking, filters and page count need no labels. */
 type RowOf = (labels: RowLabels) => ListingRowView
 
+/** The event regions, stega-free: slugs and countries are compared, so only the titles keep stega (regionTitles). */
+const cleanRegions = (data: SharedListingsData) =>
+  data.regions.flatMap((region) => {
+    const slug = stegaClean(region.slug)
+    return slug ? [{ slug, title: stegaClean(region.title) ?? '', countries: stegaClean(region.countries) }] : []
+  })
+
+/** The title of each region by slug, stega kept for click-to-edit. */
+const regionTitles = (data: SharedListingsData) =>
+  new Map(data.regions.flatMap((region) => (region.slug ? [[stegaClean(region.slug), region.title ?? '']] : [])))
+
 /** The tab's records as the ranking and filters see them, each carrying how to build its row. */
 function toRecords(tab: SharedListingsTab, data: SharedListingsData, today: string): ListingRecord<RowOf>[] {
+  const regionOf = regionResolver(cleanRegions(data))
+
   switch (tab) {
     case 'awards':
       return data.awards.map((edition) => {
@@ -211,6 +224,7 @@ function toRecords(tab: SharedListingsTab, data: SharedListingsData, today: stri
 /** The three filters of the GET form, those the tab has options for. */
 function toFilterFields(
   copy: RecordListingCopy,
+  regions: Map<string, string>,
   labels: Record<ListingStatus, string>,
   options: ReturnType<typeof listingOptions>,
   filters: ListingFilters,
@@ -219,7 +233,7 @@ function toFilterFields(
     {
       name: 'region',
       label: copy.regionFilterLabel,
-      options: options.regions.map((region) => ({ value: region, label: copy[REGION_LABELS[region]] })),
+      options: options.regions.map((region) => ({ value: region, label: regions.get(region) ?? region })),
       selected: filters.region,
     },
     {
@@ -242,7 +256,7 @@ function toFilterFields(
 /** The ranked records matching the URL's filters, the tab's filter options and the URL state. */
 function listingState({ tab, params, today, data }: Omit<RecordListingContext, 'path'>) {
   const ranked = rankListing(toRecords(tab, data, today))
-  const options = listingOptions(tab, ranked)
+  const options = listingOptions(tab, ranked, cleanRegions(data).map((region) => region.slug))
   const filters = parseListingFilters(params, options)
   const records = filterListing(tab, ranked, filters)
 
@@ -274,7 +288,8 @@ export function toRecordListingView(block: RecordListingBlock, context: RecordLi
 
   const copy = toCopy(block)
   const statuses = statusLabels(copy, toStatuses(data.statuses))
-  const labels: RowLabels = { statuses, region: (region) => (region ? copy[REGION_LABELS[region]] : null) }
+  const regions = regionTitles(data)
+  const labels: RowLabels = { statuses, region: (region) => (region ? (regions.get(region) ?? null) : null) }
   const start = (state.page - 1) * LISTING_PAGE_SIZE
   const rows = records.slice(start, start + LISTING_PAGE_SIZE).map((record) => record.item(labels))
   const href = (page: number) => listingHref(path, { ...state, page })
@@ -289,7 +304,7 @@ export function toRecordListingView(block: RecordListingBlock, context: RecordLi
     filters: {
       action: path,
       allLabel: copy.allOptionLabel,
-      fields: toFilterFields(copy, statuses, options, state),
+      fields: toFilterFields(copy, regions, statuses, options, state),
       clear: hasListingFilters(state) ? { label: copy.clearFiltersLabel, href: path } : null,
     },
     rows,

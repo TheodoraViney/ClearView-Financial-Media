@@ -65,18 +65,7 @@ export const recordListing = defineType({
     ),
     label('researchTabLabel', 'Research tab', 'Tab of the research list, opened at /resource-categories/research.', 'tabs', 'Research'),
 
-    label('regionFilterLabel', 'Region filter label', 'Label of the region filter (Awards and Events tabs).', 'filters', 'Region'),
-    label('regionEuropeLabel', 'Europe region', 'Region of records held in Europe, on their row and as a region filter option. An award takes the region of its programme (Awards programme > Region), an event the region of its country.', 'filters', 'Europe'),
-    label('regionMenaLabel', 'MENA region', 'Region of records held in the Middle East and North Africa.', 'filters', 'MENA'),
-    label('regionAsiaLabel', 'Asia region', 'Region of records held in Asia.', 'filters', 'Asia'),
-    label('regionNorthAmericaLabel', 'North America region', 'Region of records held in North America.', 'filters', 'North America'),
-    label(
-      'regionGlobalLabel',
-      'Global region',
-      'Region of awards whose programme is set to Global (Awards programme > Region). Filters on its own.',
-      'filters',
-      'Global',
-    ),
+    label('regionFilterLabel', 'Region filter label', 'Label of the region filter (Awards and Events tabs). Its options are the Event regions with at least one record.', 'filters', 'Region'),
     label('yearFilterLabel', 'Year filter label', 'Label of the year filter.', 'filters', 'Year'),
     label(
       'statusFilterLabel',
