@@ -237,6 +237,7 @@ export const structure: StructureResolver = (S) =>
             ]),
         ),
       S.documentTypeListItem('conferenceEvent').title('Events').icon(CalendarIcon),
+      S.documentTypeListItem('eventRegion').title('Event regions').icon(EarthGlobeIcon),
       S.documentTypeListItem('resource').title('Resources').icon(DocumentPdfIcon),
       S.documentTypeListItem('researchSummary').title('Executive summaries').icon(DocumentTextIcon),
       S.divider(),

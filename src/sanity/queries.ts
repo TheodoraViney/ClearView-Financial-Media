@@ -758,6 +758,13 @@ export const SHARED_LISTINGS_PAGE_QUERY = defineQuery(`
       ceremonyDueLabel,
       winnersAnnouncedLabel
     },
+    // The regions of the Awards and Events tabs (src/lib/regions.ts), in filter order.
+    "regions": *[$tab in ["awards", "events"] && _type == "eventRegion" && defined(slug.current) && defined(title)]
+      | order(lower(title) asc){
+        "slug": slug.current,
+        title,
+        "countries": coalesce(countries, [])
+      },
     "awards": *[$tab == "awards" && _type == "awardsProgramme" && defined(slug.current)]{
       _id,
       title,
@@ -768,7 +775,7 @@ export const SHARED_LISTINGS_PAGE_QUERY = defineQuery(`
       nominationsOpeningDate,
       nominationsClosingDate,
       country,
-      "programmeRegion": programme->region,
+      "programmeRegion": programme->region->slug.current,
       // The card's picture: the edition logo, else its programme's.
       "logo": select(defined(logo.asset) => logo{ ${IMAGE} }, programme->logo{ ${IMAGE} }),
       "hasWinners": count(winners[defined(category->title) && defined(company->title)]) > 0

@@ -2,7 +2,6 @@ import type { MediaImage } from '@/components/ui/Media'
 
 import type { EditionStatus } from './awards-status'
 import { AWARDS_LISTING_PATH, EVENT_LISTING_PATHS, RESEARCH_LISTING_PATH } from './links'
-import { REGIONS, type Region } from './regions'
 
 /*
  * The shared listings page (ClearView only): one `page` document (SHARED_LISTINGS_PAGE_DOCUMENT_ID) built from blocks,
@@ -10,7 +9,7 @@ import { REGIONS, type Region } from './regions'
  * paged by the URL. Pure: the ranking, filter options and URL state live here; src/sanity/shared-listings-view.ts maps
  * the query result onto them.
  *
- * URL state: `region` (a Region; Awards and Events tabs), `year` (four digits, a year present in the tab's records),
+ * URL state: `region` (an event region slug; Awards and Events tabs), `year` (four digits, a year present in the tab's records),
  * `status` (one of the tab's STATUS_PARAMS) and `page` (2 and up, no leading zeros; absent: 1). Unknown or malformed
  * values are dropped silently, as on the Search and Categories pages; a page past the end is a 404. A filtered or
  * paged unfiltered view is indexable and its own canonical; a filtered view is noindex (listingCanonical).
@@ -80,7 +79,8 @@ export type ListingRecord<T> = {
   title: string
   /** The ISO date it is sorted and filtered by: the start date of an edition or event, a report's publish date. */
   date: string | null
-  region: Region | null
+  /** The slug of the record's event region (src/lib/regions.ts). */
+  region: string | null
   status: ListingStatus | null
   /** The record's group in the order (LISTING_GROUPS). */
   group: ListingGroup
@@ -93,7 +93,7 @@ export type ListingRecord<T> = {
 }
 
 export type ListingFilters = {
-  region: Region | null
+  region: string | null
   year: string | null
   status: StatusParam | null
 }
@@ -102,8 +102,8 @@ export type ListingFilters = {
 export type ListingState = ListingFilters & { page: number }
 
 export type ListingOptions = {
-  /** Regions present in the tab's records, in REGIONS order. Empty on the Research tab. */
-  regions: Region[]
+  /** Slugs of the regions present in the tab's records, in the order given. Empty on the Research tab. */
+  regions: string[]
   /** Years present in the tab's records, newest first. */
   years: string[]
   statuses: StatusParam[]
@@ -181,13 +181,17 @@ export function rankListing<T>(records: ListingRecord<T>[]): ListingRecord<T>[] 
   )
 }
 
-/** The filter options of a tab, from its records. */
-export function listingOptions<T>(tab: SharedListingsTab, records: ListingRecord<T>[]): ListingOptions {
+/** The filter options of a tab, from its records; `regionOrder` is every region slug in option order. */
+export function listingOptions<T>(
+  tab: SharedListingsTab,
+  records: ListingRecord<T>[],
+  regionOrder: readonly string[],
+): ListingOptions {
   const regions = new Set(records.map((record) => record.region))
   const years = new Set(records.flatMap((record) => yearOf(record.date) ?? []))
 
   return {
-    regions: REGION_TABS.includes(tab) ? REGIONS.filter((region) => regions.has(region)) : [],
+    regions: REGION_TABS.includes(tab) ? regionOrder.filter((region) => regions.has(region)) : [],
     years: [...years].sort((a, b) => b.localeCompare(a)),
     statuses: Object.keys(STATUS_PARAMS[tab]) as StatusParam[],
   }
@@ -202,7 +206,7 @@ export function parseListingFilters(params: RawSearchParams, options: ListingOpt
   const status = first(params.status)
 
   return {
-    region: (options.regions as string[]).includes(region ?? '') ? (region as Region) : null,
+    region: region && options.regions.includes(region) ? region : null,
     year: year && YEAR_PATTERN.test(year) && options.years.includes(year) ? year : null,
     status: (options.statuses as string[]).includes(status ?? '') ? (status as StatusParam) : null,
   }
