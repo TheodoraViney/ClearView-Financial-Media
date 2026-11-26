@@ -9,6 +9,7 @@ import { StarIcon } from '@sanity/icons/Star'
 import type { ReferenceFilterResolver } from 'sanity'
 
 import { isCompanyEngagementPageId } from '@/lib/company-engagement'
+import { SHARED_LISTINGS_PAGE_DOCUMENT_ID } from '@/lib/shared-listings'
 
 export const TOP_STORIES_SLIDE_COUNT = 3
 export const TOP_STORIES_ARTICLE_COUNT = 3
@@ -36,9 +37,16 @@ const COMPANY_ENGAGEMENT_BLOCK_TYPES: readonly string[] = [
   'companySponsoredContent',
 ]
 
+/** Blocks only the shared listings page carries at the top level: the list needs its routes. */
+const SHARED_LISTINGS_BLOCK_TYPES: readonly string[] = ['recordListing']
+
+const isSharedListingsPageId = (id: unknown): boolean =>
+  String(id ?? '').replace(/^drafts\./, '') === SHARED_LISTINGS_PAGE_DOCUMENT_ID
+
 /** Whether the page with this document id can carry the block at the top level. */
 export const blockAllowedOnPage = (type: string, documentId: unknown): boolean =>
-  !COMPANY_ENGAGEMENT_BLOCK_TYPES.includes(type) || isCompanyEngagementPageId(documentId)
+  (!COMPANY_ENGAGEMENT_BLOCK_TYPES.includes(type) || isCompanyEngagementPageId(documentId)) &&
+  (!SHARED_LISTINGS_BLOCK_TYPES.includes(type) || isSharedListingsPageId(documentId))
 
 // ClearView posts never carry the clearview key: the group page draws on every editorial brand.
 export const postsOfPageBrand: ReferenceFilterResolver = ({ document }) => {

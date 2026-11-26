@@ -762,7 +762,6 @@ export const SHARED_LISTINGS_PAGE_QUERY = defineQuery(`
       _id,
       title,
       "slug": slug.current,
-      standfirst,
       startDate,
       endDate,
       hideDateTime,
@@ -770,7 +769,7 @@ export const SHARED_LISTINGS_PAGE_QUERY = defineQuery(`
       nominationsClosingDate,
       country,
       "programmeRegion": programme->region,
-      // AWARDS-LIST-VARIANTS (temporary): the edition logo, else its programme's.
+      // The card's picture: the edition logo, else its programme's.
       "logo": select(defined(logo.asset) => logo{ ${IMAGE} }, programme->logo{ ${IMAGE} }),
       "hasWinners": count(winners[defined(category->title) && defined(company->title)]) > 0
     },
@@ -781,13 +780,16 @@ export const SHARED_LISTINGS_PAGE_QUERY = defineQuery(`
       startDate,
       endDate,
       hideDateTime,
-      country
+      country,
+      "logo": logo{ ${IMAGE} }
     },
     "research": *[$tab == "research" && _type == "resource" && category == "research" && defined(slug.current)]{
       _id,
       title,
       "slug": slug.current,
-      publishedAt
+      publishedAt,
+      // The report cover, as in the research lists elsewhere.
+      "cover": downloadThumbnail{ ${IMAGE} }
     }
   }
 `)

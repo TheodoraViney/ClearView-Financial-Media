@@ -777,6 +777,8 @@ export const BLOCKS_PROJECTION = /* groq */ `
   _type == "companyAwards" => { ${COMPANY_AWARDS} },
   _type == "companyEvents" => { ${COMPANY_EVENTS} },
   _type == "companySponsoredContent" => { ${COMPANY_SPONSORED_CONTENT} },
+  // The shared listings page: its list, full width under the Two columns block.
+  _type == "recordListing" => { ${RECORD_LISTING} },
   _type == "splitLayout" => {
     "main": main[]{ _key, _type, ${MAIN_COLUMN_BLOCKS} },
     "aside": aside[]{ _key, _type, ${ASIDE_BLOCKS} }

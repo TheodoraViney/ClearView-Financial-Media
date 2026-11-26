@@ -1,6 +1,5 @@
-import type { MediaImage } from '@/components/ui/Media' // AWARDS-LIST-VARIANTS (temporary)
+import type { MediaImage } from '@/components/ui/Media'
 
-import type { AwardsListView } from './awards-list-view' // AWARDS-LIST-VARIANTS (temporary)
 import type { EditionStatus } from './awards-status'
 import { AWARDS_LISTING_PATH, EVENT_LISTING_PATHS, RESEARCH_LISTING_PATH } from './links'
 import { REGIONS, type Region } from './regions'
@@ -22,7 +21,7 @@ export const SHARED_LISTINGS_PAGE_DOCUMENT_ID = 'page-shared-listings'
 export const SHARED_LISTINGS_PAGE_SLUG = 'shared-listings'
 
 /** Records per page of the listing. */
-export const LISTING_PAGE_SIZE = 10
+export const LISTING_PAGE_SIZE = 12
 
 /** The tabs, in tab order. */
 export const SHARED_LISTINGS_TABS = ['awards', 'events', 'research'] as const
@@ -86,8 +85,8 @@ export type ListingRecord<T> = {
   /** The record's group in the order (LISTING_GROUPS). */
   group: ListingGroup
   /**
-   * The ISO date it is ranked by within its group: an edition open for submissions by its nominations closing date,
-   * everything else by `date`.
+   * The ISO date it is ranked by within its group: an edition open for submissions by its nominations closing date, one
+   * launching soon by its nominations opening date, everything else by `date`.
    */
   rankDate: string | null
   item: T
@@ -123,10 +122,11 @@ const yearOf = (date: string | null): string | null => {
 /**
  * The groups of the order, in order, and the direction of each one's dates:
  * - `open`: an awards edition open for submissions, soonest deadline first;
- * - `upcoming`: an edition whose ceremony is still ahead (ceremony due, launching soon) or an upcoming event, soonest first;
+ * - `upcoming`: an awards edition whose ceremony is due, or an upcoming event, soonest first;
+ * - `launching`: an awards edition launching soon (nominations not open yet), soonest nominations opening first;
  * - `past`: every other edition (winners announced or no status), every past event and every report, latest first.
  */
-const LISTING_GROUPS = { open: 1, upcoming: 1, past: -1 } as const satisfies Record<string, 1 | -1>
+const LISTING_GROUPS = { open: 1, upcoming: 1, launching: 1, past: -1 } as const satisfies Record<string, 1 | -1>
 
 export type ListingGroup = keyof typeof LISTING_GROUPS
 
@@ -135,9 +135,10 @@ export function editionGroup(status: EditionStatus | null): ListingGroup {
   switch (status) {
     case 'submissionsOpen':
       return 'open'
-    case 'launchingSoon':
     case 'ceremonyDue':
       return 'upcoming'
+    case 'launchingSoon':
+      return 'launching'
     default:
       return 'past'
   }
@@ -170,8 +171,8 @@ const byDate =
 
 /**
  * The tab's order, group by group (LISTING_GROUPS). Awards: editions open for submissions by nominations closing date
- * (soonest deadline first), then editions whose ceremony is still ahead by start date ascending, then past editions by
- * start date descending. Events: upcoming events by start date ascending (soonest first), then past events by start
+ * (soonest deadline first), then editions whose ceremony is due by start date ascending, then editions launching soon
+ * by nominations opening date ascending, then past editions by start date descending. Events: upcoming events by start date ascending (soonest first), then past events by start
  * date descending. Research: newest first. Undated records go last in each group; records on the same date run by title A to Z, then by id.
  */
 export function rankListing<T>(records: ListingRecord<T>[]): ListingRecord<T>[] {
@@ -302,18 +303,23 @@ export type ListingFilterView = {
   selected: string | null
 }
 
+/** How a tab's cards show their picture: `wordmark` (awards and event logos), `cover` (report covers). */
+export type ListingImageKind = 'wordmark' | 'cover'
+
 export type ListingRowView = {
   key: string
   title: string
   href: string | null
-  /** Awards only: the edition's standfirst. */
-  standfirst: string | null
   /** The date range of an edition or event unless it hides its dates, a report's publish date. */
   date: string | null
   /** The region label; null for a country outside the table, a record without one, and every report. */
   region: string | null
   status: { label: string; highlight: boolean } | null
-  logo?: MediaImage | null // AWARDS-LIST-VARIANTS (temporary): awards only, the edition logo, else its programme's
+  /**
+   * The card's picture: an edition's logo (else its programme's) or an event's logo, both wordmarks on their own dark
+   * ground; a report's cover. Null when the record has none.
+   */
+  image: MediaImage | null
 }
 
 /** The record listing block's props: tabs, filters, the page's records (or the empty state) and the pagination. */
@@ -329,7 +335,8 @@ export type RecordListingView = {
   }
   /** The current page's rows. */
   rows: ListingRowView[]
-  awardsView: AwardsListView // AWARDS-LIST-VARIANTS (temporary)
+  /** How the cards show their picture: a wordmark band (awards, events) or a report cover (research). */
+  imageKind: ListingImageKind
   /** Records matching the filters, on every page: for the screen reader count. */
   total: number
   /** Shown instead of the list when no record matches. */

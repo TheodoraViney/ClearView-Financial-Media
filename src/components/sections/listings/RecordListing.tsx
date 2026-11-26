@@ -5,14 +5,10 @@ import { stegaClean } from 'next-sanity'
 import { Button } from '@/components/ui/Button'
 import { Dropdown } from '@/components/ui/Dropdown'
 import { EmptyState } from '@/components/ui/EmptyState'
-import { ListingRecord } from '@/components/ui/ListingRecord'
+import { ListingCard } from '@/components/ui/ListingCard'
 import { Pagination } from '@/components/ui/Pagination'
 import { TabLinks } from '@/components/ui/TabLinks'
-import { AWARDS_LIST_VIEW_PARAM } from '@/lib/awards-list-view' // AWARDS-LIST-VARIANTS (temporary)
 import type { RecordListingView } from '@/lib/shared-listings'
-
-import { AwardsGrid } from './awards-variants/AwardsGrid' // AWARDS-LIST-VARIANTS (temporary)
-import { AwardsIconList } from './awards-variants/AwardsIconList' // AWARDS-LIST-VARIANTS (temporary)
 
 // Screen-reader-only text. Visible copy comes from the CMS.
 const TABS_LABEL = 'Listings'
@@ -25,13 +21,14 @@ const countText = (tab: string, count: number) =>
   count === 0 ? `${tab}: no records match these filters` : `${tab}: ${count} ${count === 1 ? 'record' : 'records'}`
 
 /**
- * The awards, events and research lists of the shared listings page (Claude Design wb-g-shared-listings v1.0), in the
- * main column of a Two columns block, under the page heading: the Awards | Events | Research tabs (links to each
- * listing), the filters (single-select dropdowns that submit on change; a GET form, so they work without JavaScript
- * through the submit button shown then), Clear filters while a filter is set, then the page's records or the empty
- * state, and the pagination (not in the design: 10 records a page, the Search page's look).
- * Side padding 16 / 32 / 64; 32 / 40 above the tabs, 64 / 96 under the list. All visible text is CMS copy from the view
- * (src/sanity/shared-listings-view.ts).
+ * The awards, events and research lists of the shared listings page (Claude Design wb-g-shared-listings v1.0), full
+ * page width under the Two columns block that holds the page heading and the Side banner: the Awards | Events |
+ * Research tabs (links to each listing), the filters (single-select dropdowns that submit on change; a GET form, so they
+ * work without JavaScript through the submit button shown then), Clear filters while a filter is set, then the page's
+ * records as a grid of cards (one column, two from md, four from the header breakpoint) or the empty state, and the
+ * pagination (not in the design: 12 records a page, the Search page's look).
+ * Centred at the page width; side padding 16 / 32 / 64; 32 / 40 above the tabs, 64 / 96 under the list. All visible
+ * text is CMS copy from the view (src/sanity/shared-listings-view.ts).
  */
 export function RecordListing({ view }: { view: RecordListingView }) {
   const tabLabel = view.tabs.find((tab) => tab.current)?.label ?? ''
@@ -40,13 +37,11 @@ export function RecordListing({ view }: { view: RecordListingView }) {
   const syncKey = filters.fields.map((field) => `${field.name}=${field.selected ?? ''}`).join('&')
 
   return (
-    <div className="flex min-w-0 flex-col px-gutter pt-8 pb-16 md:pt-10 header:px-16 header:pb-24">
+    <div className="mx-auto flex w-full max-w-page min-w-0 flex-col px-gutter pt-8 pb-16 md:pt-10 header:px-16 header:pb-24">
       <TabLinks items={view.tabs} label={TABS_LABEL} />
 
       {filters.fields.length > 0 && (
         <Form action={filters.action} scroll={false} prefetch={false} aria-label={FILTERS_LABEL} className="mt-6">
-          {/* AWARDS-LIST-VARIANTS (temporary): a filter change keeps the variant. */}
-          {view.awardsView && <input type="hidden" name={AWARDS_LIST_VIEW_PARAM} value={view.awardsView} />}
           {/* Four columns on desktop (gap 32), two on tablet (16 / 32), one on mobile (16). */}
           <div className="grid items-end gap-x-8 gap-y-4 md:grid-cols-2 header:grid-cols-4 noscript:items-start">
             {filters.fields.map((field) => (
@@ -105,27 +100,21 @@ export function RecordListing({ view }: { view: RecordListingView }) {
           />
         ) : (
           <>
-            {/* AWARDS-LIST-VARIANTS (temporary): the Awards `?view=` variants, else the plain list. */}
-            {view.awardsView === 'grid' ? (
-              <AwardsGrid rows={view.rows} statusLabel={STATUS_PREFIX} />
-            ) : view.awardsView === 'icon' ? (
-              <AwardsIconList rows={view.rows} statusLabel={STATUS_PREFIX} />
-            ) : (
-              <ul className="flex flex-col">
-                {view.rows.map((row) => (
-                  <li key={row.key}>
-                    <ListingRecord
-                      href={row.href}
-                      title={row.title}
-                      meta={[row.date, row.region].filter((item): item is string => Boolean(item))}
-                      status={row.status?.label}
-                      statusLabel={STATUS_PREFIX}
-                      description={row.standfirst}
-                    />
-                  </li>
-                ))}
-              </ul>
-            )}
+            <ul className="grid gap-4 md:grid-cols-2 header:grid-cols-4">
+              {view.rows.map((row) => (
+                <li key={row.key} className="flex min-w-0">
+                  <ListingCard
+                    href={row.href}
+                    title={row.title}
+                    meta={[row.date, row.region].filter((item): item is string => Boolean(item))}
+                    status={row.status}
+                    statusLabel={STATUS_PREFIX}
+                    image={row.image}
+                    imageKind={view.imageKind}
+                  />
+                </li>
+              ))}
+            </ul>
             <Pagination
               pages={view.pagination.pages}
               previousHref={view.pagination.previousHref}
