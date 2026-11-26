@@ -25,7 +25,6 @@ import { post } from './documents/post'
 import { researchGenerationSettings } from './documents/research-generation-settings'
 import { partnerProfilePage } from './documents/partner-profile-page'
 import { researchReportPage } from './documents/research-report-page'
-import { researchSummary } from './documents/research-summary'
 import { resource } from './documents/resource'
 import { searchPage } from './documents/search-page'
 import { signupNotificationSettings } from './documents/signup-notification-settings'
@@ -71,7 +70,6 @@ export const documentTypes = [
   person,
   acclaim,
   resource,
-  researchSummary,
 ]
 
 export const schemaTypes = [...documentTypes, ...objectTypes, ...blockTypes]

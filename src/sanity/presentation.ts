@@ -14,40 +14,23 @@ const eventLocations = defineLocations({
     doc?.slug ? { locations: [{ title: doc.title ?? 'Untitled', href: `/events/${doc.slug}` }] } : null,
 })
 
-// A report whose Executive Summary page is its own fields, not an old `researchSummary` document (RESEARCH_REPORT_QUERY).
-const OWN_SUMMARY = '(count(summaryLead) > 0 || count(summaryIntro) > 0 || count(summarySections) > 0)'
-
 // A research report: its page and its Executive Summary page (/resource/{slug}/{summarySlug}) on ClearView. The
 // summary page exists only while it has content, but the location is always listed, so the editor can open it once it
-// is filled. Until the merge script has run, a report whose own summary fields are all empty and that still points at
-// an old `researchSummary` document uses that document's slug, as RESEARCH_REPORT_QUERY does. The old summary
-// document itself lists no locations: the report that uses it is a reverse lookup, which `defineLocations` cannot
-// select.
+// is filled.
 const resourceLocations = defineLocations({
-  select: {
-    title: 'title',
-    slug: 'slug.current',
-    lead: 'summaryLead.0._key',
-    intro: 'summaryIntro.0._key',
-    section: 'summarySections.0._key',
-    summarySlug: 'summarySlug.current',
-    oldSummarySlug: 'executiveSummaryPage.slug.current',
-  },
-  resolve: (doc) => {
-    if (!doc?.slug) {
-      return null
-    }
-
-    const own = Boolean(doc.lead || doc.intro || doc.section)
-    const summarySlug = (!own && doc.oldSummarySlug) || doc.summarySlug || RESEARCH_SUMMARY_DEFAULT_SLUG
-
-    return {
-      locations: [
-        { title: doc.title ?? 'Untitled', href: `/resource/${doc.slug}` },
-        { title: 'Executive Summary', href: `/resource/${doc.slug}/${encodeURIComponent(summarySlug)}` },
-      ],
-    }
-  },
+  select: { title: 'title', slug: 'slug.current', summarySlug: 'summarySlug.current' },
+  resolve: (doc) =>
+    doc?.slug
+      ? {
+          locations: [
+            { title: doc.title ?? 'Untitled', href: `/resource/${doc.slug}` },
+            {
+              title: 'Executive Summary',
+              href: `/resource/${doc.slug}/${encodeURIComponent(doc.summarySlug || RESEARCH_SUMMARY_DEFAULT_SLUG)}`,
+            },
+          ],
+        }
+      : null,
 })
 
 // A company's profile page on ClearView. The page exists only while an awards edition, an event or a post names the
@@ -107,16 +90,15 @@ export const presentationTools: PluginOptions[] = BRAND_KEYS.map((key) =>
                 route: '/events/:slug',
                 filter: '_type in ["awardsProgramme", "conferenceEvent"] && slug.current == $slug',
               },
-              // A research report, and its Executive Summary page: the report itself when one of its own summary
-              // fields is set, else (until the merge script has run) the old summary document it points at, the same
-              // choice as RESEARCH_REPORT_QUERY. The report's fields on that page stay click-to-edit either way.
+              // A research report, and its Executive Summary page at the report's summary slug: both are the report's
+              // own fields.
               {
                 route: '/resource/:slug',
                 filter: '_type == "resource" && slug.current == $slug',
               },
               {
                 route: '/resource/:slug/:summary',
-                filter: `(_type == "resource" && slug.current == $slug && $summary == coalesce(summarySlug.current, "${RESEARCH_SUMMARY_DEFAULT_SLUG}") && ${OWN_SUMMARY}) || (_type == "researchSummary" && slug.current == $summary && _id in *[_type == "resource" && slug.current == $slug && !(${OWN_SUMMARY})].executiveSummaryPage._ref)`,
+                filter: `_type == "resource" && slug.current == $slug && $summary == coalesce(summarySlug.current, "${RESEARCH_SUMMARY_DEFAULT_SLUG}")`,
               },
               // The company directory: the cards are the records' own; the blocks are the Company Engagement page
               // document's.

@@ -85,8 +85,7 @@ export type ResearchReportSectionId = (typeof RESEARCH_REPORT_SECTIONS)[number]
 
 /**
  * The last segment of a report's Executive Summary page URL, /resource/{report slug}/{summary slug}: the report's
- * `summarySlug`, this by default (its initial value, and the value while the field is unset). Reports not yet moved off
- * the old `researchSummary` document use that document's own slug until the merge script copies it.
+ * `summarySlug`, this by default (its initial value, and the value while the field is unset).
  */
 export const RESEARCH_SUMMARY_DEFAULT_SLUG = 'executive-summary'
 
