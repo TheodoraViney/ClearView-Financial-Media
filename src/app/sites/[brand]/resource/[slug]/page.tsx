@@ -15,6 +15,7 @@ import {
   reportPath,
   researchReportDescription,
   researchReportShareImage,
+  seoOverrides,
   toResearchReportView,
 } from '@/sanity/research-report-view'
 import { PLACEHOLDER_SLUG } from '@/sanity/static-params'
@@ -62,23 +63,22 @@ export async function generateMetadata({ params }: { params: Promise<Params> }):
     return {}
   }
 
-  const description = researchReportDescription(data)
+  // The "SEO" tab's fields when filled, else the defaults. A meta title is the whole title: `absolute` skips the
+  // brand layout's " | {brand}" template, so the editor's text is used as written.
+  const seo = seoOverrides(data.seo, data.title)
+  const description = seo.description ?? researchReportDescription(data)
   const image = researchReportShareImage(data)
+  const shareImage =
+    seo.image ??
+    (image ? { url: isSvg(image.src) ? `${image.src}?fm=png` : image.src, width: image.width, height: image.height, alt: image.alt } : null)
   const path = reportPath(data)
   const canonical = path ? `${brandOrigin('clearview')}${path}` : undefined
 
   return {
-    title: stegaClean(data.title),
+    title: seo.title ? { absolute: seo.title } : stegaClean(data.title),
     ...(description ? { description } : {}),
     ...(canonical ? { alternates: { canonical } } : {}),
-    ...(image
-      ? {
-          openGraph: {
-            url: canonical,
-            images: [{ url: isSvg(image.src) ? `${image.src}?fm=png` : image.src, width: image.width, height: image.height, alt: image.alt }],
-          },
-        }
-      : {}),
+    ...(shareImage ? { openGraph: { url: canonical, images: [shareImage] } } : {}),
   }
 }
 

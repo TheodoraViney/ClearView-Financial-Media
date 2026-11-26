@@ -12,6 +12,7 @@ import { navLink } from './nav-link'
 import { personGroup } from './person-group'
 import { pullQuote } from './pull-quote'
 import { richText } from './rich-text'
+import { seo } from './seo'
 import { socialLink } from './social-link'
 import { videoGallery } from './video-gallery'
 import { winner } from './winner'
@@ -38,4 +39,5 @@ export const objectTypes = [
   brevoTemplate,
   brevoSender,
   brevoAttribute,
+  seo,
 ]

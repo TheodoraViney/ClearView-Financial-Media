@@ -20,7 +20,7 @@ import {
 import { RESEARCH_REPORT_PAGE_COPY_KEYS, type ResearchReportPageCopy, type ResearchReportPageCopyKey } from '@/lib/research-report-copy'
 
 import { clipDescription, sectionHeading } from './awards-programme-view'
-import { toImage } from './image'
+import { toImage, toShareImage } from './image'
 import type { MostReadGroupFill } from './most-read'
 import type { RESEARCH_REPORT_PAGE_QUERY_RESULT, RESEARCH_REPORT_QUERY_RESULT } from './types'
 
@@ -41,7 +41,8 @@ export const reportPath = (report: Pick<ResearchReportData, 'slug'>): string | n
 
 /**
  * The report's Executive Summary page path, /resource/{slug}/{summary slug}: null unless the report has a slug and its
- * `executiveSummaryPage` document has a slug and content (stega-clean checks, so it holds in draft mode too).
+ * `executiveSummaryPage` (RESEARCH_REPORT_QUERY: the report's own summary fields, or the old summary document) has a
+ * slug and content (stega-clean checks, so it holds in draft mode too).
  */
 export function executiveSummaryPagePath(report: ResearchReportData): string | null {
   const path = reportPath(report)
@@ -77,6 +78,26 @@ export function executiveSummaryDescription(report: ResearchReportData): string 
 /** An image whose missing alt falls back to a stega-clean name, since the alt goes into an attribute. */
 function withAlt<I extends { alt: string }>(image: I | null, fallback: string | null | undefined): I | null {
   return image && !image.alt ? { ...image, alt: stegaClean(fallback)?.trim() ?? '' } : image
+}
+
+type SeoData = ResearchReportData['seo']
+
+/**
+ * A page's SEO overrides (`seo` / `summarySeo` on the report), stega-clean, each null when empty: the meta title (used
+ * as the whole <title>), the meta description, and the share image at 1200×630 with its alt falling back to
+ * `fallbackAlt`. The page uses its default for an empty one.
+ */
+export function seoOverrides(
+  seo: SeoData | null | undefined,
+  fallbackAlt: string | null | undefined,
+): { title: string | null; description: string | null; image: ReturnType<typeof toShareImage> } {
+  const image = toShareImage(seo?.image)
+
+  return {
+    title: plain(seo?.title) || null,
+    description: plain(seo?.description) || null,
+    image: image && !image.alt ? { ...image, alt: plain(fallbackAlt) } : image,
+  }
 }
 
 /** The share image: the banner, else the report cover. */

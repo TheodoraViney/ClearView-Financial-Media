@@ -1,16 +1,7 @@
-import { AddIcon } from '@sanity/icons/Add'
 import { SparklesIcon } from '@sanity/icons/Sparkles'
 import { Box, Button, Card, Checkbox, Dialog, Flex, Stack, Text } from '@sanity/ui'
 import { type ReactNode, useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import {
-  type FormPatch,
-  type ObjectInputProps,
-  type RenderFieldCallback,
-  type SanityClient,
-  set,
-  unset,
-  useClient,
-} from 'sanity'
+import { type FormPatch, type ObjectInputProps, type RenderFieldCallback, set, unset, useClient } from 'sanity'
 
 import {
   MIN_RESEARCH_SOURCE_CHARS,
@@ -21,13 +12,11 @@ import {
   draftToResourceFields,
   draftToSummaryFields,
   parseResearchResponse,
-  randomKey,
   resourceToResearchSource,
 } from '@/lib/research-generation-prompt'
 import { RESEARCH_GENERATION_INSTRUCTIONS_DEFAULT } from '@/lib/research-generation-instructions'
-import { hasExecutiveSummary, publishedId } from '@/lib/research-report'
+import { hasExecutiveSummary } from '@/lib/research-report'
 import { apiVersion } from '@/sanity/env'
-import { RESEARCH_SUMMARY_DEFAULT_SLUG } from '@/sanity/schema/documents/research-summary'
 
 /**
  * The research report's form with a "Generate from report text" panel at the top of the Page content group.
@@ -41,15 +30,9 @@ import { RESEARCH_SUMMARY_DEFAULT_SLUG } from '@/sanity/schema/documents/researc
  * instructions" document, and calls the Agent Actions Prompt action as the signed-in user: one request, one AI credit.
  * The answer is checked (src/lib/research-generation-prompt.ts): items with a number the report text lacks are dropped.
  * A preview then lists what each part will get; a part that already has content is filled only when the editor ticks
- * it. The Executive Summary lives in its own document: its draft is patched through the Studio client as the
- * signed-in user, created from the published document first when there is no draft, as the Studio does on a first edit.
- * It is written only when it is a `researchSummary` that no other report points at (a duplicated report shares it).
- *
- * Generate waits for the Executive Summary page: without one (no reference, or a deleted document) the panel offers
- * "Create Executive Summary page", which creates an empty summary draft (title and slug only, no AI) and points the
- * report at it with a weak reference marked to be made strong on publish, the shape the reference input's own
- * "Create new" uses. Publishing the report makes it strong, which needs the summary published first: the
- * `executiveSummaryPage` validation (resource.ts) says so until it is.
+ * it. Every part, the Executive Summary page included, is a field of this report (the page's are `summaryLead`,
+ * `summaryIntro` and `summarySections` in the "Executive summary page" tab), so all of them are written by one
+ * `onChange` and published with the report.
  */
 
 const PAGE_GROUP = 'page'
@@ -67,32 +50,17 @@ type Resource = {
   insights?: unknown[] | null
   methodologyIntro?: Block[] | null
   methodology?: unknown[] | null
+  summaryLead?: unknown[] | null
+  summaryIntro?: unknown[] | null
+  summarySections?: { heading?: string | null; body?: unknown[] | null }[] | null
+  /** The old separate summary document, until scripts/merge-executive-summaries.ts moves it here. Deploy B drops it. */
   executiveSummaryPage?: { _ref?: string } | null
 }
-
-type SummaryDoc = {
-  _id: string
-  lead?: unknown[] | null
-  intro?: unknown[] | null
-  sections?: { heading?: string | null; body?: unknown[] | null }[] | null
-}
-
-/**
- * The report's Executive Summary page as Generate may use it: `none` (no reference), `missing` (the reference points at
- * no `researchSummary`), `shared` (another report points at it too), or `ready` with its draft, else published, fields.
- */
-type SummaryCheck =
-  | { kind: 'none' }
-  | { kind: 'missing' }
-  | { kind: 'shared'; title: string }
-  | { kind: 'ready'; doc: SummaryDoc }
-
-type SummaryState = { kind: 'loading' } | { kind: 'failed'; message: string } | SummaryCheck
 
 type PartKey = 'summary' | 'executiveSummary' | 'keyFindings' | 'charts' | 'insights' | 'methodology'
 
 const PART_LABELS: Record<PartKey, string> = {
-  summary: 'Executive summary',
+  summary: 'Short summary',
   executiveSummary: 'Executive Summary page',
   keyFindings: 'Key findings',
   charts: 'Charts',
@@ -113,8 +81,6 @@ type Status =
 type Preview = {
   generation: ResearchGeneration
   truncated: boolean
-  /** The Executive Summary page as it was when the answer came. */
-  summary: SummaryCheck
 }
 
 const count = (value: unknown[] | null | undefined) => (Array.isArray(value) ? value.length : 0)
@@ -123,12 +89,22 @@ const hasBlockText = (blocks: Block[] | null | undefined) =>
   (blocks ?? []).some((block) => (block.children ?? []).some((child) => child.text?.trim()))
 
 /** What a part holds in the document now, or null when it is empty. */
-function currentContent(part: PartKey, resource: Resource, summaryDoc: SummaryDoc | null): string | null {
+function currentContent(part: PartKey, resource: Resource): string | null {
   switch (part) {
     case 'summary':
       return hasBlockText(resource.summary) ? 'has text' : null
     case 'executiveSummary':
-      return hasExecutiveSummary(summaryDoc) ? 'has content' : null
+      // A report still linked to the old summary document counts as filled: the fields written here would replace it
+      // on the site.
+      return hasExecutiveSummary({
+        lead: resource.summaryLead,
+        intro: resource.summaryIntro,
+        sections: resource.summarySections,
+      })
+        ? 'has content'
+        : resource.executiveSummaryPage?._ref
+          ? 'has a linked page'
+          : null
     case 'keyFindings':
     case 'charts':
     case 'insights':
@@ -170,84 +146,6 @@ function generatedLines({ draft }: ResearchGeneration, part: PartKey): string[] 
 
 const clip = (text: string, max = 180) => (text.length > max ? `${text.slice(0, max - 1)}…` : text)
 
-/** The summary's draft and published documents, only when they are Executive Summaries. */
-const SUMMARY_DOCS = '*[_id in [$id, $draft] && _type == "researchSummary"]'
-
-/** Reports other than `reportId` (its published, draft or release versions) that point at the summary `id`. */
-async function otherReportTitle(client: SanityClient, id: string, reportId: string): Promise<string | null> {
-  const users = await client.fetch<{ _id: string; title?: string | null }[]>(
-    '*[_type == "resource" && executiveSummaryPage._ref in [$id, $draft]]{ _id, title }',
-    { id, draft: `drafts.${id}` },
-  )
-  const other = users.find((user) => publishedId(user._id) !== reportId)
-
-  return other ? other.title?.trim() || 'another report' : null
-}
-
-/** The Executive Summary page the report points at, checked: it must be a `researchSummary` no other report uses. */
-async function checkSummary(client: SanityClient, id: string | null, reportId: string): Promise<SummaryCheck> {
-  if (!id) {
-    return { kind: 'none' }
-  }
-
-  const docs = await client.fetch<SummaryDoc[]>(`${SUMMARY_DOCS}{ _id, lead, intro, sections }`, {
-    id,
-    draft: `drafts.${id}`,
-  })
-  const doc = docs.find((item) => item._id === `drafts.${id}`) ?? docs.find((item) => item._id === id)
-
-  if (!doc) {
-    return { kind: 'missing' }
-  }
-
-  const other = await otherReportTitle(client, id, reportId)
-
-  return other ? { kind: 'shared', title: other } : { kind: 'ready', doc }
-}
-
-const sharedMessage = (title: string) =>
-  `the Executive Summary page is also used by “${title}”. Create this report’s own page with Create Executive Summary page, then generate again`
-
-/**
- * Writes lead, introduction and sections to the Executive Summary's draft, as one transaction. Without a draft, the
- * draft is first created from the published document, so the editor sees it as an ordinary unpublished change.
- * Refuses a document that is not a `researchSummary` or that another report points at.
- */
-async function writeSummaryDraft(
-  client: SanityClient,
-  id: string,
-  reportId: string,
-  fields: ReturnType<typeof draftToSummaryFields>,
-) {
-  const draftId = `drafts.${id}`
-  const docs = await client.fetch<Record<string, unknown>[]>(SUMMARY_DOCS, { id, draft: draftId })
-  const draft = docs.find((doc) => doc._id === draftId)
-  const published = docs.find((doc) => doc._id === id)
-
-  if (!draft && !published) {
-    throw new Error('the Executive Summary page no longer exists')
-  }
-
-  const other = await otherReportTitle(client, id, reportId)
-
-  if (other) {
-    throw new Error(sharedMessage(other))
-  }
-
-  const toSet = Object.fromEntries(Object.entries(fields).filter(([, value]) => value !== undefined))
-  const toUnset = Object.keys(fields).filter((key) => fields[key as keyof typeof fields] === undefined)
-  const transaction = client.transaction()
-
-  if (!draft && published) {
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const { _rev, _updatedAt, _createdAt, ...copy } = published
-    transaction.createIfNotExists({ ...copy, _id: draftId, _type: 'researchSummary' })
-  }
-
-  transaction.patch(draftId, (patch) => patch.set(toSet).unset(toUnset))
-  await transaction.commit()
-}
-
 export function ResearchGenerateInput(props: ObjectInputProps) {
   const { onChange, readOnly, renderDefault, members, schemaType } = props
   const resource = useMemo(() => (props.value ?? {}) as Resource, [props.value])
@@ -262,17 +160,6 @@ export function ResearchGenerateInput(props: ObjectInputProps) {
   const [asking, setAsking] = useState<string[] | null>(null)
   const [preview, setPreview] = useState<Preview | null>(null)
   const [chosen, setChosen] = useState<Set<PartKey>>(new Set())
-  const [creating, setCreating] = useState(false)
-  const [recheck, setRecheck] = useState(0)
-
-  const summaryId = resource.executiveSummaryPage?._ref ? publishedId(resource.executiveSummaryPage._ref) : null
-  const reportId = resource._id ? publishedId(resource._id) : ''
-
-  // The last check of the Executive Summary page, for the reference it was made for: a new reference reads as loading.
-  const checkKey = `${summaryId ?? ''}|${reportId}|${recheck}`
-  const [summaryResult, setSummaryResult] = useState<{ key: string; state: SummaryState } | null>(null)
-  const summaryState: SummaryState = summaryResult?.key === checkKey ? summaryResult.state : { kind: 'loading' }
-  const setSummaryState = useCallback((state: SummaryState) => setSummaryResult({ key: checkKey, state }), [checkKey])
 
   // The report as it is when the answer arrives: the editor may type while the request runs.
   const latest = useRef(resource)
@@ -311,81 +198,6 @@ export function ResearchGenerateInput(props: ObjectInputProps) {
   useEffect(() => {
     loadSettings().catch(() => setSettings({ kind: 'ready', instructions: RESEARCH_GENERATION_INSTRUCTIONS_DEFAULT }))
   }, [loadSettings])
-
-  // The Executive Summary page, checked again whenever the reference changes.
-  useEffect(() => {
-    let current = true
-
-    checkSummary(client, summaryId, reportId)
-      .then((check) => current && setSummaryState(check))
-      .catch((error) => {
-        if (current) {
-          setSummaryState({ kind: 'failed', message: error instanceof Error ? error.message : String(error) })
-        }
-      })
-
-    return () => {
-      current = false
-    }
-  }, [client, summaryId, reportId, setSummaryState])
-
-  /**
-   * Creates an empty Executive Summary draft for this report and points the report at it. A draft, so the editor
-   * publishes it; a weak reference with `_strengthenOnPublish`, because a strong one cannot point at an unpublished
-   * document; the report's own publish turns it strong.
-   */
-  const createSummary = useCallback(async () => {
-    if (creating) {
-      return
-    }
-
-    setCreating(true)
-    setStatus({ kind: 'idle' })
-
-    try {
-      // The migrated naming (research-summary-wp-{n}) when the report has a WordPress id and that id is free.
-      const wp = /^resource-(wp-\d+)$/.exec(reportId)?.[1]
-      const wpId = wp ? `research-summary-${wp}` : null
-      const wpFree =
-        wpId !== null &&
-        !(await client.fetch<boolean>('count(*[_id in [$id, $draft]]) > 0', { id: wpId, draft: `drafts.${wpId}` }))
-      const id = wpFree && wpId ? wpId : `research-summary-${randomKey()}`
-
-      await client.create({
-        _id: `drafts.${id}`,
-        _type: 'researchSummary',
-        ...(latest.current.title?.trim() ? { title: latest.current.title.trim() } : {}),
-        slug: { _type: 'slug', current: RESEARCH_SUMMARY_DEFAULT_SLUG },
-      })
-
-      if (unmounted.current) {
-        return
-      }
-
-      onChange(
-        set(
-          { _type: 'reference', _ref: id, _weak: true, _strengthenOnPublish: { type: 'researchSummary' } },
-          ['executiveSummaryPage'],
-        ),
-      )
-      setStatus({
-        kind: 'done',
-        message:
-          'Created the Executive Summary page as a draft. Publish it from the Executive Summary tab before you publish the report.',
-      })
-    } catch (error) {
-      if (!unmounted.current) {
-        setStatus({
-          kind: 'error',
-          message: `The Executive Summary page was not created: ${error instanceof Error ? error.message : String(error)}.`,
-        })
-      }
-    } finally {
-      if (!unmounted.current) {
-        setCreating(false)
-      }
-    }
-  }, [client, creating, onChange, reportId])
 
   const running = status.kind === 'running'
 
@@ -426,27 +238,17 @@ export function ResearchGenerateInput(props: ObjectInputProps) {
         return
       }
 
-      const summary = await checkSummary(client, summaryId, reportId)
-      const summaryDoc = summary.kind === 'ready' ? summary.doc : null
       const report = latest.current
-
-      if (unmounted.current) {
-        return
-      }
 
       // Ticked at first: every part the answer fills that is empty now. A part with content waits for a tick.
       setChosen(
         new Set(
           PART_ORDER.filter(
-            (part) =>
-              generatedLines(result.value, part).length > 0 &&
-              currentContent(part, report, summaryDoc) === null &&
-              (part !== 'executiveSummary' || summaryDoc !== null),
+            (part) => generatedLines(result.value, part).length > 0 && currentContent(part, report) === null,
           ),
         ),
       )
-      setSummaryState(summary)
-      setPreview({ generation: result.value, truncated: source.truncated, summary })
+      setPreview({ generation: result.value, truncated: source.truncated })
       setStatus({ kind: 'idle' })
     } catch (error) {
       if (!unmounted.current) {
@@ -458,47 +260,35 @@ export function ResearchGenerateInput(props: ObjectInputProps) {
     } finally {
       inFlight.current = false
     }
-  }, [agent, client, loadSettings, reportId, setSummaryState, summaryId])
+  }, [agent, loadSettings])
 
-  const start = useCallback(async () => {
-    try {
-      const summary = await checkSummary(client, summaryId, reportId)
-      setSummaryState(summary)
+  const start = useCallback(() => {
+    const filled = PART_ORDER.filter((part) => currentContent(part, latest.current) !== null)
 
-      if (summary.kind === 'none' || summary.kind === 'missing') {
-        return
-      }
-
-      const summaryDoc = summary.kind === 'ready' ? summary.doc : null
-      const filled = PART_ORDER.filter((part) => currentContent(part, latest.current, summaryDoc) !== null)
-
-      if (filled.length > 0) {
-        setAsking(filled.map((part) => PART_LABELS[part]))
-      } else {
-        void run()
-      }
-    } catch (error) {
-      setStatus({ kind: 'error', message: `Could not read the Executive Summary: ${error instanceof Error ? error.message : String(error)}.` })
+    if (filled.length > 0) {
+      setAsking(filled.map((part) => PART_LABELS[part]))
+    } else {
+      void run()
     }
-  }, [client, reportId, run, setSummaryState, summaryId])
+  }, [run])
 
-  const apply = useCallback(async () => {
+  const apply = useCallback(() => {
     if (!preview) {
       return
     }
 
     const { draft } = preview.generation
-    const fields = draftToResourceFields(draft)
+    const fields = { ...draftToResourceFields(draft), ...draftToSummaryFields(draft) }
     const patches: FormPatch[] = []
     const written: string[] = []
     const field = (name: keyof typeof fields) => patches.push(fields[name] === undefined ? unset([name]) : set(fields[name], [name]))
 
     for (const part of chosen) {
       if (part === 'executiveSummary') {
-        continue
-      }
-
-      if (part === 'methodology') {
+        field('summaryLead')
+        field('summaryIntro')
+        field('summarySections')
+      } else if (part === 'methodology') {
         field('methodologyIntro')
         field('methodology')
       } else {
@@ -509,20 +299,6 @@ export function ResearchGenerateInput(props: ObjectInputProps) {
     }
 
     setPreview(null)
-    let summaryError: string | null = null
-
-    if (chosen.has('executiveSummary') && summaryId) {
-      try {
-        await writeSummaryDraft(client, summaryId, reportId, draftToSummaryFields(draft))
-        written.push(PART_LABELS.executiveSummary)
-      } catch (error) {
-        summaryError = error instanceof Error ? error.message : String(error)
-      }
-    }
-
-    if (unmounted.current) {
-      return
-    }
 
     if (patches.length > 0) {
       onChange(patches)
@@ -530,20 +306,13 @@ export function ResearchGenerateInput(props: ObjectInputProps) {
 
     const ordered = PART_ORDER.map((part) => PART_LABELS[part]).filter((label) => written.includes(label))
 
-    setStatus(
-      summaryError
-        ? {
-            kind: 'error',
-            message: `${ordered.length ? `Filled ${ordered.join(', ')}. ` : ''}The Executive Summary page was not written: ${summaryError}.`,
-          }
-        : {
-            kind: 'done',
-            message: ordered.length
-              ? `Filled ${ordered.join(', ')}.${written.includes(PART_LABELS.executiveSummary) ? ' The Executive Summary page change is in its draft: open it from the Executive Summary tab and publish it with the report.' : ''} Check every figure and sentence against the report before publishing.`
-              : 'Nothing was written.',
-          },
-    )
-  }, [chosen, client, onChange, preview, reportId, summaryId])
+    setStatus({
+      kind: 'done',
+      message: ordered.length
+        ? `Filled ${ordered.join(', ')}.${written.includes(PART_LABELS.executiveSummary) ? ' The Executive Summary page is in the Executive summary page tab.' : ''} Check every figure and sentence against the report before publishing.`
+        : 'Nothing was written.',
+    })
+  }, [chosen, onChange, preview])
 
   // The first Page content field the form shows: the panel renders above it.
   const firstPageField = useMemo(() => {
@@ -566,64 +335,24 @@ export function ResearchGenerateInput(props: ObjectInputProps) {
     return null
   }, [members, schemaType.fields])
 
-  const needsSummary = summaryState.kind === 'none' || summaryState.kind === 'missing' || summaryState.kind === 'shared'
-  const summaryReady = summaryState.kind === 'ready' || summaryState.kind === 'shared'
-
   const panel: ReactNode = (
     <Card padding={4} radius={2} border tone="transparent">
       <Stack gap={3}>
-        {needsSummary ? (
-          <Card padding={3} radius={2} tone="caution" border>
-            <Stack gap={3}>
-              <Text size={1}>
-                {summaryState.kind === 'shared'
-                  ? `The Executive Summary page is also used by “${summaryState.title}”, so Generate will not write it. Create this report’s own page.`
-                  : summaryState.kind === 'missing'
-                    ? 'The Executive Summary page this report pointed at no longer exists. Create the Executive Summary page first.'
-                    : 'Create the Executive Summary page first.'}{' '}
-                It is created as an empty draft and published separately: publish it before the report.
-              </Text>
-              <Box>
-                <Button
-                  icon={AddIcon}
-                  text="Create Executive Summary page"
-                  mode="ghost"
-                  loading={creating}
-                  disabled={readOnly || creating || running}
-                  onClick={() => void createSummary()}
-                />
-              </Box>
-            </Stack>
-          </Card>
-        ) : null}
-
-        {summaryState.kind === 'failed' ? (
-          <Card padding={3} radius={2} tone="critical" border role="alert">
-            <Stack gap={3}>
-              <Text size={1}>Could not check the Executive Summary page: {summaryState.message}.</Text>
-              <Box>
-                <Button text="Check again" mode="ghost" onClick={() => setRecheck((count) => count + 1)} />
-              </Box>
-            </Stack>
-          </Card>
-        ) : null}
-
         <Box>
           <Button
             icon={SparklesIcon}
             text="Generate from report text"
             tone="primary"
             loading={running}
-            disabled={readOnly || running || creating || settings.kind !== 'ready' || !summaryReady}
-            onClick={() => void start()}
+            disabled={readOnly || running || settings.kind !== 'ready'}
+            onClick={start}
           />
         </Box>
         <Text size={1} muted>
-          Drafts the executive summary, the Executive Summary page, key findings, charts, selected insights and methodology
+          Drafts the short summary, the Executive Summary page, key findings, charts, selected insights and methodology
           from the Report text in Details. You choose what to fill before anything is written. Uses one AI credit and can
           take a minute.
         </Text>
-
 
         {status.kind === 'error' ? (
           <Card padding={3} radius={2} tone="critical" border role="alert">
@@ -655,7 +384,7 @@ export function ResearchGenerateInput(props: ObjectInputProps) {
     },
     // `panel` is rebuilt with the state it shows.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [props.renderField, firstPageField, settings, status, running, readOnly, summaryState, creating],
+    [props.renderField, firstPageField, settings, status, running, readOnly],
   )
 
   return (
@@ -713,9 +442,7 @@ export function ResearchGenerateInput(props: ObjectInputProps) {
 
             {PART_ORDER.map((part) => {
               const lines = generatedLines(preview.generation, part)
-              const summaryDoc = preview.summary.kind === 'ready' ? preview.summary.doc : null
-              const existing = currentContent(part, resource, summaryDoc)
-              const noSummaryDoc = part === 'executiveSummary' && !summaryDoc
+              const existing = currentContent(part, resource)
 
               return (
                 <Card key={part} padding={3} radius={2} border tone={chosen.has(part) && existing ? 'caution' : 'default'}>
@@ -724,7 +451,7 @@ export function ResearchGenerateInput(props: ObjectInputProps) {
                       <Checkbox
                         id={`research-generate-${part}`}
                         checked={chosen.has(part)}
-                        disabled={lines.length === 0 || noSummaryDoc}
+                        disabled={lines.length === 0}
                         onChange={(event) => {
                           const checked = event.currentTarget.checked
                           setChosen((previous) => {
@@ -745,15 +472,11 @@ export function ResearchGenerateInput(props: ObjectInputProps) {
                           {PART_LABELS[part]}
                           {lines.length === 0
                             ? ' – nothing in the report text for it, left as it is'
-                            : noSummaryDoc
-                              ? preview.summary.kind === 'shared'
-                                ? ` – the page is also used by “${preview.summary.title}”, so it is not written here`
-                                : ' – create the Executive Summary page first'
-                              : existing
-                                ? ` – ${existing} now; ticking replaces it`
-                                : ''}
-                          {part === 'executiveSummary' && lines.length > 0 && !noSummaryDoc
-                            ? '. Saved as a draft of the Executive Summary page: publish that page separately.'
+                            : existing
+                              ? ` – ${existing} now; ticking replaces it`
+                              : ''}
+                          {part === 'executiveSummary' && lines.length > 0
+                            ? '. Goes into the Executive summary page tab of this report.'
                             : ''}
                         </label>
                       </Text>

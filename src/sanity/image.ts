@@ -71,3 +71,32 @@ export function toImage(image: SanityImage | null | undefined): MediaImage | nul
     position,
   }
 }
+
+/**
+ * A Sanity image as a link-preview image (Open Graph), cut to `width`×`height` on the Sanity CDN: the editor's crop
+ * first (`rect` from toImage), then a cover crop around the hotspot (`crop=focalpoint`, the hotspot relative to the
+ * cropped image). An SVG is rendered as PNG, since link previews do not show SVG. Null without an asset.
+ */
+export function toShareImage(
+  image: SanityImage | null | undefined,
+  { width = 1200, height = 630 }: { width?: number; height?: number } = {},
+): { url: string; width: number; height: number; alt: string } | null {
+  const media = toImage(image)
+
+  if (!media) {
+    return null
+  }
+
+  const [src, rect] = media.src.split('?')
+  const focal = /^([\d.]+)% ([\d.]+)%$/.exec(media.position ?? '')
+  const params = [
+    ...(rect ? [rect] : []),
+    `w=${width}`,
+    `h=${height}`,
+    'fit=crop',
+    ...(focal ? ['crop=focalpoint', `fp-x=${Number(focal[1]) / 100}`, `fp-y=${Number(focal[2]) / 100}`] : []),
+    ...(src.endsWith('.svg') ? ['fm=png'] : []),
+  ]
+
+  return { url: `${src}?${params.join('&')}`, width, height, alt: media.alt }
+}

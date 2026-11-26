@@ -1,13 +1,10 @@
 import { DocumentTextIcon } from '@sanity/icons/DocumentText'
-import { defineArrayMember, defineField, defineType } from 'sanity'
+import { defineField, defineType } from 'sanity'
+
+import { RESEARCH_SUMMARY_DEFAULT_SLUG, RESEARCH_SUMMARY_SLUG } from '@/lib/research-report'
 
 import { paragraphsBlock } from '../objects/rich-text'
-
-/** The slug every migrated and new Executive Summary starts with. */
-export const RESEARCH_SUMMARY_DEFAULT_SLUG = 'executive-summary'
-
-/** A summary slug: lowercase letters, digits and hyphens, no hyphen at either end. */
-export const RESEARCH_SUMMARY_SLUG = /^[a-z0-9](?:[a-z0-9-]*[a-z0-9])?$/
+import { executiveSummarySectionMember } from './resource'
 
 /** The plain text of the first paragraphs of a block array, for a Studio preview. */
 function blocksText(blocks: unknown): string {
@@ -25,6 +22,11 @@ function blocksText(blocks: unknown): string {
 }
 
 /**
+ * Being retired (Deploy A of the merge): the page's fields now live on the report itself (`summaryLead`,
+ * `summaryIntro`, `summarySections` on `resource`), and scripts/merge-executive-summaries.ts moves these documents'
+ * content there and deletes them. Until it runs, a report that still points here is read from here
+ * (RESEARCH_REPORT_QUERY). Remove this type, its Studio list and the reference in Deploy B.
+ *
  * A research report's Executive Summary page, at /resource/{report slug}/{this slug} on ClearView Publishing. One per
  * report: the report points at it with its required `executiveSummaryPage` reference, and the reference is unique
  * across reports. The page exists only while this document has a lead, an introduction or a section. Its labels
@@ -88,32 +90,7 @@ export const researchSummary = defineType({
       title: 'Sections',
       type: 'array',
       description: 'Each section shows a heading beside its text, for example "Automation".',
-      of: [
-        defineArrayMember({
-          type: 'object',
-          name: 'executiveSummarySection',
-          title: 'Section',
-          fields: [
-            defineField({
-              name: 'heading',
-              title: 'Heading',
-              type: 'string',
-              validation: (Rule) => Rule.required(),
-            }),
-            defineField({
-              name: 'body',
-              title: 'Text',
-              type: 'array',
-              description: 'Bold, italic and links only.',
-              of: [paragraphsBlock],
-              validation: (Rule) => Rule.required(),
-            }),
-          ],
-          preview: {
-            select: { title: 'heading' },
-          },
-        }),
-      ],
+      of: [executiveSummarySectionMember],
     }),
   ],
   preview: {

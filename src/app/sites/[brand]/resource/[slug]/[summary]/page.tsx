@@ -13,15 +13,17 @@ import {
   executiveSummaryDescription,
   executiveSummaryPagePath,
   researchReportShareImage,
+  seoOverrides,
   toExecutiveSummaryView,
   type ResearchReportData,
 } from '@/sanity/research-report-view'
 import { PLACEHOLDER_SLUG } from '@/sanity/static-params'
 
-// A research report's Executive Summary page at /resource/{report slug}/{summary slug}: the report's own
-// `executiveSummaryPage` document. Same host and slug rules as the report page (../page.tsx). It exists only while the
-// report is found, the segment equals its summary's slug and the summary has a lead, an introduction or a section, and
-// answers 404 otherwise.
+// A research report's Executive Summary page at /resource/{report slug}/executive-summary, from the report's own
+// summary fields. Same host and slug rules as the report page (../page.tsx). It exists only while the report is found,
+// the segment equals its summary's slug and the summary has a lead, an introduction or a section, and answers 404
+// otherwise. The slug is RESEARCH_SUMMARY_DEFAULT_SLUG, set by RESEARCH_REPORT_QUERY; until the merge script has run, a
+// report still pointing at an old `researchSummary` document is served at that document's own slug instead.
 export const instant = false
 
 type Params = { brand: string; slug: string; summary: string }
@@ -75,21 +77,22 @@ export async function generateMetadata({ params }: { params: Promise<Params> }):
   }
 
   const canonical = `${brandOrigin('clearview')}${path}`
-  const description = executiveSummaryDescription(data)
+  const title = [copy?.summaryTitle, data.title].map((part) => stegaClean(part)?.trim()).filter(Boolean).join(' — ')
+  // The "Summary SEO" tab's fields when filled, else the defaults; the share image falls back to the report page's
+  // ("SEO" tab) before the banner. A meta title is the whole title: `absolute` skips the brand layout's template.
+  const seo = seoOverrides(data.summarySeo, title)
+  const description = seo.description ?? executiveSummaryDescription(data)
   const image = researchReportShareImage(data)
+  const shareImage =
+    seo.image ??
+    seoOverrides(data.seo, data.title).image ??
+    (image ? { url: isSvg(image.src) ? `${image.src}?fm=png` : image.src, width: image.width, height: image.height, alt: image.alt } : null)
 
   return {
-    title: [copy?.summaryTitle, data.title].map((part) => stegaClean(part)?.trim()).filter(Boolean).join(' — '),
+    title: seo.title ? { absolute: seo.title } : title,
     ...(description ? { description } : {}),
     alternates: { canonical },
-    ...(image
-      ? {
-          openGraph: {
-            url: canonical,
-            images: [{ url: isSvg(image.src) ? `${image.src}?fm=png` : image.src, width: image.width, height: image.height, alt: image.alt }],
-          },
-        }
-      : {}),
+    ...(shareImage ? { openGraph: { url: canonical, images: [shareImage] } } : {}),
   }
 }
 

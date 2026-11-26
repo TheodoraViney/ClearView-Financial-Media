@@ -801,13 +801,18 @@ export const SHARED_LISTINGS_PAGE_QUERY = defineQuery(`
   }
 `)
 
-// A research report at /resource/{slug} and its Executive Summary page (/resource/{slug}/{summary slug}, the report's
-// `executiveSummaryPage` document), ClearView only. Everything both pages show: the legacy `body` has no place in the
-// design (wb-g-research-report v1.1) and only feeds the metadata description as plain text, as do the rich text
-// summary, lead and introduction (pt::text). A field still holding a plain string from before the rich text change
-// reads as null. Authors and the partner company dereference in the request's perspective, so a person or company
-// unpublished after picking drops out (null) on the live site. The related research picks and fill go through
-// relatedResearchItems (src/lib/research-report.ts), shared with the Studio panel.
+// A research report at /resource/{slug} and its Executive Summary page (/resource/{slug}/executive-summary), ClearView
+// only. Everything both pages show: the legacy `body` has no place in the design (wb-g-research-report v1.1) and only
+// feeds the metadata description as plain text, as do the rich text summary, lead and introduction (pt::text). A field
+// still holding a plain string from before the rich text change reads as null. Authors and the partner company
+// dereference in the request's perspective, so a person or company unpublished after picking drops out (null) on the
+// live site. The related research picks and fill go through relatedResearchItems (src/lib/research-report.ts), shared
+// with the Studio panel.
+// `executiveSummaryPage` has one shape for both data shapes while the summaries are merged into the report: the
+// report's own summaryLead / summaryIntro / summarySections when any has an item (slug: summarySlug, else
+// RESEARCH_SUMMARY_DEFAULT_SLUG, since reports made before the field have none), else the old `researchSummary`
+// document it still points at (its own slug). summarySlug alone never selects the first branch. Deploy B drops the
+// second branch. `seo` and `summarySeo` are the pages' optional metadata overrides (generateMetadata).
 export const RESEARCH_REPORT_QUERY = defineQuery(`
   *[_type == "resource" && slug.current == $slug][0]{
     _id,
@@ -834,16 +839,30 @@ export const RESEARCH_REPORT_QUERY = defineQuery(`
       description,
       "company": company->{ _id, title, "logo": logo{ ${IMAGE} }, websiteUrl }
     },
-    "executiveSummaryPage": executiveSummaryPage->{
-      _id,
-      _type,
-      "slug": slug.current,
-      lead[]{ ${ARTICLE_BODY} },
-      "leadText": pt::text(lead),
-      intro[]{ ${ARTICLE_BODY} },
-      "introText": pt::text(intro),
-      sections[]{ _key, heading, body[]{ ${ARTICLE_BODY} } }
-    },
+    "executiveSummaryPage": select(
+      count(summaryLead) > 0 || count(summaryIntro) > 0 || count(summarySections) > 0 => {
+        _id,
+        _type,
+        "slug": coalesce(summarySlug.current, "executive-summary"),
+        "lead": summaryLead[]{ ${ARTICLE_BODY} },
+        "leadText": pt::text(summaryLead),
+        "intro": summaryIntro[]{ ${ARTICLE_BODY} },
+        "introText": pt::text(summaryIntro),
+        "sections": summarySections[]{ _key, heading, body[]{ ${ARTICLE_BODY} } }
+      },
+      executiveSummaryPage->{
+        _id,
+        _type,
+        "slug": slug.current,
+        lead[]{ ${ARTICLE_BODY} },
+        "leadText": pt::text(lead),
+        intro[]{ ${ARTICLE_BODY} },
+        "introText": pt::text(intro),
+        sections[]{ _key, heading, body[]{ ${ARTICLE_BODY} } }
+      }
+    ),
+    "seo": seo{ title, description, "image": image{ ${IMAGE} } },
+    "summarySeo": summarySeo{ title, description, "image": image{ ${IMAGE} } },
     "relatedResearch": relatedResearch[]->{ ${RELATED_RESEARCH} },
     "relatedResearchFill": ${RELATED_RESEARCH_FILL}
   }
