@@ -149,6 +149,7 @@ function toWinnerGroups(edition: EditionData): WinnersGroupView[] {
       name: winnerName(row) ?? company,
       organisation: filled(row.displayName) ? row.displayName : company,
       logo: toImage(row.company?.logo),
+      banner: toImage(row.banner),
     })
     groups.set(key, group)
   }
@@ -249,6 +250,7 @@ export function toAwardsProgrammeView({
   const videoId = stegaClean(edition.highlightsVideoId)?.trim()
   const acclaimLink = acclaimHref(edition.acclaimLink)
   const body = richText(edition.body)
+  const finalists = richText(edition.finalists)
   const panels = toPanels(edition)
   const sponsorTiers = toSponsorTiers(edition)
   const faq = toFaq(edition)
@@ -301,18 +303,19 @@ export function toAwardsProgrammeView({
               ? statusLabel
               : [year, copy.registrationClosedLabel].filter(Boolean).join(' ') || null,
             intro: nominationsOpen ? copy.registrationOpenIntro : copy.registrationClosedIntro,
-            faqLink: faq.length > 0 ? copy.registrationFaqLinkLabel : null,
             steps,
           }
         : null,
     sponsors: sponsorTiers.length > 0 ? { heading: toHeading(rawCopy.sponsorsHeading), tiers: sponsorTiers } : null,
     judges:
       panels.length > 0 ? { heading: toHeading(rawCopy.judgesHeading), intro: richText(edition.judgesIntro), panels } : null,
+    finalists: finalists ? { heading: toHeading(rawCopy.finalistsHeading), body: finalists } : null,
     winners:
       winnerGroups.length > 0
         ? {
             heading: toHeading(rawCopy.winnersHeading),
             previousYear: previousHref ? { label: copy.previousYearWinnersLabel, href: `${previousHref}#winners` } : null,
+            allLabel: copy.winnersAllLabel,
             groups: winnerGroups,
           }
         : null,
@@ -341,6 +344,7 @@ export function toAwardsProgrammeView({
     ['categories-and-registration', view.registration, 'navCategoriesLabel'],
     ['sponsors', view.sponsors, 'navSponsorsLabel'],
     ['judging-panel', view.judges, 'navJudgesLabel'],
+    ['finalists', view.finalists, 'navFinalistsLabel'],
     ['winners', view.winners, 'navWinnersLabel'],
     ['acclaim', view.acclaim, 'navMarketingKitLabel'],
     ['faq', view.faq, 'navFaqLabel'],
