@@ -243,6 +243,8 @@ export type NewsArticleInput = {
   excerpt?: string | null
   /** The share image source (seo.image, else the post image), without the brand default. */
   image: SanityImage | null
+  /** An image known only by its absolute URL (an archived article's), used when `image` is empty. */
+  imageUrl?: string | null
   publishedAt?: string | null
   updatedAt?: string | null
   section?: string | null
@@ -258,7 +260,7 @@ export async function newsArticle(input: NewsArticleInput): Promise<JsonLdNode> 
     '@id': `${input.url}#article`,
     headline: headline(input.title),
     description: describe(input.seoDescription, input.excerpt),
-    image: imageCrops(input.image),
+    image: input.image ? imageCrops(input.image) : stegaClean(input.imageUrl),
     datePublished: publishedAt,
     dateModified: stegaClean(input.updatedAt) || publishedAt,
     author: person(input.author),
