@@ -162,6 +162,11 @@ export type PageMetadataInput = {
   description?: string | null
   /** The record's own images in order of preference, used when `seo.image` is empty. SVGs are skipped. */
   images?: (SanityImage | null | undefined)[]
+  /**
+   * A record image known only by its absolute URL, with no stored size (an archived article's), used when `seo.image`
+   * and `images` give none. Its size is unknown, so the X card is the small `summary`.
+   */
+  imageUrl?: string | null
   /** Noindex whatever `seo.noIndex` says, such as a filtered listing view. */
   noIndex?: boolean
   /** The brand's home page: the title reads "{brand} | {seo title}", or the brand title alone. */
@@ -200,8 +205,10 @@ export async function pageMetadata(input: PageMetadataInput): Promise<Metadata> 
 
   const canonical = canonicalUrl({ brand: input.canonicalBrand ?? brand, path: input.path, seo }) ?? undefined
 
-  const source = recordShareImage(seo, input.images) ?? defaults.image
-  const shareImage = toShareImage(source)
+  // Without an image of its own the page shares the canonical brand's default, which belongs with its site name.
+  const ownImage = recordShareImage(seo, input.images)
+  const urlImage = ownImage ? null : stegaClean(input.imageUrl) || null
+  const shareImage = urlImage ? { url: urlImage, alt: '' } : toShareImage(ownImage ?? (canonicalDefaults ?? defaults).image)
   const image = shareImage ? { ...shareImage, alt: shareImage.alt || shareTitle } : null
 
   const article = input.article
@@ -230,7 +237,7 @@ export async function pageMetadata(input: PageMetadataInput): Promise<Metadata> 
       images: image ? [image] : undefined,
     },
     twitter: {
-      card: 'summary_large_image',
+      card: urlImage ? 'summary' : 'summary_large_image',
       ...(defaults.xHandle ? { site: defaults.xHandle } : {}),
       title: shareTitle,
       description,

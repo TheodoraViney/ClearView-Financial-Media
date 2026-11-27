@@ -1,10 +1,12 @@
 import { NextResponse, type NextRequest } from 'next/server'
 
 import { fallbackBrand, isEditorialBrandKey, resolveBrandFromHost } from '@/brands'
+import { archiveRequest } from '@/lib/archive'
 import { isLegacyArticlePath, LEGACY_URL_HEADER } from '@/lib/legacy-redirects'
 import { withoutEmptyListingParams } from '@/lib/shared-listings'
+import { isMissingExecutiveSummary } from '@/sanity/summary-route'
 
-export default function proxy(request: NextRequest) {
+export default async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl
 
   if (pathname === '/sites' || pathname.startsWith('/sites/')) {
@@ -29,8 +31,28 @@ export default function proxy(request: NextRequest) {
     return NextResponse.redirect(clean)
   }
 
+  // Archive articles: an unknown article or a non-canonical slug gets its status here, before the layout streams.
+  const archive = pathname.startsWith('/archive/') ? await archiveRequest(pathname, isEditorialBrandKey(resolved)) : null
+
+  if (archive?.action === 'redirect') {
+    const canonical = request.nextUrl.clone()
+    canonical.pathname = archive.path
+
+    return NextResponse.redirect(canonical, 308)
+  }
+
+  // An Executive Summary that does not exist, checked the same way. In draft mode the page decides, so an editor can
+  // preview an unpublished report's summary.
+  const missingSummary =
+    pathname.startsWith('/resource/') &&
+    !request.cookies.has('__prerender_bypass') &&
+    (await isMissingExecutiveSummary(pathname, resolved === 'clearview'))
+
   const url = request.nextUrl.clone()
-  url.pathname = `/sites/${resolved}${pathname === '/' ? '' : pathname}`
+  url.pathname =
+    archive?.action === 'missing' || missingSummary
+      ? `/sites/${resolved}/archive/missing`
+      : `/sites/${resolved}${pathname === '/' ? '' : pathname}`
 
   let response: NextResponse
 

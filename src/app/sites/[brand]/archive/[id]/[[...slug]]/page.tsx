@@ -3,26 +3,35 @@ import { draftMode } from 'next/headers'
 import { notFound, permanentRedirect } from 'next/navigation'
 import { connection } from 'next/server'
 
-import { stegaClean } from 'next-sanity'
-
-import { articlePageDocumentId, brandOrigin, isEditorialBrandKey, mostReadDocumentId, type EditorialBrandKey } from '@/brands'
+import {
+  articlePageDocumentId,
+  brandOrigin,
+  isBrandKey,
+  isEditorialBrandKey,
+  mostReadDocumentId,
+  type BrandKey,
+  type EditorialBrandKey,
+} from '@/brands'
 import { toLogo } from '@/components/blocks/shell'
 import { ArchiveBody } from '@/components/sections/article/ArchiveBody'
 import { ArticlePage } from '@/components/sections/article/ArticlePage'
 import { ArticleViewEvent } from '@/components/ui/AnalyticsEvents.client'
+import { JsonLd } from '@/components/ui/JsonLd'
 import {
   archiveArticlePath,
-  archiveCanonicalUrl,
   archivePlainText,
   getArchiveRecord,
   parseArchiveId,
   type ArchiveRecord,
 } from '@/lib/archive'
+import { jsonLdGraph } from '@/lib/json-ld'
 import { fromArchiveRecord, toEmbedConsentCopy } from '@/sanity/article-view'
-import { brandTitle, fetchAdUnits, fetchBrandTitle, fetchShell } from '@/sanity/brand-title'
+import { brandTitle, fetchAdUnits, fetchShell } from '@/sanity/brand-title'
+import { breadcrumbList, newsArticle } from '@/sanity/json-ld'
 import { cachedSanity, type DynamicFetchOptions } from '@/sanity/live'
 import { mostReadAutoFill } from '@/sanity/most-read'
 import { ARTICLE_PAGE_QUERY, MOST_READ_QUERY } from '@/sanity/queries'
+import { pageMetadata } from '@/sanity/seo'
 
 // Legacy archive articles on the article template (src/components/sections/article/ArticlePage.tsx).
 
@@ -88,27 +97,38 @@ function imageSrc(value: string | null | undefined): string | null {
   return value && (value.startsWith('/archive-media/') || value.startsWith('https://')) ? value : null
 }
 
+/** The brand whose domain is canonical for the article: its first publication, else the host's brand. */
+function canonicalBrand(record: ArchiveRecord, brand: EditorialBrandKey): BrandKey {
+  return record.publications.find(isBrandKey) ?? brand
+}
+
+/** The featured image as an absolute URL on the canonical brand's domain, or null. */
+function absoluteImage(record: ArchiveRecord, home: BrandKey): string | null {
+  const image = imageSrc(record.media.image)
+
+  return image?.startsWith('/') ? `${brandOrigin(home)}${image}` : image
+}
+
 export async function generateMetadata({ params }: { params: Params }): Promise<Metadata> {
   const { brand, record } = await loadArticle(params)
-  const description = describe(record)
-  const image = imageSrc(record.media.image)
-  const canonical = archiveCanonicalUrl(record, brand)
-  const siteName = stegaClean(await fetchBrandTitle(brand, PUBLISHED))
+  const home = canonicalBrand(record, brand)
 
-  return {
+  // Every editorial domain renders the article; its first publication is canonical and names the site. Archive images
+  // have no stored size (most are small thumbnails), so an article with its own image gets the small X card; one
+  // without shares the canonical brand's default image on the large card.
+  return pageMetadata({
+    brand,
+    canonicalBrand: home,
+    path: archiveArticlePath(record),
     title: record.title,
-    description,
-    // Every editorial domain renders the article; its first publication is canonical.
-    alternates: { canonical },
-    openGraph: {
-      type: 'article',
-      title: record.title,
-      description,
-      url: canonical,
-      siteName,
-      images: image ? [{ url: image.startsWith('/') ? `${brandOrigin(brand)}${image}` : image }] : undefined,
+    description: describe(record),
+    imageUrl: absoluteImage(record, home),
+    article: {
+      publishedTime: record.date,
+      section: record.types[home] ?? record.types[brand],
+      authors: [record.author?.name],
     },
-  }
+  })
 }
 
 export default async function ArchiveArticlePage({ params }: { params: Params }) {
@@ -148,9 +168,28 @@ export default async function ArchiveArticlePage({ params }: { params: Params })
     ),
   })
 
+  // The article as structured data: NewsArticle published by its canonical brand, and the trail (Home, then the article)
+  // as on CMS posts.
+  const home = canonicalBrand(record, brand)
+  const jsonLd = jsonLdGraph([
+    await newsArticle({
+      url: article.shareUrl,
+      publisher: home,
+      title: record.title,
+      seoDescription: describe(record),
+      image: null,
+      imageUrl: absoluteImage(record, home),
+      publishedAt: record.date,
+      section: record.types[home] ?? record.types[brand],
+      author: record.author?.name ? { name: record.author.name, jobTitle: record.author.jobTitle } : null,
+    }),
+    breadcrumbList(brand, [{ label: article.copy.breadcrumbHomeLabel, href: '/' }, { label: record.title }], article.shareUrl),
+  ])
+
   // `article_view` outside draft mode, as on CMS posts: an editor browsing with draft mode on is not a reader.
   return (
     <>
+      <JsonLd data={jsonLd} />
       <ArticlePage article={article} />
       {!isDraftMode && <ArticleViewEvent source="archive" id={String(record.id)} />}
     </>

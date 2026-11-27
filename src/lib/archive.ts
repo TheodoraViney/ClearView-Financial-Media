@@ -111,6 +111,54 @@ export const getArchiveRecord = cache(async (id: number): Promise<ArchiveRecord 
   return (await response.json()) as ArchiveRecord
 })
 
+/**
+ * What the proxy does with an `/archive/{id}/...` path before any rendering, so the status is real: the article page
+ * streams after the layout, where a 404 or a redirect would go out as a 200. `missing` for no article (a host without
+ * the archive, an id that is not a legacy id, or one the archive does not hold), `redirect` to the canonical path for
+ * any other slug or none, `render` for the canonical path, and null for a path that is not an article's or a Worker
+ * failure (the page then renders, or fails, as it would). The sitemap routes under /archive/sitemap/ are not articles.
+ */
+export async function archiveRequest(
+  pathname: string,
+  hasArchive: boolean,
+): Promise<{ action: 'missing' | 'render' } | { action: 'redirect'; path: string } | null> {
+  const match = /^\/archive\/([^/]+)(?:\/(.*))?$/.exec(pathname)
+
+  if (!match || (match[1] === 'sitemap' && match[2] !== undefined)) {
+    return null
+  }
+
+  const id = parseArchiveId(match[1])
+
+  if (!hasArchive || id === null) {
+    return { action: 'missing' }
+  }
+
+  let record: ArchiveRecord | null
+
+  try {
+    record = await getArchiveRecord(id)
+  } catch {
+    return null
+  }
+
+  if (!record) {
+    return { action: 'missing' }
+  }
+
+  const path = archiveArticlePath(record)
+
+  return pathname === path || safeDecode(pathname) === safeDecode(path) ? { action: 'render' } : { action: 'redirect', path }
+}
+
+function safeDecode(value: string): string | null {
+  try {
+    return decodeURIComponent(value)
+  } catch {
+    return null
+  }
+}
+
 /** Canonical path of an archived article. The id identifies it; the slug is cosmetic. */
 export function archiveArticlePath(record: Pick<ArchiveRecord, 'id' | 'slug'>): string {
   return `/archive/${record.id}/${encodeURIComponent(record.slug)}`
