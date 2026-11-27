@@ -98,7 +98,13 @@ export interface BrandColors {
 
 interface BrandDefaults {
   title: string
+  /** The bare domain, without `www`: the brand's name for it, as in the newsletter footer. */
   domain: string
+  /**
+   * The production primary host, as on the legacy sites: `www` for the three publications, the apex for ClearView.
+   * The other host redirects to it (see docs/infrastructure.md).
+   */
+  host: string
   region: 'uk' | 'asia' | 'us' | 'global'
   colors: BrandColors
   stagingHost: string
@@ -129,6 +135,7 @@ export const BRANDS: Record<BrandKey, BrandDefaults> = {
   wealthbriefing: {
     title: 'WealthBriefing',
     domain: 'wealthbriefing.com',
+    host: 'www.wealthbriefing.com',
     region: 'uk',
     colors: {
       accent: '#174493',
@@ -146,6 +153,7 @@ export const BRANDS: Record<BrandKey, BrandDefaults> = {
   wealthbriefingasia: {
     title: 'WealthBriefingAsia',
     domain: 'wealthbriefingasia.com',
+    host: 'www.wealthbriefingasia.com',
     region: 'asia',
     colors: {
       accent: '#B41412',
@@ -163,6 +171,7 @@ export const BRANDS: Record<BrandKey, BrandDefaults> = {
   familywealthreport: {
     title: 'Family Wealth Report',
     domain: 'familywealthreport.com',
+    host: 'www.familywealthreport.com',
     region: 'us',
     colors: {
       accent: '#1B6B47',
@@ -182,6 +191,7 @@ export const BRANDS: Record<BrandKey, BrandDefaults> = {
   clearview: {
     title: 'ClearView Financial Media',
     domain: 'clearviewpublishing.com',
+    host: 'clearviewpublishing.com',
     region: 'global',
     colors: {
       accent: '#B41412',
@@ -211,14 +221,15 @@ export function brandColorVars(colors: BrandColors): Record<string, string> {
 
 /**
  * Origin a brand is served from in the current environment, from
- * `NEXT_PUBLIC_SITE_ENV`: the live apex on `production` (`www` redirects to
- * it, see docs/infrastructure.md), the Vercel staging host on `staging`, and
- * `{key}.localhost:3000` in development, over https when
- * `NEXT_PUBLIC_DEV_HTTPS=true`.
+ * `NEXT_PUBLIC_SITE_ENV`: the brand's primary host (`BRANDS[key].host`) on
+ * `production`, `www` for the three publications and the apex for ClearView,
+ * the other host redirecting to it (see docs/infrastructure.md); the Vercel
+ * staging host on `staging`; and `{key}.localhost:3000` in development, over
+ * https when `NEXT_PUBLIC_DEV_HTTPS=true`.
  */
 export function brandOrigin(key: BrandKey): string {
   if (process.env.NEXT_PUBLIC_SITE_ENV === 'production') {
-    return `https://${BRANDS[key].domain}`
+    return `https://${BRANDS[key].host}`
   }
 
   if (process.env.NEXT_PUBLIC_SITE_ENV === 'staging') {
@@ -230,6 +241,7 @@ export function brandOrigin(key: BrandKey): string {
   return `${protocol}://${key}.localhost:3000`
 }
 
+// Keyed without `www`: resolveBrandFromHost strips it, so the apex and `www` hosts both resolve, whichever is primary.
 const HOST_TO_BRAND: Record<string, BrandKey> = {}
 
 for (const key of BRAND_KEYS) {
