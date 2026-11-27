@@ -1,6 +1,8 @@
 import { TagIcon } from '@sanity/icons/Tag'
 import { defineField, defineType } from 'sanity'
 
+import { seoField } from '../objects/seo'
+
 /**
  * One award category, for example "Investment Offering (UK)".
  *
@@ -26,18 +28,24 @@ export const awardCategory = defineType({
   title: 'Award category',
   type: 'document',
   icon: TagIcon,
+  groups: [
+    { name: 'content', title: 'Content', default: true },
+    { name: 'seo', title: 'SEO' },
+  ],
   fieldsets: [{ name: 'copy', title: 'Category page', description: SHARED_COPY }],
   fields: [
     defineField({
       name: 'title',
       title: 'Title',
       type: 'string',
+      group: 'content',
       validation: (Rule) => Rule.required(),
     }),
     defineField({
       name: 'slug',
       title: 'Slug',
       type: 'slug',
+      group: 'content',
       options: { source: 'title', maxLength: 96 },
       description: 'Changing it changes the page address.',
       validation: (Rule) => Rule.required(),
@@ -46,6 +54,7 @@ export const awardCategory = defineType({
       name: 'categoryGroup',
       title: 'Category group',
       type: 'string',
+      group: 'content',
       // The heading the category most often appears under, for example "TECHNOLOGY CATEGORIES".
       description: "Shown only when the latest edition's winners have no group of their own.",
     }),
@@ -53,6 +62,7 @@ export const awardCategory = defineType({
       name: 'description',
       title: 'Description',
       type: 'text',
+      group: 'content',
       rows: 3,
       fieldset: 'copy',
       validation: (Rule) => Rule.max(400).warning('Longer than 400 characters; one short paragraph reads best'),
@@ -61,6 +71,7 @@ export const awardCategory = defineType({
       name: 'eligibility',
       title: 'Eligibility',
       type: 'text',
+      group: 'content',
       rows: 3,
       fieldset: 'copy',
       validation: (Rule) => Rule.max(400).warning('Longer than 400 characters; keep it to a sentence or two'),
@@ -69,6 +80,7 @@ export const awardCategory = defineType({
       name: 'recognises',
       title: 'What the category recognises',
       type: 'text',
+      group: 'content',
       rows: 3,
       fieldset: 'copy',
       validation: (Rule) => Rule.max(400).warning('Longer than 400 characters; keep it to a sentence or two'),
@@ -77,10 +89,12 @@ export const awardCategory = defineType({
       name: 'judging',
       title: 'Judging context',
       type: 'text',
+      group: 'content',
       rows: 3,
       fieldset: 'copy',
       validation: (Rule) => Rule.max(400).warning('Longer than 400 characters; keep it to a sentence or two'),
     }),
+    seoField(),
   ],
   preview: {
     select: { title: 'title', group: 'categoryGroup', slug: 'slug.current' },

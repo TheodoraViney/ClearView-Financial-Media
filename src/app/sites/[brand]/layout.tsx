@@ -18,15 +18,15 @@ import { GptLoader } from '@/components/ui/Gpt.client'
 import type { SubscribeModalData } from '@/components/sections/subscribe/types'
 import { GAM_NETWORK_CODE } from '@/lib/gam'
 import { subscribeOptions } from '@/lib/subscribe-options'
-import { fetchBrandTitle, fetchShell } from '@/sanity/brand-title'
+import { fetchBrandTitle, fetchShell, fetchTitleSuffix } from '@/sanity/brand-title'
 import { getDynamicFetchOptions, SanityLive, type DynamicFetchOptions } from '@/sanity/live'
 
 export function generateStaticParams() {
   return BRAND_KEYS.map((brand) => ({ brand }))
 }
 
-// The brand title from Brand settings names every page of the brand: the default title, and the suffix of a page that
-// sets its own. Published content only, so it shares the layout's published shell cache entry and needs no draft mode.
+// Brand settings name every page of the brand: the brand title is the default title, and "Name in titles" the suffix
+// of a page that sets its own. Published content only, so it shares the layout's published shell cache entry and needs no draft mode.
 export async function generateMetadata({ params }: { params: Promise<{ brand: string }> }): Promise<Metadata> {
   const { brand } = await params
 
@@ -34,9 +34,10 @@ export async function generateMetadata({ params }: { params: Promise<{ brand: st
     return {}
   }
 
-  const title = stegaClean(await fetchBrandTitle(brand, { perspective: 'published', stega: false }))
+  const options = { perspective: 'published', stega: false } as const
+  const [title, suffix] = await Promise.all([fetchBrandTitle(brand, options), fetchTitleSuffix(brand, options)])
 
-  return { title: { default: title, template: `%s | ${title}` } }
+  return { title: { default: stegaClean(title), template: `%s | ${stegaClean(suffix)}` } }
 }
 
 export default async function BrandLayout({

@@ -4,6 +4,7 @@ import { defineArrayMember, defineField, defineType } from 'sanity'
 import { PROFILE_METRICS_MAX } from '@/lib/partner-profile-copy'
 
 import { altField, imageField, keyFindingMember, legacyWpIdField, linkRowMember } from '../fields'
+import { seoField } from '../objects/seo'
 
 /**
  * A Company. Sponsor, venue, winner, partner and technology demonstrator are
@@ -35,6 +36,7 @@ export const company = defineType({
   groups: [
     { name: 'company', title: 'Company', default: true },
     { name: 'profile', title: 'Profile page' },
+    { name: 'seo', title: 'SEO' },
   ],
   fieldsets: [
     { name: 'legacy', title: 'Not shown on the site', options: { collapsible: true, collapsed: true, columns: 2 } },
@@ -178,6 +180,7 @@ export const company = defineType({
       group: 'profile',
       of: [linkRowMember({ title: 'Link' })],
     }),
+    seoField(),
     { ...legacyWpIdField, group: 'company', fieldset: 'legacy' },
   ],
   preview: {

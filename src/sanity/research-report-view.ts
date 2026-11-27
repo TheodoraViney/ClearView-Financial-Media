@@ -99,9 +99,8 @@ export function seoOverrides(
   }
 }
 
-/** The share image: the banner, else the report cover. */
-export const researchReportShareImage = (report: ResearchReportData) =>
-  toImage(report.featuredImage) ?? toImage(report.downloadThumbnail)
+/** The share image when the SEO tab has none: the report cover. */
+export const researchReportShareImage = (report: ResearchReportData) => toImage(report.downloadThumbnail)
 
 const keyFindings = (report: ResearchReportData) =>
   (report.keyFindings ?? []).flatMap((item) =>

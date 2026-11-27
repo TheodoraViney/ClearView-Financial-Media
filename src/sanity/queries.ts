@@ -57,6 +57,7 @@ export const SHELL_QUERY = defineQuery(`
     },
     "brand": *[_type == "brand" && _id == $brandId && key.current == $brand][0]{
       title,
+      seoSiteName,
       logo{ "alt": asset->altText, asset->{ url, metadata{ dimensions{ width, height } } } },
       footerLogo{ "alt": asset->altText, asset->{ url, metadata{ dimensions{ width, height } } } },
       ${ADVERTISING}
@@ -836,7 +837,6 @@ export const RESEARCH_REPORT_QUERY = defineQuery(`
     summary[]{ ${ARTICLE_BODY} },
     "summaryText": pt::text(summary),
     "bodyText": pt::text(body),
-    "featuredImage": featuredImage{ ${IMAGE} },
     "downloadThumbnail": downloadThumbnail{ ${IMAGE} },
     downloadUrl,
     "downloadFileUrl": downloadFile.asset->url,

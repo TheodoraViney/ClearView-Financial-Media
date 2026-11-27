@@ -9,13 +9,15 @@ import {
   RESEARCH_SUMMARY_DEFAULT_SLUG,
   RESEARCH_SUMMARY_MAX_CHARS,
   RESEARCH_SUMMARY_SLUG,
+  hasExecutiveSummary,
   publishedId,
 } from '@/lib/research-report'
 import { AutoFillPicksInput } from '@/sanity/components/auto-fill-picks-input'
 import { ResearchGenerateInput } from '@/sanity/components/research-generate-input'
 
-import { altField, imageField, keyFindingMember, legacyWpIdField } from '../fields'
+import { altField, keyFindingMember, legacyWpIdField } from '../fields'
 import { blocksTextLength, paragraphsBlock } from '../objects/rich-text'
+import { seoField } from '../objects/seo'
 
 /**
  * A downloadable research report or post-forum report. 12 records.
@@ -28,7 +30,7 @@ import { blocksTextLength, paragraphsBlock } from '../objects/rich-text'
  * Executive Summary page at /resource/{slug}/{summarySlug, default
  * executive-summary} from its "Executive summary page" fields (`summaryLead`,
  * `summaryIntro`, `summarySections`), shown while one of them has content. Each
- * page has optional SEO overrides (`seo`, `summarySeo`). The "Page content" fields
+ * page has its SEO metadata (`seo`, `summarySeo`). The "Page content" fields
  * are optional: the page hides a section, and its tab, while the section is
  * empty. The pages' labels live on the "Resource page texts" document
  * (RESEARCH_REPORT_PAGE_ID).
@@ -452,24 +454,21 @@ export const resource = defineType({
       fieldset: 'summaryPage',
       of: [executiveSummarySectionMember],
     }),
-    imageField('featuredImage', {
-      title: 'Banner image',
-      group: 'seo',
-      description: 'Used only when the report is shared, not on the page.',
-    }),
-    defineField({
-      name: 'seo',
-      title: 'Report page SEO',
-      type: 'seo',
-      group: 'seo',
-      description: 'Empty fields use the report title, Standfirst and Banner image.',
-    }),
+    seoField({ title: 'Report page SEO' }),
     defineField({
       name: 'summarySeo',
       title: 'Executive Summary page SEO',
       type: 'seo',
       group: 'summarySeo',
-      description: 'Empty fields use the summary title, Lead and the report’s share image.',
+      validation: (Rule) =>
+        Rule.custom((value, context) => {
+          const report = context.document as
+            | { summaryLead?: unknown[]; summaryIntro?: unknown[]; summarySections?: { heading?: string; body?: unknown[] }[] }
+            | undefined
+          const summary = { lead: report?.summaryLead, intro: report?.summaryIntro, sections: report?.summarySections }
+
+          return value || !hasExecutiveSummary(summary) ? true : 'Required while the Executive Summary page has content'
+        }),
     }),
     legacyWpIdField,
   ],
