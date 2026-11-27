@@ -74,11 +74,12 @@ export async function generateMetadata({ params }: { params: Promise<Params> }):
   }
 
   // The "Summary SEO" tab's fields, else the summary's own; the share image falls back to the report page's ("SEO"
-  // tab) before the report cover.
+  // tab) before the report cover. A noindex report hides its summary too.
   return pageMetadata({
     brand,
     path,
     seo: data.summarySeo,
+    noIndex: Boolean(data.seo?.noIndex),
     title: [copy?.summaryTitle, data.title].map((part) => stegaClean(part)?.trim()).filter(Boolean).join(' — '),
     description: executiveSummaryDescription(data),
     images: [data.seo?.image, data.downloadThumbnail],

@@ -1059,3 +1059,100 @@ export const COMPANY_ENGAGEMENT_PAGE_QUERY = defineQuery(`
 export const NOT_FOUND_PAGE_QUERY = defineQuery(`
   *[_id == $id && _type == "notFoundPage"][0]{ title, description, buttonLabel }
 `)
+
+// Every document behind a public URL of `$brand`, for the brand's CMS sitemap (src/sanity/sitemap.ts), with what
+// decides whether the URL is listed: its noindex and canonical override, and the labels documents the ClearView
+// templates require (each page is a 404 without its own). The ClearView records (`cv`) are fetched on ClearView only.
+// `$categoriesId` is the brand's Categories page id ("" on ClearView, which has none).
+const SITEMAP_SEO = /* groq */ `"seo": seo{ canonical, noIndex }`
+
+export const SITEMAP_QUERY = defineQuery(`
+  {
+    "home": *[_type == "page" && brand == $brand && slug.current == "home"][0]{ _updatedAt, ${SITEMAP_SEO} },
+    "pages": *[
+      _type == "page"
+      && brand == $brand
+      && defined(slug.current)
+      && !(slug.current in ["home", "categories", "shared-listings", "company-engagement"])
+    ]{ "slug": slug.current, _updatedAt, ${SITEMAP_SEO} },
+    "categoriesPage": *[_type == "page" && _id == $categoriesId && brand == $brand][0]{ _updatedAt, ${SITEMAP_SEO} },
+    "posts": *[_type == "post" && defined(slug.current) && $brand in brands] | order(publishedAt desc){
+      "slug": slug.current,
+      "firstBrand": brands[0],
+      _updatedAt,
+      ${SITEMAP_SEO}
+    },
+    "cv": {
+      "awardCategoryLabels": defined(*[$brand == "clearview" && _id == $awardCategoryPageId && _type == "awardCategoryPage"][0]._id),
+      "awardsLabels": defined(*[$brand == "clearview" && _id == $awardsProgrammePageId && _type == "awardsProgrammePage"][0]._id),
+      "eventLabels": defined(*[$brand == "clearview" && _id == $eventPageId && _type == "eventPage"][0]._id),
+      "researchLabels": defined(*[$brand == "clearview" && _id == $researchReportPageId && _type == "researchReportPage"][0]._id),
+      "companyLabels": defined(*[$brand == "clearview" && _id == $partnerProfilePageId && _type == "partnerProfilePage"][0]._id),
+      "sharedListings": *[$brand == "clearview" && _type == "page" && _id == $sharedListingsId && brand == $brand][0]{ _updatedAt, ${SITEMAP_SEO} },
+      "companyEngagement": *[$brand == "clearview" && _type == "page" && _id == $companyEngagementId && brand == $brand][0]{ _updatedAt, ${SITEMAP_SEO} },
+      "records": *[$brand == "clearview" && _type in ["awardsProgramme", "conferenceEvent"] && defined(slug.current)]{
+        _type,
+        "slug": slug.current,
+        _updatedAt,
+        ${SITEMAP_SEO}
+      },
+      "editions": *[$brand == "clearview" && _type == "awardsProgramme" && defined(programme->slug.current)]{
+        _updatedAt,
+        "programme": programme->slug.current,
+        "categories": winners[defined(category._ref)].category->{ "slug": slug.current, _updatedAt, ${SITEMAP_SEO} }
+      },
+      "resources": *[$brand == "clearview" && _type == "resource" && defined(slug.current)]{
+        "slug": slug.current,
+        _updatedAt,
+        ${SITEMAP_SEO},
+        "summarySeo": summarySeo{ canonical, noIndex },
+        "summary": {
+          "slug": coalesce(summarySlug.current, "executive-summary"),
+          "lead": summaryLead[]{ _key },
+          "intro": summaryIntro[]{ _key },
+          "sections": summarySections[]{ heading, "body": body[]{ _key } }
+        }
+      },
+      "companies": *[$brand == "clearview" && _type == "company" && defined(slug.current) && ${COMPANY_HAS_PROFILE}]{
+        "slug": slug.current,
+        _updatedAt,
+        ${SITEMAP_SEO}
+      }
+    }
+  }
+`)
+
+// The links of a brand's /llms.txt (src/app/sites/[brand]/llms.txt): an editorial brand's latest posts whose canonical
+// home it is; ClearView's awards open for entries, upcoming conference events and latest research. Noindex records
+// are left out. `$today` is the UK date (cachedUkToday).
+export const LLMS_QUERY = defineQuery(`
+  {
+    "posts": *[
+      _type == "post"
+      && defined(slug.current)
+      && brands[0] == $brand
+      && seo.noIndex != true
+    ] | order(publishedAt desc)[0...15]{ title, "slug": slug.current },
+    "awards": *[
+      $brand == "clearview"
+      && _type == "awardsProgramme"
+      && defined(slug.current)
+      && nominationsClosingDate >= $today
+      && seo.noIndex != true
+    ] | order(nominationsClosingDate asc)[0...10]{ _type, title, "slug": slug.current },
+    "events": *[
+      $brand == "clearview"
+      && _type == "conferenceEvent"
+      && defined(slug.current)
+      && coalesce(endDate, startDate) >= $today
+      && seo.noIndex != true
+    ] | order(startDate asc)[0...10]{ _type, title, "slug": slug.current },
+    "research": *[
+      $brand == "clearview"
+      && _type == "resource"
+      && category == "research"
+      && defined(slug.current)
+      && seo.noIndex != true
+    ] | order(publishedAt desc)[0...5]{ _type, title, "slug": slug.current }
+  }
+`)
