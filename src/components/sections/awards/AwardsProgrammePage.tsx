@@ -600,12 +600,16 @@ function WinnersGroup({ group }: { group: WinnersGroupView }) {
   )
 }
 
+// A shortlist with more names than this leaves the card grid for the full width, its names in columns.
+const LONG_SHORTLIST = 12
+
 // Finalist names, one a line, flowing down two columns once the column is 504 wide and three from 844.
 const NAME_COLUMNS = 'gap-x-8 @cards-2:columns-2 @cards-3:columns-3'
 
 /**
  * One finalists category group: its heading, then its shortlists. A shortlist with an award category (older editions)
- * is a card of the category and its names, in the card grid; the names of shortlists without one flow in columns.
+ * is a card of the category and its names, in the card grid; a long one (more than LONG_SHORTLIST names) spans the
+ * grid and flows its names in columns, as do the names of shortlists without a category.
  */
 function FinalistsGroup({ group }: { group: FinalistsGroupView }) {
   const headingId = `${group.id}-heading`
@@ -631,7 +635,10 @@ function FinalistsGroup({ group }: { group: FinalistsGroupView }) {
       {categorised.length > 0 && (
         <ul className={cx(CARDS, 'gap-x-8 gap-y-6')}>
           {categorised.map((list) => (
-            <li key={list.key} className="flex min-w-0 flex-col gap-2">
+            <li
+              key={list.key}
+              className={cx('flex min-w-0 flex-col gap-2', list.companies.length > LONG_SHORTLIST && 'col-span-full')}
+            >
               <h4 className="text-base leading-title font-medium wrap-break-word text-foreground">
                 {list.categoryHref ? (
                   <Link
@@ -645,9 +652,9 @@ function FinalistsGroup({ group }: { group: FinalistsGroupView }) {
                   list.category
                 )}
               </h4>
-              <ul>
+              <ul className={list.companies.length > LONG_SHORTLIST ? NAME_COLUMNS : undefined}>
                 {list.companies.map((company) => (
-                  <li key={company.key} className={cx(COPY, 'wrap-break-word')}>
+                  <li key={company.key} className={cx(COPY, 'break-inside-avoid wrap-break-word')}>
                     {company.name}
                   </li>
                 ))}
