@@ -5,13 +5,17 @@ import { Suspense } from 'react'
 
 import { PageBlocks } from '@/components/blocks/PageBlocks'
 import { TopBanner } from '@/components/sections/company-engagement/TopBanner'
+import { JsonLd } from '@/components/ui/JsonLd'
 import {
   COMPANY_ENGAGEMENT_PAGE_DOCUMENT_ID,
   companyEngagementCanonical,
   type RawSearchParams,
 } from '@/lib/company-engagement'
+import { jsonLdGraph } from '@/lib/json-ld'
+import { COMPANY_ENGAGEMENT_PATH } from '@/lib/links'
 import { fetchAdUnits } from '@/sanity/brand-title'
-import { toCompanyEngagementContext } from '@/sanity/company-engagement-view'
+import { companyDirectoryHrefs, toCompanyEngagementContext } from '@/sanity/company-engagement-view'
+import { absoluteUrl, blocksBreadcrumb, breadcrumbList, itemList } from '@/sanity/json-ld'
 import { cachedNow, cachedSanity, cachedUkToday, getDynamicFetchOptions, type DynamicFetchOptions } from '@/sanity/live'
 import { COMPANY_ENGAGEMENT_PAGE_QUERY, COMPANY_ENGAGEMENT_QUERY } from '@/sanity/queries'
 import { pageMetadata } from '@/sanity/seo'
@@ -120,8 +124,17 @@ async function CachedCompanyEngagement({
     notFound()
   }
 
+  // The companies the directory lists on this page (when the page has the directory), and the heading block's trail.
+  const directory = page.blocks?.some((block) => block._type === 'companyDirectory')
+  const trail = blocksBreadcrumb(page.blocks)
+  const jsonLd = jsonLdGraph([
+    directory ? itemList('clearview', companyDirectoryHrefs(context)) : null,
+    trail && breadcrumbList('clearview', trail, absoluteUrl('clearview', COMPANY_ENGAGEMENT_PATH)),
+  ])
+
   return (
     <main className="mx-auto flex w-full max-w-page flex-col pb-16 md:pb-20">
+      <JsonLd data={jsonLd} />
       <PageBlocks
         blocks={page.blocks}
         brand="clearview"

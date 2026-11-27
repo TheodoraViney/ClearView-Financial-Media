@@ -171,6 +171,11 @@ function toCard(item: ListItem, brand: EditorialBrandKey): CategoriesCardView | 
   }
 }
 
+/** The links of the articles a page of the list shows, in order: the listing's structured data. */
+export function articleListingHrefs(context: Pick<ArticleListingContext, 'list' | 'brand'>): string[] {
+  return context.list.items.flatMap((item) => toCard(item, context.brand)?.href ?? [])
+}
+
 /** The articles list block's props: filters, the featured story (page 1), the cards and the pagination. */
 export function toArticleListingView(block: BlockOf<'articleListing'>, context: ArticleListingContext): ArticleListingView {
   const { data, filters, list, brand } = context

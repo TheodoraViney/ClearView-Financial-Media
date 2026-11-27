@@ -5,7 +5,10 @@ import { Suspense } from 'react'
 
 import { RESEARCH_REPORT_PAGE_ID } from '@/brands'
 import { ResearchReportPage } from '@/components/sections/research/ResearchReportPage'
+import { JsonLd } from '@/components/ui/JsonLd'
+import { jsonLdGraph } from '@/lib/json-ld'
 import { fetchAdUnits } from '@/sanity/brand-title'
+import { breadcrumbList } from '@/sanity/json-ld'
 import { cachedSanity, getDynamicFetchOptions, type DynamicFetchOptions } from '@/sanity/live'
 import { mostReadGroupFill } from '@/sanity/most-read'
 import { RESEARCH_REPORT_PAGE_QUERY, RESEARCH_REPORT_QUERY } from '@/sanity/queries'
@@ -14,7 +17,7 @@ import {
   researchReportDescription,
   toResearchReportView,
 } from '@/sanity/research-report-view'
-import { pageMetadata } from '@/sanity/seo'
+import { canonicalUrl, pageMetadata } from '@/sanity/seo'
 import { PLACEHOLDER_SLUG } from '@/sanity/static-params'
 
 // A research report at /resource/{slug} (sharedRecordHref), the WordPress path without its trailing slash. Served on
@@ -111,5 +114,14 @@ async function CachedReport({ slug, perspective, variant, stega }: { slug: strin
     notFound()
   }
 
-  return <ResearchReportPage view={toResearchReportView({ report, copy, ads, mostRead })} />
+  const view = toResearchReportView({ report, copy, ads, mostRead })
+  const url = canonicalUrl({ brand: 'clearview', path: reportPath(report), seo: report.seo })
+
+  // The visible trail stops at Research; the structured one ends at the report.
+  return (
+    <>
+      {url && <JsonLd data={jsonLdGraph([breadcrumbList('clearview', [...view.breadcrumb, { label: report.title }], url)])} />}
+      <ResearchReportPage view={view} />
+    </>
+  )
 }

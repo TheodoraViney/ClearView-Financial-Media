@@ -5,6 +5,7 @@ import { Suspense } from 'react'
 
 import { categoriesPageDocumentId, isEditorialBrandKey, type EditorialBrandKey } from '@/brands'
 import { PageBlocks } from '@/components/blocks/PageBlocks'
+import { JsonLd } from '@/components/ui/JsonLd'
 import {
   CATEGORIES_PATH,
   categoriesHref,
@@ -15,8 +16,16 @@ import {
   type CategoriesState,
   type RawSearchParams,
 } from '@/lib/categories'
+import { jsonLdGraph } from '@/lib/json-ld'
 import { fetchAdUnits } from '@/sanity/brand-title'
-import { categoriesHeading, findPageHero, resolveCategoriesFilters } from '@/sanity/categories-view'
+import {
+  articleListingHrefs,
+  categoriesHeading,
+  findPageHero,
+  resolveCategoriesFilters,
+  toCategoriesHeading,
+} from '@/sanity/categories-view'
+import { absoluteUrl, breadcrumbList, itemList } from '@/sanity/json-ld'
 import { heroIntroText } from '@/sanity/page-hero'
 import {
   cachedNow,
@@ -162,8 +171,17 @@ async function CachedCategories({
     notFound()
   }
 
+  // The articles this page lists, and the heading block's trail (Home / page, or Home / page / category or topic).
+  const context = { brand, data, filters, list, banner3: ads.banner3 }
+  const hero = findPageHero(data.page.blocks)
+  const jsonLd = jsonLdGraph([
+    itemList(brand, articleListingHrefs(context)),
+    hero && breadcrumbList(brand, toCategoriesHeading(hero, context).breadcrumb, absoluteUrl(brand, categoriesHref(filters.state))),
+  ])
+
   return (
     <main>
+      <JsonLd data={jsonLd} />
       <PageBlocks
         blocks={data.page.blocks}
         brand={brand}
@@ -172,7 +190,7 @@ async function CachedCategories({
         ads={ads}
         options={options}
         sidebar="rail"
-        articles={{ brand, data, filters, list, banner3: ads.banner3 }}
+        articles={context}
       />
     </main>
   )

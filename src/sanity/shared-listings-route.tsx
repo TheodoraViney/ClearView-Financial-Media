@@ -5,6 +5,8 @@ import { Suspense } from 'react'
 
 import { AWARDS_PROGRAMME_PAGE_ID } from '@/brands'
 import { PageBlocks } from '@/components/blocks/PageBlocks'
+import { JsonLd } from '@/components/ui/JsonLd'
+import { jsonLdGraph } from '@/lib/json-ld'
 import {
   listingCanonical,
   SHARED_LISTINGS_PAGE_DOCUMENT_ID,
@@ -14,10 +16,11 @@ import {
 } from '@/lib/shared-listings'
 
 import { fetchAdUnits } from './brand-title'
+import { absoluteUrl, blocksBreadcrumb, breadcrumbList, itemList } from './json-ld'
 import { cachedNow, cachedSanity, cachedUkToday, getDynamicFetchOptions, type DynamicFetchOptions } from './live'
 import { SHARED_LISTINGS_PAGE_QUERY } from './queries'
 import { pageMetadata } from './seo'
-import { isCompletePage, sharedListingsState } from './shared-listings-view'
+import { isCompletePage, sharedListingsPageHrefs, sharedListingsState } from './shared-listings-view'
 
 /*
  * The shared listings page, rendered by its two routes: /events-category/{awards,summits,briefings,webinar} and
@@ -109,8 +112,16 @@ async function CachedSharedListings({
     notFound()
   }
 
+  // The records this page lists, and the heading block's trail ending at the route's own path.
+  const trail = blocksBreadcrumb(data.page.blocks)
+  const jsonLd = jsonLdGraph([
+    itemList('clearview', sharedListingsPageHrefs({ tab, params: searchParams, today, data })),
+    trail && breadcrumbList('clearview', trail, absoluteUrl('clearview', path)),
+  ])
+
   return (
     <main>
+      <JsonLd data={jsonLd} />
       <PageBlocks
         blocks={data.page.blocks}
         brand="clearview"

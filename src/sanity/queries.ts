@@ -64,6 +64,7 @@ export const SHELL_QUERY = defineQuery(`
       "seoImage": seoImage{ ${IMAGE} },
       "favicon": favicon{ asset },
       xHandle,
+      socialProfiles,
       logo{ "alt": asset->altText, asset->{ url, metadata{ dimensions{ width, height } } } },
       footerLogo{ "alt": asset->altText, asset->{ url, metadata{ dimensions{ width, height } } } },
       ${ADVERTISING}
@@ -569,6 +570,7 @@ export const AWARDS_PROGRAMME_QUERY = defineQuery(`
       nominationsClosingDate,
       country,
       "venue": venue->title,
+      "venueAddress": venue->address,
       registerLink{ ${LINK} },
       highlightsVideoId,
       "highlightVideoThumbnail": highlightVideoThumbnail{ ${IMAGE} },

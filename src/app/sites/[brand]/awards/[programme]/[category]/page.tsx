@@ -6,12 +6,15 @@ import { Suspense } from 'react'
 
 import { AWARD_CATEGORY_PAGE_ID, AWARDS_PROGRAMME_PAGE_ID } from '@/brands'
 import { AwardCategoryPage } from '@/components/sections/awards/AwardCategoryPage'
+import { JsonLd } from '@/components/ui/JsonLd'
+import { jsonLdGraph } from '@/lib/json-ld'
 import { awardCategoryHref } from '@/lib/links'
 import { isAwardedCategory, toAwardCategoryView } from '@/sanity/award-category-view'
 import { fetchAdUnits } from '@/sanity/brand-title'
+import { breadcrumbList } from '@/sanity/json-ld'
 import { cachedSanity, cachedUkToday, getDynamicFetchOptions, type DynamicFetchOptions } from '@/sanity/live'
 import { AWARD_CATEGORY_PAGE_QUERY, AWARD_CATEGORY_QUERY, OTHER_AWARDS_QUERY } from '@/sanity/queries'
-import { pageMetadata } from '@/sanity/seo'
+import { canonicalUrl, pageMetadata } from '@/sanity/seo'
 import { PLACEHOLDER_SLUG } from '@/sanity/static-params'
 
 // An award category page: one category as awarded by one evergreen programme, /awards/{programme}/{category}
@@ -121,5 +124,13 @@ async function CachedAwardCategory({
     notFound()
   }
 
-  return <AwardCategoryPage view={toAwardCategoryView({ category: data, others, copy, statuses: copy.statuses, ads, today })} />
+  const view = toAwardCategoryView({ category: data, others, copy, statuses: copy.statuses, ads, today })
+  const url = canonicalUrl({ brand: 'clearview', path: awardCategoryHref(data.programme.slug, data.slug, 'clearview'), seo: data.seo })
+
+  return (
+    <>
+      {url && <JsonLd data={jsonLdGraph([breadcrumbList('clearview', view.breadcrumb, url)])} />}
+      <AwardCategoryPage view={view} />
+    </>
+  )
 }
