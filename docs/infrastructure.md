@@ -5,7 +5,7 @@ It covers Cloudflare, Vercel, and R2.
 No infrastructure is provisioned yet.
 This is the plan for the engineer who provisions it later.
 
-The platform serves four apex domains from one Next.js app on one Vercel project.
+The platform serves four domains from one Next.js app on one Vercel project.
 Cloudflare sits in front of Vercel for all four domains.
 Cloudflare also serves the static article archive from R2, bypassing Vercel for that path.
 
@@ -57,7 +57,7 @@ None of this buys anything, because the code is the same for all four brands.
 Brand is data, not code.
 Brand documents live in Sanity, one per publication.
 The app resolves brand per request from the hostname.
-One Vercel project attaches all four apex domains and their `www` redirects.
+One Vercel project attaches all four domains, each with its apex and `www` hosts.
 One deploy updates all four sites at once.
 
 Vercel functions default to region `iad1`.
@@ -71,16 +71,26 @@ One project.
 
 Domains attached to the project:
 
-- `wealthbriefing.com` (apex, primary)
-- `www.wealthbriefing.com` (redirects to apex)
-- `wealthbriefingasia.com` (apex, primary)
-- `www.wealthbriefingasia.com` (redirects to apex)
-- `familywealthreport.com` (apex, primary)
-- `www.familywealthreport.com` (redirects to apex)
-- `clearviewpublishing.com` (apex, primary)
-- `www.clearviewpublishing.com` (redirects to apex)
+- `www.wealthbriefing.com` (primary)
+- `wealthbriefing.com` (redirects to `www`)
+- `www.wealthbriefingasia.com` (primary)
+- `wealthbriefingasia.com` (redirects to `www`)
+- `www.familywealthreport.com` (primary)
+- `familywealthreport.com` (redirects to `www`)
+- `clearviewpublishing.com` (primary)
+- `www.clearviewpublishing.com` (redirects to the apex)
 
-Vercel handles the `www` to apex redirect once each `www` domain is added and marked as a redirect target.
+The primary hosts match the legacy sites.
+The three publications are primary on `www`, and their apex redirects to it.
+ClearView Publishing is primary on the apex, and its `www` redirects to it.
+`BRANDS[key].host` in `src/brands.ts` holds each primary host, and `brandOrigin()` builds production links from it.
+The app still resolves the brand from either host.
+
+Add both hosts of each domain in Vercel.
+Edit the non-primary one and set it to redirect to the primary.
+Choose 301 for that redirect.
+Vercel defaults to 308, but the redirect baseline asserts a 301.
+The redirect keeps the path and query string.
 
 Environment variables, set once for the project:
 
@@ -120,7 +130,7 @@ Switch the brand shown on a branch preview with the `brand` cookie, as described
 
 ## 4. Cloudflare setup per zone
 
-Four zones, one per apex domain.
+Four zones, one per domain.
 Each zone needs the same configuration.
 
 Proxy mode: ON, for every DNS record that serves traffic.
@@ -135,7 +145,10 @@ This validates the certificate on the Vercel side of the connection.
 DNS records per zone:
 
 - Apex (`@`): CNAME to `cname.vercel-dns.com`. Cloudflare flattens this CNAME at the apex automatically, so this works even though apex CNAMEs are normally invalid DNS.
-- `www`: CNAME to `cname.vercel-dns.com`. Vercel serves the redirect to apex from this hostname.
+- `www`: CNAME to `cname.vercel-dns.com`.
+
+Vercel serves the redirect from whichever host is not primary (see section 3).
+Both records stay proxied, so the redirect still passes through Cloudflare.
 
 Plan tier per zone:
 
@@ -162,14 +175,13 @@ The `slug` is cosmetic and does not need to be unique.
 A single Cloudflare Worker is bound to the bucket.
 The Worker is deployed with these routes:
 
-- `wealthbriefing.com/archive/*`
 - `www.wealthbriefing.com/archive/*`
-- `wealthbriefingasia.com/archive/*`
 - `www.wealthbriefingasia.com/archive/*`
-- `familywealthreport.com/archive/*`
 - `www.familywealthreport.com/archive/*`
 - `clearviewpublishing.com/archive/*`
-- `www.clearviewpublishing.com/archive/*`
+
+Routes cover the primary hosts only.
+An `/archive/*` request on the other host passes to Vercel, which redirects it to the primary host, where the Worker serves it.
 
 Worker behaviour:
 
@@ -276,7 +288,7 @@ Sanity CORS origins to add, in the Sanity project settings:
 - `https://wealthbriefingasia.localhost:3000`
 - `https://familywealthreport.localhost:3000`
 - `https://clearview.localhost:3000`
-- `https://wealthbriefing.com`
-- `https://wealthbriefingasia.com`
-- `https://familywealthreport.com`
+- `https://www.wealthbriefing.com`
+- `https://www.wealthbriefingasia.com`
+- `https://www.familywealthreport.com`
 - `https://clearviewpublishing.com`

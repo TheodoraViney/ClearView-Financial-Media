@@ -28,7 +28,7 @@ const block = (text: string) => ({
 
 const heading = (text: string, as: 'h2' | 'h3' = 'h2') => ({ as, text })
 
-const ARCHIVE = 'https://wealthbriefing.com/archive'
+const ARCHIVE = 'https://www.wealthbriefing.com/archive'
 
 const COMPLETE: Omit<PartnerProfileView, 'panel'> = {
   name: 'WIZE by TeamWork',
