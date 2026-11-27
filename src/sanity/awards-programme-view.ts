@@ -28,6 +28,7 @@ import { acclaimHref, AWARDS_LISTING_PATH, awardCategoryHref, sharedRecordHref }
 import { toStatuses } from './award-category-view'
 import { toImage } from './image'
 import type { AWARDS_PROGRAMME_PAGE_QUERY_RESULT, AWARDS_PROGRAMME_QUERY_RESULT, OPEN_AWARDS_QUERY_RESULT } from './types'
+import { clipDescription } from './seo'
 
 type RecordData = StegaBranded<AWARDS_PROGRAMME_QUERY_RESULT>
 type CopyData = StegaBranded<AWARDS_PROGRAMME_PAGE_QUERY_RESULT>
@@ -40,7 +41,6 @@ export type EditionData = Extract<NonNullable<RecordData>, { _type: 'awardsProgr
 type Body = EditionData['body']
 
 // About two lines of a search result: the metadata description when the edition has no standfirst.
-const DESCRIPTION_LENGTH = 160
 
 const filled = <T extends string>(value: T | null | undefined): value is T => Boolean(stegaClean(value)?.trim())
 
@@ -71,23 +71,8 @@ export function plainText(value: TextBlocks | null | undefined): string {
     .trim()
 }
 
-/**
- * A metadata description from plain text: the text, cut at a word boundary near DESCRIPTION_LENGTH. Null when empty.
- * Also used by the event page.
- */
-export function clipDescription(text: string): string | null {
-  if (!text) {
-    return null
-  }
-
-  if (text.length <= DESCRIPTION_LENGTH) {
-    return text
-  }
-
-  const end = text.lastIndexOf(' ', DESCRIPTION_LENGTH)
-
-  return `${text.slice(0, end > DESCRIPTION_LENGTH / 2 ? end : DESCRIPTION_LENGTH).replace(/[\s,.;:]+$/, '')}…`
-}
+// The metadata description cut (src/sanity/seo.ts), kept here for the record views that import it with plainText.
+export { clipDescription }
 
 /**
  * The metadata description: the standfirst, else the start of the introduction cut at a word boundary. Null when the

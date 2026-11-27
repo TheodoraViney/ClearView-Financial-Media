@@ -38,9 +38,6 @@ export const partnerProfilePath = (company: Pick<PartnerProfileData, 'slug'>): s
 /** The metadata description: the start of About cut at a word boundary, or null without one. */
 export const partnerProfileDescription = (company: PartnerProfileData): string | null => clipDescription(plain(company.aboutText))
 
-/** The share image: the profile image, else the logo. */
-export const partnerProfileShareImage = (company: PartnerProfileData) => toImage(company.profileImage) ?? toImage(company.logo)
-
 /** Link rows typed on the company: a label and a target that resolves (allowlisted address or a routable document). */
 const linkRows = (rows: LinkRowData[] | null | undefined): LinkView[] =>
   (rows ?? []).flatMap((row) => {

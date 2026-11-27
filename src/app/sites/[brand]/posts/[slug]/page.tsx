@@ -1,3 +1,4 @@
+import type { Metadata } from 'next'
 import { draftMode } from 'next/headers'
 import { notFound } from 'next/navigation'
 import { Suspense } from 'react'
@@ -21,6 +22,7 @@ import {
 } from '@/sanity/live'
 import { mostReadAutoFill } from '@/sanity/most-read'
 import { ARTICLE_PAGE_QUERY, MOST_READ_QUERY, POST_QUERY, POST_SLUGS_QUERY } from '@/sanity/queries'
+import { pageMetadata, SEO_FETCH } from '@/sanity/seo'
 import { PLACEHOLDER_SLUG, withPlaceholder } from '@/sanity/static-params'
 
 // A slug of another brand, or of no post, ends in notFound() inside the page. Instant-navigation validation (dev
@@ -50,6 +52,39 @@ export async function generateStaticParams({
   return withPlaceholder(
     (data ?? []).flatMap(({ slug }) => (slug ? [{ slug }] : [])),
   )
+}
+
+// A post on several brands renders on each of their hosts; its canonical is on its first brand.
+export async function generateMetadata({ params }: { params: Promise<{ brand: string; slug: string }> }): Promise<Metadata> {
+  const { brand, slug } = await params
+
+  if (!isEditorialBrandKey(brand) || slug === PLACEHOLDER_SLUG) {
+    return {}
+  }
+
+  const { data: post } = await cachedSanity({ query: POST_QUERY, params: { brand, slug }, ...SEO_FETCH })
+
+  if (!post?.slug) {
+    return {}
+  }
+
+  const first = post.brands?.[0]
+
+  return pageMetadata({
+    brand,
+    canonicalBrand: first && isEditorialBrandKey(first) ? first : brand,
+    path: `/posts/${encodeURIComponent(post.slug)}`,
+    seo: post.seo,
+    title: post.title,
+    description: post.excerpt,
+    images: [post.image],
+    article: {
+      publishedTime: post.publishedAt,
+      modifiedTime: post._updatedAt,
+      section: post.category?.title,
+      authors: [post.author?.name],
+    },
+  })
 }
 
 export default async function PostPage({

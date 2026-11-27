@@ -5,7 +5,7 @@ import type { MediaImage } from '@/components/ui/Media'
 import { dataset, projectId } from './env'
 
 /** The image fields the IMAGE fragment projects (and the raw image in a Portable Text body). */
-type SanityImage = {
+export type SanityImage = {
   asset?: { _ref?: string | null } | null
   crop?: { top?: number | null; bottom?: number | null; left?: number | null; right?: number | null } | null
   hotspot?: { x?: number | null; y?: number | null } | null
@@ -75,7 +75,8 @@ export function toImage(image: SanityImage | null | undefined): MediaImage | nul
 /**
  * A Sanity image as a link-preview image (Open Graph), cut to `width`×`height` on the Sanity CDN: the editor's crop
  * first (`rect` from toImage), then a cover crop around the hotspot (`crop=focalpoint`, the hotspot relative to the
- * cropped image). An SVG is rendered as PNG, since link previews do not show SVG. Null without an asset.
+ * cropped image). An SVG is rendered as PNG, since link previews do not show SVG, and any other format but JPEG and
+ * PNG (WebP, GIF, TIFF) as JPEG, which every link preview reads. Null without an asset.
  */
 export function toShareImage(
   image: SanityImage | null | undefined,
@@ -95,7 +96,7 @@ export function toShareImage(
     `h=${height}`,
     'fit=crop',
     ...(focal ? ['crop=focalpoint', `fp-x=${Number(focal[1]) / 100}`, `fp-y=${Number(focal[2]) / 100}`] : []),
-    ...(src.endsWith('.svg') ? ['fm=png'] : []),
+    ...(src.endsWith('.svg') ? ['fm=png'] : /\.(jpe?g|png)$/.test(src) ? [] : ['fm=jpg']),
   ]
 
   return { url: `${src}?${params.join('&')}`, width, height, alt: media.alt }

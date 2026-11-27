@@ -1,3 +1,4 @@
+import type { Metadata } from 'next'
 import { draftMode } from 'next/headers'
 import { notFound } from 'next/navigation'
 import { Suspense } from 'react'
@@ -15,6 +16,24 @@ import {
   type DynamicFetchOptions,
 } from '@/sanity/live'
 import { HOME_PAGE_QUERY } from '@/sanity/queries'
+import { pageMetadata, SEO_FETCH } from '@/sanity/seo'
+
+// The home page leads its title with the brand ("{name in titles} | {meta title}"), else shows the brand title alone.
+export async function generateMetadata({ params }: { params: Promise<{ brand: string }> }): Promise<Metadata> {
+  const { brand } = await params
+
+  if (!isBrandKey(brand)) {
+    return {}
+  }
+
+  const { data } = await cachedSanity({
+    query: HOME_PAGE_QUERY,
+    params: { brand, today: await cachedUkToday() },
+    ...SEO_FETCH,
+  })
+
+  return pageMetadata({ brand, path: '/', seo: data?.seo, home: true })
+}
 
 export default async function BrandHomePage({
   params,

@@ -1,3 +1,4 @@
+import type { Metadata } from 'next'
 import { draftMode } from 'next/headers'
 import { notFound } from 'next/navigation'
 import { Suspense } from 'react'
@@ -15,6 +16,7 @@ import {
   type DynamicFetchOptions,
 } from '@/sanity/live'
 import { PAGE_QUERY, PAGE_SLUGS_QUERY } from '@/sanity/queries'
+import { pageMetadata, SEO_FETCH } from '@/sanity/seo'
 import { PLACEHOLDER_SLUG, withPlaceholder } from '@/sanity/static-params'
 
 export async function generateStaticParams({
@@ -40,6 +42,36 @@ export async function generateStaticParams({
   )
 }
 
+const isServedSlug = (slug: string) =>
+  slug !== PLACEHOLDER_SLUG && slug !== SHARED_LISTINGS_PAGE_SLUG && slug !== COMPANY_ENGAGEMENT_PAGE_SLUG
+
+export async function generateMetadata({ params }: { params: Promise<{ brand: string; slug: string }> }): Promise<Metadata> {
+  const { brand, slug } = await params
+
+  if (!isBrandKey(brand) || !isServedSlug(slug)) {
+    return {}
+  }
+
+  const { data } = await cachedSanity({
+    query: PAGE_QUERY,
+    params: { brand, slug, today: await cachedUkToday() },
+    ...SEO_FETCH,
+  })
+
+  if (!data) {
+    return {}
+  }
+
+  return pageMetadata({
+    brand,
+    path: `/${encodeURIComponent(slug)}`,
+    seo: data.seo,
+    title: data.title,
+    description: data.heroText,
+    images: [data.heroImage],
+  })
+}
+
 export default async function BrandPage({
   params,
 }: {
@@ -49,12 +81,7 @@ export default async function BrandPage({
 
   // The shared listings page is served only at its listing paths (/events-category/…, /resource-categories/research),
   // the Company Engagement page only at /companies.
-  if (
-    !isBrandKey(brand) ||
-    slug === PLACEHOLDER_SLUG ||
-    slug === SHARED_LISTINGS_PAGE_SLUG ||
-    slug === COMPANY_ENGAGEMENT_PAGE_SLUG
-  ) {
+  if (!isBrandKey(brand) || !isServedSlug(slug)) {
     notFound()
   }
 

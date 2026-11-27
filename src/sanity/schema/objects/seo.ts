@@ -206,7 +206,7 @@ export const seo = defineType({
     }),
     defineField({
       name: 'noIndex',
-      title: 'Hide from search engines',
+      title: 'Noindex (hide from search engines)',
       type: 'boolean',
       initialValue: false,
     }),

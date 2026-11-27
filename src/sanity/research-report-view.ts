@@ -20,7 +20,7 @@ import {
 import { RESEARCH_REPORT_PAGE_COPY_KEYS, type ResearchReportPageCopy, type ResearchReportPageCopyKey } from '@/lib/research-report-copy'
 
 import { clipDescription, sectionHeading } from './awards-programme-view'
-import { toImage, toShareImage } from './image'
+import { toImage } from './image'
 import type { MostReadGroupFill } from './most-read'
 import type { RESEARCH_REPORT_PAGE_QUERY_RESULT, RESEARCH_REPORT_QUERY_RESULT } from './types'
 
@@ -78,29 +78,6 @@ export function executiveSummaryDescription(report: ResearchReportData): string 
 function withAlt<I extends { alt: string }>(image: I | null, fallback: string | null | undefined): I | null {
   return image && !image.alt ? { ...image, alt: stegaClean(fallback)?.trim() ?? '' } : image
 }
-
-type SeoData = ResearchReportData['seo']
-
-/**
- * A page's SEO overrides (`seo` / `summarySeo` on the report), stega-clean, each null when empty: the meta title (used
- * as the whole <title>), the meta description, and the share image at 1200×630 with its alt falling back to
- * `fallbackAlt`. The page uses its default for an empty one.
- */
-export function seoOverrides(
-  seo: SeoData | null | undefined,
-  fallbackAlt: string | null | undefined,
-): { title: string | null; description: string | null; image: ReturnType<typeof toShareImage> } {
-  const image = toShareImage(seo?.image)
-
-  return {
-    title: plain(seo?.title) || null,
-    description: plain(seo?.description) || null,
-    image: image && !image.alt ? { ...image, alt: plain(fallbackAlt) } : image,
-  }
-}
-
-/** The share image when the SEO tab has none: the report cover. */
-export const researchReportShareImage = (report: ResearchReportData) => toImage(report.downloadThumbnail)
 
 const keyFindings = (report: ResearchReportData) =>
   (report.keyFindings ?? []).flatMap((item) =>
