@@ -15,6 +15,7 @@
     "redirects:build": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/build-legacy-redirects.mjs",
     "redirects:verify": "node scripts/verify-legacy-redirects.mjs",
     "sitemap:build": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/build-archive-sitemap.mjs",
+    "seo:check": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/seo-check.mjs",
     "analytics:gtm": "bun scripts/analytics/gtm-apply.ts",
     "analytics:ga4": "bun scripts/analytics/ga4-apply.ts"
   },
