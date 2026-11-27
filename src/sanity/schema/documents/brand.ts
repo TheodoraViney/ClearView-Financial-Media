@@ -1,4 +1,4 @@
-import { defineField, defineType, type CurrentUser, type ValidationContext } from 'sanity'
+import { defineArrayMember, defineField, defineType, type CurrentUser, type ValidationContext } from 'sanity'
 
 import { brandDocumentId, EDITORIAL_BRAND_KEYS } from '@/brands'
 import {
@@ -21,6 +21,7 @@ import { apiVersion } from '@/sanity/env'
 
 import { brevoSenderField } from '../fields'
 import { bannerFields } from '../newsletter-banner'
+import { metaDescriptionWarnings, shareImageField } from '../objects/seo'
 
 // Only the three publications send a newsletter and carry articles; ClearView's brand document has no Newsletter tab
 // and no article banner. Matched on the fixed document id (the draft id carries a `drafts.` prefix).
@@ -143,6 +144,7 @@ export const brand = defineType({
   type: 'document',
   groups: [
     { name: 'brand', title: 'Brand', default: true },
+    { name: 'seo', title: 'SEO' },
     { name: 'newsletter', title: 'Newsletter', hidden: ({ document }) => !isPublication(document?._id) },
     { name: 'advertising', title: 'Advertising', hidden: ({ currentUser }) => !isAdministrator(currentUser) },
   ],
@@ -150,6 +152,8 @@ export const brand = defineType({
     { name: 'identity', title: 'Name and key', options: { columns: 2 } },
     { name: 'site', title: 'Site', options: { columns: 2 } },
     { name: 'logos', title: 'Logos', options: { columns: 2 } },
+    { name: 'seoNames', title: 'Names', options: { columns: 2 } },
+    { name: 'seoImages', title: 'Images', options: { columns: 2 } },
   ],
   fields: [
     defineField({
@@ -219,6 +223,87 @@ export const brand = defineType({
       description: 'Set in code to match the design.',
       readOnly: true,
       components: { input: BrandColorsInput },
+    }),
+    // Added after every page's meta title: "{title} | {name in titles}".
+    defineField({
+      name: 'seoSiteName',
+      title: 'Name in titles',
+      type: 'string',
+      group: 'seo',
+      fieldset: 'seoNames',
+      validation: (Rule) => Rule.required(),
+    }),
+    // The site's defaults: a page's own SEO fields replace them.
+    defineField({
+      name: 'seoDescription',
+      title: 'Default meta description',
+      type: 'text',
+      rows: 3,
+      group: 'seo',
+      validation: (Rule) => [Rule.required(), ...metaDescriptionWarnings(Rule)],
+    }),
+    shareImageField({ name: 'seoImage', title: 'Default share image', group: 'seo', fieldset: 'seoImages', required: true }),
+    defineField({
+      name: 'favicon',
+      title: 'Favicon',
+      type: 'image',
+      group: 'seo',
+      fieldset: 'seoImages',
+      options: { accept: 'image/png,image/svg+xml' },
+      validation: (Rule) => [
+        Rule.custom(async (value: { asset?: { _ref?: string } } | undefined, context) => {
+          const ref = value?.asset?._ref
+
+          if (!ref) {
+            return 'Upload a favicon'
+          }
+
+          const mimeType = await context
+            .getClient({ apiVersion })
+            .fetch<string | null>('*[_id == $ref][0].mimeType', { ref })
+
+          return !mimeType || ['image/png', 'image/svg+xml'].includes(mimeType) ? true : 'Use a PNG or SVG'
+        }),
+        Rule.custom(async (value: { asset?: { _ref?: string } } | undefined, context) => {
+          const ref = value?.asset?._ref
+
+          if (!ref) {
+            return true
+          }
+
+          const asset = await context
+            .getClient({ apiVersion })
+            .fetch<{ mimeType?: string; width?: number; height?: number } | null>(
+              '*[_id == $ref][0]{mimeType, "width": metadata.dimensions.width, "height": metadata.dimensions.height}',
+              { ref },
+            )
+
+          return asset?.mimeType === 'image/png' && ((asset.width ?? 0) < 512 || (asset.height ?? 0) < 512)
+            ? `Best at 512×512 or larger; this one is ${asset.width}×${asset.height}.`
+            : true
+        }).warning(),
+      ],
+    }),
+    defineField({
+      name: 'socialProfiles',
+      title: 'Social profiles',
+      type: 'array',
+      group: 'seo',
+      // Organization structured data (sameAs).
+      description: 'For search engines. Footer icons are set in Footer.',
+      of: [defineArrayMember({ type: 'url', validation: (Rule) => Rule.uri({ scheme: ['https'] }) })],
+      validation: (Rule) => Rule.unique(),
+    }),
+    defineField({
+      name: 'xHandle',
+      title: 'X handle',
+      type: 'string',
+      group: 'seo',
+      fieldset: 'seoNames',
+      validation: (Rule) =>
+        Rule.regex(/^@?[A-Za-z0-9_]{1,15}$/, { name: 'X handle' }).error(
+          'Up to 15 letters, digits or underscores, for example @WealthBriefing',
+        ),
     }),
     defineField({
       name: 'newsletter',

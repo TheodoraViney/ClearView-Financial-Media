@@ -63,8 +63,7 @@ export async function generateMetadata({ params }: { params: Promise<Params> }):
     return {}
   }
 
-  // The "SEO" tab's fields when filled, else the defaults. A meta title is the whole title: `absolute` skips the
-  // brand layout's " | {brand}" template, so the editor's text is used as written.
+  // The "SEO" tab's fields when filled, else the defaults. The brand layout's template adds " | {brand}" to the title.
   const seo = seoOverrides(data.seo, data.title)
   const description = seo.description ?? researchReportDescription(data)
   const image = researchReportShareImage(data)
@@ -75,7 +74,7 @@ export async function generateMetadata({ params }: { params: Promise<Params> }):
   const canonical = path ? `${brandOrigin('clearview')}${path}` : undefined
 
   return {
-    title: seo.title ? { absolute: seo.title } : stegaClean(data.title),
+    title: seo.title ?? stegaClean(data.title),
     ...(description ? { description } : {}),
     ...(canonical ? { alternates: { canonical } } : {}),
     ...(shareImage ? { openGraph: { url: canonical, images: [shareImage] } } : {}),

@@ -3,6 +3,7 @@ import { defineArrayMember, defineField, defineType } from 'sanity'
 
 import { EVENT_COUNTRIES, altField, isUniqueEventSlug, legacyWpIdField, timeField } from '../fields'
 import { paragraphsBlock } from '../objects/rich-text'
+import { seoField } from '../objects/seo'
 
 /**
  * A summit, briefing or webinar. 195 records.
@@ -30,6 +31,7 @@ export const conferenceEvent = defineType({
     { name: 'agenda', title: 'Agenda' },
     { name: 'sponsors', title: 'Sponsors' },
     { name: 'relatedCoverage', title: 'Related coverage' },
+    { name: 'seo', title: 'SEO' },
     // Legacy WordPress fields only, all hidden: tab hidden in the Studio. Remove before launch if unused.
     { name: 'media', title: 'Media', hidden: true },
     // Legacy WordPress fields only, all hidden: tab hidden in the Studio. Remove before launch if unused.
@@ -354,6 +356,7 @@ export const conferenceEvent = defineType({
       hidden: true,
       of: [defineArrayMember({ type: 'customTab' })],
     }),
+    seoField(),
     legacyWpIdField,
   ],
   preview: {

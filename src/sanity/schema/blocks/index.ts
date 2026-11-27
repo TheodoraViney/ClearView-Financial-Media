@@ -149,12 +149,13 @@ const INSERT_MENU_GROUPS = [
 /** A list of page blocks. The page document has one, and the home page two more between its fixed banners. */
 export const pageBlocksField = (
   name: string,
-  { title, description, hidden }: { title: string; description?: string; hidden?: ConditionalProperty },
+  { title, description, group, hidden }: { title: string; description?: string; group?: string; hidden?: ConditionalProperty },
 ) =>
   defineField({
     name,
     title,
     description,
+    group,
     hidden,
     type: 'array',
     of: pageBlockTypes.map((blockType) => defineArrayMember({ type: blockType.name })),

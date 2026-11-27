@@ -78,7 +78,7 @@ export async function generateMetadata({ params }: { params: Promise<Params> }):
   const canonical = `${brandOrigin('clearview')}${path}`
   const title = [copy?.summaryTitle, data.title].map((part) => stegaClean(part)?.trim()).filter(Boolean).join(' — ')
   // The "Summary SEO" tab's fields when filled, else the defaults; the share image falls back to the report page's
-  // ("SEO" tab) before the banner. A meta title is the whole title: `absolute` skips the brand layout's template.
+  // ("SEO" tab) before the banner. The brand layout's template adds " | {brand}" to the title.
   const seo = seoOverrides(data.summarySeo, title)
   const description = seo.description ?? executiveSummaryDescription(data)
   const image = researchReportShareImage(data)
@@ -88,7 +88,7 @@ export async function generateMetadata({ params }: { params: Promise<Params> }):
     (image ? { url: isSvg(image.src) ? `${image.src}?fm=png` : image.src, width: image.width, height: image.height, alt: image.alt } : null)
 
   return {
-    title: seo.title ? { absolute: seo.title } : title,
+    title: seo.title ?? title,
     ...(description ? { description } : {}),
     alternates: { canonical },
     ...(shareImage ? { openGraph: { url: canonical, images: [shareImage] } } : {}),

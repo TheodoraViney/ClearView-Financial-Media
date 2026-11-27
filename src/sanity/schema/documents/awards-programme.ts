@@ -3,6 +3,7 @@ import { defineArrayMember, defineField, defineType } from 'sanity'
 
 import { EVENT_COUNTRIES, altField, isUniqueEventSlug, legacyWpIdField, linkField, timeField } from '../fields'
 import { paragraphsBlock, paragraphsWithListsBlock } from '../objects/rich-text'
+import { seoField } from '../objects/seo'
 
 /**
  * One yearly edition of an awards programme, for example "The Twelfth
@@ -37,6 +38,7 @@ export const awardsProgramme = defineType({
     { name: 'winners', title: 'Finalists and Winners' },
     { name: 'acclaim', title: 'Acclaim' },
     { name: 'faq', title: 'FAQ' },
+    { name: 'seo', title: 'SEO' },
     // Legacy WordPress fields only, all hidden: tab hidden in the Studio. Remove before launch if unused.
     { name: 'extra', title: 'Legacy', hidden: true },
   ],
@@ -495,6 +497,7 @@ export const awardsProgramme = defineType({
       // Legacy WordPress prose, split by hand into `finalistRows`; the page shows it only for an edition without rows.
       hidden: true,
     }),
+    seoField(),
     legacyWpIdField,
   ],
   preview: {

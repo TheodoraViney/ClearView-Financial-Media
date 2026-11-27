@@ -6,6 +6,7 @@ import { isCompanyEngagementPageId } from '@/lib/company-engagement'
 import { SHARED_LISTINGS_PAGE_DOCUMENT_ID } from '@/lib/shared-listings'
 
 import { pageBlocksField } from '../blocks'
+import { seoField } from '../objects/seo'
 
 // The home page is the page with the slug "home". Its banners sit between three block lists; other pages have one.
 const isHome = (document: unknown) =>
@@ -36,11 +37,16 @@ export const page = defineType({
   name: 'page',
   title: 'Page',
   type: 'document',
+  groups: [
+    { name: 'content', title: 'Content', default: true },
+    { name: 'seo', title: 'SEO' },
+  ],
   fields: [
     defineField({
       name: 'brand',
       title: 'Brand',
       type: 'string',
+      group: 'content',
       options: {
         list: BRAND_KEYS.map((key) => ({
           title: BRANDS[key].title,
@@ -56,12 +62,14 @@ export const page = defineType({
       name: 'title',
       title: 'Title',
       type: 'string',
+      group: 'content',
       validation: (Rule) => Rule.required(),
     }),
     defineField({
       name: 'slug',
       title: 'Slug',
       type: 'slug',
+      group: 'content',
       // Read-only on the Categories, shared listings and Company Engagement pages, which their own routes serve.
       description: 'Changing it breaks the page’s live address.',
       readOnly: ({ document }) => isFixedPage(document),
@@ -95,18 +103,22 @@ export const page = defineType({
     // `blocks` keeps its name on the home page too, so its blocks above Banner 3 needed no move.
     pageBlocksField('blocks', {
       title: 'Blocks',
+      group: 'content',
       // Banners are placed by the page template.
       description: 'On the home page: the blocks above Banner 3.',
     }),
     pageBlocksField('blocksMiddle', {
       title: 'Blocks between Banner 3 and Banner 4',
+      group: 'content',
       description: 'Empty: no Banner 4.',
       hidden: notHome,
     }),
     pageBlocksField('blocksBottom', {
       title: 'Blocks below Banner 4',
+      group: 'content',
       hidden: notHome,
     }),
+    seoField(),
   ],
   // The brand and the address under the title, so the four "Contact" or "Privacy policy" pages tell apart in reference
   // pickers, lists and search.

@@ -6,6 +6,7 @@ import { BRIEF_MAX_CHARS, BRIEF_TARGET_MIN_CHARS } from '@/lib/brief-prompt'
 import { BriefTextInput } from '@/sanity/components/brief-text-input'
 
 import { imageField } from '../fields'
+import { seoField } from '../objects/seo'
 
 type RefValue = { _ref?: string } | undefined
 
@@ -21,6 +22,10 @@ export const post = defineType({
   name: 'post',
   title: 'Post',
   type: 'document',
+  groups: [
+    { name: 'content', title: 'Content', default: true },
+    { name: 'seo', title: 'SEO' },
+  ],
   fieldsets: [
     { name: 'filing', title: 'Category and region', options: { columns: 2 } },
     { name: 'partner', title: 'Sponsored or contributed', options: { columns: 2 } },
@@ -30,6 +35,7 @@ export const post = defineType({
       name: 'brands',
       title: 'Brands',
       type: 'array',
+      group: 'content',
       of: [defineArrayMember({ type: 'string' })],
       options: {
         list: EDITORIAL_BRAND_KEYS.map((key) => ({
@@ -44,12 +50,14 @@ export const post = defineType({
       name: 'title',
       title: 'Title',
       type: 'string',
+      group: 'content',
       validation: (Rule) => Rule.required(),
     }),
     defineField({
       name: 'slug',
       title: 'Slug',
       type: 'slug',
+      group: 'content',
       options: { source: 'title' },
       validation: (Rule) => Rule.required(),
     }),
@@ -57,6 +65,7 @@ export const post = defineType({
       name: 'publishedAt',
       title: 'Published at',
       type: 'datetime',
+      group: 'content',
       initialValue: () => new Date().toISOString(),
       validation: (Rule) => Rule.required(),
     }),
@@ -64,6 +73,7 @@ export const post = defineType({
       name: 'category',
       title: 'Category',
       type: 'reference',
+      group: 'content',
       to: [{ type: 'category' }],
       fieldset: 'filing',
       options: { disableNew: true },
@@ -73,6 +83,7 @@ export const post = defineType({
       name: 'region',
       title: 'Region',
       type: 'reference',
+      group: 'content',
       to: [{ type: 'region' }],
       fieldset: 'filing',
       options: { disableNew: true },
@@ -82,6 +93,7 @@ export const post = defineType({
       name: 'primaryTopic',
       title: 'Main topic',
       type: 'reference',
+      group: 'content',
       to: [{ type: 'topic' }],
       options: { disableNew: true },
       validation: (Rule) => Rule.required(),
@@ -90,6 +102,7 @@ export const post = defineType({
       name: 'secondaryTopics',
       title: 'Other topics',
       type: 'array',
+      group: 'content',
       of: [
         defineArrayMember({
           type: 'reference',
@@ -118,6 +131,7 @@ export const post = defineType({
       name: 'author',
       title: 'Author',
       type: 'reference',
+      group: 'content',
       to: [{ type: 'author' }],
       description: 'Use Editorial Staff for unsigned pieces.',
       options: { disableNew: true },
@@ -127,6 +141,7 @@ export const post = defineType({
       name: 'excerpt',
       title: 'Standfirst',
       type: 'text',
+      group: 'content',
       validation: (Rule) => [
         Rule.required(),
         Rule.max(200).warning('Longer than 200 characters; the hero will wrap onto more lines'),
@@ -134,6 +149,7 @@ export const post = defineType({
     }),
     {
       ...imageField('image', {
+        group: 'content',
         fields: [
           defineField({
             name: 'credit',
@@ -152,6 +168,7 @@ export const post = defineType({
       name: 'sponsor',
       title: 'Sponsor',
       type: 'reference',
+      group: 'content',
       to: [{ type: 'company' }],
       fieldset: 'partner',
       description: 'Only for sponsored content. Lets the post appear in the Sponsored content block.',
@@ -161,6 +178,7 @@ export const post = defineType({
       name: 'contributor',
       title: 'Contributor (guest)',
       type: 'reference',
+      group: 'content',
       to: [{ type: 'company' }],
       fieldset: 'partner',
       description: 'The company of the guest author.',
@@ -172,17 +190,20 @@ export const post = defineType({
       name: 'content',
       title: 'Text before the banner',
       type: 'articleBody',
+      group: 'content',
     }),
     defineField({
       name: 'contentAfter',
       title: 'Text after the banner',
       type: 'articleBody',
+      group: 'content',
       description: 'Empty: the banner shows after the text.',
     }),
     defineField({
       name: 'briefText',
       title: 'Brief',
       type: 'text',
+      group: 'content',
       rows: 5,
       description: `Shown in News in Brief, about ${BRIEF_TARGET_MIN_CHARS}–${BRIEF_MAX_CHARS} characters. Write it or use Generate brief; empty shows the standfirst.`,
       components: { input: BriefTextInput },
@@ -195,6 +216,7 @@ export const post = defineType({
       name: 'recommended',
       title: 'Recommended articles',
       type: 'array',
+      group: 'content',
       description: 'Empty: the latest articles of the same category.',
       of: [
         defineArrayMember({
@@ -226,6 +248,7 @@ export const post = defineType({
             return value?.some((item) => item?._ref === self) ? 'An article cannot recommend itself' : true
           }),
     }),
+    seoField(),
   ],
   // The publications under the title, so posts with the same headline tell apart in reference pickers, lists and search.
   preview: {
