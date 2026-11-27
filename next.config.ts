@@ -8,7 +8,7 @@ const nextConfig: NextConfig = {
     '/sites/\\[brand\\]/legacy-article': ['./data/legacy-redirects/*.json'],
     '/sites/\\[brand\\]/archive/sitemap/\\[file\\]': ['./data/archive-sitemap/**/*.json'],
     // The sitemap index names the archive files from each brand's archive index.
-    '/sites/\\[brand\\]/sitemap.xml': ['./data/archive-sitemap/*/index.json'],
+    '/sites/\\[brand\\]/sitemap-index': ['./data/archive-sitemap/*/index.json'],
   },
   cacheLife: {
     default: sanity,

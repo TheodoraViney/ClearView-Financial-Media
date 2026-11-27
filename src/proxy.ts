@@ -9,7 +9,8 @@ import { isMissingExecutiveSummary } from '@/sanity/summary-route'
 export default async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl
 
-  if (pathname === '/sites' || pathname.startsWith('/sites/')) {
+  // The sitemap index handler is reachable only as /sitemap.xml (rewritten below), never under its internal name.
+  if (pathname === '/sites' || pathname.startsWith('/sites/') || pathname === '/sitemap-index') {
     return new NextResponse(null, { status: 404 })
   }
 
@@ -52,7 +53,9 @@ export default async function proxy(request: NextRequest) {
   url.pathname =
     archive?.action === 'missing' || missingSummary
       ? `/sites/${resolved}/archive/missing`
-      : `/sites/${resolved}${pathname === '/' ? '' : pathname}`
+      : pathname === '/sitemap.xml'
+        ? `/sites/${resolved}/sitemap-index`
+        : `/sites/${resolved}${pathname === '/' ? '' : pathname}`
 
   let response: NextResponse
 
@@ -78,7 +81,7 @@ export const config = {
   // Dotted paths are skipped, so robots.txt, llms.txt, the sitemaps and the legacy article paths are listed on their own.
   matcher: [
     '/((?!api|studio|archive-media/|_next/static|_next/image|favicon.ico|.*\\..*).*)',
-    // The internal prefix with a dotted last segment (/sites/{brand}/sitemap.xml), so the 404 above covers it too.
+    // The internal prefix with a dotted last segment (/sites/{brand}/robots.txt), so the 404 above covers it too.
     '/sites/:path*',
     '/robots.txt',
     '/llms.txt',

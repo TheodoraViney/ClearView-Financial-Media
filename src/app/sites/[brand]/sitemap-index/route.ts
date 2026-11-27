@@ -13,8 +13,10 @@ import { cmsSitemapUrls } from '@/sanity/sitemap'
 /**
  * `/sitemap.xml` per brand host: the sitemap index of the brand's CMS sitemap files (`/sitemap/{n}.xml`) and, on the
  * editorial brands, its archive sitemap files (`/archive/sitemap/{n}.xml`). Each file holds at most 10,000 URLs.
+ * The proxy rewrites `/sitemap.xml` here: a `sitemap.xml` folder is a Next metadata route, which the build prerenders
+ * with a placeholder param and Vercel never routes to.
  */
-export async function GET(_request: Request, { params }: RouteContext<'/sites/[brand]/sitemap.xml'>) {
+export async function GET(_request: Request, { params }: RouteContext<'/sites/[brand]/sitemap-index'>) {
   const { brand } = await params
 
   if (!isBrandKey(brand)) {
