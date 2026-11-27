@@ -19,12 +19,13 @@ import { hasExecutiveSummary } from '@/lib/research-report'
 import { apiVersion } from '@/sanity/env'
 
 /**
- * The research report's form with a "Generate from report text" panel at the top of the Page content group.
+ * The research report's form with a "Generate from report text" panel right under the Report text (`body`), the first
+ * field of the Page content group, so the source sits above the panel and every field it fills sits below it.
  *
  * It is the document's own input, not a field's: the panel writes several report fields at once, and only the
  * document input's `onChange` can patch them, through the form like any edit, so they land in the draft and document
- * history can undo them. The panel is placed by wrapping `renderField`: it renders above the first Page content field
- * shown, under the group tabs, so no placeholder field is stored and reordering the fields moves nothing.
+ * history can undo them. The panel is placed by wrapping `renderField`: it renders after the Report text field, so no
+ * placeholder field is stored.
  *
  * Generate reads the report's title and `body` ("Report text") from the form and the published "Research generation
  * instructions" document, and calls the Agent Actions Prompt action as the signed-in user: one request, one AI credit.
@@ -35,7 +36,8 @@ import { apiVersion } from '@/sanity/env'
  * `onChange` and published with the report.
  */
 
-const PAGE_GROUP = 'page'
+/** The panel renders right after this field: the report text it reads. */
+const SOURCE_FIELD = 'body'
 
 type Block = { _type?: string; children?: { text?: string }[] }
 
@@ -141,7 +143,7 @@ function generatedLines({ draft }: ResearchGeneration, part: PartKey): string[] 
 const clip = (text: string, max = 180) => (text.length > max ? `${text.slice(0, max - 1)}…` : text)
 
 export function ResearchGenerateInput(props: ObjectInputProps) {
-  const { onChange, readOnly, renderDefault, members, schemaType } = props
+  const { onChange, readOnly, renderDefault } = props
   const resource = useMemo(() => (props.value ?? {}) as Resource, [props.value])
   const studioClient = useClient({ apiVersion })
   // Raw: drafts and published documents by their own ids (the Studio client's default, made explicit).
@@ -308,27 +310,6 @@ export function ResearchGenerateInput(props: ObjectInputProps) {
     })
   }, [chosen, onChange, preview])
 
-  // The first Page content field the form shows: the panel renders above it.
-  const firstPageField = useMemo(() => {
-    const inGroup = new Set(
-      schemaType.fields
-        .filter((item) => {
-          const group = (item as { group?: string | string[] }).group
-
-          return Array.isArray(group) ? group.includes(PAGE_GROUP) : group === PAGE_GROUP
-        })
-        .map((item) => item.name),
-    )
-
-    for (const member of members) {
-      if (member.kind === 'field' && inGroup.has(member.name)) {
-        return member.name
-      }
-    }
-
-    return null
-  }, [members, schemaType.fields])
-
   const panel: ReactNode = (
     <Card padding={4} radius={2} border tone="transparent">
       <Stack gap={3}>
@@ -344,7 +325,7 @@ export function ResearchGenerateInput(props: ObjectInputProps) {
         </Box>
         <Text size={1} muted>
           Drafts the short summary, the Executive Summary page, key findings, charts, selected insights and methodology
-          from the Report text in Details. You choose what to fill before anything is written. Uses one AI credit and can
+          from the Report text above. You choose what to fill before anything is written. Uses one AI credit and can
           take a minute.
         </Text>
 
@@ -367,10 +348,10 @@ export function ResearchGenerateInput(props: ObjectInputProps) {
     (fieldProps) => {
       const rendered = props.renderField(fieldProps)
 
-      return fieldProps.path.length === 1 && fieldProps.name === firstPageField ? (
+      return fieldProps.path.length === 1 && fieldProps.name === SOURCE_FIELD ? (
         <Stack gap={5}>
-          {panel}
           {rendered}
+          {panel}
         </Stack>
       ) : (
         rendered
@@ -378,7 +359,7 @@ export function ResearchGenerateInput(props: ObjectInputProps) {
     },
     // `panel` is rebuilt with the state it shows.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [props.renderField, firstPageField, settings, status, running, readOnly],
+    [props.renderField, settings, status, running, readOnly],
   )
 
   return (

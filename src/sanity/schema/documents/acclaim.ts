@@ -10,8 +10,10 @@ import { altField, legacyWpIdField } from '../fields'
  * `awardsProgramme.acclaim`, and the link opens `link` in a new tab
  * (`acclaimHref`). Any address works: the Issuu reader, a PDF, another page.
  *
- * `programme`, `thumbnailImage`, `issuuId` and `embedCode` are WordPress data the
- * site does not read. The slug is kept for the legacy `/acclaim/{slug}/` redirects.
+ * Studio shows Title, Link and Awards programme. The rest is WordPress data the site does not read, kept but hidden:
+ * the slug (kept for the legacy `/acclaim/{slug}/` redirects, so not required on new records), the thumbnail, the
+ * Issuu id and embed code, and the legacy id. `programme` is not read by the site either; it tells editors which
+ * programme a magazine belongs to.
  */
 export const acclaim = defineType({
   name: 'acclaim',
@@ -30,16 +32,13 @@ export const acclaim = defineType({
       title: 'Slug',
       type: 'slug',
       options: { source: 'title', maxLength: 96 },
-      description:
-        'The old clearviewpublishing.com address /acclaim/{slug}/, kept to redirect it. The new site has no Acclaim page.',
-      validation: (Rule) => Rule.required(),
+      hidden: true,
     }),
     defineField({
       name: 'link',
       title: 'Link',
       type: 'url',
-      description:
-        'Where "Annual Acclaim magazine" on the awards page goes, opened in a new tab: the magazine on Issuu, a PDF or any other page. Paste the full address, starting with https://.',
+      description: 'Opened in a new tab from the awards page: Issuu, a PDF or any page.',
       validation: (Rule) => Rule.required().uri({ scheme: ['https'] }),
     }),
     defineField({
@@ -47,7 +46,6 @@ export const acclaim = defineType({
       title: 'Awards programme',
       type: 'reference',
       to: [{ type: 'awardsProgrammeGroup' }],
-      description: 'From the `acclaim---awards-programme` taxonomy. 7 of 8 records carry a term.',
     }),
     defineField({
       name: 'thumbnailImage',
@@ -55,13 +53,13 @@ export const acclaim = defineType({
       type: 'image',
       options: { hotspot: true },
       fields: [altField],
+      hidden: true,
     }),
     defineField({
       name: 'issuuId',
       title: 'Issuu ID',
       type: 'string',
-      description:
-        'The 32-character document hash, for example c2007338474b6528a1bc9d7614c33cfb. From WordPress, not used on the site: the awards page uses Link.',
+      hidden: true,
       validation: (Rule) =>
         Rule.regex(/^[0-9a-f]{32}$/, { name: 'Issuu document hash', invert: false }),
     }),
@@ -70,10 +68,9 @@ export const acclaim = defineType({
       title: 'Issuu embed code',
       type: 'text',
       rows: 6,
-      description:
-        'Raw iframe as published by Issuu. From WordPress, not used on the site: the awards page uses Link.',
+      hidden: true,
     }),
-    legacyWpIdField,
+    { ...legacyWpIdField, hidden: true },
   ],
   preview: {
     select: { title: 'title', link: 'link', media: 'thumbnailImage' },
