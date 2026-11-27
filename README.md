@@ -57,6 +57,7 @@ pnpm typecheck
 pnpm lint
 pnpm build
 pnpm seed:brands  # create the four brand documents, needs SANITY_API_WRITE_TOKEN
+pnpm seo:check --origin <production|staging|url>  # per-host SEO checklist, options in scripts/seo-check.mjs
 ```
 
 Copy `.env.example` to `.env.local` and fill the two tokens.
