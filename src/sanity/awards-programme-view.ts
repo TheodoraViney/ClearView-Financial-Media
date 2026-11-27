@@ -6,6 +6,7 @@ import { categoryGroupLabel, openProgrammeEditions, winnerName, type OtherProgra
 import type {
   AwardsProgrammeSectionId,
   AwardsProgrammeView,
+  FinalistsGroupView,
   HeadingView,
   JudgesPanelView,
   SponsorTierView,
@@ -165,6 +166,46 @@ function toWinnerGroups(edition: EditionData): WinnersGroupView[] {
   return [...groups.values()]
 }
 
+/**
+ * The finalist rows grouped by their category group, as the winners: in stored order, groups compared case-insensitively.
+ * A row's companies are its non-empty lines; a row without any is dropped, then an empty group.
+ */
+function toFinalistGroups(edition: EditionData): FinalistsGroupView[] {
+  const programmeSlug = edition.programme?.slug
+  const groups = new Map<string, FinalistsGroupView>()
+
+  for (const row of edition.finalistRows ?? []) {
+    const companies = (row.companies ?? '').split('\n').flatMap((line, index) => {
+      const name = line.trim()
+
+      return stegaClean(name) ? [{ key: `${row._key}-${index}`, name }] : []
+    })
+
+    if (companies.length === 0) {
+      continue
+    }
+
+    const key = stegaClean(row.categoryGroup)?.trim().toLowerCase() ?? ''
+    const group = groups.get(key) ?? {
+      key: key || 'ungrouped',
+      id: `finalists-group-${groups.size + 1}`,
+      label: filled(row.categoryGroup) ? categoryGroupLabel(row.categoryGroup) : null,
+      lists: [],
+    }
+    const category = row.category?.title ?? null
+
+    group.lists.push({
+      key: row._key,
+      category,
+      categoryHref: category && programmeSlug ? awardCategoryHref(programmeSlug, row.category?.slug, 'clearview') : null,
+      companies,
+    })
+    groups.set(key, group)
+  }
+
+  return [...groups.values()]
+}
+
 /** The sponsor tiers in their stored order; a company unpublished or deleted after picking is dropped, then an empty tier. */
 function toSponsorTiers(edition: EditionData): SponsorTierView[] {
   return (edition.sponsorTypes ?? [])
@@ -258,7 +299,9 @@ export function toAwardsProgrammeView({
   const videoId = stegaClean(edition.highlightsVideoId)?.trim()
   const acclaimLink = acclaimHref(edition.acclaimLink)
   const body = richText(edition.body)
-  const finalists = richText(edition.finalists)
+  const finalistGroups = toFinalistGroups(edition)
+  const finalistsIntro = richText(edition.finalistsIntro)
+  const legacyFinalists = finalistGroups.length > 0 ? null : richText(edition.finalists)
   const panels = toPanels(edition)
   const sponsorTiers = toSponsorTiers(edition)
   const faq = toFaq(edition)
@@ -317,7 +360,17 @@ export function toAwardsProgrammeView({
     sponsors: sponsorTiers.length > 0 ? { heading: sectionHeading(rawCopy.sponsorsHeading), tiers: sponsorTiers } : null,
     judges:
       panels.length > 0 ? { heading: sectionHeading(rawCopy.judgesHeading), intro: richText(edition.judgesIntro), panels } : null,
-    finalists: finalists ? { heading: sectionHeading(rawCopy.finalistsHeading), body: finalists } : null,
+    finalists:
+      finalistGroups.length > 0 || legacyFinalists || finalistsIntro
+        ? {
+            heading: sectionHeading(rawCopy.finalistsHeading),
+            intro: finalistsIntro,
+            consent: embedConsent,
+            allLabel: copy.winnersAllLabel,
+            groups: finalistGroups,
+            legacy: legacyFinalists,
+          }
+        : null,
     winners:
       winnerGroups.length > 0
         ? {

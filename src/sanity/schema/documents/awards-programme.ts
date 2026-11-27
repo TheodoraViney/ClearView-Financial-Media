@@ -275,10 +275,17 @@ export const awardsProgramme = defineType({
     }),
 
     defineField({
-      name: 'finalists',
-      title: 'Finalists',
+      name: 'finalistsIntro',
+      title: 'Finalists intro',
       type: 'richText',
       group: 'winners',
+    }),
+    defineField({
+      name: 'finalistRows',
+      title: 'Finalists',
+      type: 'array',
+      group: 'winners',
+      of: [defineArrayMember({ type: 'finalistRow' })],
     }),
     defineField({
       name: 'winners',
@@ -479,6 +486,14 @@ export const awardsProgramme = defineType({
       // Legacy WordPress field, not in the new design: hidden in the Studio, data kept. Remove before launch if unused.
       hidden: true,
       of: [defineArrayMember({ type: 'customTab' })],
+    }),
+    defineField({
+      name: 'finalists',
+      title: 'Finalists (old text)',
+      type: 'richText',
+      group: 'extra',
+      // Legacy WordPress prose, split by hand into `finalistRows`; the page shows it only for an edition without rows.
+      hidden: true,
     }),
     legacyWpIdField,
   ],

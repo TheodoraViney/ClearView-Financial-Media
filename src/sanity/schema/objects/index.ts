@@ -15,6 +15,7 @@ import { richText } from './rich-text'
 import { seo } from './seo'
 import { socialLink } from './social-link'
 import { videoGallery } from './video-gallery'
+import { finalistRow } from './finalist-row'
 import { winner } from './winner'
 
 export const objectTypes = [
@@ -25,6 +26,7 @@ export const objectTypes = [
   infographic,
   personGroup,
   companyGroup,
+  finalistRow,
   winner,
   customTab,
   agenda,
