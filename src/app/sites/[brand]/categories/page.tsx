@@ -1,10 +1,9 @@
 import type { Metadata } from 'next'
 import { draftMode } from 'next/headers'
 import { notFound } from 'next/navigation'
-import { stegaClean } from 'next-sanity'
 import { Suspense } from 'react'
 
-import { brandOrigin, categoriesPageDocumentId, isEditorialBrandKey, type EditorialBrandKey } from '@/brands'
+import { categoriesPageDocumentId, isEditorialBrandKey, type EditorialBrandKey } from '@/brands'
 import { PageBlocks } from '@/components/blocks/PageBlocks'
 import {
   CATEGORIES_PATH,
@@ -27,6 +26,7 @@ import {
   type DynamicFetchOptions,
 } from '@/sanity/live'
 import { CATEGORIES_LATEST_QUERY, CATEGORIES_OLDEST_QUERY, CATEGORIES_PAGE_QUERY } from '@/sanity/queries'
+import { pageMetadata } from '@/sanity/seo'
 
 // The Categories page (the articles list) of an editorial brand, filtered and paged by the URL
 // (src/lib/categories.ts). It takes precedence over [slug] for the page document with the slug "categories".
@@ -82,12 +82,22 @@ export async function generateMetadata({ params, searchParams }: Props): Promise
   )
   const path = filtered ? CATEGORIES_PATH : categoriesHref(state)
 
-  return {
-    title: stegaClean(heading.title),
-    description: heroIntroText(heading.intro) || undefined,
-    alternates: { canonical: `${brandOrigin(brand)}${path}` },
-    ...(filtered ? { robots: { index: false, follow: true } } : {}),
+  // A category or topic heading names the view, so the page's own meta title and description give way to the term's.
+  // The page document serves every view, so its canonical override is not used.
+  const seo = data.page.seo && {
+    ...data.page.seo,
+    canonical: null,
+    ...(heading.term ? { title: null, description: null } : {}),
   }
+
+  return pageMetadata({
+    brand,
+    path,
+    seo,
+    title: heading.title,
+    description: heroIntroText(heading.intro),
+    noIndex: filtered,
+  })
 }
 
 export default async function CategoriesRoute({ params, searchParams }: Props) {

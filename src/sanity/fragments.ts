@@ -9,6 +9,27 @@ export const IMAGE = /* groq */ `
   "alt": coalesce(alt, asset->altText)
 `
 
+/** The `seo` object of a routable document, as every page query projects it (`"seo": seo{ ${SEO} }`). */
+export const SEO = /* groq */ `
+  title,
+  description,
+  "image": image{ ${IMAGE} },
+  canonical,
+  noIndex
+`
+
+/**
+ * A page's own text and image for its metadata when its SEO fields are empty: the standfirst and image of an opening
+ * Hero with image or Hero over image, else the intro of a top-level Page heading.
+ */
+export const PAGE_SEO_FALLBACK = /* groq */ `
+  "heroText": coalesce(
+    blocks[_type in ["imageHero", "overlayHero"]][0].standfirst,
+    pt::text(blocks[_type == "pageHero"][0].intro)
+  ),
+  "heroImage": blocks[_type in ["imageHero", "overlayHero"]][0].image{ ${IMAGE} }
+`
+
 /**
  * One member of a post's body field (`content`, `contentAfter`): the Portable Text member as stored, plus the image
  * alt fallback and the video file URL. An infographic sends only what the page shows: its generation metadata is

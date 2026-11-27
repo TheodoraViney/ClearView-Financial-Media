@@ -1,21 +1,19 @@
 import type { Metadata } from 'next'
 import { draftMode } from 'next/headers'
 import { notFound } from 'next/navigation'
-import { stegaClean } from 'next-sanity'
 import { Suspense } from 'react'
 
-import { brandOrigin, PARTNER_PROFILE_PAGE_ID } from '@/brands'
+import { PARTNER_PROFILE_PAGE_ID } from '@/brands'
 import { PartnerProfilePage } from '@/components/sections/partner-profile/PartnerProfilePage'
-import { isSvg } from '@/components/ui/Media'
 import { fetchAdUnits } from '@/sanity/brand-title'
 import { cachedSanity, getDynamicFetchOptions, type DynamicFetchOptions } from '@/sanity/live'
 import {
   partnerProfileDescription,
   partnerProfilePath,
-  partnerProfileShareImage,
   toPartnerProfileView,
 } from '@/sanity/partner-profile-view'
 import { PARTNER_PROFILE_PAGE_QUERY, PARTNER_PROFILE_QUERY } from '@/sanity/queries'
+import { pageMetadata } from '@/sanity/seo'
 import { PLACEHOLDER_SLUG } from '@/sanity/static-params'
 
 // A partner profile at /companies/{slug} (sharedRecordHref), for a company that an awards edition, an event or a post
@@ -60,25 +58,15 @@ export async function generateMetadata({ params }: { params: Promise<Params> }):
     return {}
   }
 
-  const description = partnerProfileDescription(data)
-  const image = partnerProfileShareImage(data)
-  const path = partnerProfilePath(data)
-  const canonical = path ? `${brandOrigin('clearview')}${path}` : undefined
-
-  return {
-    title: stegaClean(data.title),
-    ...(description ? { description } : {}),
-    ...(canonical ? { alternates: { canonical } } : {}),
-    // Most company logos are SVG, which link previews do not show: the Sanity CDN renders those as PNG.
-    ...(image
-      ? {
-          openGraph: {
-            url: canonical,
-            images: [{ url: isSvg(image.src) ? `${image.src}?fm=png` : image.src, width: image.width, height: image.height, alt: image.alt }],
-          },
-        }
-      : {}),
-  }
+  // Most company logos are SVG, which link previews do not show: those fall through to the brand image.
+  return pageMetadata({
+    brand,
+    path: partnerProfilePath(data),
+    seo: data.seo,
+    title: data.title,
+    description: partnerProfileDescription(data),
+    images: [data.profileImage, data.logo],
+  })
 }
 
 export default async function PartnerProfileRoute({ params }: { params: Promise<Params> }) {

@@ -1,19 +1,16 @@
 import type { Metadata } from 'next'
 import { draftMode } from 'next/headers'
 import { notFound } from 'next/navigation'
-import { stegaClean } from 'next-sanity'
 import { Suspense } from 'react'
 
-import { AWARDS_PROGRAMME_PAGE_ID, brandOrigin, EVENT_PAGE_ID } from '@/brands'
+import { AWARDS_PROGRAMME_PAGE_ID, EVENT_PAGE_ID } from '@/brands'
 import { AwardsProgrammePage } from '@/components/sections/awards/AwardsProgrammePage'
 import { EventPage } from '@/components/sections/events/EventPage'
 import { CurrentNavSection } from '@/components/sections/header/nav-section.client'
-import { isSvg } from '@/components/ui/Media'
 import { sharedRecordHref } from '@/lib/links'
 import { editionDescription, toAwardsProgrammeView } from '@/sanity/awards-programme-view'
 import { fetchAdUnits } from '@/sanity/brand-title'
 import { eventDescription, toEventPageView, type ConferenceEventData } from '@/sanity/event-page-view'
-import { toImage } from '@/sanity/image'
 import { cachedSanity, cachedUkToday, getDynamicFetchOptions, type DynamicFetchOptions } from '@/sanity/live'
 import {
   AWARDS_PROGRAMME_PAGE_QUERY,
@@ -22,6 +19,7 @@ import {
   OPEN_AWARDS_QUERY,
   RELATED_EVENTS_QUERY,
 } from '@/sanity/queries'
+import { pageMetadata } from '@/sanity/seo'
 import { PLACEHOLDER_SLUG } from '@/sanity/static-params'
 
 // An awards edition or a conference event at /events/{slug} (sharedRecordHref), the WordPress path without its
@@ -68,25 +66,15 @@ export async function generateMetadata({ params }: { params: Promise<Params> }):
     return {}
   }
 
-  const description = data._type === 'awardsProgramme' ? editionDescription(data) : eventDescription(data)
-  const logo = toImage(data.logo)
-  const path = sharedRecordHref(data._type, data.slug, 'clearview')
-  const canonical = path ? `${brandOrigin('clearview')}${path}` : undefined
-
-  return {
-    title: stegaClean(data.title),
-    ...(description ? { description } : {}),
-    ...(canonical ? { alternates: { canonical } } : {}),
-    // Most edition and event logos are SVG, which link previews do not show: the Sanity CDN renders those as PNG.
-    ...(logo
-      ? {
-          openGraph: {
-            url: canonical,
-            images: [{ url: isSvg(logo.src) ? `${logo.src}?fm=png` : logo.src, width: logo.width, height: logo.height, alt: logo.alt }],
-          },
-        }
-      : {}),
-  }
+  // Most edition and event logos are SVG, which link previews do not show: those fall through to the brand image.
+  return pageMetadata({
+    brand,
+    path: sharedRecordHref(data._type, data.slug, 'clearview'),
+    seo: data.seo,
+    title: data.title,
+    description: data._type === 'awardsProgramme' ? editionDescription(data) : eventDescription(data),
+    images: data._type === 'awardsProgramme' ? [data.logo, data.highlightVideoThumbnail] : [data.logo],
+  })
 }
 
 export default async function EventRoute({ params }: { params: Promise<Params> }) {

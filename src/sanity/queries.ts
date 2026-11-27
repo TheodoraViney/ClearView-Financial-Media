@@ -13,10 +13,12 @@ import {
   OPEN_AWARDS_FILL,
   OTHER_AWARDS_EDITION,
   OTHER_AWARDS_FILL,
+  PAGE_SEO_FALLBACK,
   RELATED_EVENT,
   RELATED_EVENTS_FILL,
   RELATED_RESEARCH,
   RELATED_RESEARCH_FILL,
+  SEO,
   SUBSCRIBE_MODAL,
 } from './fragments'
 
@@ -58,6 +60,10 @@ export const SHELL_QUERY = defineQuery(`
     "brand": *[_type == "brand" && _id == $brandId && key.current == $brand][0]{
       title,
       seoSiteName,
+      seoDescription,
+      "seoImage": seoImage{ ${IMAGE} },
+      "favicon": favicon{ asset },
+      xHandle,
       logo{ "alt": asset->altText, asset->{ url, metadata{ dimensions{ width, height } } } },
       footerLogo{ "alt": asset->altText, asset->{ url, metadata{ dimensions{ width, height } } } },
       ${ADVERTISING}
@@ -71,6 +77,7 @@ export const HOME_PAGE_QUERY = defineQuery(`
   *[_type == "page" && brand == $brand && slug.current == "home"][0]{
     _id,
     title,
+    "seo": seo{ ${SEO} },
     blocks[]{ _key, _type, ${BLOCKS_PROJECTION} },
     blocksMiddle[]{ _key, _type, ${BLOCKS_PROJECTION} },
     blocksBottom[]{ _key, _type, ${BLOCKS_PROJECTION} }
@@ -81,6 +88,8 @@ export const PAGE_QUERY = defineQuery(`
   *[_type == "page" && slug.current == $slug && brand == $brand][0]{
     _id,
     title,
+    "seo": seo{ ${SEO} },
+    ${PAGE_SEO_FALLBACK},
     blocks[]{ _key, _type, ${BLOCKS_PROJECTION} }
   }
 `)
@@ -116,10 +125,12 @@ export const POSTS_QUERY = defineQuery(`
 export const POST_QUERY = defineQuery(`
   *[_type == "post" && slug.current == $slug && $brand in brands][0]{
     _id,
+    _updatedAt,
     title,
     "slug": slug.current,
     brands,
     publishedAt,
+    "seo": seo{ ${SEO} },
     excerpt,
     "image": image{ ${IMAGE}, credit },
     "category": category->{ title, "slug": slug.current },
@@ -214,6 +225,7 @@ export const CATEGORIES_PAGE_QUERY = defineQuery(`
     "page": *[_type == "page" && _id == $id && brand == $brand][0]{
       _id,
       title,
+      "seo": seo{ ${SEO} },
       blocks[]{ _key, _type, ${BLOCKS_PROJECTION} }
     },
     "topics": *[
@@ -472,6 +484,7 @@ export const AWARD_CATEGORY_QUERY = defineQuery(`
   *[_type == "awardCategory" && slug.current == $category][0]{
     _id,
     title,
+    "seo": seo{ ${SEO} },
     "slug": slug.current,
     categoryGroup,
     description,
@@ -543,6 +556,7 @@ export const AWARDS_PROGRAMME_QUERY = defineQuery(`
     _type == "awardsProgramme" => {
       _id,
       title,
+      "seo": seo{ ${SEO} },
       "slug": slug.current,
       standfirst,
       body[]{ ${ARTICLE_BODY} },
@@ -613,6 +627,7 @@ export const AWARDS_PROGRAMME_QUERY = defineQuery(`
     _type == "conferenceEvent" => {
       _id,
       title,
+      "seo": seo{ ${SEO} },
       "slug": slug.current,
       eventType,
       body[]{ ${ARTICLE_BODY} },
@@ -768,6 +783,7 @@ export const SHARED_LISTINGS_PAGE_QUERY = defineQuery(`
     "page": *[_type == "page" && _id == $id && brand == $brand][0]{
       _id,
       title,
+      "seo": seo{ ${SEO} },
       blocks[]{ _key, _type, ${BLOCKS_PROJECTION} }
     },
     "statuses": *[_id == $statusesId && _type == "awardsProgrammePage"][0]{
@@ -858,8 +874,8 @@ export const RESEARCH_REPORT_QUERY = defineQuery(`
       "introText": pt::text(summaryIntro),
       "sections": summarySections[]{ _key, heading, body[]{ ${ARTICLE_BODY} } }
     },
-    "seo": seo{ title, description, "image": image{ ${IMAGE} } },
-    "summarySeo": summarySeo{ title, description, "image": image{ ${IMAGE} } },
+    "seo": seo{ ${SEO} },
+    "summarySeo": summarySeo{ ${SEO} },
     "relatedResearch": relatedResearch[]->{ ${RELATED_RESEARCH} },
     "relatedResearchFill": ${RELATED_RESEARCH_FILL}
   }
@@ -917,6 +933,7 @@ export const PARTNER_PROFILE_QUERY = defineQuery(`
     "slug": slug.current,
     "logo": logo{ ${IMAGE} },
     "profileImage": profileImage{ ${IMAGE} },
+    "seo": seo{ ${SEO} },
     about[]{ ${ARTICLE_BODY} },
     "aboutText": pt::text(about),
     websiteUrl,
@@ -1032,6 +1049,7 @@ export const COMPANY_ENGAGEMENT_PAGE_QUERY = defineQuery(`
   *[_type == "page" && _id == $id && brand == $brand][0]{
     _id,
     title,
+    "seo": seo{ ${SEO} },
     blocks[]{ _key, _type, ${BLOCKS_PROJECTION} }
   }
 `)

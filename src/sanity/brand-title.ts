@@ -66,11 +66,3 @@ export async function fetchAdUnits(brand: BrandKey, page: AdPageType, options: D
 
   return toAdUnits(stegaClean(data.brand?.advertising), page)
 }
-
-/** The name the site adds after a page's own title: "Name in titles" from Brand settings, else the brand title. */
-export async function fetchTitleSuffix(brand: BrandKey, options: DynamicFetchOptions): Promise<string> {
-  const { data } = await fetchShell(brand, options)
-  const name = data.brand?.seoSiteName
-
-  return name && stegaClean(name).trim() ? name : brandTitle(brand, data.brand?.title)
-}

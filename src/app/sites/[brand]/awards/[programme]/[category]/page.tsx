@@ -4,13 +4,14 @@ import { notFound } from 'next/navigation'
 import { stegaClean } from 'next-sanity'
 import { Suspense } from 'react'
 
-import { AWARD_CATEGORY_PAGE_ID, AWARDS_PROGRAMME_PAGE_ID, brandOrigin } from '@/brands'
+import { AWARD_CATEGORY_PAGE_ID, AWARDS_PROGRAMME_PAGE_ID } from '@/brands'
 import { AwardCategoryPage } from '@/components/sections/awards/AwardCategoryPage'
 import { awardCategoryHref } from '@/lib/links'
 import { isAwardedCategory, toAwardCategoryView } from '@/sanity/award-category-view'
 import { fetchAdUnits } from '@/sanity/brand-title'
 import { cachedSanity, cachedUkToday, getDynamicFetchOptions, type DynamicFetchOptions } from '@/sanity/live'
 import { AWARD_CATEGORY_PAGE_QUERY, AWARD_CATEGORY_QUERY, OTHER_AWARDS_QUERY } from '@/sanity/queries'
+import { pageMetadata } from '@/sanity/seo'
 import { PLACEHOLDER_SLUG } from '@/sanity/static-params'
 
 // An award category page: one category as awarded by one evergreen programme, /awards/{programme}/{category}
@@ -34,6 +35,8 @@ function fetchCategory(programme: string, category: string, options: DynamicFetc
   return cachedSanity({ query: AWARD_CATEGORY_QUERY, params: { programme, category }, ...options })
 }
 
+// The category's meta title (else its title) with the programme's, as one category page exists per programme that
+// awarded it. Description and share image come from the category's SEO fields, else its description, else the brand's.
 export async function generateMetadata({ params }: { params: Promise<Params> }): Promise<Metadata> {
   const { brand, programme, category } = await params
 
@@ -47,13 +50,15 @@ export async function generateMetadata({ params }: { params: Promise<Params> }):
     return {}
   }
 
-  const description = stegaClean(data.description)?.trim()
+  const name = stegaClean(data.seo?.title)?.trim() || stegaClean(data.title)
 
-  return {
-    title: `${stegaClean(data.title)} | ${stegaClean(data.programme.title)}`,
-    ...(description ? { description } : {}),
-    alternates: { canonical: `${brandOrigin('clearview')}${awardCategoryHref(data.programme.slug, data.slug, 'clearview')}` },
-  }
+  return pageMetadata({
+    brand,
+    path: awardCategoryHref(data.programme.slug, data.slug, 'clearview'),
+    seo: data.seo,
+    pageTitle: `${name} | ${stegaClean(data.programme.title)}`,
+    description: data.description,
+  })
 }
 
 export default async function AwardCategoryRoute({ params }: { params: Promise<Params> }) {

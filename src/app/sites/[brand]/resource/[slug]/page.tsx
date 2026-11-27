@@ -1,12 +1,10 @@
 import type { Metadata } from 'next'
 import { draftMode } from 'next/headers'
 import { notFound } from 'next/navigation'
-import { stegaClean } from 'next-sanity'
 import { Suspense } from 'react'
 
-import { brandOrigin, RESEARCH_REPORT_PAGE_ID } from '@/brands'
+import { RESEARCH_REPORT_PAGE_ID } from '@/brands'
 import { ResearchReportPage } from '@/components/sections/research/ResearchReportPage'
-import { isSvg } from '@/components/ui/Media'
 import { fetchAdUnits } from '@/sanity/brand-title'
 import { cachedSanity, getDynamicFetchOptions, type DynamicFetchOptions } from '@/sanity/live'
 import { mostReadGroupFill } from '@/sanity/most-read'
@@ -14,10 +12,9 @@ import { RESEARCH_REPORT_PAGE_QUERY, RESEARCH_REPORT_QUERY } from '@/sanity/quer
 import {
   reportPath,
   researchReportDescription,
-  researchReportShareImage,
-  seoOverrides,
   toResearchReportView,
 } from '@/sanity/research-report-view'
+import { pageMetadata } from '@/sanity/seo'
 import { PLACEHOLDER_SLUG } from '@/sanity/static-params'
 
 // A research report at /resource/{slug} (sharedRecordHref), the WordPress path without its trailing slash. Served on
@@ -63,22 +60,14 @@ export async function generateMetadata({ params }: { params: Promise<Params> }):
     return {}
   }
 
-  // The "SEO" tab's fields when filled, else the defaults. The brand layout's template adds " | {brand}" to the title.
-  const seo = seoOverrides(data.seo, data.title)
-  const description = seo.description ?? researchReportDescription(data)
-  const image = researchReportShareImage(data)
-  const shareImage =
-    seo.image ??
-    (image ? { url: isSvg(image.src) ? `${image.src}?fm=png` : image.src, width: image.width, height: image.height, alt: image.alt } : null)
-  const path = reportPath(data)
-  const canonical = path ? `${brandOrigin('clearview')}${path}` : undefined
-
-  return {
-    title: seo.title ?? stegaClean(data.title),
-    ...(description ? { description } : {}),
-    ...(canonical ? { alternates: { canonical } } : {}),
-    ...(shareImage ? { openGraph: { url: canonical, images: [shareImage] } } : {}),
-  }
+  return pageMetadata({
+    brand,
+    path: reportPath(data),
+    seo: data.seo,
+    title: data.title,
+    description: researchReportDescription(data),
+    images: [data.downloadThumbnail],
+  })
 }
 
 export default async function ResearchReportRoute({ params }: { params: Promise<Params> }) {

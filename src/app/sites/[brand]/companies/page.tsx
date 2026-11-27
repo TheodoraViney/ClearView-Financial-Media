@@ -1,10 +1,8 @@
 import type { Metadata } from 'next'
 import { draftMode } from 'next/headers'
 import { notFound } from 'next/navigation'
-import { stegaClean } from 'next-sanity'
 import { Suspense } from 'react'
 
-import { brandOrigin } from '@/brands'
 import { PageBlocks } from '@/components/blocks/PageBlocks'
 import { TopBanner } from '@/components/sections/company-engagement/TopBanner'
 import {
@@ -16,6 +14,7 @@ import { fetchAdUnits } from '@/sanity/brand-title'
 import { toCompanyEngagementContext } from '@/sanity/company-engagement-view'
 import { cachedNow, cachedSanity, cachedUkToday, getDynamicFetchOptions, type DynamicFetchOptions } from '@/sanity/live'
 import { COMPANY_ENGAGEMENT_PAGE_QUERY, COMPANY_ENGAGEMENT_QUERY } from '@/sanity/queries'
+import { pageMetadata } from '@/sanity/seo'
 
 // The Company Engagement page, Industry Engagement, at /companies on ClearView Publishing: the `page` document
 // COMPANY_ENGAGEMENT_PAGE_DOCUMENT_ID, built from blocks like any page (page heading, search and filters, company
@@ -63,11 +62,13 @@ export async function generateMetadata({ params, searchParams }: Props): Promise
   const context = toCompanyEngagementContext({ data, blocks: page.blocks, params: await searchParams })
   const canonical = context ? companyEngagementCanonical(context.state) : null
 
-  return {
-    title: stegaClean(page.title),
-    ...(canonical ? { alternates: { canonical: `${brandOrigin('clearview')}${canonical.path}` } } : {}),
-    ...(canonical?.indexable ? {} : { robots: { index: false, follow: true } }),
-  }
+  return pageMetadata({
+    brand,
+    path: canonical?.path ?? null,
+    seo: page.seo,
+    title: page.title,
+    noIndex: !canonical?.indexable,
+  })
 }
 
 export default async function CompanyEngagementRoute({ params, searchParams }: Props) {

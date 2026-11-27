@@ -4,19 +4,17 @@ import { notFound } from 'next/navigation'
 import { stegaClean } from 'next-sanity'
 import { Suspense } from 'react'
 
-import { brandOrigin, RESEARCH_REPORT_PAGE_ID } from '@/brands'
+import { RESEARCH_REPORT_PAGE_ID } from '@/brands'
 import { ExecutiveSummaryPage } from '@/components/sections/research/ExecutiveSummaryPage'
-import { isSvg } from '@/components/ui/Media'
 import { cachedSanity, getDynamicFetchOptions, type DynamicFetchOptions } from '@/sanity/live'
 import { RESEARCH_REPORT_PAGE_QUERY, RESEARCH_REPORT_QUERY } from '@/sanity/queries'
 import {
   executiveSummaryDescription,
   executiveSummaryPagePath,
-  researchReportShareImage,
-  seoOverrides,
   toExecutiveSummaryView,
   type ResearchReportData,
 } from '@/sanity/research-report-view'
+import { pageMetadata } from '@/sanity/seo'
 import { PLACEHOLDER_SLUG } from '@/sanity/static-params'
 
 // A research report's Executive Summary page at /resource/{report slug}/{summary slug}, from the report's own
@@ -75,24 +73,16 @@ export async function generateMetadata({ params }: { params: Promise<Params> }):
     return {}
   }
 
-  const canonical = `${brandOrigin('clearview')}${path}`
-  const title = [copy?.summaryTitle, data.title].map((part) => stegaClean(part)?.trim()).filter(Boolean).join(' — ')
-  // The "Summary SEO" tab's fields when filled, else the defaults; the share image falls back to the report page's
-  // ("SEO" tab) before the banner. The brand layout's template adds " | {brand}" to the title.
-  const seo = seoOverrides(data.summarySeo, title)
-  const description = seo.description ?? executiveSummaryDescription(data)
-  const image = researchReportShareImage(data)
-  const shareImage =
-    seo.image ??
-    seoOverrides(data.seo, data.title).image ??
-    (image ? { url: isSvg(image.src) ? `${image.src}?fm=png` : image.src, width: image.width, height: image.height, alt: image.alt } : null)
-
-  return {
-    title: seo.title ?? title,
-    ...(description ? { description } : {}),
-    alternates: { canonical },
-    ...(shareImage ? { openGraph: { url: canonical, images: [shareImage] } } : {}),
-  }
+  // The "Summary SEO" tab's fields, else the summary's own; the share image falls back to the report page's ("SEO"
+  // tab) before the report cover.
+  return pageMetadata({
+    brand,
+    path,
+    seo: data.summarySeo,
+    title: [copy?.summaryTitle, data.title].map((part) => stegaClean(part)?.trim()).filter(Boolean).join(' — '),
+    description: executiveSummaryDescription(data),
+    images: [data.seo?.image, data.downloadThumbnail],
+  })
 }
 
 export default async function ExecutiveSummaryRoute({ params }: { params: Promise<Params> }) {

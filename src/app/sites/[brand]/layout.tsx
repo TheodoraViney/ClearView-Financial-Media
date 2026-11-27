@@ -1,11 +1,10 @@
 import type { Metadata } from 'next'
 import { draftMode } from 'next/headers'
 import { notFound } from 'next/navigation'
-import { stegaClean } from 'next-sanity'
 import { VisualEditing } from 'next-sanity/visual-editing'
 import { Suspense, type CSSProperties, type ReactNode } from 'react'
 
-import { BRAND_KEYS, BRANDS, brandColorVars, isBrandKey, type BrandKey } from '@/brands'
+import { BRAND_KEYS, BRANDS, brandColorVars, brandOrigin, isBrandKey, type BrandKey } from '@/brands'
 import { Footer } from '@/components/blocks/Footer'
 import { Header } from '@/components/blocks/Header'
 import { toSubscribeModal } from '@/components/blocks/subscribe-modal'
@@ -18,15 +17,19 @@ import { GptLoader } from '@/components/ui/Gpt.client'
 import type { SubscribeModalData } from '@/components/sections/subscribe/types'
 import { GAM_NETWORK_CODE } from '@/lib/gam'
 import { subscribeOptions } from '@/lib/subscribe-options'
-import { fetchBrandTitle, fetchShell, fetchTitleSuffix } from '@/sanity/brand-title'
+import { fetchShell } from '@/sanity/brand-title'
+import { toShareImage } from '@/sanity/image'
 import { getDynamicFetchOptions, SanityLive, type DynamicFetchOptions } from '@/sanity/live'
+import { brandIcons, fetchBrandSeo } from '@/sanity/seo'
 
 export function generateStaticParams() {
   return BRAND_KEYS.map((brand) => ({ brand }))
 }
 
 // Brand settings name every page of the brand: the brand title is the default title, and "Name in titles" the suffix
-// of a page that sets its own. Published content only, so it shares the layout's published shell cache entry and needs no draft mode.
+// of a page that sets its own. They also give the defaults a page without its own metadata shows (description, share
+// image), the favicon and the X handle. Published content only, so it shares the layout's published shell cache entry
+// and needs no draft mode. No canonical or og:url here: a page inheriting them would point at another address.
 export async function generateMetadata({ params }: { params: Promise<{ brand: string }> }): Promise<Metadata> {
   const { brand } = await params
 
@@ -34,10 +37,24 @@ export async function generateMetadata({ params }: { params: Promise<{ brand: st
     return {}
   }
 
-  const options = { perspective: 'published', stega: false } as const
-  const [title, suffix] = await Promise.all([fetchBrandTitle(brand, options), fetchTitleSuffix(brand, options)])
+  const defaults = await fetchBrandSeo(brand)
+  const image = toShareImage(defaults.image)
+  const description = defaults.description ?? undefined
 
-  return { title: { default: stegaClean(title), template: `%s | ${stegaClean(suffix)}` } }
+  return {
+    metadataBase: new URL(brandOrigin(brand)),
+    title: { default: defaults.siteName, template: `%s | ${defaults.titleName}` },
+    description,
+    icons: brandIcons(defaults.favicon),
+    openGraph: {
+      type: 'website',
+      siteName: defaults.siteName,
+      locale: 'en_GB',
+      description,
+      images: image ? [{ ...image, alt: image.alt || defaults.siteName }] : undefined,
+    },
+    twitter: { card: 'summary_large_image', ...(defaults.xHandle ? { site: defaults.xHandle } : {}) },
+  }
 }
 
 export default async function BrandLayout({

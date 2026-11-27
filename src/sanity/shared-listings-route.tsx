@@ -1,10 +1,9 @@
 import type { Metadata } from 'next'
 import { draftMode } from 'next/headers'
 import { notFound } from 'next/navigation'
-import { stegaClean } from 'next-sanity'
 import { Suspense } from 'react'
 
-import { AWARDS_PROGRAMME_PAGE_ID, brandOrigin } from '@/brands'
+import { AWARDS_PROGRAMME_PAGE_ID } from '@/brands'
 import { PageBlocks } from '@/components/blocks/PageBlocks'
 import {
   listingCanonical,
@@ -17,6 +16,7 @@ import {
 import { fetchAdUnits } from './brand-title'
 import { cachedNow, cachedSanity, cachedUkToday, getDynamicFetchOptions, type DynamicFetchOptions } from './live'
 import { SHARED_LISTINGS_PAGE_QUERY } from './queries'
+import { pageMetadata } from './seo'
 import { isCompletePage, sharedListingsState } from './shared-listings-view'
 
 /*
@@ -43,7 +43,7 @@ function fetchPage(tab: SharedListingsTab, today: string, options: DynamicFetchO
 /**
  * The canonical sits under the tab's own path: /events-category/briefings and /events-category/webinar show the same
  * Events list as /events-category/summits, so they point there. Pages of the unfiltered list are indexable, filtered
- * views are noindex (listingCanonical).
+ * views are noindex (listingCanonical). The page document serves every tab, so its canonical override is not used.
  */
 export async function sharedListingsMetadata({ tab, searchParams }: SharedListingsRouteProps): Promise<Metadata> {
   const today = await cachedUkToday()
@@ -58,11 +58,13 @@ export async function sharedListingsMetadata({ tab, searchParams }: SharedListin
     ? listingCanonical(SHARED_LISTINGS_TAB_PATHS[tab], state)
     : { path: SHARED_LISTINGS_TAB_PATHS[tab], indexable: false }
 
-  return {
-    title: stegaClean(data.page.title),
-    alternates: { canonical: `${brandOrigin('clearview')}${canonical.path}` },
-    ...(canonical.indexable ? {} : { robots: { index: false, follow: true } }),
-  }
+  return pageMetadata({
+    brand: 'clearview',
+    path: canonical.path,
+    seo: data.page.seo && { ...data.page.seo, canonical: null },
+    title: data.page.title,
+    noIndex: !canonical.indexable,
+  })
 }
 
 export async function SharedListingsRoute(props: SharedListingsRouteProps) {

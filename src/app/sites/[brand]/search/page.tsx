@@ -1,7 +1,6 @@
 import type { Metadata } from 'next'
 import { draftMode } from 'next/headers'
 import { notFound } from 'next/navigation'
-import { stegaClean } from 'next-sanity'
 import { Suspense } from 'react'
 
 import { BRANDS, isBrandKey, searchPageDocumentId, type BrandKey } from '@/brands'
@@ -11,6 +10,7 @@ import { toSearchPageCopy } from '@/lib/search-page-copy'
 import { searchResults } from '@/lib/search-results'
 import { cachedSanity, getDynamicFetchOptions, type DynamicFetchOptions } from '@/sanity/live'
 import { SEARCH_PAGE_QUERY } from '@/sanity/queries'
+import { pageMetadata } from '@/sanity/seo'
 
 // The search results page of every brand, ClearView included, searching the Algolia index by the URL
 // (src/lib/search-page.ts). Closed to crawlers: noindex here and Disallow in the production robots.txt.
@@ -42,10 +42,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { data } = await fetchCopy(brand, PUBLISHED)
   const copy = toSearchPageCopy(data)
 
-  return {
-    ...(copy ? { title: stegaClean(copy.title) } : {}),
-    robots: { index: false, follow: true },
-  }
+  return pageMetadata({ brand, path: null, pageTitle: copy?.title, noIndex: true })
 }
 
 export default async function SearchRoute({ params, searchParams }: Props) {
