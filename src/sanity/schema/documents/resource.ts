@@ -79,13 +79,14 @@ export const resource = defineType({
   // The "Generate from report text" panel at the top of Page content (it writes several fields at once).
   components: { input: ResearchGenerateInput },
   groups: [
-    { name: 'details', title: 'Details', default: true },
+    { name: 'details', title: 'Header', default: true },
+    { name: 'download', title: 'Download' },
     { name: 'page', title: 'Page content' },
     { name: 'summary', title: 'Executive summary page' },
-    { name: 'download', title: 'Download' },
     { name: 'seo', title: 'SEO' },
     { name: 'summarySeo', title: 'Summary SEO' },
   ],
+  fieldsets: [{ name: 'summaryPage', title: 'Executive summary page' }],
   fields: [
     defineField({
       name: 'title',
@@ -125,39 +126,50 @@ export const resource = defineType({
       initialValue: 'research',
       hidden: true,
     }),
-    imageField('featuredImage', {
-      title: 'Banner image',
-      group: 'details',
-      description: 'Used only when the report is shared, not on the page.',
-    }),
-    defineField({
-      name: 'body',
-      title: 'Report text',
-      type: 'richText',
-      group: 'details',
-      description: 'Not shown on the page: feeds site search and the Generate from report text button.',
-    }),
-    defineField({
-      name: 'authors',
-      title: 'Participants and authors',
-      type: 'array',
-      group: 'details',
-      of: [defineArrayMember({ type: 'reference', to: [{ type: 'person' }] })],
-      validation: (Rule) => Rule.unique(),
-    }),
-
     defineField({
       name: 'edition',
       title: 'Edition',
       type: 'string',
-      group: 'page',
+      group: 'details',
     }),
     defineField({
       name: 'standfirst',
       title: 'Standfirst',
       type: 'text',
       rows: 3,
+      group: 'details',
+    }),
+    defineField({
+      name: 'downloadThumbnail',
+      title: 'Download thumbnail',
+      type: 'image',
+      group: 'download',
+      description: 'The report cover on the page and in research lists.',
+      options: { hotspot: true },
+      fields: [altField],
+    }),
+    defineField({
+      name: 'downloadFile',
+      title: 'Download file',
+      type: 'file',
+      group: 'download',
+      description: 'Used only when Download URL or form is empty.',
+    }),
+    defineField({
+      name: 'downloadUrl',
+      title: 'Download URL or form',
+      type: 'url',
+      group: 'download',
+      validation: (Rule) => Rule.uri({ scheme: ['http', 'https'] }),
+    }),
+    // The AI source: first in Page content, so the Generate panel (research-generate-input.tsx) sits right under it
+    // and above every field it fills.
+    defineField({
+      name: 'body',
+      title: 'Report text',
+      type: 'richText',
       group: 'page',
+      description: 'Not shown on the page: feeds site search and the Generate from report text button.',
     }),
     defineField({
       name: 'summary',
@@ -187,6 +199,14 @@ export const resource = defineType({
       type: 'array',
       group: 'page',
       of: [paragraphsBlock],
+    }),
+    defineField({
+      name: 'authors',
+      title: 'Participants and authors',
+      type: 'array',
+      group: 'page',
+      of: [defineArrayMember({ type: 'reference', to: [{ type: 'person' }] })],
+      validation: (Rule) => Rule.unique(),
     }),
     defineField({
       name: 'methodology',
@@ -387,12 +407,12 @@ export const resource = defineType({
             return id && (items ?? []).some((item) => item._ref === id) ? 'A report cannot be related to itself' : true
           }),
     }),
-
     defineField({
       name: 'summarySlug',
       title: 'Slug',
       type: 'slug',
       group: 'summary',
+      fieldset: 'summaryPage',
       description: 'Changing it breaks a live URL.',
       initialValue: { current: RESEARCH_SUMMARY_DEFAULT_SLUG },
       // The URL sits under the report's own slug, so every report may use the same summary slug.
@@ -412,6 +432,7 @@ export const resource = defineType({
       title: 'Lead paragraph',
       type: 'array',
       group: 'summary',
+      fieldset: 'summaryPage',
       description: 'The page exists only while this tab has a lead, introduction or section.',
       of: [paragraphsBlock],
     }),
@@ -420,6 +441,7 @@ export const resource = defineType({
       title: 'Introduction',
       type: 'array',
       group: 'summary',
+      fieldset: 'summaryPage',
       of: [paragraphsBlock],
     }),
     defineField({
@@ -427,7 +449,13 @@ export const resource = defineType({
       title: 'Sections',
       type: 'array',
       group: 'summary',
+      fieldset: 'summaryPage',
       of: [executiveSummarySectionMember],
+    }),
+    imageField('featuredImage', {
+      title: 'Banner image',
+      group: 'seo',
+      description: 'Used only when the report is shared, not on the page.',
     }),
     defineField({
       name: 'seo',
@@ -442,30 +470,6 @@ export const resource = defineType({
       type: 'seo',
       group: 'summarySeo',
       description: 'Empty fields use the summary title, Lead and the report’s share image.',
-    }),
-
-    defineField({
-      name: 'downloadThumbnail',
-      title: 'Download thumbnail',
-      type: 'image',
-      group: 'download',
-      description: 'The report cover on the page and in research lists.',
-      options: { hotspot: true },
-      fields: [altField],
-    }),
-    defineField({
-      name: 'downloadFile',
-      title: 'Download file',
-      type: 'file',
-      group: 'download',
-      description: 'Used only when Download URL or form is empty.',
-    }),
-    defineField({
-      name: 'downloadUrl',
-      title: 'Download URL or form',
-      type: 'url',
-      group: 'download',
-      validation: (Rule) => Rule.uri({ scheme: ['http', 'https'] }),
     }),
     legacyWpIdField,
   ],

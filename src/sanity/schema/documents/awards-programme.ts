@@ -40,6 +40,12 @@ export const awardsProgramme = defineType({
     // Legacy WordPress fields only, all hidden: tab hidden in the Studio. Remove before launch if unused.
     { name: 'extra', title: 'Legacy', hidden: true },
   ],
+  fieldsets: [
+    { name: 'dates', title: 'Dates', options: { columns: 2 } },
+    { name: 'nominations', title: 'Nominations', options: { columns: 2 } },
+    { name: 'location', title: 'Location', options: { columns: 2 } },
+    { name: 'video', title: 'Highlights video' },
+  ],
   fields: [
     defineField({
       name: 'title',
@@ -54,7 +60,8 @@ export const awardsProgramme = defineType({
       type: 'slug',
       group: 'header',
       options: { source: 'title', maxLength: 96, isUnique: isUniqueEventSlug },
-      description: 'Published at /events/{slug}/. Migrated from WordPress, changing it breaks a live URL.',
+      // Migrated from WordPress.
+      description: 'Published at /events/{slug}/; changing it breaks a live URL.',
       validation: (Rule) => Rule.required(),
     }),
     defineField({
@@ -63,7 +70,6 @@ export const awardsProgramme = defineType({
       type: 'reference',
       to: [{ type: 'awardsProgrammeGroup' }],
       group: 'header',
-      description: 'The evergreen programme this edition belongs to.',
       validation: (Rule) => Rule.required(),
     }),
     defineField({
@@ -80,7 +86,6 @@ export const awardsProgramme = defineType({
       type: 'text',
       rows: 2,
       group: 'header',
-      description: 'Optional. One or two sentences under the page title. Hidden on the page when empty.',
       validation: (Rule) => Rule.max(200).warning('Longer than 200 characters; keep it to a sentence or two'),
     }),
     defineField({
@@ -88,6 +93,7 @@ export const awardsProgramme = defineType({
       title: 'Start date',
       type: 'date',
       group: 'header',
+      fieldset: 'dates',
       validation: (Rule) => Rule.required(),
     }),
     defineField({
@@ -95,6 +101,7 @@ export const awardsProgramme = defineType({
       title: 'End date',
       type: 'date',
       group: 'header',
+      fieldset: 'dates',
       validation: (Rule) =>
         Rule.custom((endDate, context) => {
           const startDate = (context.document as { startDate?: string } | undefined)?.startDate
@@ -106,22 +113,26 @@ export const awardsProgramme = defineType({
     }),
     defineField({
       name: 'hideDateTime',
-      title: 'Hide the date and time on the page',
+      title: 'Hide dates',
       type: 'boolean',
+      description: 'Hides the dates everywhere on the site, e.g. until they are confirmed.',
       group: 'header',
+      fieldset: 'dates',
       initialValue: false,
     }),
     defineField({
       name: 'nominationsOpeningDate',
-      title: 'Nominations opening date',
+      title: 'Opening date',
       type: 'date',
       group: 'header',
+      fieldset: 'nominations',
     }),
     defineField({
       name: 'nominationsClosingDate',
-      title: 'Nominations closing date',
+      title: 'Closing date',
       type: 'date',
       group: 'header',
+      fieldset: 'nominations',
       validation: (Rule) =>
         Rule.custom((closing, context) => {
           const opening = (context.document as { nominationsOpeningDate?: string } | undefined)
@@ -138,28 +149,31 @@ export const awardsProgramme = defineType({
       type: 'reference',
       to: [{ type: 'company' }],
       group: 'header',
-      description: 'Venues are held as Company records in the source.',
+      fieldset: 'location',
+      description: 'Venues are Company records.',
     }),
     defineField({
       name: 'country',
       title: 'Country',
       type: 'string',
       group: 'header',
+      fieldset: 'location',
       options: { list: EVENT_COUNTRIES },
     }),
     linkField({
       name: 'registerLink',
       title: 'Register button',
       group: 'header',
-      description:
-        'Usually a web address: the nominations form (Jotform). Leave the label empty to show the button text from Awards › Awards page texts.',
+      // Usually a web address: the nominations form (Jotform). An empty label uses registerLabel from Awards page texts.
     }),
     defineField({
       name: 'registerButtonLink',
       title: 'Register now button link (old)',
       type: 'url',
-      group: 'header',
-      description: 'From WordPress, copied into Register button above. Not used on the site.',
+      // From WordPress, copied into registerLink above; not used on the site. Hidden: a hidden group alone still shows
+      // the field under "All fields".
+      group: 'extra',
+      hidden: true,
       validation: (Rule) => Rule.uri({ scheme: ['http', 'https'] }),
     }),
 
@@ -172,16 +186,18 @@ export const awardsProgramme = defineType({
 
     defineField({
       name: 'highlightsVideoId',
-      title: 'Highlights video (Vimeo ID)',
+      title: 'Vimeo ID',
       type: 'string',
       group: 'video',
+      fieldset: 'video',
       validation: (Rule) => Rule.regex(/^\d+$/, { name: 'Vimeo ID', invert: false }),
     }),
     defineField({
       name: 'highlightVideoThumbnail',
-      title: 'Highlights video thumbnail',
+      title: 'Thumbnail',
       type: 'image',
       group: 'video',
+      fieldset: 'video',
       options: { hotspot: true },
       fields: [altField],
       hidden: ({ document }) => !document?.highlightsVideoId,
@@ -201,7 +217,6 @@ export const awardsProgramme = defineType({
       type: 'text',
       rows: 3,
       group: 'video',
-      description: 'Optional. Short text next to the highlights video. Hidden on the page when empty.',
     }),
 
     defineField({
@@ -209,8 +224,7 @@ export const awardsProgramme = defineType({
       title: 'Registration steps',
       type: 'array',
       group: 'registration',
-      description:
-        'Optional. The numbered steps in the Categories and Registration section, in this order. The section is hidden when there are none.',
+      description: 'Empty: the Categories and Registration section is hidden.',
       of: [
         defineArrayMember({
           type: 'object',
@@ -221,8 +235,7 @@ export const awardsProgramme = defineType({
               name: 'text',
               title: 'Text',
               type: 'array',
-              description:
-                'The page numbers the steps. Start with the lead-in and bold it if you like, for example "Check eligibility." Then any text: paragraphs, lists, links, bold and italic.',
+              description: 'Numbered on the page. Start with a bold lead-in if you like, e.g. "Check eligibility."',
               of: [paragraphsWithListsBlock],
               validation: (Rule) => Rule.required(),
             }),
@@ -243,8 +256,7 @@ export const awardsProgramme = defineType({
       title: 'Sponsors',
       type: 'array',
       group: 'sponsors',
-      description:
-        'Optional. Sponsors grouped by tier, for example "Headline Sponsor", in the order shown on the page. Each tier lists its companies in order; the logo comes from the company. The section is hidden when empty.',
+      description: 'Grouped by tier; logos come from the company records.',
       of: [defineArrayMember({ type: 'companyGroup', title: 'Sponsor tier' })],
     }),
 
@@ -267,16 +279,14 @@ export const awardsProgramme = defineType({
       title: 'Finalists',
       type: 'richText',
       group: 'winners',
-      description:
-        'Optional. The Finalists section above the winners, for example a heading per category group with the finalist firms under it. The section and its navigation link are hidden when empty.',
     }),
     defineField({
       name: 'winners',
       title: 'Winners',
       type: 'array',
       group: 'winners',
+      // Parsed out of the legacy Winners wysiwyg: 2,981 rows across 45 editions.
       of: [defineArrayMember({ type: 'winner' })],
-      description: 'Parsed out of the legacy Winners wysiwyg. 2,981 rows across 45 editions.',
     }),
 
     defineField({
@@ -292,7 +302,6 @@ export const awardsProgramme = defineType({
       title: 'Frequently asked questions',
       type: 'array',
       group: 'faq',
-      description: 'Optional. Questions and answers in the FAQ section, in this order. The section is hidden when empty.',
       of: [
         defineArrayMember({
           type: 'object',
@@ -309,7 +318,6 @@ export const awardsProgramme = defineType({
               name: 'answer',
               title: 'Answer',
               type: 'array',
-              description: 'Bold, italic and links only.',
               of: [paragraphsBlock],
               validation: (Rule) => Rule.required(),
             }),

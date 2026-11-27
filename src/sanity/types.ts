@@ -3298,7 +3298,9 @@ export type Resource = {
   slug?: Slug;
   publishedAt?: string;
   category?: "research";
-  featuredImage?: {
+  edition?: string;
+  standfirst?: string;
+  downloadThumbnail?: {
     asset?: SanityImageAssetReference;
     media?: unknown;
     hotspot?: SanityImageHotspot;
@@ -3306,14 +3308,13 @@ export type Resource = {
     alt?: string;
     _type: "image";
   };
+  downloadFile?: {
+    asset?: SanityFileAssetReference;
+    media?: unknown;
+    _type: "file";
+  };
+  downloadUrl?: string;
   body?: RichText;
-  authors?: Array<
-    {
-      _key: string;
-    } & PersonReference
-  >;
-  edition?: string;
-  standfirst?: string;
   summary?: Array<{
     children?: Array<{
       marks?: Array<string>;
@@ -3359,6 +3360,11 @@ export type Resource = {
     _type: "block";
     _key: string;
   }>;
+  authors?: Array<
+    {
+      _key: string;
+    } & PersonReference
+  >;
   methodology?: Array<{
     label?: string;
     value?: string;
@@ -3457,9 +3463,7 @@ export type Resource = {
     _type: "executiveSummarySection";
     _key: string;
   }>;
-  seo?: Seo;
-  summarySeo?: Seo;
-  downloadThumbnail?: {
+  featuredImage?: {
     asset?: SanityImageAssetReference;
     media?: unknown;
     hotspot?: SanityImageHotspot;
@@ -3467,12 +3471,8 @@ export type Resource = {
     alt?: string;
     _type: "image";
   };
-  downloadFile?: {
-    asset?: SanityFileAssetReference;
-    media?: unknown;
-    _type: "file";
-  };
-  downloadUrl?: string;
+  seo?: Seo;
+  summarySeo?: Seo;
   legacyWpId?: number;
 };
 
@@ -3523,7 +3523,6 @@ export type ConferenceEvent = {
   title?: string;
   slug?: Slug;
   eventType?: "summit" | "briefing" | "webinar";
-  body?: RichText;
   logo?: {
     asset?: SanityImageAssetReference;
     media?: unknown;
@@ -3532,6 +3531,12 @@ export type ConferenceEvent = {
     alt?: string;
     _type: "image";
   };
+  startDate?: string;
+  endDate?: string;
+  hideDateTime?: boolean;
+  startTime?: string;
+  endTime?: string;
+  timezoneCode?: string;
   venue?: CompanyReference;
   country?:
     | "AF"
@@ -3783,7 +3788,18 @@ export type ConferenceEvent = {
     | "YE"
     | "ZM"
     | "ZW";
+  body?: RichText;
   eventFormat?: Array<string>;
+  speakerTypes?: Array<
+    {
+      _key: string;
+    } & PersonGroup
+  >;
+  chairs?: Array<
+    {
+      _key: string;
+    } & PersonReference
+  >;
   whyAttend?: {
     intro?: Array<{
       children?: Array<{
@@ -3806,33 +3822,17 @@ export type ConferenceEvent = {
     }>;
     points?: Array<string>;
   };
-  relatedCoverage?: Array<
-    {
-      _key: string;
-    } & PostReference
-  >;
-  startDate?: string;
-  startTime?: string;
-  endDate?: string;
-  endTime?: string;
-  timezoneCode?: string;
-  hideDateTime?: boolean;
-  speakerTypes?: Array<
-    {
-      _key: string;
-    } & PersonGroup
-  >;
-  chairs?: Array<
-    {
-      _key: string;
-    } & PersonReference
-  >;
   agenda?: Array<
     {
       _key: string;
     } & Agenda
   >;
   agendaText?: RichText;
+  sponsorTypes?: Array<
+    {
+      _key: string;
+    } & CompanyGroup
+  >;
   techDemos?: Array<{
     title?: string;
     company?: CompanyReference;
@@ -3840,13 +3840,13 @@ export type ConferenceEvent = {
     _type: "techDemo";
     _key: string;
   }>;
-  sponsorTypes?: Array<
-    {
-      _key: string;
-    } & CompanyGroup
-  >;
   sponsorBenefits?: RichText;
   sponsorVideos?: VideoGallery;
+  relatedCoverage?: Array<
+    {
+      _key: string;
+    } & PostReference
+  >;
   photographs?: Array<{
     asset?: SanityImageAssetReference;
     media?: unknown;

@@ -384,7 +384,7 @@ export const linkField = (
               name: 'label',
               title: 'Label',
               type: 'string',
-              description: labelRequired ? undefined : "Empty: the block's default text.",
+              description: labelRequired ? undefined : 'Empty: the default text.',
               validation: labelRequired
                 ? requiredWhen && !required
                   ? (Rule) =>

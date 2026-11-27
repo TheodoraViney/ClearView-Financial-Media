@@ -23,12 +23,13 @@ export const conferenceEvent = defineType({
   type: 'document',
   icon: CalendarIcon,
   groups: [
-    { name: 'details', title: 'Details', default: true },
-    { name: 'page', title: 'Page content' },
-    { name: 'schedule', title: 'Date and time' },
+    { name: 'header', title: 'Header', default: true },
+    { name: 'overview', title: 'Overview' },
     { name: 'speakers', title: 'Speakers' },
+    { name: 'whyAttend', title: 'Why attend' },
     { name: 'agenda', title: 'Agenda' },
     { name: 'sponsors', title: 'Sponsors' },
+    { name: 'relatedCoverage', title: 'Related coverage' },
     // Legacy WordPress fields only, all hidden: tab hidden in the Studio. Remove before launch if unused.
     { name: 'media', title: 'Media', hidden: true },
     // Legacy WordPress fields only, all hidden: tab hidden in the Studio. Remove before launch if unused.
@@ -36,28 +37,34 @@ export const conferenceEvent = defineType({
     // Legacy WordPress fields only, all hidden: tab hidden in the Studio. Remove before launch if unused.
     { name: 'extra', title: 'Extra tabs', hidden: true },
   ],
+  fieldsets: [
+    { name: 'location', title: 'Location', options: { columns: 2 } },
+    { name: 'dates', title: 'Dates', options: { columns: 2 } },
+    { name: 'time', title: 'Time', description: '24-hour clock, for example 14:00.', options: { columns: 3 } },
+  ],
   fields: [
     defineField({
       name: 'title',
       title: 'Title',
       type: 'string',
-      group: 'details',
+      group: 'header',
       validation: (Rule) => Rule.required(),
     }),
     defineField({
       name: 'slug',
       title: 'Slug',
       type: 'slug',
-      group: 'details',
+      group: 'header',
       options: { source: 'title', maxLength: 96, isUnique: isUniqueEventSlug },
-      description: 'Published at /events/{slug}/. Migrated from WordPress, changing it breaks a live URL.',
+      // Migrated from WordPress.
+      description: 'Published at /events/{slug}/; changing it breaks a live URL.',
       validation: (Rule) => Rule.required(),
     }),
     defineField({
       name: 'eventType',
       title: 'Event type',
       type: 'string',
-      group: 'details',
+      group: 'header',
       options: {
         list: [
           { title: 'Summit', value: 'summit' },
@@ -67,98 +74,31 @@ export const conferenceEvent = defineType({
         layout: 'radio',
         direction: 'horizontal',
       },
-      description: 'Drives /events-category/{type}/. From the `events-category` taxonomy, minus the awards term.',
+      // Drives /events-category/{type}/. From the WordPress `events-category` taxonomy, minus the awards term.
       validation: (Rule) => Rule.required(),
-    }),
-    defineField({
-      name: 'body',
-      title: 'Introduction',
-      type: 'richText',
-      group: 'details',
     }),
     defineField({
       name: 'logo',
       title: 'Event logo',
       type: 'image',
-      group: 'details',
+      group: 'header',
       options: { hotspot: true },
       fields: [altField],
     }),
     defineField({
-      name: 'venue',
-      title: 'Venue',
-      type: 'reference',
-      to: [{ type: 'company' }],
-      group: 'details',
-      description: 'Venues are held as Company records in the source.',
-    }),
-    defineField({
-      name: 'country',
-      title: 'Country',
-      type: 'string',
-      group: 'details',
-      options: { list: EVENT_COUNTRIES },
-    }),
-
-    defineField({
-      name: 'eventFormat',
-      title: 'Event format',
-      type: 'array',
-      group: 'page',
-      of: [defineArrayMember({ type: 'string', validation: (Rule) => Rule.required() })],
-      description: 'Optional. Short points shown beside the overview, for example "Specialist panels". Hidden when empty.',
-    }),
-    defineField({
-      name: 'whyAttend',
-      title: 'Why attend',
-      type: 'object',
-      group: 'page',
-      description: 'Optional. Hidden on the page when it has no points.',
-      options: { collapsible: false },
-      validation: (Rule) =>
-        Rule.custom((value: { intro?: unknown[]; points?: unknown[] } | undefined) =>
-          value?.intro?.length && !value.points?.length ? 'The section is hidden until it has at least one point.' : true,
-        ).warning(),
-      fields: [
-        defineField({
-          name: 'intro',
-          title: 'Introduction',
-          type: 'array',
-          description: 'A short paragraph. Bold, italic and links only.',
-          of: [paragraphsBlock],
-        }),
-        defineField({
-          name: 'points',
-          title: 'Points',
-          type: 'array',
-          description: 'Short reasons to attend, shown as a plain list beside the introduction.',
-          of: [defineArrayMember({ type: 'string', validation: (Rule) => Rule.required() })],
-        }),
-      ],
-    }),
-    defineField({
-      name: 'relatedCoverage',
-      title: 'Related coverage',
-      type: 'array',
-      group: 'page',
-      description: 'Optional. Articles about the event, each linked by its headline. Hidden when empty.',
-      of: [defineArrayMember({ type: 'reference', to: [{ type: 'post' }], options: { disableNew: true } })],
-      validation: (Rule) => Rule.unique(),
-    }),
-
-    defineField({
       name: 'startDate',
       title: 'Start date',
       type: 'date',
-      group: 'schedule',
+      group: 'header',
+      fieldset: 'dates',
       validation: (Rule) => Rule.required(),
     }),
-    timeField('startTime', 'Start time', 'schedule'),
     defineField({
       name: 'endDate',
       title: 'End date',
       type: 'date',
-      group: 'schedule',
+      group: 'header',
+      fieldset: 'dates',
       validation: (Rule) =>
         Rule.custom((endDate, context) => {
           const startDate = (context.document as { startDate?: string } | undefined)?.startDate
@@ -170,29 +110,63 @@ export const conferenceEvent = defineType({
           return true
         }),
     }),
-    timeField('endTime', 'End time', 'schedule'),
-    defineField({
-      name: 'timezoneCode',
-      title: 'Timezone code',
-      type: 'string',
-      group: 'schedule',
-      description: 'Free text in the source, for example "EST".',
-    }),
     defineField({
       name: 'hideDateTime',
-      title: 'Hide the date and time on the page',
+      title: 'Hide date and time',
       type: 'boolean',
-      group: 'schedule',
+      description: 'Hides the date and time everywhere on the site, e.g. until they are confirmed.',
+      group: 'header',
+      fieldset: 'dates',
       initialValue: false,
     }),
-
+    // The 24-hour format hint sits on the Time fieldset instead of under each field.
+    { ...timeField('startTime', 'Start time', 'header'), fieldset: 'time', description: undefined },
+    { ...timeField('endTime', 'End time', 'header'), fieldset: 'time', description: undefined },
+    defineField({
+      name: 'timezoneCode',
+      title: 'Timezone',
+      type: 'string',
+      group: 'header',
+      fieldset: 'time',
+      // Free text in the WordPress source, for example "EST". Shown after the time.
+    }),
+    defineField({
+      name: 'venue',
+      title: 'Venue',
+      type: 'reference',
+      to: [{ type: 'company' }],
+      group: 'header',
+      fieldset: 'location',
+      description: 'Venues are Company records.',
+    }),
+    defineField({
+      name: 'country',
+      title: 'Country',
+      type: 'string',
+      group: 'header',
+      fieldset: 'location',
+      options: { list: EVENT_COUNTRIES },
+    }),
+    defineField({
+      name: 'body',
+      title: 'Introduction',
+      type: 'richText',
+      group: 'overview',
+    }),
+    defineField({
+      name: 'eventFormat',
+      title: 'Event format',
+      type: 'array',
+      group: 'overview',
+      of: [defineArrayMember({ type: 'string', validation: (Rule) => Rule.required() })],
+      description: 'Short points listed beside the introduction.',
+    }),
     defineField({
       name: 'speakerTypes',
       title: 'Speakers',
       type: 'array',
       group: 'speakers',
       of: [defineArrayMember({ type: 'personGroup' })],
-      description: 'Grouped by speaker type, as in the source.',
     }),
     defineField({
       name: 'chairs',
@@ -202,22 +176,45 @@ export const conferenceEvent = defineType({
       of: [defineArrayMember({ type: 'reference', to: [{ type: 'person' }] })],
       validation: (Rule) => Rule.unique(),
     }),
-
+    defineField({
+      name: 'whyAttend',
+      title: 'Why attend',
+      type: 'object',
+      group: 'whyAttend',
+      options: { collapsible: false },
+      validation: (Rule) =>
+        Rule.custom((value: { intro?: unknown[]; points?: unknown[] } | undefined) =>
+          value?.intro?.length && !value.points?.length ? 'The section is hidden until it has at least one point.' : true,
+        ).warning(),
+      fields: [
+        defineField({
+          name: 'intro',
+          title: 'Introduction',
+          type: 'array',
+          of: [paragraphsBlock],
+        }),
+        defineField({
+          name: 'points',
+          title: 'Points',
+          type: 'array',
+          of: [defineArrayMember({ type: 'string', validation: (Rule) => Rule.required() })],
+        }),
+      ],
+    }),
     defineField({
       name: 'agenda',
       title: 'Agenda',
       type: 'array',
       group: 'agenda',
       of: [defineArrayMember({ type: 'agenda' })],
-      description: 'The event programme. Use one track, or one per day or parallel room.',
     }),
     defineField({
       name: 'agendaText',
       title: 'Agenda (legacy text)',
       type: 'richText',
       group: 'agenda',
-      description:
-        'An old agenda kept as text because its lines could not be read as items. Shown on the page as text. Hidden once the agenda above has items: move the content up and clear this.',
+      // An old agenda kept as text because its lines could not be read as items.
+      description: 'Shown on the page while the agenda above is empty; move it there and clear this.',
       hidden: ({ document }) => {
         const structured = (document as { agenda?: unknown[] } | undefined)?.agenda
 
@@ -237,10 +234,17 @@ export const conferenceEvent = defineType({
         }),
     }),
     defineField({
+      name: 'sponsorTypes',
+      title: 'Sponsor tiers',
+      type: 'array',
+      group: 'sponsors',
+      of: [defineArrayMember({ type: 'companyGroup' })],
+    }),
+    defineField({
       name: 'techDemos',
       title: 'Technology demos',
       type: 'array',
-      group: 'agenda',
+      group: 'sponsors',
       // Legacy WordPress field, not in the new design: hidden in the Studio, data kept. Remove before launch if unused.
       hidden: true,
       of: [
@@ -276,14 +280,6 @@ export const conferenceEvent = defineType({
         }),
       ],
     }),
-
-    defineField({
-      name: 'sponsorTypes',
-      title: 'Sponsor tiers',
-      type: 'array',
-      group: 'sponsors',
-      of: [defineArrayMember({ type: 'companyGroup' })],
-    }),
     defineField({
       name: 'sponsorBenefits',
       title: 'Sponsor benefits',
@@ -300,7 +296,14 @@ export const conferenceEvent = defineType({
       // Legacy WordPress field, not in the new design: hidden in the Studio, data kept. Remove before launch if unused.
       hidden: true,
     }),
-
+    defineField({
+      name: 'relatedCoverage',
+      title: 'Related coverage',
+      type: 'array',
+      group: 'relatedCoverage',
+      of: [defineArrayMember({ type: 'reference', to: [{ type: 'post' }], options: { disableNew: true } })],
+      validation: (Rule) => Rule.unique(),
+    }),
     defineField({
       name: 'photographs',
       title: 'Photographs',
@@ -317,7 +320,6 @@ export const conferenceEvent = defineType({
       ],
       options: { layout: 'grid' },
     }),
-
     defineField({
       name: 'registerButtonLink',
       title: 'Register now button link',
@@ -335,7 +337,6 @@ export const conferenceEvent = defineType({
       // Legacy WordPress field, not in the new design: hidden in the Studio, data kept. Remove before launch if unused.
       hidden: true,
     }),
-
     defineField({
       name: 'faqs',
       title: 'Frequently asked questions',

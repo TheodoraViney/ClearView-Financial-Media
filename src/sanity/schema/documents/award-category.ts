@@ -17,14 +17,16 @@ import { defineField, defineType } from 'sanity'
  * every programme's page for it.
  */
 // Categories are shared: "Overall Private Bank" is awarded by both the Channel Islands and the MENA programmes.
+// Description sits under the title on the category page; the other three under Category details.
 const SHARED_COPY =
-  'Optional, hidden when empty. Shows on the page of every programme that awards this category, so write it for any programme; a programme that needs its own wording needs its own category.'
+  'Shows on the page of every programme that awards this category; a programme that needs its own wording needs its own category.'
 
 export const awardCategory = defineType({
   name: 'awardCategory',
   title: 'Award category',
   type: 'document',
   icon: TagIcon,
+  fieldsets: [{ name: 'copy', title: 'Category page', description: SHARED_COPY }],
   fields: [
     defineField({
       name: 'title',
@@ -37,21 +39,22 @@ export const awardCategory = defineType({
       title: 'Slug',
       type: 'slug',
       options: { source: 'title', maxLength: 96 },
+      description: 'Changing it changes the page address.',
       validation: (Rule) => Rule.required(),
     }),
     defineField({
       name: 'categoryGroup',
       title: 'Category group',
       type: 'string',
-      description:
-        'Heading the category most often appears under, for example "TECHNOLOGY CATEGORIES". Indicative only: the group is stored per winner, because it varies by programme.',
+      // The heading the category most often appears under, for example "TECHNOLOGY CATEGORIES".
+      description: "Shown only when the latest edition's winners have no group of their own.",
     }),
     defineField({
       name: 'description',
       title: 'Description',
       type: 'text',
       rows: 3,
-      description: `Under the title on the category page. ${SHARED_COPY}`,
+      fieldset: 'copy',
       validation: (Rule) => Rule.max(400).warning('Longer than 400 characters; one short paragraph reads best'),
     }),
     defineField({
@@ -59,7 +62,7 @@ export const awardCategory = defineType({
       title: 'Eligibility',
       type: 'text',
       rows: 3,
-      description: `Who can enter, under Category details. ${SHARED_COPY}`,
+      fieldset: 'copy',
       validation: (Rule) => Rule.max(400).warning('Longer than 400 characters; keep it to a sentence or two'),
     }),
     defineField({
@@ -67,7 +70,7 @@ export const awardCategory = defineType({
       title: 'What the category recognises',
       type: 'text',
       rows: 3,
-      description: `What the judges look for, under Category details. ${SHARED_COPY}`,
+      fieldset: 'copy',
       validation: (Rule) => Rule.max(400).warning('Longer than 400 characters; keep it to a sentence or two'),
     }),
     defineField({
@@ -75,7 +78,7 @@ export const awardCategory = defineType({
       title: 'Judging context',
       type: 'text',
       rows: 3,
-      description: `How the category is judged, under Category details. ${SHARED_COPY}`,
+      fieldset: 'copy',
       validation: (Rule) => Rule.max(400).warning('Longer than 400 characters; keep it to a sentence or two'),
     }),
   ],
