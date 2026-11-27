@@ -584,9 +584,15 @@ export const AWARDS_PROGRAMME_QUERY = defineQuery(`
       finalistRows[]{
         _key,
         categoryGroup,
-        "category": category->{ title, "slug": slug.current },
+        "category": category->{ _id, title, "slug": slug.current },
         companies
       },
+      // The categories the programme has awarded in any edition: an award category page exists only for these.
+      "programmeWonCategories": array::unique(*[
+        _type == "awardsProgramme"
+        && defined(^.programme._ref)
+        && programme._ref == ^.programme._ref
+      ].winners[].category._ref),
       finalists[]{ ${ARTICLE_BODY} },
       registrationSteps[]{ _key, text[]{ ${ARTICLE_BODY} } },
       sponsorTypes[]{
