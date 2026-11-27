@@ -7,6 +7,8 @@ import { isBrandKey, type BrandKey } from '@/brands'
 import { BlockRenderer } from '@/components/blocks/BlockRenderer'
 import { PageAd } from '@/components/blocks/PageAd'
 import { PageBlocks } from '@/components/blocks/PageBlocks'
+import { JsonLd } from '@/components/ui/JsonLd'
+import { jsonLdGraph } from '@/lib/json-ld'
 import { fetchAdUnits, fetchBrandTitle } from '@/sanity/brand-title'
 import {
   cachedNow,
@@ -15,6 +17,7 @@ import {
   getDynamicFetchOptions,
   type DynamicFetchOptions,
 } from '@/sanity/live'
+import { brandOrganization, brandWebSite } from '@/sanity/json-ld'
 import { HOME_PAGE_QUERY } from '@/sanity/queries'
 import { pageMetadata, SEO_FETCH } from '@/sanity/seo'
 
@@ -78,11 +81,15 @@ async function CachedHome({
   variant,
   stega,
 }: { brand: BrandKey } & DynamicFetchOptions) {
-  const [today, now, ads] = await Promise.all([
+  const [today, now, ads, organization, website] = await Promise.all([
     cachedUkToday(),
     cachedNow(),
     fetchAdUnits(brand, 'home', { perspective, variant, stega }),
+    brandOrganization(brand, { full: true }),
+    brandWebSite(brand),
   ])
+  // Google reads the publisher and the site from the home page; other pages refer to the same ids.
+  const jsonLd = <JsonLd data={jsonLdGraph([organization, website])} />
   const { data } = await cachedSanity({
     query: HOME_PAGE_QUERY,
     params: { brand, today },
@@ -97,6 +104,7 @@ async function CachedHome({
 
     return (
       <main className="px-6 py-16">
+        {jsonLd}
         <h1 className="text-3xl font-semibold">{title}</h1>
         <p>No home page published yet.</p>
       </main>
@@ -110,6 +118,7 @@ async function CachedHome({
 
   return (
     <main>
+      {jsonLd}
       <PageBlocks blocks={data.blocks} brand={brand} today={today} now={now} ads={ads} options={options} />
       <PageAd position="banner3" ads={ads} brand={brand} />
       <BlockRenderer blocks={data.blocksMiddle} brand={brand} today={today} now={now} ads={ads} options={options} />

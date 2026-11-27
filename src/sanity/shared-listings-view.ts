@@ -112,6 +112,9 @@ type RowLabels = { statuses: Record<ListingStatus, string>; region: (region: str
 /** A record's row, built once the labels are known. The ranking, filters and page count need no labels. */
 type RowOf = (labels: RowLabels) => ListingRowView
 
+/** A record's link and how to build its row. */
+type RecordItem = { href: string | null; row: RowOf }
+
 /** The event regions, stega-free: slugs are compared, so only the titles keep stega (regionTitles). */
 const cleanRegions = (data: SharedListingsData) =>
   data.regions.flatMap((region) => {
@@ -123,14 +126,15 @@ const cleanRegions = (data: SharedListingsData) =>
 const regionTitles = (data: SharedListingsData) =>
   new Map(data.regions.flatMap((region) => (region.slug ? [[stegaClean(region.slug), region.title ?? '']] : [])))
 
-/** The tab's records as the ranking and filters see them, each carrying how to build its row. */
-function toRecords(tab: SharedListingsTab, data: SharedListingsData, today: string): ListingRecord<RowOf>[] {
+/** The tab's records as the ranking and filters see them, each carrying its link and how to build its row. */
+function toRecords(tab: SharedListingsTab, data: SharedListingsData, today: string): ListingRecord<RecordItem>[] {
   const regionOf = regionResolver(cleanRegions(data))
 
   switch (tab) {
     case 'awards':
       return data.awards.map((edition) => {
         const startDate = stegaClean(edition.startDate)
+        const href = sharedRecordHref('awardsProgramme', edition.slug, 'clearview')
         const closingDate = stegaClean(edition.nominationsClosingDate)
         const region = regionOf(stegaClean(edition.country), stegaClean(edition.programmeRegion))
         const status = editionStatus(
@@ -156,21 +160,25 @@ function toRecords(tab: SharedListingsTab, data: SharedListingsData, today: stri
               : status === 'launchingSoon'
                 ? stegaClean(edition.nominationsOpeningDate)
                 : startDate,
-          item: (labels) => ({
-            key: edition._id,
-            title: edition.title ?? '',
-            href: sharedRecordHref('awardsProgramme', edition.slug, 'clearview'),
-            date: stegaClean(edition.hideDateTime) ? null : formatDateRange(startDate, stegaClean(edition.endDate)),
-            region: labels.region(region),
-            status: status ? { label: labels.statuses[status], highlight: status === 'submissionsOpen' } : null,
-            image: toImage(edition.logo),
-          }),
+          item: {
+            href,
+            row: (labels) => ({
+              key: edition._id,
+              title: edition.title ?? '',
+              href,
+              date: stegaClean(edition.hideDateTime) ? null : formatDateRange(startDate, stegaClean(edition.endDate)),
+              region: labels.region(region),
+              status: status ? { label: labels.statuses[status], highlight: status === 'submissionsOpen' } : null,
+              image: toImage(edition.logo),
+            }),
+          },
         }
       })
     case 'events':
       return data.events.map((event) => {
         const startDate = stegaClean(event.startDate)
         const endDate = stegaClean(event.endDate)
+        const href = sharedRecordHref('conferenceEvent', event.slug, 'clearview')
         const region = regionOf(stegaClean(event.country))
         // An event turns past the day after it ends (isUpcomingEvent with the UK `today`).
         const upcoming = isUpcomingEvent({ startDate, endDate }, today)
@@ -184,20 +192,24 @@ function toRecords(tab: SharedListingsTab, data: SharedListingsData, today: stri
           status,
           group: status,
           rankDate: startDate,
-          item: (labels) => ({
-            key: event._id,
-            title: event.title ?? '',
-            href: sharedRecordHref('conferenceEvent', event.slug, 'clearview'),
-            date: stegaClean(event.hideDateTime) ? null : formatDateRange(startDate, endDate),
-            region: labels.region(region),
-            status: { label: labels.statuses[status], highlight: upcoming },
-            image: toImage(event.logo),
-          }),
+          item: {
+            href,
+            row: (labels) => ({
+              key: event._id,
+              title: event.title ?? '',
+              href,
+              date: stegaClean(event.hideDateTime) ? null : formatDateRange(startDate, endDate),
+              region: labels.region(region),
+              status: { label: labels.statuses[status], highlight: upcoming },
+              image: toImage(event.logo),
+            }),
+          },
         }
       })
     case 'research':
       return data.research.map((report) => {
         const publishedAt = stegaClean(report.publishedAt)
+        const href = sharedRecordHref('resource', report.slug, 'clearview')
 
         return {
           id: report._id,
@@ -207,15 +219,18 @@ function toRecords(tab: SharedListingsTab, data: SharedListingsData, today: stri
           status: 'published',
           group: 'past',
           rankDate: publishedAt,
-          item: (labels) => ({
-            key: report._id,
-            title: report.title ?? '',
-            href: sharedRecordHref('resource', report.slug, 'clearview'),
-            date: formatLongDate(publishedAt),
-            region: null,
-            status: { label: labels.statuses.published, highlight: false },
-            image: toImage(report.cover),
-          }),
+          item: {
+            href,
+            row: (labels) => ({
+              key: report._id,
+              title: report.title ?? '',
+              href,
+              date: formatLongDate(publishedAt),
+              region: null,
+              status: { label: labels.statuses.published, highlight: false },
+              image: toImage(report.cover),
+            }),
+          },
         }
       })
   }
@@ -273,6 +288,14 @@ export function sharedListingsState(context: Omit<RecordListingContext, 'path'>)
   return state.page <= listingPageCount(records.length) ? state : null
 }
 
+/** The links of the records the open page lists, in order: the listing's structured data. */
+export function sharedListingsPageHrefs(context: Omit<RecordListingContext, 'path'>): string[] {
+  const { records, state } = listingState(context)
+  const start = (state.page - 1) * LISTING_PAGE_SIZE
+
+  return records.slice(start, start + LISTING_PAGE_SIZE).flatMap((record) => record.item.href ?? [])
+}
+
 /**
  * The record listing block as plain props, or null for a page past the end (a 404). Twelve records a page; the
  * pagination links keep the filters, and a filter change (the GET form) drops the page number.
@@ -291,7 +314,7 @@ export function toRecordListingView(block: RecordListingBlock, context: RecordLi
   const regions = regionTitles(data)
   const labels: RowLabels = { statuses, region: (region) => (region ? (regions.get(region) ?? null) : null) }
   const start = (state.page - 1) * LISTING_PAGE_SIZE
-  const rows = records.slice(start, start + LISTING_PAGE_SIZE).map((record) => record.item(labels))
+  const rows = records.slice(start, start + LISTING_PAGE_SIZE).map((record) => record.item.row(labels))
   const href = (page: number) => listingHref(path, { ...state, page })
 
   return {

@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 import { draftMode } from 'next/headers'
+import { stegaClean, type StegaBranded } from 'next-sanity'
 import { notFound } from 'next/navigation'
 import { Suspense } from 'react'
 
@@ -7,10 +8,14 @@ import { AWARDS_PROGRAMME_PAGE_ID, EVENT_PAGE_ID } from '@/brands'
 import { AwardsProgrammePage } from '@/components/sections/awards/AwardsProgrammePage'
 import { EventPage } from '@/components/sections/events/EventPage'
 import { CurrentNavSection } from '@/components/sections/header/nav-section.client'
+import { JsonLd } from '@/components/ui/JsonLd'
+import { jsonLdGraph } from '@/lib/json-ld'
 import { sharedRecordHref } from '@/lib/links'
-import { editionDescription, toAwardsProgrammeView } from '@/sanity/awards-programme-view'
+import { editionDescription, plainText as blocksText, toAwardsProgrammeView } from '@/sanity/awards-programme-view'
 import { fetchAdUnits } from '@/sanity/brand-title'
 import { eventDescription, toEventPageView, type ConferenceEventData } from '@/sanity/event-page-view'
+import type { SanityImage } from '@/sanity/image'
+import { breadcrumbList, event as eventNode, faqPage } from '@/sanity/json-ld'
 import { cachedSanity, cachedUkToday, getDynamicFetchOptions, type DynamicFetchOptions } from '@/sanity/live'
 import {
   AWARDS_PROGRAMME_PAGE_QUERY,
@@ -19,8 +24,9 @@ import {
   OPEN_AWARDS_QUERY,
   RELATED_EVENTS_QUERY,
 } from '@/sanity/queries'
-import { pageMetadata } from '@/sanity/seo'
+import { canonicalUrl, pageMetadata, recordShareImage } from '@/sanity/seo'
 import { PLACEHOLDER_SLUG } from '@/sanity/static-params'
+import type { AWARDS_PROGRAMME_QUERY_RESULT } from '@/sanity/types'
 
 // An awards edition or a conference event at /events/{slug} (sharedRecordHref), the WordPress path without its
 // trailing slash. Served on ClearView only, like the other shared records; every other host answers 404. An unknown
@@ -130,13 +136,90 @@ async function CachedEvent({ slug, perspective, variant, stega }: { slug: string
   }
 
   const embedConsent = { text: copy.videoConsentText ?? '', button: copy.videoConsentButton ?? '' }
+  const view = toAwardsProgrammeView({ edition: data, open, copy, ads, today, embedConsent })
 
   return (
     <>
+      <JsonLd data={await editionJsonLd(data, view.breadcrumb)} />
       <CurrentNavSection section="awards" />
-      <AwardsProgrammePage view={toAwardsProgrammeView({ edition: data, open, copy, ads, today, embedConsent })} />
+      <AwardsProgrammePage view={view} />
     </>
   )
+}
+
+type EditionData = Extract<NonNullable<StegaBranded<AWARDS_PROGRAMME_QUERY_RESULT>>, { _type: 'awardsProgramme' }>
+type Crumbs = { label?: string | null; href?: string | null }[]
+
+/** The page's own address: the editor's canonical override, else /events/{slug} on ClearView. */
+const recordUrl = (data: { slug: string | null; seo: Parameters<typeof canonicalUrl>[0]['seo'] }, type: 'awardsProgramme' | 'conferenceEvent') =>
+  canonicalUrl({ brand: 'clearview', path: sharedRecordHref(type, data.slug, 'clearview'), seo: data.seo })
+
+/** An awards edition as structured data: the ceremony as an Event (judges as contributors), its FAQ, the trail. */
+async function editionJsonLd(edition: EditionData, breadcrumb: Crumbs) {
+  const url = recordUrl(edition, 'awardsProgramme')
+
+  if (!url) {
+    return null
+  }
+
+  return jsonLdGraph([
+    await eventNode({
+      url,
+      name: edition.title,
+      seoDescription: edition.seo?.description,
+      description: editionDescription(edition),
+      image: recordShareImage(edition.seo, [edition.logo, edition.highlightVideoThumbnail]),
+      startDate: edition.startDate,
+      endDate: edition.endDate,
+      hideDateTime: edition.hideDateTime,
+      online: false,
+      venue: { name: edition.venue, address: edition.venueAddress },
+      country: edition.country,
+      judges: (edition.judgesPanels ?? []).flatMap((panel) =>
+        (panel.people ?? []).map((person) => person && { name: person.title, jobTitle: person.jobTitle, company: person.company, photo: person.photo }),
+      ),
+    }),
+    faqPage(
+      url,
+      (edition.faq ?? []).map((item) => ({ question: item.question, answer: blocksText(item.answer) })),
+    ),
+    breadcrumbList('clearview', breadcrumb, url),
+  ])
+}
+
+/** A conference event as structured data: the Event (speakers and chairs as performers) and the trail. */
+async function conferenceEventJsonLd(event: ConferenceEventData, breadcrumb: Crumbs) {
+  const url = recordUrl(event, 'conferenceEvent')
+
+  if (!url) {
+    return null
+  }
+
+  const speaker = (person: { title: string | null; jobTitle: string | null; company: string | null; photo: SanityImage | null } | null) =>
+    person && { name: person.title, jobTitle: person.jobTitle, company: person.company, photo: person.photo }
+
+  return jsonLdGraph([
+    await eventNode({
+      url,
+      name: event.title,
+      seoDescription: event.seo?.description,
+      description: eventDescription(event),
+      image: recordShareImage(event.seo, [event.logo]),
+      startDate: event.startDate,
+      endDate: event.endDate,
+      startTime: event.startTime,
+      endTime: event.endTime,
+      hideDateTime: event.hideDateTime,
+      online: stegaClean(event.eventType) === 'webinar',
+      venue: event.venue ? { name: event.venue.title, address: event.venue.address } : null,
+      country: event.country,
+      speakers: [
+        ...(event.chairs ?? []).map(speaker),
+        ...(event.speakerTypes ?? []).flatMap((group) => (group.people ?? []).map(speaker)),
+      ],
+    }),
+    breadcrumbList('clearview', breadcrumb, url),
+  ])
 }
 
 async function ConferenceEvent({ event, options }: { event: ConferenceEventData; options: DynamicFetchOptions }) {
@@ -152,10 +235,13 @@ async function ConferenceEvent({ event, options }: { event: ConferenceEventData;
     notFound()
   }
 
+  const view = toEventPageView({ event, others, copy, ads, today })
+
   return (
     <>
+      <JsonLd data={await conferenceEventJsonLd(event, view.breadcrumb)} />
       <CurrentNavSection section="events" />
-      <EventPage view={toEventPageView({ event, others, copy, ads, today })} />
+      <EventPage view={view} />
     </>
   )
 }

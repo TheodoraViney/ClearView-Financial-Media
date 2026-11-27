@@ -6,15 +6,19 @@ import { Suspense } from 'react'
 
 import { RESEARCH_REPORT_PAGE_ID } from '@/brands'
 import { ExecutiveSummaryPage } from '@/components/sections/research/ExecutiveSummaryPage'
+import { JsonLd } from '@/components/ui/JsonLd'
+import { jsonLdGraph } from '@/lib/json-ld'
+import { breadcrumbList } from '@/sanity/json-ld'
 import { cachedSanity, getDynamicFetchOptions, type DynamicFetchOptions } from '@/sanity/live'
 import { RESEARCH_REPORT_PAGE_QUERY, RESEARCH_REPORT_QUERY } from '@/sanity/queries'
 import {
   executiveSummaryDescription,
   executiveSummaryPagePath,
+  reportPath,
   toExecutiveSummaryView,
   type ResearchReportData,
 } from '@/sanity/research-report-view'
-import { pageMetadata } from '@/sanity/seo'
+import { canonicalUrl, pageMetadata } from '@/sanity/seo'
 import { PLACEHOLDER_SLUG } from '@/sanity/static-params'
 
 // A research report's Executive Summary page at /resource/{report slug}/{summary slug}, from the report's own
@@ -129,5 +133,15 @@ async function CachedSummary({
     notFound()
   }
 
-  return <ExecutiveSummaryPage view={toExecutiveSummaryView({ report, copy })} />
+  const view = toExecutiveSummaryView({ report, copy })
+  const url = canonicalUrl({ brand: 'clearview', path: pagePath(report, summary), seo: report.summarySeo })
+  // The visible trail reads Home / Research / Executive summary; the structured one puts the report before the summary.
+  const breadcrumb = [...view.breadcrumb.slice(0, -1), { label: report.title, href: reportPath(report) }, ...view.breadcrumb.slice(-1)]
+
+  return (
+    <>
+      {url && <JsonLd data={jsonLdGraph([breadcrumbList('clearview', breadcrumb, url)])} />}
+      <ExecutiveSummaryPage view={view} />
+    </>
+  )
 }

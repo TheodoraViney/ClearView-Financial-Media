@@ -449,6 +449,11 @@ function summaryOf(block: BlockOf<'companyDirectory'>, context: CompanyEngagemen
   return parts.reduce((line, [token, value]) => fillTemplate(line, token, value), text(block.summaryText))
 }
 
+/** The profile links of the companies the directory's open page lists, in order: the page's structured data. */
+export function companyDirectoryHrefs(context: CompanyEngagementContext): string[] {
+  return pageOf(context.matches, context.state.pages.directory).map((entry) => entry.item.company.href)
+}
+
 /** The company directory block: the summary line and the companies matching the search and filters, A to Z. */
 export function toCompanyDirectoryView(
   block: BlockOf<'companyDirectory'>,

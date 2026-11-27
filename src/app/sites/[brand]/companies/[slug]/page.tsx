@@ -5,7 +5,10 @@ import { Suspense } from 'react'
 
 import { PARTNER_PROFILE_PAGE_ID } from '@/brands'
 import { PartnerProfilePage } from '@/components/sections/partner-profile/PartnerProfilePage'
+import { JsonLd } from '@/components/ui/JsonLd'
+import { jsonLdGraph } from '@/lib/json-ld'
 import { fetchAdUnits } from '@/sanity/brand-title'
+import { breadcrumbList } from '@/sanity/json-ld'
 import { cachedSanity, getDynamicFetchOptions, type DynamicFetchOptions } from '@/sanity/live'
 import {
   partnerProfileDescription,
@@ -13,7 +16,7 @@ import {
   toPartnerProfileView,
 } from '@/sanity/partner-profile-view'
 import { PARTNER_PROFILE_PAGE_QUERY, PARTNER_PROFILE_QUERY } from '@/sanity/queries'
-import { pageMetadata } from '@/sanity/seo'
+import { canonicalUrl, pageMetadata } from '@/sanity/seo'
 import { PLACEHOLDER_SLUG } from '@/sanity/static-params'
 
 // A partner profile at /companies/{slug} (sharedRecordHref), for a company that an awards edition, an event or a post
@@ -109,5 +112,13 @@ async function CachedProfile({ slug, perspective, variant, stega }: { slug: stri
     notFound()
   }
 
-  return <PartnerProfilePage view={toPartnerProfileView({ company, copy, ads })} />
+  const view = toPartnerProfileView({ company, copy, ads })
+  const url = canonicalUrl({ brand: 'clearview', path: partnerProfilePath(company), seo: company.seo })
+
+  return (
+    <>
+      {url && <JsonLd data={jsonLdGraph([breadcrumbList('clearview', view.breadcrumb, url)])} />}
+      <PartnerProfilePage view={view} />
+    </>
+  )
 }

@@ -104,7 +104,42 @@ export async function fetchBrandSeo(brand: BrandKey) {
     image: shareable(settings?.seoImage),
     favicon: settings?.favicon ?? null,
     xHandle: xHandle(settings?.xHandle),
+    /** The logo as uploaded (SVG as a rule), with its pixel size: Organization structured data. */
+    logo: settings?.logo?.asset?.url
+      ? {
+          url: settings.logo.asset.url,
+          width: settings.logo.asset.metadata?.dimensions?.width ?? null,
+          height: settings.logo.asset.metadata?.dimensions?.height ?? null,
+        }
+      : null,
+    /**
+     * The brand's profiles on other sites (Organization sameAs): the SEO tab's list, else the footer's icons. A bare
+     * network address (https://x.com/) is a placeholder, not a profile, and is left out.
+     */
+    profiles: [
+      ...new Set(
+        (settings?.socialProfiles?.length ? settings.socialProfiles : (data.footer?.social ?? []).map((item) => item.url))
+          .map(httpsUrl)
+          .filter((url): url is string => Boolean(url) && /^https:\/\/[^/]+\/[^?#\s]+/i.test(url ?? '')),
+      ),
+    ],
   }
+}
+
+/** The canonical URL: the editor's override when it is an https URL, else `path` on the brand's origin. Null without either. */
+export function canonicalUrl({ brand, path, seo }: { brand: BrandKey; path: string | null; seo?: SeoFields }): string | null {
+  return httpsUrl(seo?.canonical) ?? (path ? `${brandOrigin(brand)}${path}` : null)
+}
+
+/**
+ * The record's share image without the brand default: `seo.image`, else the first of the record's own images that
+ * can be shared (no SVG, at least SHARE_MIN_WIDTH wide). Null when none qualifies.
+ */
+export function recordShareImage(
+  seo: SeoFields,
+  images: (SanityImage | null | undefined)[] | undefined,
+): SanityImage | null {
+  return shareable(seo?.image) ?? (images ?? []).map((image) => shareable(image, SHARE_MIN_WIDTH)).find(Boolean) ?? null
 }
 
 export type PageMetadataInput = {
@@ -163,13 +198,9 @@ export async function pageMetadata(input: PageMetadataInput): Promise<Metadata> 
   const description =
     plainText(seo?.description) || clipDescription(input.description) || defaults.description || undefined
 
-  const canonical =
-    httpsUrl(seo?.canonical) ?? (input.path ? `${brandOrigin(input.canonicalBrand ?? brand)}${input.path}` : undefined)
+  const canonical = canonicalUrl({ brand: input.canonicalBrand ?? brand, path: input.path, seo }) ?? undefined
 
-  const source =
-    shareable(seo?.image) ??
-    (input.images ?? []).map((image) => shareable(image, SHARE_MIN_WIDTH)).find(Boolean) ??
-    defaults.image
+  const source = recordShareImage(seo, input.images) ?? defaults.image
   const shareImage = toShareImage(source)
   const image = shareImage ? { ...shareImage, alt: shareImage.alt || shareTitle } : null
 

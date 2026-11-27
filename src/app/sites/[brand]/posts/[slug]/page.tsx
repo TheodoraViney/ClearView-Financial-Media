@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 import { draftMode } from 'next/headers'
+import { stegaClean } from 'next-sanity'
 import { notFound } from 'next/navigation'
 import { Suspense } from 'react'
 
@@ -13,8 +14,11 @@ import {
 import { ArticleBody } from '@/components/sections/article/ArticleBody'
 import { ArticlePage } from '@/components/sections/article/ArticlePage'
 import { ArticleViewEvent } from '@/components/ui/AnalyticsEvents.client'
+import { JsonLd } from '@/components/ui/JsonLd'
+import { jsonLdGraph } from '@/lib/json-ld'
 import { fromPost, toEmbedConsentCopy } from '@/sanity/article-view'
 import { fetchAdUnits } from '@/sanity/brand-title'
+import { breadcrumbList, newsArticle } from '@/sanity/json-ld'
 import {
   cachedSanity,
   getDynamicFetchOptions,
@@ -22,7 +26,7 @@ import {
 } from '@/sanity/live'
 import { mostReadAutoFill } from '@/sanity/most-read'
 import { ARTICLE_PAGE_QUERY, MOST_READ_QUERY, POST_QUERY, POST_SLUGS_QUERY } from '@/sanity/queries'
-import { pageMetadata, SEO_FETCH } from '@/sanity/seo'
+import { canonicalUrl, pageMetadata, recordShareImage, SEO_FETCH } from '@/sanity/seo'
 import { PLACEHOLDER_SLUG, withPlaceholder } from '@/sanity/static-params'
 
 // A slug of another brand, or of no post, ends in notFound() inside the page. Instant-navigation validation (dev
@@ -68,12 +72,10 @@ export async function generateMetadata({ params }: { params: Promise<{ brand: st
     return {}
   }
 
-  const first = post.brands?.[0]
-
   return pageMetadata({
     brand,
-    canonicalBrand: first && isEditorialBrandKey(first) ? first : brand,
-    path: `/posts/${encodeURIComponent(post.slug)}`,
+    canonicalBrand: canonicalBrand(post.brands, brand),
+    path: postPath(post.slug),
     seo: post.seo,
     title: post.title,
     description: post.excerpt,
@@ -86,6 +88,15 @@ export async function generateMetadata({ params }: { params: Promise<{ brand: st
     },
   })
 }
+
+/** A post's canonical brand: its first brand, else the host's. */
+function canonicalBrand(brands: string[] | null | undefined, brand: EditorialBrandKey): EditorialBrandKey {
+  const first = stegaClean(brands?.[0])
+
+  return first && isEditorialBrandKey(first) ? first : brand
+}
+
+const postPath = (slug: string) => `/posts/${encodeURIComponent(stegaClean(slug))}`
 
 export default async function PostPage({
   params,
@@ -189,9 +200,36 @@ async function CachedPost({
     ),
   })
 
+  // The article as structured data: NewsArticle published by its canonical brand, and the visible trail (Home, the
+  // category) ending at the article on this host.
+  const publisher = canonicalBrand(post.brands, brand)
+  const url = post.slug ? canonicalUrl({ brand: publisher, path: postPath(post.slug), seo: post.seo }) : null
+  const jsonLd = url
+    ? jsonLdGraph([
+        await newsArticle({
+          url,
+          publisher,
+          title: post.title,
+          seoDescription: post.seo?.description,
+          excerpt: post.excerpt,
+          image: recordShareImage(post.seo, [post.image]),
+          publishedAt: post.publishedAt,
+          updatedAt: post._updatedAt,
+          section: post.category?.title,
+          author: post.author ? { name: post.author.name, jobTitle: post.author.jobTitle, photo: post.author.photo } : null,
+        }),
+        breadcrumbList(
+          brand,
+          [{ label: article.copy.breadcrumbHomeLabel, href: '/' }, ...(article.category ? [article.category] : []), { label: post.title }],
+          article.shareUrl,
+        ),
+      ])
+    : null
+
   // `article_view` on the live site only: a preview is not a read.
   return (
     <>
+      <JsonLd data={jsonLd} />
       <ArticlePage article={article} />
       {live && <ArticleViewEvent source="cms" id={post._id} />}
     </>

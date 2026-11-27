@@ -5,9 +5,12 @@ import { Suspense } from 'react'
 
 import { isBrandKey, type BrandKey } from '@/brands'
 import { PageBlocks } from '@/components/blocks/PageBlocks'
+import { JsonLd } from '@/components/ui/JsonLd'
 import { COMPANY_ENGAGEMENT_PAGE_SLUG } from '@/lib/company-engagement'
+import { jsonLdGraph } from '@/lib/json-ld'
 import { SHARED_LISTINGS_PAGE_SLUG } from '@/lib/shared-listings'
 import { fetchAdUnits } from '@/sanity/brand-title'
+import { blocksBreadcrumb, breadcrumbList } from '@/sanity/json-ld'
 import {
   cachedNow,
   cachedSanity,
@@ -16,7 +19,7 @@ import {
   type DynamicFetchOptions,
 } from '@/sanity/live'
 import { PAGE_QUERY, PAGE_SLUGS_QUERY } from '@/sanity/queries'
-import { pageMetadata, SEO_FETCH } from '@/sanity/seo'
+import { canonicalUrl, pageMetadata, SEO_FETCH } from '@/sanity/seo'
 import { PLACEHOLDER_SLUG, withPlaceholder } from '@/sanity/static-params'
 
 export async function generateStaticParams({
@@ -149,8 +152,13 @@ async function CachedPage({
   const ownsHeading =
     first === 'imageHero' || first === 'overlayHero' || first === 'contactForm' || first === 'legalText'
 
+  // The trail of the page's heading block, ending at the page's canonical address.
+  const trail = blocksBreadcrumb(data.blocks)
+  const url = canonicalUrl({ brand, path: `/${encodeURIComponent(slug)}`, seo: data.seo })
+
   return (
     <main>
+      {trail && url && <JsonLd data={jsonLdGraph([breadcrumbList(brand, trail, url)])} />}
       <PageBlocks
         blocks={data.blocks}
         brand={brand}
