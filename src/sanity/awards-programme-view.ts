@@ -172,6 +172,7 @@ function toWinnerGroups(edition: EditionData): WinnersGroupView[] {
  */
 function toFinalistGroups(edition: EditionData): FinalistsGroupView[] {
   const programmeSlug = edition.programme?.slug
+  const won = new Set((edition.programmeWonCategories ?? []).map((id) => stegaClean(id)))
   const groups = new Map<string, FinalistsGroupView>()
 
   for (const row of edition.finalistRows ?? []) {
@@ -197,7 +198,11 @@ function toFinalistGroups(edition: EditionData): FinalistsGroupView[] {
     group.lists.push({
       key: row._key,
       category,
-      categoryHref: category && programmeSlug ? awardCategoryHref(programmeSlug, row.category?.slug, 'clearview') : null,
+      // The category page lists the programme's winners, so it 404s for a category the programme never awarded.
+      categoryHref:
+        category && programmeSlug && row.category && won.has(stegaClean(row.category._id))
+          ? awardCategoryHref(programmeSlug, row.category.slug, 'clearview')
+          : null,
       companies,
     })
     groups.set(key, group)
