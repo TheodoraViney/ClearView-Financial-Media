@@ -78,6 +78,24 @@ export type WinnersGroupView = {
   winners: ProgrammeWinnerView[]
 }
 
+/** One shortlist: an award category (older editions) or none, and its finalist companies in the order typed. */
+export type FinalistsListView = {
+  key: string
+  category: string | null
+  /** The award category page, when the row links a category and the edition belongs to a programme. */
+  categoryHref: string | null
+  companies: { key: string; name: string }[]
+}
+
+export type FinalistsGroupView = {
+  key: string
+  /** Anchor id of the group, which its heading labels. */
+  id: string
+  /** The category group as shown (categoryGroupLabel); null for rows without one. */
+  label: string | null
+  lists: FinalistsListView[]
+}
+
 export type AwardsProgrammeView = {
   title: string
   breadcrumb: BreadcrumbItem[]
@@ -117,7 +135,19 @@ export type AwardsProgrammeView = {
   } | null
   sponsors: { heading: HeadingView; tiers: SponsorTierView[] } | null
   judges: { heading: HeadingView; intro: RichTextValue | null; panels: JudgesPanelView[] } | null
-  finalists: { heading: HeadingView; body: RichTextValue } | null
+  /**
+   * The intro (text, image or video above the lists) and the finalists by category group, with "All" for the group
+   * buttons; `legacy` is the old rich text, shown only for an edition whose finalists were not split into rows.
+   */
+  finalists: {
+    heading: HeadingView
+    intro: RichTextValue | null
+    /** Shown instead of a video in the intro until the reader allows functional cookies. */
+    consent: EmbedConsentCopy
+    allLabel: string
+    groups: FinalistsGroupView[]
+    legacy: RichTextValue | null
+  } | null
   winners: {
     heading: HeadingView
     previousYear: LinkView | null

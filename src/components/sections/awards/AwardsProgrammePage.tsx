@@ -18,6 +18,7 @@ import { SpeakerCard } from '@/components/ui/SpeakerCard'
 import { trackAttributes } from '@/lib/analytics'
 import type {
   AwardsProgrammeView,
+  FinalistsGroupView,
   HeadingView,
   JudgesPanelView,
   SponsorTierView,
@@ -32,6 +33,7 @@ import { OtherProgrammes } from './OtherProgrammes'
 // Screen-reader-only texts. Visible copy comes from the CMS.
 const NAV_LABEL = 'Programme sections'
 const GROUP_FILTER_LABEL = 'Category groups'
+const FINALISTS_FILTER_LABEL = 'Finalist category groups'
 const STATUS_PREFIX = 'Status: '
 const CLOSE_VIDEO_LABEL = 'Close video'
 const CLOSE_BIO_LABEL = 'Close biography'
@@ -202,7 +204,27 @@ export function AwardsProgrammePage({ view }: { view: AwardsProgrammeView }) {
               {(heading) => (
                 <>
                   {heading}
-                  <RichText value={finalists.body} spacing="tight" className={cx(COPY, 'wrap-break-word')} />
+                  {finalists.intro && (
+                    <RichText
+                      value={finalists.intro}
+                      spacing="tight"
+                      embedCopy={finalists.consent}
+                      className={cx(COPY, 'wrap-break-word')}
+                    />
+                  )}
+                  {finalists.legacy ? (
+                    <RichText value={finalists.legacy} spacing="tight" className={cx(COPY, 'wrap-break-word')} />
+                  ) : (
+                    <GroupFilter
+                      label={FINALISTS_FILTER_LABEL}
+                      allLabel={finalists.allLabel}
+                      groups={finalists.groups.map((group) => ({
+                        key: group.key,
+                        label: group.label,
+                        content: <FinalistsGroup group={group} />,
+                      }))}
+                    />
+                  )}
                 </>
               )}
             </Section>
@@ -570,6 +592,66 @@ function WinnersGroup({ group }: { group: WinnersGroupView }) {
           {rows.map((winner) => (
             <li key={winner.key} className={cx(COPY, 'wrap-break-word')}>
               <WinnerLine winner={winner} />
+            </li>
+          ))}
+        </ul>
+      )}
+    </section>
+  )
+}
+
+// Finalist names, one a line, flowing down two columns once the column is 504 wide and three from 844.
+const NAME_COLUMNS = 'gap-x-8 @cards-2:columns-2 @cards-3:columns-3'
+
+/**
+ * One finalists category group: its heading, then its shortlists. A shortlist with an award category (older editions)
+ * is a card of the category and its names, in the card grid; the names of shortlists without one flow in columns.
+ */
+function FinalistsGroup({ group }: { group: FinalistsGroupView }) {
+  const headingId = `${group.id}-heading`
+  const categorised = group.lists.filter((list) => list.category)
+  const names = group.lists.filter((list) => !list.category).flatMap((list) => list.companies)
+
+  return (
+    <section id={group.id} aria-labelledby={group.label ? headingId : undefined} className="flex min-w-0 flex-col gap-4">
+      {group.label && (
+        <h3 id={headingId} className={cx(GROUP_HEADING, 'wrap-anywhere')}>
+          {group.label}
+        </h3>
+      )}
+      {names.length > 0 && (
+        <ul className={NAME_COLUMNS}>
+          {names.map((company) => (
+            <li key={company.key} className={cx(COPY, 'break-inside-avoid wrap-break-word')}>
+              {company.name}
+            </li>
+          ))}
+        </ul>
+      )}
+      {categorised.length > 0 && (
+        <ul className={cx(CARDS, 'gap-x-8 gap-y-6')}>
+          {categorised.map((list) => (
+            <li key={list.key} className="flex min-w-0 flex-col gap-2">
+              <h4 className="text-base leading-title font-medium wrap-break-word text-foreground">
+                {list.categoryHref ? (
+                  <Link
+                    href={list.categoryHref}
+                    prefetch={false}
+                    className="transition-colors duration-180 ease-out hover:text-accent"
+                  >
+                    {list.category}
+                  </Link>
+                ) : (
+                  list.category
+                )}
+              </h4>
+              <ul>
+                {list.companies.map((company) => (
+                  <li key={company.key} className={cx(COPY, 'wrap-break-word')}>
+                    {company.name}
+                  </li>
+                ))}
+              </ul>
             </li>
           ))}
         </ul>

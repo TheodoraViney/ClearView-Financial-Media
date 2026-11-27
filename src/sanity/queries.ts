@@ -580,6 +580,13 @@ export const AWARDS_PROGRAMME_QUERY = defineQuery(`
         "banner": banner{ ${IMAGE} },
         "company": company->{ title, "logo": logo{ ${IMAGE} } }
       },
+      finalistsIntro[]{ ${ARTICLE_BODY} },
+      finalistRows[]{
+        _key,
+        categoryGroup,
+        "category": category->{ title, "slug": slug.current },
+        companies
+      },
       finalists[]{ ${ARTICLE_BODY} },
       registrationSteps[]{ _key, text[]{ ${ARTICLE_BODY} } },
       sponsorTypes[]{

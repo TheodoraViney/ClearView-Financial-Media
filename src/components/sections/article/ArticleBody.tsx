@@ -172,10 +172,15 @@ type Embed = { provider?: string; id?: string; hash?: string; caption?: string }
 
 /** The body components, with the Vimeo and Issuu players held until the reader allows functional cookies. */
 function bodyComponents(embedCopy: EmbedConsentCopy): PortableTextComponents {
+  return withEmbeds(components, embedCopy)
+}
+
+/** Adds the embedded players (Vimeo, Issuu) to a component set, held until the reader allows functional cookies. */
+function withEmbeds(base: PortableTextComponents, embedCopy: EmbedConsentCopy): PortableTextComponents {
   return {
-    ...components,
+    ...base,
     types: {
-      ...components.types,
+      ...base.types,
       embed: ({ value }: { value: Embed }) => {
         const src = embedSrc(value.provider, value.id, value.hash)
 
@@ -416,6 +421,7 @@ export function RichText({
   spacing = 'default',
   variant = 'default',
   anchors,
+  embedCopy,
   className,
 }: {
   value: PortableTextProps['value']
@@ -426,6 +432,8 @@ export function RichText({
   variant?: 'default' | 'legal'
   /** `legal` only: H2 and H3 anchor ids by block key. */
   anchors?: Record<string, string>
+  /** Renders embedded players, with this text shown until the reader allows them; without it embeds are skipped. */
+  embedCopy?: EmbedConsentCopy
   className?: string
 }) {
   if (variant === 'legal') {
@@ -438,7 +446,10 @@ export function RichText({
 
   return (
     <div className={cx('article-flow min-w-0', spacing === 'tight' && 'article-flow-tight', className)}>
-      <PortableText value={value} components={SIZE_COMPONENTS[size]} />
+      <PortableText
+        value={value}
+        components={embedCopy ? withEmbeds(SIZE_COMPONENTS[size], embedCopy) : SIZE_COMPONENTS[size]}
+      />
     </div>
   )
 }
