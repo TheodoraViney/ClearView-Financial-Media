@@ -12,20 +12,17 @@ export const finalistRow = defineType({
   title: 'Finalists',
   type: 'object',
   icon: UsersIcon,
-  fieldsets: [{ name: 'award', title: 'Award', options: { columns: 2 } }],
   fields: [
     defineField({
       name: 'categoryGroup',
       title: 'Category group',
       type: 'string',
-      fieldset: 'award',
     }),
     defineField({
       name: 'category',
       title: 'Category',
       type: 'reference',
       to: [{ type: 'awardCategory' }],
-      fieldset: 'award',
     }),
     defineField({
       name: 'companies',
